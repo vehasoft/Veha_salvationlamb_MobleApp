@@ -33,7 +33,7 @@ class HomeFragment : Fragment() {
     }
     fun richTextEditer (view: View){
         var mEditor = view.findViewById<RichEditor>(R.id.editor)
-        mEditor.setEditorHeight(200);
+        mEditor.setEditorHeight(100);
         mEditor.setEditorFontSize(22);
         mEditor.setPadding(10, 10, 10, 10);
         view.findViewById<ImageButton>(R.id.action_undo).setOnClickListener { mEditor.undo() }
