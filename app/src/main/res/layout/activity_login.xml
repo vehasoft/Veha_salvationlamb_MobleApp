@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/login_bg"
+        tools:context=".LoginActivity">
+    <!-- Header -->
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/Product_name"
+              android:textColor="@color/white"
+              android:textStyle="bold"
+              android:padding="15dp"
+              android:textSize="20dp"
+              app:layout_constraintLeft_toLeftOf="parent"
+              app:layout_constraintTop_toTopOf="parent"
+    />
+    <!--<TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="About"
+              android:textColor="@color/white"
+              android:textStyle="bold"
+              android:padding="15dp"
+              android:textSize="20dp"
+              app:layout_constraintRight_toRightOf="parent"
+              app:layout_constraintTop_toTopOf="parent"
+    />-->
+    <!-- Body -->
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  app:layout_constraintTop_toTopOf="parent"
+                  app:layout_constraintRight_toRightOf="parent"
+                  app:layout_constraintLeft_toLeftOf="parent"
+                  android:layout_marginTop="56dp"
+                  android:orientation="vertical"
+                  android:background="@drawable/rounded_border_login_register"
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginRight="10dp"
+                  android:padding="20dp"
+                  app:layout_constraintHorizontal_bias="0.0">
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Login"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:textSize="28dp"
+                  android:layout_marginTop="5dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Hello Everyone, Welcome Back"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:textSize="20dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Welcome to salvation Lamb, Please login to your accout"
+                  android:textColor="@color/hintcolor"
+                  android:textSize="15dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Email Address"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:textSize="20dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:hint="Enter Email"
+                  android:textColorHint="@color/hintcolor"
+                  android:layout_marginBottom="10dp"
+                  android:drawableEnd="@drawable/profile"
+        />
+
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Password"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:textSize="20dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:hint="Password"
+                  android:textColorHint="@color/hintcolor"
+        />
+        <CheckBox android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Remember Me"
+                  android:textColor="@color/hintcolor"
+                  android:shadowColor="@color/hintcolor"
+                  android:buttonTint="@color/hintcolor"
+                  android:layout_marginBottom="10dp"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Forgot Password?"
+                  android:textColor="@color/hintcolor"
+                  android:textSize="15dp"
+                  android:layout_marginBottom="10dp"
+        />
+        <Button android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:id="@+id/login_btn"
+                android:background="@drawable/rounded_border_login_register"
+                android:backgroundTint="@color/primary_blue"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+        />
+        <Button android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign Up"
+                android:id="@+id/signup_btn"
+                android:background="@drawable/rounded_border_login_register"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/primary_blue"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="15dp"
+                android:shadowColor="@color/primary_blue"
+        />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

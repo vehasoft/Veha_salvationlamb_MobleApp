@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:background="@color/white"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" tools:ignore="ExtraText">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+        >
+            <androidx.cardview.widget.CardView
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    app:cardCornerRadius="250dp"
+                    app:cardBackgroundColor="@color/white">
+
+                <androidx.cardview.widget.CardView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        app:cardCornerRadius="250dp"
+                        android:layout_gravity="center">
+
+                    <ImageView
+                            android:layout_width="75dp"
+                            android:layout_height="75dp"
+                            android:src="@mipmap/ic_launcher_round"
+                            android:scaleType="centerCrop"/>
+
+                </androidx.cardview.widget.CardView>
+
+            </androidx.cardview.widget.CardView>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
+                          android:orientation="vertical"
+                          android:layout_marginLeft="20dp"
+                          android:layout_gravity="center"
+                          android:gravity="center"
+            >
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textColor="@color/black"
+                          android:textSize="25dp"
+                          android:text="M.Hari Prasath"
+                />
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textColor="@color/black"
+                          android:textSize="15dp"
+                          android:layout_gravity="left"
+                          android:text="30 mins ago"
+                />
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textColor="@color/black"
+                  android:textSize="20dp"
+                  android:textStyle="bold"
+                  android:layout_gravity="left"
+                  android:text="Heading"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textColor="@color/black"
+                  android:textSize="20dp"
+                  android:layout_gravity="left"
+                  android:text="Tags"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textColor="@color/black"
+                  android:textSize="20dp"
+                  android:layout_gravity="left"
+                  android:text="Contents ADDRESS specifies the set of hosts the record matches.  It can be a
+# host name, or it is made up of an IP address and a CIDR mask that is
+# an integer (between 0 and 32 (IPv4) or 128 (IPv6) inclusive) that"
+        />
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textColor="@color/black"
+                  android:textSize="20dp"
+                  android:layout_marginTop="15dp"
+                  android:layout_marginBottom="15dp"
+                  android:layout_gravity="left"
+                  android:text="12 people reacts"
+        />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+        <Button android:layout_width="match_parent" android:layout_height="match_parent"
+                android:text="React"
+                android:textColor="@color/black"
+                android:background="@color/white"
+        android:layout_weight="1"/>
+        <Button android:layout_width="match_parent" android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:background="@color/white"
+                android:text="Share"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
