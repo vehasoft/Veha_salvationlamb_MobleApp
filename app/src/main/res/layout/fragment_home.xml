@@ -61,7 +61,6 @@
                                                    android:layout_marginTop="15dp"
                                                    android:background="@color/white"
                                                    android:id="@+id/list"
-                                                   android:nestedScrollingEnabled="false"
                                                    >
         </androidx.recyclerview.widget.RecyclerView>
 
