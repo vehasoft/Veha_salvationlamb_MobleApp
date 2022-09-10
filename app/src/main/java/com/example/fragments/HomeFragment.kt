@@ -1,5 +1,6 @@
 package com.example.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +36,8 @@ class HomeFragment : Fragment() {
         var mEditor = view.findViewById<RichEditor>(R.id.editor)
         mEditor.setEditorHeight(100);
         mEditor.setEditorFontSize(22);
+        mEditor.setEditorFontColor(Color.BLACK);
+        mEditor.setPlaceholder("Write something here...")
         mEditor.setPadding(10, 10, 10, 10);
         view.findViewById<ImageButton>(R.id.action_undo).setOnClickListener { mEditor.undo() }
         view.findViewById<ImageButton>(R.id.action_redo).setOnClickListener { mEditor.redo() }
