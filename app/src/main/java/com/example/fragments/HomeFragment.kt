@@ -34,8 +34,8 @@ class HomeFragment : Fragment() {
     }
     fun richTextEditer (view: View){
         var mEditor = view.findViewById<RichEditor>(R.id.editor)
-        mEditor.setEditorHeight(100);
-        mEditor.setEditorFontSize(22);
+        mEditor.setEditorHeight(100)
+        mEditor.setEditorFontSize(22)
         mEditor.setEditorFontColor(Color.BLACK);
         mEditor.setPlaceholder("Write something here...")
         mEditor.setPadding(10, 10, 10, 10);
