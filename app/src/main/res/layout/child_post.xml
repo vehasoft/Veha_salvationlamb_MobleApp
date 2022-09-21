@@ -17,20 +17,21 @@
                       android:orientation="horizontal"
         >
             <androidx.cardview.widget.CardView
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     app:cardCornerRadius="250dp"
                     app:cardBackgroundColor="@color/white">
 
                 <androidx.cardview.widget.CardView
-                        android:layout_width="75dp"
-                        android:layout_height="75dp"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
                         app:cardCornerRadius="250dp"
                         android:layout_gravity="center">
 
                     <ImageView
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/profile_pic"
                             android:src="@mipmap/ic_launcher_round"
                             android:scaleType="centerCrop"/>
 
@@ -46,13 +47,15 @@
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textColor="@color/black"
-                          android:textSize="25dp"
+                          android:id="@+id/name_post"
+                          android:textSize="15dp"
                           android:text="M.Hari Prasath"
                 />
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textColor="@color/black"
-                          android:textSize="15dp"
+                          android:id="@+id/post_time"
+                          android:textSize="10dp"
                           android:layout_gravity="left"
                           android:text="30 mins ago"
                 />
@@ -63,45 +66,47 @@
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textColor="@color/black"
-                  android:textSize="20dp"
-                  android:textStyle="bold"
-                  android:layout_gravity="left"
-                  android:text="Heading"
-        />
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:textColor="@color/black"
-                  android:textSize="20dp"
+                  android:textSize="15dp"
+                  android:id="@+id/tags"
                   android:layout_gravity="left"
                   android:text="Tags"
         />
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textColor="@color/black"
-                  android:textSize="20dp"
+                  android:id="@+id/post_content"
+                  android:textSize="15dp"
                   android:layout_gravity="left"
                   android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
         />
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textColor="@color/black"
-                  android:textSize="20dp"
+                  android:textSize="15dp"
                   android:layout_marginTop="15dp"
                   android:layout_marginBottom="15dp"
                   android:layout_gravity="left"
-                  android:text="12 people reacts"
+                  android:id="@+id/no_of_reacts"
+                  android:text="12    "
         />
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
                       android:orientation="horizontal">
-        <Button android:layout_width="match_parent" android:layout_height="match_parent"
+        <Button android:layout_width="match_parent"
+                android:layout_height="30dp"
                 android:text="React"
+                android:id="@+id/react_btn"
                 android:textColor="@color/black"
                 android:background="@color/white"
-        android:layout_weight="1"/>
-        <Button android:layout_width="match_parent" android:layout_height="match_parent"
+                android:textSize="10dp"
+                android:layout_weight="1"/>
+        <Button android:layout_width="match_parent"
+                android:layout_height="30dp"
                 android:layout_weight="1"
+                android:id="@+id/share_btn"
                 android:textColor="@color/black"
                 android:background="@color/white"
+                android:textSize="10dp"
                 android:text="Share"/>
         </LinearLayout>
 

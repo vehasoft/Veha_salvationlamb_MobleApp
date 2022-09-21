@@ -15,20 +15,17 @@
                       app:layout_constraintTop_toTopOf="parent"
                       app:layout_constraintRight_toRightOf="parent"
                       android:background="@color/white"
-                      android:layout_marginTop="10dp"
+                      android:padding="10dp"
                       android:orientation="vertical">
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="Create Post"
                       android:textStyle="bold"
-                      android:layout_marginLeft="10dp"
-                      android:textSize="25dp"
+                      android:textSize="18dp"
                       android:textColor="@color/black"
-                      android:layout_marginTop="15dp"
             />
             <include android:layout_height="wrap_content"
                      android:layout_width="match_parent"
-                     android:layout_marginHorizontal="10dp"
                      android:layout_marginTop="10dp"
                      layout="@layout/richtext_layout"/>
            <!-- <EditText android:layout_width="match_parent"
@@ -44,13 +41,12 @@
                       />-->
 
             <Button android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:text="Post"
                     android:id="@+id/post_btn"
                     android:background="@drawable/rounded_border_login_register"
                     android:backgroundTint="@color/primary_blue"
-                    android:layout_marginBottom="10dp"
-                    android:layout_margin="10dp"
+                    android:layout_marginTop="10dp"
             />
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
@@ -58,7 +54,7 @@
                                                    app:layout_constraintTop_toBottomOf="@+id/createpostLinear"
                                                    app:layout_constraintLeft_toLeftOf="parent"
                                                    app:layout_constraintRight_toRightOf="parent"
-                                                   android:layout_marginTop="15dp"
+                                                   android:layout_marginTop="10dp"
                                                    android:background="@color/white"
                                                    android:id="@+id/list"
                                                    >
