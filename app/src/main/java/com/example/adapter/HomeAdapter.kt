@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,10 +20,12 @@ import java.net.URL
 class HomeAdapter() : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var posts: ArrayList<Post>
     private  lateinit var context: Context
+    private  lateinit var page: String
 
-    constructor(posts: ArrayList<Post>,context: Context) : this() {
+    constructor(posts: ArrayList<Post>,context: Context,page: String) : this() {
         this.posts = posts
         this.context = context
+        this.page = page
     }
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name : TextView = view.findViewById(R.id.name_post)
@@ -33,6 +36,8 @@ class HomeAdapter() : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
         val profilePic : ImageView = view.findViewById(R.id.profile_pic)
         val reactBtn : Button = view.findViewById(R.id.react_btn)
         val shareBtn : Button = view.findViewById(R.id.share_btn)
+        val followBtn : Button = view.findViewById(R.id.follow_btn)
+        val fav : ImageButton = view.findViewById(R.id.fav)
     }
 
 
@@ -41,6 +46,12 @@ class HomeAdapter() : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
         var layoutInflater : LayoutInflater = LayoutInflater.from(context)
         var items : View = layoutInflater.inflate(R.layout.child_post,parent,false)
         var viewHolder = ViewHolder(items)
+        if(page.contentEquals("home")){
+            viewHolder.followBtn.text = "Follow"
+        }
+        else if(page.contentEquals("profile")){
+            viewHolder.followBtn.text = "Delete"
+        }
         return viewHolder
 
     }

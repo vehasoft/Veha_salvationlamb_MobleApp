@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.fragments.HomeFragment
 import com.example.fragments.ProfileFragment
+import com.example.util.Profile
 
 
 internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : FragmentPagerAdapter(fm!!) {
@@ -24,7 +25,7 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
                 HomeFragment()
             }
             1 -> {
-                ProfileFragment()
+                ProfileFragment(Profile("M.Hari prasath","250","100","https://www.gstatic.com/webp/gallery/5.jpg","1","I'm hari from Veha","10"))
             }
             else -> b as Fragment
         }

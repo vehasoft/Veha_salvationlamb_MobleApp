@@ -23,5 +23,12 @@ data class Post(val heading: String,
                 val time: String,
                 val noOfReacts: String,
                 val content: String)
+data class Profile(val name: String,
+                val followers: String,
+                val following: String,
+                val image: String,
+                val id: String,
+                val about: String,
+                val noOfPosts: String)
 
 

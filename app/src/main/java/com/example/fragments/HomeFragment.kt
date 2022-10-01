@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +30,7 @@ class HomeFragment : Fragment() {
         var view = inflater.inflate(R.layout.fragment_home, container, false)
         richTextEditer(view)
 
+
         var post1 = Post("Temp1","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/1.jpg","M. Hari prasath1","30 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
         var post2 = Post("Temp2","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/2.jpg","M. Hari prasath2","31 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
         var post3 = Post("Temp3","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/3.jpg","M. Hari prasath3","32 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
@@ -45,7 +47,7 @@ class HomeFragment : Fragment() {
 
         var list : RecyclerView = view.findViewById(R.id.list)
         list.layoutManager = LinearLayoutManager(activity)
-        list.adapter = HomeAdapter(posts, container!!.context)
+        list.adapter = HomeAdapter(posts, container!!.context,"home")
         return  view
     }
     fun richTextEditer (view: View){

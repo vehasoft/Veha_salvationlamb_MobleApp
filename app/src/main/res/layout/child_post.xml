@@ -60,6 +60,15 @@
                           android:text="30 mins ago"
                 />
             </LinearLayout>
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:id="@+id/follow_btn"
+                    android:text="follow"
+                    android:layout_gravity="top"
+                    android:textColor="@color/primary_blue"
+                    android:backgroundTint="@color/white"
+                    android:layout_marginLeft="10dp"
+                    android:background="@drawable/rounded_border_login_register"/>
 
 
         </LinearLayout>
@@ -112,5 +121,13 @@
 
     </LinearLayout>
 
-
+<ImageButton android:layout_width="30dp"
+             android:layout_height="30dp"
+             android:src="@drawable/bold"
+             android:id="@+id/fav"
+             app:layout_constraintTop_toTopOf="parent"
+             app:layout_constraintRight_toRightOf="parent"
+             android:layout_marginTop="5dp"
+             android:layout_marginRight="5dp"
+/>
 </androidx.constraintlayout.widget.ConstraintLayout>
