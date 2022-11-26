@@ -1,12 +1,16 @@
 package com.example.fbproject
 
+import android.app.DatePickerDialog
+import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_register.*
 
 class EditProfileActivity : AppCompatActivity() {
     lateinit var image : String
@@ -21,6 +25,9 @@ class EditProfileActivity : AppCompatActivity() {
     lateinit var mobileEdit : TextInputEditText
     lateinit var saveBtn : Button
     lateinit var cancelBtn : Button
+    private val year = 0
+    private  var month:Int = 0
+    private  var day:Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
@@ -53,4 +60,22 @@ class EditProfileActivity : AppCompatActivity() {
         emailEdit.text = Editable.Factory.getInstance().newEditable(email)
         mobileEdit.text = Editable.Factory.getInstance().newEditable(mobile)
     }
+    fun setDate(view: View?) {
+        showDialog(999)
+    }
+
+    override fun onCreateDialog(id: Int): Dialog? {
+        return if (id == 999) {
+            DatePickerDialog(
+                this,
+                myDateListener, year, month, day
+            )
+        } else null
+    }
+
+    private val myDateListener =
+        DatePickerDialog.OnDateSetListener { arg0, year, month, day ->
+            date?.text = StringBuilder().append(day).append("-")
+                .append(month).append("-").append(year)
+        }
 }

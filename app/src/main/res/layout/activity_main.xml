@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/home_bg"
-        tools:context=".MainActivity">
+        tools:context="com.example.fbproject.MainActivity">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   app:layout_constraintTop_toTopOf="parent"
@@ -48,13 +48,26 @@
                     android:layout_height="48dp"
                     android:background="@null"
                     android:contentDescription="@null"
-                    app:layout_constraintRight_toLeftOf="@+id/action_insert_bullets"
+                    app:layout_constraintRight_toLeftOf="@+id/menu"
                     app:layout_constraintTop_toTopOf="parent"
+                    android:tint="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:src="@drawable/justify_right" />
+                    android:src="@drawable/moon" />
+            <ImageButton
+                    android:id="@+id/day_mode"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@null"
+                    android:contentDescription="@null"
+                    app:layout_constraintRight_toLeftOf="@+id/menu"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:tint="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:visibility="gone"
+                    android:src="@drawable/sun" />
 
             <ImageButton
-                    android:id="@+id/action_insert_bullets"
+                    android:id="@+id/menu"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@null"
@@ -62,7 +75,8 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:src="@drawable/bullets" />
+                    android:tint="@color/white"
+                    android:src="@drawable/menu" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewPager"

@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@mipmap/login_bg"
-        tools:context=".LoginActivity">
+        tools:context="com.example.fbproject.LoginActivity">
     <!-- Header -->
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -80,6 +80,7 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/name"
                     android:textColorHint="@color/black"
+                    android:textColor="@color/black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -97,6 +98,7 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/email"
                     android:textColorHint="@color/black"
+                    android:textColor="@color/black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -114,34 +116,42 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/mobile"
                     android:textColorHint="@color/black"
+                    android:textColor="@color/black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
         </com.google.android.material.textfield.TextInputLayout>
-<!--
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="Gender"
+
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  android:gravity="center_vertical"
+                  android:id="@+id/date"
+                  android:text="Date of birth"
+                  android:background="@color/home_bg"
                   android:textColor="@color/black"
                   android:textSize="20dp"
-                  android:layout_marginBottom="10dp"
-        />-->
+                  android:onClick="setDate"
+                  android:layout_marginTop="10dp"
+        />
         <RadioGroup android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:layout_marginTop="10dp"
+                    android:id="@+id/gender"
                     android:background="@color/home_bg"
         >
             <RadioButton android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
+                         android:id="@+id/male"
                          android:text="Male"
                          android:textSize="15dp"
                          android:layout_weight="0.3"
                          android:buttonTint="@color/black"
                          android:textColor="@color/black"
                          />
-            <RadioButton android:layout_width="125dp"
+            <RadioButton android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
+                         android:id="@+id/female"
                          android:text="Female"
                          android:textSize="15dp"
                          android:layout_weight="0.3"
@@ -150,6 +160,7 @@
             />
             <RadioButton android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
+                         android:id="@+id/other"
                          android:text="Other"
                          android:textSize="15dp"
                          android:layout_weight="0.3"

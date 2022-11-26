@@ -1,22 +1,37 @@
 package com.example.fragments
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.HomeAdapter
 import com.example.fbproject.R
+import com.example.models.Posts
+import com.example.util.APIUtil
 import com.example.util.Post
+import com.example.util.UserPreferences
+import com.example.util.Util
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import jp.wasabeef.richeditor.RichEditor
+import retrofit2.Call
+import retrofit2.Response
 
 
 class HomeFragment : Fragment() {
+    //lateinit var userPreferences: UserPreferences
+    var posts: ArrayList<Posts> = ArrayList()
+    lateinit var list : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,28 +41,12 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         var view = inflater.inflate(R.layout.fragment_home, container, false)
         richTextEditer(view)
+        list = view.findViewById(R.id.list)
 
 
-        var post1 = Post("Temp1","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/1.jpg","M. Hari prasath1","30 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-        var post2 = Post("Temp2","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/2.jpg","M. Hari prasath2","31 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-        var post3 = Post("Temp3","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/3.jpg","M. Hari prasath3","32 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-        var post4 = Post("Temp4","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/4.jpg","M. Hari prasath4","33 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-        var post5 = Post("Temp5","#veha,#salvationlamb","https://www.gstatic.com/webp/gallery/5.jpg","M. Hari prasath5","34 mins ago","12","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s")
-
-        var posts : ArrayList<Post> = ArrayList()
-        posts.add(post1)
-        posts.add(post2)
-        posts.add(post3)
-        posts.add(post4)
-        posts.add(post5)
-
-
-        var list : RecyclerView = view.findViewById(R.id.list)
-        list.layoutManager = LinearLayoutManager(activity)
-        list.adapter = HomeAdapter(posts, container!!.context,"home")
+        getallPosts(container!!.context)
         return  view
     }
     fun richTextEditer (view: View){
@@ -70,5 +69,35 @@ class HomeFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.action_align_center).setOnClickListener { mEditor.setAlignCenter() }
         view.findViewById<ImageButton>(R.id.action_align_right).setOnClickListener { mEditor.setAlignRight() }
         view.findViewById<ImageButton>(R.id.action_insert_bullets).setOnClickListener { mEditor.setBullets() }
+    }
+    fun getallPosts(context: Context){
+        val postlist: ArrayList<Posts> = ArrayList()
+        val retrofit = APIUtil.getRetrofit()
+        val call: Call<JsonObject?>? = retrofit.getPost("Bearer ${Util.token}",1,10)
+        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+
+            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                if (response.code()==200){
+                    val resp = response.body()
+                    val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+
+                    Log.e("Status", resp?.get("status").toString())
+                    Log.e("result", resp?.get("results").toString())
+                    Log.e("result", loginresp.toString())
+
+                    for (post in loginresp){
+                        val pos = Gson().fromJson(post,Posts::class.java)
+                        postlist.add(pos)
+                    }
+                    Log.e("postlist",postlist.toString())
+                    list.layoutManager = LinearLayoutManager(activity)
+                    list.adapter = HomeAdapter(postlist, context,"home")
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                Log.e("fail ","Posts")
+            }
+        })
     }
 }
