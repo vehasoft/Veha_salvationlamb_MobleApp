@@ -1,5 +1,7 @@
 package com.example.util;
 
+import com.example.models.Loginresp;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -7,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class Util {
     public static final String SUCCESS = "success";
-    public static String token = "";
+    public static Loginresp user;
     public static String getTimeAgo(String date){
         String timeAgo = "";
         try

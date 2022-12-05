@@ -21,10 +21,14 @@ class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(Util.token !=null) {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
+        userPreferences = UserPreferences(this@LoginActivity)
+        /*userPreferences.authToken.asLiveData().observe(this) {
+            Log.e("token################", it)
+            if (!TextUtils.isEmpty(it) || !it.equals("null")) {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
+        }*/
         setContentView(R.layout.activity_login)
         signup_btn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -40,39 +44,39 @@ class LoginActivity : AppCompatActivity() {
             if(!Util.isValidEmail(emailstr))
                 Toast.makeText(this,"Invalid Email",Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
-                Toast.makeText(this,"Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8",Toast.LENGTH_LONG).show()
+                Toast.makeText(this,"Invalid Password",Toast.LENGTH_LONG).show()
             else
                 login(data)
         }
     }
     private fun login(data: JsonObject) {
-        userPreferences = UserPreferences(this@LoginActivity)
-        //Log.e("dataaa",data.toString())
+        Log.e("data",data.toString())
         val retrofit = APIUtil.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                 if (response.code()==200){
                     val resp = response.body()
                     val loginresp: Loginresp = Gson().fromJson(resp?.get("result"),Loginresp::class.java)
+                    Util.user = loginresp
                     lifecycleScope.launch {
                         userPreferences.saveAuthToken(loginresp.token)
                     }
-                    Util.token = loginresp.token
+                    Log.e("token#######################",loginresp.token)
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
-                    //Log.e("Status", resp?.get("status").toString())
-                    //Log.e("result", resp?.get("result").toString())
-                    //Log.e("result", loginresp.toString())
+                    finish()
+                    Log.e("Status", resp?.get("status").toString())
+                    Log.e("result", resp?.get("result").toString())
+                    Log.e("result", loginresp.toString())
                 }
                 else{
                     val resp = response.errorBody()
                     val loginresp: JsonObject = Gson().fromJson(resp?.string(),JsonObject::class.java)
                     val status = loginresp.get("status").toString()
                     val errorMessage = loginresp.get("errorMessage").toString()
-                    //Log.e("Status", status)
-                    //Log.e("result", errorMessage)
+                    Log.e("Status", status)
+                    Log.e("result", errorMessage)
                     if (errorMessage.contains("Invalid password",true)){
                         Toast.makeText(this@LoginActivity,"INVALID PASSWORD",Toast.LENGTH_LONG).show()
                     }
@@ -82,8 +86,10 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                Toast.makeText(this@LoginActivity,"No Internet",Toast.LENGTH_LONG).show()
                 Log.e("responseee","fail")
             }
         })
     }
 }
+

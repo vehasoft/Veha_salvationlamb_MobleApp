@@ -94,7 +94,8 @@ class HomeAdapter() : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
         holder.name.text = post.user.name
         holder.tags.text = post.tags
-        holder.time.text = Util.getTimeAgo(post.createdAt)
+        //holder.time.text = Util.getTimeAgo(post.createdAt)
+        holder.time.text = "30 mins ago"
         holder.content.text = post.content
         holder.reacts.text = post.likesCount + " people reacts"
         if (post.user.picture.isNullOrEmpty()){
