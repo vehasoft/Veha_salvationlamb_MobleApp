@@ -284,7 +284,7 @@
         <jp.wasabeef.richeditor.RichEditor
                 android:id="@+id/editor"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:lines="5"
                 android:hint="Write something here ...."
                 android:textColorHint="@color/black"

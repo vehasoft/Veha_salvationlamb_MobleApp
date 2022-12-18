@@ -7,9 +7,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.models.Loginresp
-import com.example.util.APIUtil
-import com.example.util.UserPreferences
 import com.example.util.Util
+import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_login.*
@@ -51,17 +50,18 @@ class LoginActivity : AppCompatActivity() {
     }
     private fun login(data: JsonObject) {
         Log.e("data",data.toString())
-        val retrofit = APIUtil.getRetrofit()
+        val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                 if (response.code()==200){
                     val resp = response.body()
                     val loginresp: Loginresp = Gson().fromJson(resp?.get("result"),Loginresp::class.java)
-                    Util.user = loginresp
                     lifecycleScope.launch {
                         userPreferences.saveAuthToken(loginresp.token)
+                        userPreferences.saveUserId(loginresp.id)
                     }
+                    Util.userId = loginresp.id
                     Log.e("token#######################",loginresp.token)
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)

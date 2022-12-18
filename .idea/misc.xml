@@ -17,16 +17,21 @@
         <entry key="..\:/Intelij/FbAPP/app/src/main/res/mipmap-anydpi-v26/login-bg.xml" value="0.11510416666666666" />
         <entry key="..\:/Intelij/FbAPP/app/src/main/res/mipmap-anydpi-v26/undo.xml" value="0.2064814814814815" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_edit_profile.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_favorites.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_follower.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_login.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_main.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_register.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_view_likes.xml" value="0.264" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_view_profile.xml" value="0.1" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/add_post.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_follow.xml" value="0.2890625" />
-        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_post.xml" value="0.217578125" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_likes_list.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_post.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/fragment_home.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/fragment_profile.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/richtext_layout.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/menu/like_list.xml" value="0.30364583333333334" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/menu/main_menu.xml" value="0.13385416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/xml/network_security_config.xml" value="0.1" />
       </map>

@@ -1,13 +1,12 @@
 package com.example.fbproject
 
-import android.R.attr.button
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.widget.ImageButton
+import android.view.ContextThemeWrapper
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -17,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.example.adapter.TabAdapter
 import com.example.util.UserPreferences
+import com.example.util.Util
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
@@ -39,6 +39,11 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+        userPreferences.userId.asLiveData().observe(this) {
+            Log.e("UserId################", it)
+            Util.userId = it
+        }
+
         setContentView(R.layout.activity_main)
 
         menu.setOnClickListener {
@@ -46,7 +51,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         menu.setOnClickListener {
-            val popup = PopupMenu(this@MainActivity, menu)
+            //val popup = PopupMenu(this@MainActivity, menu)
+            val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
+            val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu);
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
@@ -70,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                         builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
                             lifecycleScope.launch {
                                 userPreferences.deleteAuthToken()
+                                userPreferences.deleteUserId()
                             }
                             val intent = Intent(this@MainActivity, LoginActivity::class.java)
                             startActivity(intent)
@@ -82,6 +90,10 @@ class MainActivity : AppCompatActivity() {
 
                     R.id.edit_profile ->{
                         val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+                        startActivity(intent)
+                    }
+                    R.id.fav ->{
+                        val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
                 }

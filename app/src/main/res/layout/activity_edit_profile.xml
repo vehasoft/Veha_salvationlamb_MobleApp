@@ -197,6 +197,24 @@
                         android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/language_layout"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:background="@color/home_bg"
+                    android:hint="Language">
+
+                <!--this is the actual edit text which takes the input-->
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/language"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button android:layout_width="match_parent"
                     android:layout_height="wrap_content"

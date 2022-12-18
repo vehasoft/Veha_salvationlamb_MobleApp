@@ -1,5 +1,8 @@
 package com.example.util
 
+import com.example.models.PostUser
+import com.example.models.Posts
+
 data class Login(val email: String,
                  val password: String,
                  val isMobile: Boolean
@@ -92,4 +95,30 @@ data class UserResponse(
     val errorMessage: String,
     val rslt: UserRslt,
     val token: String,
+)
+
+data class PostLikes(
+    val id: String,
+    val userId: String,
+    val postId: String,
+    val reaction: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val user: PostUser,
+)
+data class AllFavList(
+    val id: String,
+    val userId: String,
+    val postId: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val posts: Posts
+)
+data class AllFollowerList(
+    val id: String,
+    val userId: String,
+    val followerId: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val user: PostUser,
 )

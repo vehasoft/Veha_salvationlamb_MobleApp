@@ -14,9 +14,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.models.UserRslt
-import com.example.util.APIUtil
-import com.example.util.UserPreferences
 import com.example.util.Util
+import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_register.*
@@ -121,7 +120,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun register(data: JsonObject) {
         userPreferences = UserPreferences(this@RegisterActivity)
 
-        val retrofit = APIUtil.getRetrofit()
+        val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 

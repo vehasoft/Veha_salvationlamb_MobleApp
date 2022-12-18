@@ -25,9 +25,25 @@ class UserPreferences (context: Context) {
             it.remove(AUTH_TOKEN)
         }
     }
+    val userId: Flow<String>
+        get() = dataStorePref.data.map { preferences ->
+            preferences[USER_ID].toString()
+        }
+
+    suspend fun saveUserId(token: String){
+        dataStorePref.edit { preferences ->
+            preferences[USER_ID] = token
+        }
+    }
+    suspend fun deleteUserId(){
+        dataStorePref.edit {
+            it.remove(USER_ID)
+        }
+    }
 
 
     companion object{
         private val AUTH_TOKEN = preferencesKey<String>("token")
+        private val USER_ID = preferencesKey<String>("userId")
     }
 }

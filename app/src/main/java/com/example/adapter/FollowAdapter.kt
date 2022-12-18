@@ -8,15 +8,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.R
+import com.example.util.AllFollowerList
 import com.example.util.Followers
 import com.squareup.picasso.Picasso
 
 class FollowAdapter() : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
-    private lateinit var follows: ArrayList<Followers>
+    private lateinit var follows: ArrayList<AllFollowerList>
     private  lateinit var context: Context
     private  lateinit var page: String
 
-    constructor(follows: ArrayList<Followers>, context: Context, page: String) : this() {
+    constructor(follows:  ArrayList<AllFollowerList>, context: Context, page: String) : this() {
         this.follows = follows
         this.context = context
         this.page = page
@@ -41,8 +42,12 @@ class FollowAdapter() : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val follow : Followers = follows[position]
-        holder.name.text = follow.name
-        Picasso.with(context).load(follow.image).into(holder.profilePic)
+        val follow : AllFollowerList = follows[position]
+        holder.name.text = follow.user.name
+        if (follow.user.picture.isNullOrEmpty()){
+            Picasso.with(context).load("https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50").into(holder.profilePic)
+        }else {
+            Picasso.with(context).load(follow.user.picture).into(holder.profilePic)
+        }
     }
 }

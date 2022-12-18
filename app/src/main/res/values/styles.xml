@@ -4,4 +4,7 @@
         <item name="colorPrimary">@color/primary_blue</item>
         <item name="colorPrimaryDark">@color/black</item>
     </style>
+    <style name="menuStyle">
+        <item name="android:layoutDirection">ltr</item>
+    </style>
 </resources>

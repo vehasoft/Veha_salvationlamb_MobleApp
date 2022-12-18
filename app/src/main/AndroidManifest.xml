@@ -13,6 +13,15 @@
             android:theme="@style/Theme.Design.NoActionBar"
             android:usesCleartextTraffic="true">
         <activity
+                android:name=".FavoritesActivity"
+                android:exported="false"/>
+        <activity
+                android:name=".ViewProfileActivity"
+                android:exported="false"/>
+        <activity
+                android:name=".ViewLikesActivity"
+                android:exported="false"/>
+        <activity
                 android:name=".SplashhScreenActivity"
                 android:exported="true">
             <intent-filter>
@@ -37,6 +46,7 @@
                 android:name=".MainActivity"
                 android:exported="true">
         </activity>
+
     </application>
 
 </manifest>
