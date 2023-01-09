@@ -6,11 +6,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.fragments.HomeFragment
 import com.example.fragments.ProfileFragment
-import com.example.util.Profile
 import com.example.util.Util
 
 
-internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : FragmentPagerAdapter(fm!!) {
+internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int, userType: String) : FragmentPagerAdapter(fm!!) {
     var context: Context
     var totalTabs: Int
 
@@ -23,7 +22,7 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
         var b : Any ? =null
         return when (position) {
             0 -> {
-                HomeFragment(context,"warrior")
+                HomeFragment(context,"user")
             }
             1 -> {
                 ProfileFragment(Util.userId,context,"me")

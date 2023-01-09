@@ -28,6 +28,9 @@ class FollowerActivity : AppCompatActivity() {
     lateinit var nodata: LinearLayout
     private lateinit var userId: String
 
+    private var myFollowerMap: HashMap<String,String> = HashMap()
+    private var followingMap: HashMap<String,String> = HashMap()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follower)
@@ -40,7 +43,7 @@ class FollowerActivity : AppCompatActivity() {
 
         lists = findViewById(R.id.my_follow_list)
         nodata = findViewById(R.id.no_data)
-
+/*
         var follow1 = Followers("hari ","https://www.gstatic.com/webp/gallery/1.jpg")
         var follow2 = Followers("hari ","https://www.gstatic.com/webp/gallery/2.jpg")
         var follow3 = Followers("hari ","https://www.gstatic.com/webp/gallery/3.jpg")
@@ -58,7 +61,7 @@ class FollowerActivity : AppCompatActivity() {
         followLists.add(follow5)
         followLists.add(follow6)
         followLists.add(follow7)
-        followLists.add(follow8)
+        followLists.add(follow8)*/
     }
     private fun getallFollowers(context: Context) {
         val retrofit = Util.getRetrofit()
@@ -76,6 +79,7 @@ class FollowerActivity : AppCompatActivity() {
                             for (likes in loginresp) {
                                 val pos = Gson().fromJson(likes, AllFollowerList::class.java)
                                 followList.add(pos)
+                                myFollowerMap.put(pos.userId,pos.followerId)
                             }
                             if (followList.size <= 0){
                                 lists.visibility = View.GONE
@@ -84,7 +88,7 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.visibility = View.VISIBLE
                                 nodata.visibility = View.GONE
                                 lists.layoutManager = LinearLayoutManager(context)
-                                lists.adapter = FollowAdapter(followList, context,"followers")
+                                lists.adapter = FollowAdapter(followList, context,myFollowerMap,this@FollowerActivity)
                             }
 
                             Log.e("MYFOLLOWobj####", followList.toString())
@@ -111,9 +115,10 @@ class FollowerActivity : AppCompatActivity() {
                             val resp = response.body()
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                             followList = ArrayList()
-                            for (likes in loginresp) {
-                                val pos = Gson().fromJson(likes, AllFollowerList::class.java)
+                            for (followings in loginresp) {
+                                val pos = Gson().fromJson(followings, AllFollowerList::class.java)
                                 followList.add(pos)
+                                followingMap.put(pos.followerId,pos.userId)
                             }
                             if (followList.size <= 0){
                                 lists.visibility = View.GONE
@@ -122,7 +127,7 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.visibility = View.VISIBLE
                                 nodata.visibility = View.GONE
                                 lists.layoutManager = LinearLayoutManager(context)
-                                lists.adapter = FollowAdapter(followList, context,"followers")
+                                lists.adapter = FollowAdapter(followList, context,followingMap,this@FollowerActivity)
                             }
                             Log.e("MYFOLLOWobj####", followList.toString())
                         }

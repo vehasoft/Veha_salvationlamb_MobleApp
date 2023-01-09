@@ -6,12 +6,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.models.Loginresp
+import com.example.util.Loginresp
 import com.example.util.Util
 import com.example.util.UserPreferences
+import com.example.util.UserRslt
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_login.email
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -21,16 +23,13 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
-        /*userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null")) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
-        }*/
         setContentView(R.layout.activity_login)
         signup_btn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+        forgot_pwd.setOnClickListener {
+            val intent = Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
             startActivity(intent)
         }
         login_btn.setOnClickListener {
@@ -47,6 +46,7 @@ class LoginActivity : AppCompatActivity() {
             else
                 login(data)
         }
+
     }
     private fun login(data: JsonObject) {
         Log.e("data",data.toString())
@@ -62,6 +62,31 @@ class LoginActivity : AppCompatActivity() {
                         userPreferences.saveUserId(loginresp.id)
                     }
                     Util.userId = loginresp.id
+                    Log.e("USERRSLT",loginresp.toString())
+                    Util.user = UserRslt(
+                        loginresp.id,
+                        loginresp.loginSource,
+                        loginresp.role,
+                        loginresp.name,
+                        loginresp.email,
+                        loginresp.gender,
+                        loginresp.password,
+                        loginresp.mobile,
+                        loginresp.dateOfBirth,
+                        loginresp.updatedAt,
+                        loginresp.createdAt,
+                        loginresp.picture,
+                        loginresp.coverPicture,
+                        loginresp.address,
+                        loginresp.isWarrior,
+                        loginresp.isReviewState,
+                        loginresp.state,
+                        loginresp.pinCode,
+                        loginresp.country,
+                        loginresp.religion,
+                        loginresp.language,
+                        loginresp.blocked
+                    )
                     Log.e("token#######################",loginresp.token)
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)

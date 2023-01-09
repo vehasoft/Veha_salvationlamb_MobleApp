@@ -1,6 +1,7 @@
 package com.example.fbproject
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.HomeAdapter
@@ -20,6 +22,7 @@ import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
@@ -76,6 +79,14 @@ class ViewLikesActivity : AppCompatActivity() {
                         Log.e("fail ","Posts")
                     }
                 })
+            } else {
+                Toast.makeText(this@ViewLikesActivity,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@ViewLikesActivity, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
 

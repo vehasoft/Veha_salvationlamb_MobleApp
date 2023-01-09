@@ -6,7 +6,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/login_bg"
+        android:background="@color/primary_blue"
         tools:context="com.example.fbproject.LoginActivity">
     <!-- Header -->
     <TextView android:layout_width="wrap_content"
@@ -158,7 +158,7 @@
                          android:buttonTint="@color/black"
                          android:textColor="@color/black"
             />
-            <RadioButton android:layout_width="wrap_content"
+            <!--<RadioButton android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
                          android:id="@+id/other"
                          android:text="Other"
@@ -166,7 +166,7 @@
                          android:layout_weight="0.3"
                          android:buttonTint="@color/black"
                          android:textColor="@color/black"
-            />
+            />-->
 
         </RadioGroup>
 
@@ -192,14 +192,6 @@
                     android:layout_height="wrap_content" />
 
         </com.google.android.material.textfield.TextInputLayout>
-        <CheckBox android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="Make Me Warrior"
-                  android:textColor="@color/black"
-                  android:layout_marginTop="10dp"
-                  android:layout_marginBottom="10dp"
-                  android:buttonTint="@color/black"
-        />
         <!--<TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="Forgot Password?"

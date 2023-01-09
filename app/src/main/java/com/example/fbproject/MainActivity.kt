@@ -7,44 +7,61 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
-import android.widget.PopupMenu
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.example.adapter.TabAdapter
 import com.example.util.UserPreferences
+import com.example.util.UserRslt
 import com.example.util.Util
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.activity_main.menu
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
 
-    //lateinit var nightMode: ImageButton
-    //lateinit var dayMode: ImageButton
+    lateinit var nightMode: ImageButton
+    lateinit var dayMode: ImageButton
+    lateinit var search: Button
+    var userType: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         userPreferences = UserPreferences(this@MainActivity)
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        getMyDetails()
+
+        Log.e("countriesssssssssssssssssssssssssss",Util.getCountries().toString())
+
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
+            //Log.e("token################", it)
             if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
         userPreferences.userId.asLiveData().observe(this) {
-            Log.e("UserId################", it)
+            //Log.e("UserId################", it)
             Util.userId = it
         }
+        search = findViewById(R.id.search)
+        search.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+        }
 
-        setContentView(R.layout.activity_main)
 
         menu.setOnClickListener {
             openOptionsMenu()
@@ -104,8 +121,10 @@ class MainActivity : AppCompatActivity() {
 
 
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
-        //nightMode = findViewById(R.id.night_mode)
-        //dayMode = findViewById(R.id.day_mode)
+        nightMode = findViewById(R.id.night_mode)
+        dayMode = findViewById(R.id.day_mode)
+        dayMode.visibility = View.GONE
+        nightMode.visibility = View.GONE
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         home.tag = "Home"
@@ -118,7 +137,8 @@ class MainActivity : AppCompatActivity() {
 
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
-        val adapter = TabAdapter(this,supportFragmentManager,tabLayout.tabCount)
+        val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount,userType)
+        Log.e("usertypeeeee",userType)
         val viewPager : ViewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
@@ -135,20 +155,20 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
-        /*nightMode.setOnClickListener{
-            //dayMode.isEnabled = true
+        nightMode.setOnClickListener{
+            dayMode.isEnabled = true
             dayMode.visibility = View.VISIBLE
             nightMode.visibility = View.GONE
-            //nightMode.isEnabled = false
-            //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            nightMode.isEnabled = false
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         }
-        dayMode.setOnClickListener{
-           // nightMode.isEnabled = true
+        /*dayMode.setOnClickListener{
+            nightMode.isEnabled = true
             nightMode.visibility = View.VISIBLE
             dayMode.visibility = View.GONE
-          //  dayMode.isEnabled = false
-            //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            dayMode.isEnabled = false
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }*/
     }
     override fun onBackPressed() {
@@ -161,6 +181,38 @@ class MainActivity : AppCompatActivity() {
 
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
+    }
+    private fun getMyDetails() {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            Log.e("token################", it)
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code() == 200) {
+                            val resp = response.body()
+                            Log.e("userrrrr",resp.toString())
+                            val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                            Util.user = loginresp
+                            val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                            userType = if(isWarrior) Util.WARRIOR else Util.USER
+                        }
+                    }
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ", "Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
 }

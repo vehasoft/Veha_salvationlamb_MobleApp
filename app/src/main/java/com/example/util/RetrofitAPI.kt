@@ -34,7 +34,7 @@ interface RetrofitAPI {
 
     @POST("api/v1/{url}")
     fun postCallHead(@Header(value="Authorization") head: String,@Path (value = "url") url: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
-//use it for like post
+//use it for like post changepassword
     @POST("api/v1/follows")
     fun postFollow(@Header(value="Authorization") head: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
     //userid followerid
@@ -48,6 +48,9 @@ interface RetrofitAPI {
 
     @GET("api/v1/favorites/{userId}")
     fun getFav(@Header(value="Authorization") head: String,@Path (value = "userId") userId: String): Call<JsonObject?>?
+
+    @GET("api/v1/favorites/{userId}")
+    fun getMyFav(@Header(value="Authorization") head: String,@Path (value = "userId") userId: String): Call<JsonObject?>?
 
     @GET("api/v1/like/post/{postId}")
     fun getPostLike(@Header(value="Authorization") head: String,@Path (value = "postId") postId: String): Call<JsonObject?>?
@@ -76,8 +79,15 @@ interface RetrofitAPI {
     @GET("api/v1/follows/{userId}")
     fun getFollowing(@Header("Authorization") dataModal: String?,@Path (value = "userId") userId: String): Call<JsonObject?>?
 
+    @GET("api/v1/search")
+    fun getSearch(@Header(value="Authorization") head: String,@Query("query") query: String?): Call<JsonObject?>?
+
+    @GET("api/v1/post/{postId}")
+    fun getPost(@Header("Authorization") dataModal: String?,@Path (value = "postId") postId: String): Call<JsonObject?>?
 
 
+    @GET("api/v0.1/countries/")
+    fun getCountries(): Call<JsonObject>?
 
 
     @PUT("api/v1/users/{userId}")
@@ -87,6 +97,8 @@ interface RetrofitAPI {
 
 
 
+    @DELETE("api/v1/follows/{postId}")
+    fun deletePost(@Header(value="Authorization") head: String,@Path (value = "postId") postId: String): Call<JsonObject?>?
 
     @DELETE("api/v1/follows/{followerId}")
     fun deleteFollow(@Header(value="Authorization") head: String,@Path (value = "followerId") followerId: String): Call<JsonObject?>?

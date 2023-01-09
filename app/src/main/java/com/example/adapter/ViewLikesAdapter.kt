@@ -1,13 +1,16 @@
 package com.example.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.R
+import com.example.fbproject.ViewProfileActivity
 import com.example.util.PostLikes
 import com.squareup.picasso.Picasso
 
@@ -24,6 +27,7 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
         val name : TextView = view.findViewById(R.id.name_fol)
         val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
         val emoji : ImageView = view.findViewById(R.id.like_symbol)
+        val likeListLinear : LinearLayout = view.findViewById(R.id.like_list_linear)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewLikesAdapter.ViewHolder {
@@ -41,21 +45,23 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
         val post : PostLikes = posts[position]
 
         when(post.reaction){
-            "happy" -> holder.emoji.setImageResource(R.drawable.moon)
-            "sad" -> holder.emoji.setImageResource(R.drawable.moon)
-            "like" -> holder.emoji.setImageResource(R.drawable.moon)
-            "love" -> holder.emoji.setImageResource(R.drawable.moon)
-            "cry" -> holder.emoji.setImageResource(R.drawable.moon)
-            "angry" -> holder.emoji.setImageResource(R.drawable.moon)
+            "smile" -> holder.emoji.setImageResource(R.drawable.ic_smile)
+            "love" -> holder.emoji.setImageResource(R.drawable.ic_love)
+            "cry" -> holder.emoji.setImageResource(R.drawable.ic_cry)
+            "wow" -> holder.emoji.setImageResource(R.drawable.ic_wow)
+            "angry" -> holder.emoji.setImageResource(R.drawable.ic_angry)
+            "haha" -> holder.emoji.setImageResource(R.drawable.ic_haha)
         }
 
         holder.name.text = post.user.name
-        if (post.user.picture.isNullOrEmpty()){
-            Picasso.with(context).load("https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50").into(holder.profilePic)
-        }else {
+        if (!post.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(post.user.picture).into(holder.profilePic)
         }
 
-
+        holder.likeListLinear.setOnClickListener {
+            val intent = Intent(context, ViewProfileActivity::class.java)
+            intent.putExtra("userId",post.userId)
+            context.startActivity(intent)
+        }
     }
 }

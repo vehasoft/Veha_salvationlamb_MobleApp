@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/login_bg_foreground"
+        android:background="@color/primary_blue"
         tools:context="com.example.fbproject.LoginActivity">
     <!-- Header -->
     <TextView android:layout_width="wrap_content"
@@ -123,17 +123,18 @@
                     android:layout_height="wrap_content" />
 
         </com.google.android.material.textfield.TextInputLayout>
-        <CheckBox android:layout_width="wrap_content"
+        <!--<CheckBox android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="Remember Me"
                   android:textColor="@color/hintcolor"
                   android:shadowColor="@color/hintcolor"
                   android:buttonTint="@color/hintcolor"
                   android:layout_marginBottom="10dp"
-        />
+        />-->
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="Forgot Password?"
+                  android:id="@+id/forgot_pwd"
                   android:textColor="@color/primary_blue"
                   android:textSize="15dp"
                   android:layout_marginBottom="10dp"

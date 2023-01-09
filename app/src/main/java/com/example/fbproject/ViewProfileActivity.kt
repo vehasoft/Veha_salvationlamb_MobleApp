@@ -2,6 +2,7 @@ package com.example.fbproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import com.example.fragments.ProfileFragment
 import com.example.util.Util
@@ -11,6 +12,7 @@ class ViewProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_profile)
         val userId = intent.getStringExtra("userId")
+        Log.e("useridddd",userId.toString())
         val viewProfile = ProfileFragment(userId!!,this,"other")
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.view_profile,viewProfile)

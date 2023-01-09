@@ -24,6 +24,12 @@ data class UserRslt(
     val coverPicture: String,
     val address: String,
     val isWarrior: String,
+    val isReviewState: String,
+    val state: String,
+    val pinCode: String,
+    val country: String,
+    val religion: String,
+    val language: String,
     val blocked: String,
 )
 data class UserResponse(

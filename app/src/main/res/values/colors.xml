@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="purple_200">#FFBB86FC</color>
-    <color name="primary_blue">#3b5999</color>
+    <color name="primary_blue">#0F52BA</color>
     <color name="secondary_blue">#8BA9E9</color>
     <color name="home_bg">#F0F3F9</color>
     <color name="hintcolor">#52595D</color>

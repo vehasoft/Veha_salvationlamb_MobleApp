@@ -5,17 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.fbproject.EditProfileActivity
 import com.example.adapter.HomeAdapter
+import com.example.fbproject.EditProfileActivity
 import com.example.fbproject.FollowerActivity
+import com.example.fbproject.LoginActivity
 import com.example.fbproject.R
 import com.example.models.Posts
 import com.example.util.*
@@ -23,6 +26,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
@@ -51,7 +55,7 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
     private lateinit var followingLinear: LinearLayout
     private lateinit var nodata: LinearLayout
 
-    val postlist: ArrayList<Posts> = ArrayList()
+    private lateinit var postlist: ArrayList<Posts>
     private var page: Int = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +71,7 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
 
         profilePic = view.findViewById(R.id.profile_pic_main)
         profileName = view.findViewById(R.id.profile_name)
-        profileAbout = view.findViewById(R.id.profile_about)
+        //profileAbout = view.findViewById(R.id.profile_about)
         profileFollowers = view.findViewById(R.id.followers)
         profileFollowing = view.findViewById(R.id.following)
         profilePosts = view.findViewById(R.id.posts)
@@ -109,6 +113,19 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
         editProfile.setOnClickListener {
             val intent = Intent(context, EditProfileActivity::class.java)
             startActivity(intent)
+            /*val ft: FragmentTransaction = requireFragmentManager().beginTransaction()
+            ft.setReorderingAllowed(false)
+            ft.detach(this).attach(this).commit()*/
+            /*val intent = requireActivity().intent
+            intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        or Intent.FLAG_ACTIVITY_NO_ANIMATION
+            )
+            requireActivity().overridePendingTransition(0, 0)
+            requireActivity().finish()
+
+            requireActivity().overridePendingTransition(0, 0)
+            startActivity(intent)*/
         }
         followerLinear.setOnClickListener {
             val intent = Intent(context, FollowerActivity::class.java)
@@ -129,8 +146,9 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
 
     private fun getallPosts(context: Context){
         var count: Int
+        postlist = ArrayList()
         val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
+        userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
             Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getMyPosts("Bearer $it",userId,page,10)
@@ -178,6 +196,14 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                         Log.e("fail ","Posts")
                     }
                 })
+            } else {
+                Toast.makeText(contexts,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(contexts, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
 
@@ -185,7 +211,7 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
     fun getallLikes(){
         var count: Int
         val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
+        userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
             Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it",userId)
@@ -211,13 +237,21 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                         Log.e("fail ","Posts")
                     }
                 })
+            } else {
+                Toast.makeText(contexts,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(contexts, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
 
     }
     private fun getallFollowers() {
         val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
+        userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
             Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
@@ -231,7 +265,7 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                             for (likes in loginresp) {
                                 val pos = Gson().fromJson(likes, AllFollowerList::class.java)
                                 followersList.add(pos)
-                                Log.e("MYFOLLOWMAP", pos.followerId + "-----" + pos.id)
+                                //Log.e("MYFOLLOWMAP", pos.followerId + "-----" + pos.id)
                             }
                             followerCount = followersList.size
                             profileFollowers.text = followerCount.toString()
@@ -244,12 +278,20 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                         Log.e("fail ", "Posts")
                     }
                 })
+            } else {
+                Toast.makeText(contexts,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(contexts, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }
     private fun getallFollowing() {
         val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
+        userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
             Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
@@ -264,8 +306,11 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                                 val pos = Gson().fromJson(likes, AllFollowerList::class.java)
                                 followingList.add(pos)
                             }
+                            Log.e("followingList",followingList.toString())
                             followingCount = followingList.size
                             profileFollowing.text = followingCount.toString()
+                        } else{
+                            Log.e("following","fails - "+response.code())
                         }
 
                         getmyDetails(contexts)
@@ -275,12 +320,20 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                         Log.e("fail ", "Posts")
                     }
                 })
+            } else {
+                Toast.makeText(contexts,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(contexts, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }
     private fun getmyDetails(context: Context) {
         val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
+        userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
             Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", userId)
@@ -289,11 +342,9 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            Log.e("userrrrr",resp.toString())
+                            //Log.e("userrrrr",resp.toString())
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                            if (loginresp.picture.isNullOrEmpty()){
-                                Picasso.with(context).load("https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50").into(profilePic)
-                            }else {
+                            if (!loginresp.picture.isNullOrEmpty()){
                                 Picasso.with(context).load(loginresp.picture).into(profilePic)
                             }
                             profileName.text = loginresp.name
@@ -304,6 +355,14 @@ class ProfileFragment(private val  userId: String,private val contexts: Context,
                         Log.e("fail ", "Posts")
                     }
                 })
+            } else {
+                Toast.makeText(contexts,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(contexts, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }
