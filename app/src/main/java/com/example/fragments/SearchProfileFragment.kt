@@ -9,10 +9,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.adapter.FollowAdapter
 import com.example.adapter.UsersAdapter
 import com.example.fbproject.R
-import com.example.models.PostUser
+import com.example.util.PostUser
 
 class SearchProfileFragment(private val contexts: Context,private val profileList: ArrayList<PostUser>) : Fragment() {
 
@@ -21,7 +20,6 @@ class SearchProfileFragment(private val contexts: Context,private val profileLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,7 +28,6 @@ class SearchProfileFragment(private val contexts: Context,private val profileLis
 
         lists = view.findViewById(R.id.search_profile_list)
         nodata = view.findViewById(R.id.no_data)
-
 
         if (profileList.size <= 0){
             lists.visibility = View.GONE
@@ -41,9 +38,6 @@ class SearchProfileFragment(private val contexts: Context,private val profileLis
             lists.layoutManager = LinearLayoutManager(context)
             lists.adapter = UsersAdapter(profileList, contexts,this)
         }
-
-
-
         return view
     }
 

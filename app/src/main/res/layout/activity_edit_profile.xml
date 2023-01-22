@@ -81,11 +81,8 @@
                 app:layout_constraintTop_toBottomOf="@+id/header_main"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
     >
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:orientation="vertical">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:gravity="center"
@@ -162,6 +159,7 @@
                         android:id="@+id/mobile"
                         android:textColorHint="@color/black"
                         android:textColor="@color/black"
+                        android:inputType="phone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -189,6 +187,15 @@
                              android:layout_height="wrap_content"
                              android:id="@+id/male"
                              android:text="Male"
+                             android:textSize="15dp"
+                             android:layout_weight="0.3"
+                             android:buttonTint="@color/black"
+                             android:textColor="@color/black"
+                />
+                <RadioButton android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:id="@+id/female"
+                             android:text="Female"
                              android:textSize="15dp"
                              android:layout_weight="0.3"
                              android:buttonTint="@color/black"
@@ -244,35 +251,35 @@
                         android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
             <Spinner
                     android:id="@+id/country"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/black"
-                    android:tooltipText="Country"
-
+                    android:gravity="start"
+                    android:backgroundTint="@color/home_bg"
                     android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
-            <!--<com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/country_layout"
-                    android:layout_marginTop="10dp"
+            <Spinner
+                    android:id="@+id/state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColorHint="@color/black"
-                    android:background="@color/home_bg"
-                    android:hint="Country">
+                    android:layout_marginTop="10dp"
+                    android:gravity="start"
+                    android:backgroundTint="@color/home_bg"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:spinnerMode="dropdown"/>
+            <Spinner
+                    android:id="@+id/city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="start"
+                    android:backgroundTint="@color/home_bg"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:spinnerMode="dropdown"/>
 
-                &lt;!&ndash;this is the actual edit text which takes the input&ndash;&gt;
-                <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/country"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/black"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-            </com.google.android.material.textfield.TextInputLayout>-->
             <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/language_layout"
                     android:layout_marginTop="10dp"
@@ -322,19 +329,6 @@
                     android:layout_marginTop="15dp"
                     android:shadowColor="@color/primary_blue"
             />
-            <RadioButton android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:id="@+id/female"
-                         android:text="Female"
-                         android:textSize="15dp"
-                         android:layout_weight="0.3"
-                         android:buttonTint="@color/black"
-                         android:textColor="@color/black"
-            />
         </LinearLayout>
-
-        </LinearLayout>
-
-
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

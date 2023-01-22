@@ -9,8 +9,7 @@ class FavoritesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
-        //val userId = intent.getStringExtra("userId")
-        val viewProfile = HomeFragment(this,"fav")
+        val viewProfile = HomeFragment.getInstance("fav")
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.view_fav,viewProfile)
         ft.commit()

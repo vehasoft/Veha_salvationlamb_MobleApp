@@ -1,7 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
-             android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_height="match_parent"
+             android:background="@color/home_bg"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.example.fragments.ProfileFragment">
     <ScrollView android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -49,7 +51,6 @@
                                   android:textColor="@color/black"
                                   android:textSize="20dp"
                                   android:id="@+id/followers"
-                                  android:text="250"
                         />
                         <TextView android:layout_width="match_parent"
                                   android:layout_height="wrap_content"
@@ -70,7 +71,6 @@
                                   android:gravity="center"
                                   android:textColor="@color/black"
                                   android:textSize="20dp"
-                                  android:text="250"
                         />
                         <TextView android:layout_width="match_parent"
                                   android:layout_height="wrap_content"
@@ -91,7 +91,6 @@
                                   android:textColor="@color/black"
                                   android:id="@+id/posts"
                                   android:textSize="20dp"
-                                  android:text="250"
                         />
                         <TextView android:layout_width="match_parent"
                                   android:layout_height="wrap_content"
@@ -108,7 +107,6 @@
                           android:layout_marginTop="10dp"
                           android:id="@+id/profile_name"
                           android:textSize="20dp"
-                          android:text="M.hari prasath"
                 />
                 <!--<TextView android:layout_width="match_parent"
                           android:layout_height="wrap_content"
@@ -120,7 +118,7 @@
                 />-->
                 <Button android:layout_width="150dp"
                         android:layout_height="30dp"
-                        android:text="Edit profile"
+                        android:text="About"
                         android:layout_gravity="center"
                         android:id="@+id/edit_profile"
                         android:background="@drawable/rounded_border_login_register"
@@ -143,12 +141,15 @@
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:id="@+id/no_data"
-                          android:visibility="gone"
+                          android:visibility="visible"
                           app:layout_constraintTop_toTopOf="parent"
                           app:layout_constraintBottom_toBottomOf="parent"
                           app:layout_constraintLeft_toLeftOf="parent"
                           app:layout_constraintRight_toRightOf="parent"
                           android:orientation="vertical">
+                <ImageView android:layout_width="300dp"
+                           android:layout_height="300dp"
+                           android:src="@drawable/ic_no_record"/>
                 <TextView android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:text="No Data found"

@@ -44,6 +44,7 @@
                           android:layout_height="match_parent"
                           android:orientation="vertical"
                           android:layout_marginLeft="10dp"
+                          android:layout_weight="1"
                           android:layout_gravity="center"
                           android:gravity="center"
             >
@@ -54,7 +55,6 @@
                           android:gravity="left"
                           android:layout_gravity="left"
                           android:textSize="20dp"
-                          android:text="M.Hari Prasath"
                 />
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
@@ -62,16 +62,15 @@
                           android:id="@+id/post_time"
                           android:textSize="15dp"
                           android:layout_gravity="left"
-                          android:text="30 mins ago"
                 />
             </LinearLayout>
             <Button android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:id="@+id/follow_post_btn"
                     android:text="follow"
-                    android:layout_gravity="top"
-                    android:textColor="@color/primary_blue"
-                    android:backgroundTint="@color/white"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/primary_blue"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/rounded_border_login_register"/>
 
@@ -85,11 +84,19 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textColor="@color/black"
-                      android:textSize="20dp"
+                      android:textSize="15dp"
                       android:layout_marginTop="5dp"
                       android:id="@+id/tags"
                       android:layout_gravity="left"
-                      android:text="Tags"
+            />
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="@color/black"
+                      android:textSize="20dp"
+                      android:layout_marginTop="5dp"
+                      android:id="@+id/title"
+                      android:layout_gravity="left"
             />
             <ImageView android:layout_width="match_parent"
                        android:layout_height="wrap_content"
@@ -104,8 +111,7 @@
                       android:id="@+id/post_content"
                       android:textSize="20dp"
                       android:layout_gravity="left"
-                      android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            />
+                      />
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_weight="1"
@@ -134,7 +140,6 @@
                           android:paddingStart="10dp"
                           android:layout_gravity="center_vertical"
                           android:id="@+id/no_of_reacts"
-                          android:text="12    "
                 />
             </LinearLayout>
 
@@ -169,7 +174,8 @@
              android:id="@+id/fav"
              app:layout_constraintTop_toTopOf="parent"
              app:layout_constraintRight_toRightOf="parent"
-             android:layout_marginTop="15dp"
+             android:layout_marginTop="60dp"
+             android:src="@drawable/ic_baseline_bookmark_border_24"
              android:layout_marginRight="5dp"
 />
     <Button android:layout_width="wrap_content"
@@ -177,8 +183,8 @@
             android:id="@+id/Delete_btn"
             android:text="Delete"
             android:layout_gravity="top"
-            android:textColor="@color/primary_blue"
-            android:backgroundTint="@color/white"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/primary_blue"
             android:layout_marginLeft="10dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

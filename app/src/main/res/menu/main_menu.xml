@@ -5,7 +5,9 @@
     <item  android:id="@+id/edit_profile"
            android:title="Edit Profile"/>
     <item  android:id="@+id/fav"
-           android:title="Favorites"/>
+           android:title="Saved Posts"/>
+    <item  android:id="@+id/nightmode"
+           android:title="Night Mode"/>
     <item  android:id="@+id/logout"
            android:title="Logout"
            />

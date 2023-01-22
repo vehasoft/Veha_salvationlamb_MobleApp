@@ -49,7 +49,6 @@ class LoginActivity : AppCompatActivity() {
 
     }
     private fun login(data: JsonObject) {
-        Log.e("data",data.toString())
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -60,40 +59,13 @@ class LoginActivity : AppCompatActivity() {
                     lifecycleScope.launch {
                         userPreferences.saveAuthToken(loginresp.token)
                         userPreferences.saveUserId(loginresp.id)
+                        userPreferences.saveIsNightModeEnabled(false)
+                        Util.userId = loginresp.id
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
-                    Util.userId = loginresp.id
-                    Log.e("USERRSLT",loginresp.toString())
-                    Util.user = UserRslt(
-                        loginresp.id,
-                        loginresp.loginSource,
-                        loginresp.role,
-                        loginresp.name,
-                        loginresp.email,
-                        loginresp.gender,
-                        loginresp.password,
-                        loginresp.mobile,
-                        loginresp.dateOfBirth,
-                        loginresp.updatedAt,
-                        loginresp.createdAt,
-                        loginresp.picture,
-                        loginresp.coverPicture,
-                        loginresp.address,
-                        loginresp.isWarrior,
-                        loginresp.isReviewState,
-                        loginresp.state,
-                        loginresp.pinCode,
-                        loginresp.country,
-                        loginresp.religion,
-                        loginresp.language,
-                        loginresp.blocked
-                    )
-                    Log.e("token#######################",loginresp.token)
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                    Log.e("Status", resp?.get("status").toString())
-                    Log.e("result", resp?.get("result").toString())
-                    Log.e("result", loginresp.toString())
+
                 }
                 else{
                     val resp = response.errorBody()

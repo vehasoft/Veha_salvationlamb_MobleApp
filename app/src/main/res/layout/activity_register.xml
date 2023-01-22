@@ -118,6 +118,7 @@
                     android:textColorHint="@color/black"
                     android:textColor="@color/black"
                     android:layout_width="match_parent"
+                    android:inputType="phone"
                     android:layout_height="wrap_content" />
 
         </com.google.android.material.textfield.TextInputLayout>

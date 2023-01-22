@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.HomeAdapter
 import com.example.adapter.ViewLikesAdapter
-import com.example.models.Posts
+import com.example.util.Posts
 import com.example.util.Util
 import com.example.util.PostLikes
 import com.example.util.UserPreferences
@@ -32,7 +32,7 @@ class ViewLikesActivity : AppCompatActivity() {
     lateinit var list : RecyclerView
     lateinit var nodata : LinearLayout
 
-    val likeslist: ArrayList<PostLikes> = ArrayList()
+    lateinit var likeslist: ArrayList<PostLikes>
 
     private var postId: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,16 +48,14 @@ class ViewLikesActivity : AppCompatActivity() {
     fun getALlLikes(context: Context){
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getPostLike("Bearer $it",postId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code()==200){
+                            likeslist = ArrayList()
                             val resp = response.body()
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-
                             for (post in loginresp){
                                 val pos = Gson().fromJson(post, PostLikes::class.java)
                                 likeslist.add(pos)
@@ -71,7 +69,6 @@ class ViewLikesActivity : AppCompatActivity() {
                                 list.layoutManager = LinearLayoutManager(context)
                                 list.adapter = ViewLikesAdapter(likeslist, context)
                             }
-                            Log.e("postlist",likeslist.toString())
                         }
                     }
 

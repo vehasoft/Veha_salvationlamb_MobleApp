@@ -41,9 +41,26 @@ class UserPreferences (context: Context) {
         }
     }
 
+    val isNightModeEnabled: Flow<Boolean>
+        get() = dataStorePref.data.map { preferences ->
+            preferences[IS_NIGHT] as Boolean
+        }
+
+    suspend fun saveIsNightModeEnabled(isNight: Boolean){
+        dataStorePref.edit { preferences ->
+            preferences[IS_NIGHT] = isNight
+        }
+    }
+    suspend fun deleteIsNightModeEnabled(){
+        dataStorePref.edit {
+            it.remove(IS_NIGHT)
+        }
+    }
+
 
     companion object{
         private val AUTH_TOKEN = preferencesKey<String>("token")
         private val USER_ID = preferencesKey<String>("userId")
+        private val IS_NIGHT = preferencesKey<Boolean>("isNight")
     }
 }

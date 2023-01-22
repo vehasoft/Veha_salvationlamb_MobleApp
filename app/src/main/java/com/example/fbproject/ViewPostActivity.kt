@@ -6,8 +6,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.*
 import androidx.lifecycle.asLiveData
-import com.example.models.Post
-import com.example.util.Loginresp
+import com.example.util.Posts
 import com.example.util.UserPreferences
 import com.example.util.Util
 import com.google.gson.Gson
@@ -38,8 +37,6 @@ class ViewPostActivity : AppCompatActivity() {
     val wow : ImageView = findViewById(R.id.wow)
     val angry : ImageView = findViewById(R.id.angry)
     val haha : ImageView = findViewById(R.id.haha)
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -47,30 +44,25 @@ class ViewPostActivity : AppCompatActivity() {
         var postId: String = intent.extras!!.get("postId").toString()
         getPost(postId)
     }
-
     fun getPost(postId: String) {
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
-                            val post: Post = Gson().fromJson(response.body()?.get("result"), Post::class.java)
-                            //name.text = post.user.name
+                            val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
                             tags.text = post.tags
                             time.text = Util.getTimeAgo(post.createdAt)
                             content.text = post.content
                             reacts.text = "${post.likesCount} people reacts"
                         } else {
                             Log.e("fail fav",response.errorBody().toString())
-                            //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
                             val resp = response.errorBody()
                             val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                             val status = loginresp.get("status").toString()
                             val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
                         }
                     }
 

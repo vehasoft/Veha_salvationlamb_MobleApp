@@ -11,6 +11,7 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.FollowAdapter
+import com.example.util.PostUser
 import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -22,7 +23,7 @@ class FollowerActivity : AppCompatActivity() {
 
 
     private lateinit var userPreferences: UserPreferences
-    private lateinit var followList: ArrayList<AllFollowerList>
+    private lateinit var followList: ArrayList<PostUser>
 
     lateinit var lists: RecyclerView
     lateinit var nodata: LinearLayout
@@ -43,31 +44,11 @@ class FollowerActivity : AppCompatActivity() {
 
         lists = findViewById(R.id.my_follow_list)
         nodata = findViewById(R.id.no_data)
-/*
-        var follow1 = Followers("hari ","https://www.gstatic.com/webp/gallery/1.jpg")
-        var follow2 = Followers("hari ","https://www.gstatic.com/webp/gallery/2.jpg")
-        var follow3 = Followers("hari ","https://www.gstatic.com/webp/gallery/3.jpg")
-        var follow4 = Followers("hari ","https://www.gstatic.com/webp/gallery/4.jpg")
-        var follow5 = Followers("hari ","https://www.gstatic.com/webp/gallery/5.jpg")
-        var follow6 = Followers("hari ","https://www.gstatic.com/webp/gallery/6.jpg")
-        var follow7 = Followers("hari ","https://www.gstatic.com/webp/gallery/7.jpg")
-        var follow8 = Followers("hari ","https://www.gstatic.com/webp/gallery/8.jpg")
-
-        var followLists : ArrayList<Followers> = ArrayList()
-        followLists.add(follow1)
-        followLists.add(follow2)
-        followLists.add(follow3)
-        followLists.add(follow4)
-        followLists.add(follow5)
-        followLists.add(follow6)
-        followLists.add(follow7)
-        followLists.add(follow8)*/
     }
     private fun getallFollowers(context: Context) {
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -77,9 +58,9 @@ class FollowerActivity : AppCompatActivity() {
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                             followList = ArrayList()
                             for (likes in loginresp) {
-                                val pos = Gson().fromJson(likes, AllFollowerList::class.java)
+                                val pos = Gson().fromJson(likes, PostUser::class.java)
                                 followList.add(pos)
-                                myFollowerMap.put(pos.userId,pos.followerId)
+                                myFollowerMap.put(Util.userId,pos.id)
                             }
                             if (followList.size <= 0){
                                 lists.visibility = View.GONE
@@ -91,7 +72,6 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.adapter = FollowAdapter(followList, context,myFollowerMap,this@FollowerActivity)
                             }
 
-                            Log.e("MYFOLLOWobj####", followList.toString())
                         }
                     }
 
@@ -105,8 +85,7 @@ class FollowerActivity : AppCompatActivity() {
     private fun getallFollowing(context: Context) {
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -116,9 +95,9 @@ class FollowerActivity : AppCompatActivity() {
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                             followList = ArrayList()
                             for (followings in loginresp) {
-                                val pos = Gson().fromJson(followings, AllFollowerList::class.java)
+                                val pos = Gson().fromJson(followings, PostUser::class.java)
                                 followList.add(pos)
-                                followingMap.put(pos.followerId,pos.userId)
+                                followingMap.put(pos.id,Util.userId)
                             }
                             if (followList.size <= 0){
                                 lists.visibility = View.GONE
@@ -129,7 +108,6 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.layoutManager = LinearLayoutManager(context)
                                 lists.adapter = FollowAdapter(followList, context,followingMap,this@FollowerActivity)
                             }
-                            Log.e("MYFOLLOWobj####", followList.toString())
                         }
                     }
 

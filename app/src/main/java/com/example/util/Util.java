@@ -1,6 +1,7 @@
 package com.example.util;
 
 import android.util.Log;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import okhttp3.OkHttpClient;
@@ -10,10 +11,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -23,8 +23,10 @@ public class Util {
     public static String userId;
     public static final String WARRIOR = "Warrior";
     public static final String USER = "User";
+    public static Boolean isNight;
+    public static Boolean isWarrior;
     public static UserRslt user;
-
+    public static Map<String,String> countryMap = new HashMap();
     private static RetrofitAPI retrofitAPI;
 
     public static RetrofitAPI getRetrofit(){
@@ -41,40 +43,12 @@ public class Util {
         retrofitAPI = retrofit.create(RetrofitAPI.class);
         return retrofitAPI;
     }
-
-    public static ArrayList<String> getCountries(){
-        ArrayList countries = new ArrayList<String>();
-        OkHttpClient.Builder okhttpClientBuilder = new OkHttpClient.Builder();
-        OkHttpClient okHttpClient = okhttpClientBuilder.build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://countriesnow.space/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpClient)
-                .build();
-        RetrofitAPI retrofi = retrofit.create(RetrofitAPI.class);
-        Call<JsonObject> call = retrofi.getCountries();
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                JsonArray array = (JsonArray) response.body().get("data");
-                for (int i = 0;i<array.size();i++){
-                    JsonObject country = (JsonObject) array.get(i);
-                    countries.add(country.get("country"));
-                }
-                Log.e("countriesssss",countries.toString());
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-
-            }
-        });
-
-        Log.e("countriesssss",countries.toString());
-        return countries;
+    public static String formatDate(String date) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        Date past = format.parse(date);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        return formatter.format(past);
     }
-
     public static String getTimeAgo(String date){
         String timeAgo = "";
         try

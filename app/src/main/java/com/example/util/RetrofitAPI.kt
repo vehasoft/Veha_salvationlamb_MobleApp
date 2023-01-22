@@ -26,6 +26,9 @@ interface RetrofitAPI {
     @POST("api/v1/password/forgot-password")
     fun postForgotPassword(@Body dataModal: JsonObject?): Call<JsonObject?>?
 
+    @POST("api/v1/password/confirm-password")
+    fun postChangeForgotPassword(@Body dataModal: JsonObject?): Call<JsonObject?>?
+
     @POST("api/v1/password/verify-otp")
     fun postForgotPasswordOtp(@Body dataModal: JsonObject?): Call<JsonObject?>?
 
@@ -42,7 +45,11 @@ interface RetrofitAPI {
     fun postFav(@Header(value="Authorization") head: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
 //userid and postid
 
+    @POST("api/v1/Users/image/{userId}")
+    fun postProfilePic(@Header(value="Authorization") head: String,@Path (value = "userId") userId: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
 
+    @POST("api/v1/users/change-password")
+    fun postChangePassword(@Header(value="Authorization") head: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
 
 
 
@@ -86,8 +93,12 @@ interface RetrofitAPI {
     fun getPost(@Header("Authorization") dataModal: String?,@Path (value = "postId") postId: String): Call<JsonObject?>?
 
 
-    @GET("api/v0.1/countries/")
+    @GET("api/v1/Country")
     fun getCountries(): Call<JsonObject>?
+    @GET("api/v1/state/{countryID}")
+    fun getState(@Path (value = "countryID") countryID: String): Call<JsonObject>?
+    @GET("api/v1/city/{stateId}")
+    fun getCity(@Path (value = "stateId") stateId: String): Call<JsonObject>?
 
 
     @PUT("api/v1/users/{userId}")
@@ -97,7 +108,7 @@ interface RetrofitAPI {
 
 
 
-    @DELETE("api/v1/follows/{postId}")
+    @DELETE("api/v1/post/{postId}")
     fun deletePost(@Header(value="Authorization") head: String,@Path (value = "postId") postId: String): Call<JsonObject?>?
 
     @DELETE("api/v1/follows/{followerId}")

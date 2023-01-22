@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
-import android.view.View
+import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +22,7 @@ import com.example.util.Util
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.activity_main.menu
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
 
-    lateinit var nightMode: ImageButton
-    lateinit var dayMode: ImageButton
     lateinit var search: Button
     var userType: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,19 +39,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         getMyDetails()
-
-        Log.e("countriesssssssssssssssssssssssssss",Util.getCountries().toString())
+        userPreferences.isNightModeEnabled.asLiveData().observe(this) {
+            if(it){ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) } else{ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
+        }
 
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
-            //Log.e("token################", it)
-            if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()) {
+            if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
         userPreferences.userId.asLiveData().observe(this) {
-            //Log.e("UserId################", it)
             Util.userId = it
         }
         search = findViewById(R.id.search)
@@ -66,12 +63,13 @@ class MainActivity : AppCompatActivity() {
         menu.setOnClickListener {
             openOptionsMenu()
         }
-
         menu.setOnClickListener {
-            //val popup = PopupMenu(this@MainActivity, menu)
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
-            popup.menuInflater.inflate(R.menu.main_menu, popup.menu);
+            popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
+            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
+            val night: MenuItem = popup.menu.findItem(R.id.nightmode)
+            if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
@@ -113,18 +111,25 @@ class MainActivity : AppCompatActivity() {
                         val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+                    R.id.nightmode ->{
+                        if (Util.isNight){
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                            Util.isNight = false
+                            night.title = "Day Mode"
+                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
+                        } else {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            Util.isNight = true
+                            night.title = "Night Mode"
+                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
+                        }
+                    }
                 }
                 true
             })
             popup.show()
         }
-
-
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
-        nightMode = findViewById(R.id.night_mode)
-        dayMode = findViewById(R.id.day_mode)
-        dayMode.visibility = View.GONE
-        nightMode.visibility = View.GONE
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         home.tag = "Home"
@@ -137,8 +142,7 @@ class MainActivity : AppCompatActivity() {
 
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
-        val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount,userType)
-        Log.e("usertypeeeee",userType)
+        val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
         val viewPager : ViewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
@@ -148,28 +152,12 @@ class MainActivity : AppCompatActivity() {
                     viewPager.currentItem = tab.position
                 }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
-        nightMode.setOnClickListener{
-            dayMode.isEnabled = true
-            dayMode.visibility = View.VISIBLE
-            nightMode.visibility = View.GONE
-            nightMode.isEnabled = false
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
-        }
-        /*dayMode.setOnClickListener{
-            nightMode.isEnabled = true
-            nightMode.visibility = View.VISIBLE
-            dayMode.visibility = View.GONE
-            dayMode.isEnabled = false
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }*/
     }
     override fun onBackPressed() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
@@ -185,17 +173,16 @@ class MainActivity : AppCompatActivity() {
     private fun getMyDetails() {
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            Log.e("userrrrr",resp.toString())
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
                             val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                            Util.isWarrior = isWarrior
                             userType = if(isWarrior) Util.WARRIOR else Util.USER
                         }
                     }

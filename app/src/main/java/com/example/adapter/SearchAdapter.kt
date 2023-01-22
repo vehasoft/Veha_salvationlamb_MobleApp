@@ -6,8 +6,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.fragments.SearchPostFragment
 import com.example.fragments.SearchProfileFragment
-import com.example.models.PostUser
-import com.example.models.Posts
+import com.example.util.PostUser
+import com.example.util.Posts
 
 
 internal class SearchAdapter(val context: Context,

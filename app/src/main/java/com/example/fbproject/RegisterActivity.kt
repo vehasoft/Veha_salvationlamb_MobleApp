@@ -17,7 +17,13 @@ import com.example.util.Util
 import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.activity_register.date
+import kotlinx.android.synthetic.main.activity_register.email
+import kotlinx.android.synthetic.main.activity_register.gender
+import kotlinx.android.synthetic.main.activity_register.mobile
+import kotlinx.android.synthetic.main.activity_register.name
 import retrofit2.Call
 import retrofit2.Response
 
@@ -40,7 +46,6 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         register_btn.setOnClickListener {
-
             nameTxt = name.text.toString()
             emailTxt = email.text.toString()
             mobileTxt = mobile.text.toString()
@@ -48,10 +53,7 @@ class RegisterActivity : AppCompatActivity() {
             genderId = gender.checkedRadioButtonId
             dobTxt = date.text.toString()
 
-            Log.e("genderid",genderId.toString())
-
-            if (doValidation().equals(SUCCESS)){
-                Log.e("genderid",genderId.toString())
+            if (doValidation() == SUCCESS){
                 val data = JsonObject()
                 data.addProperty("name",nameTxt)
                 data.addProperty("email",emailTxt)
@@ -62,7 +64,7 @@ class RegisterActivity : AppCompatActivity() {
                 data.addProperty("isWarrior",false)
                 register(data)
             }
-            else if (doValidation().equals("error")){
+            else {
                 Toast.makeText(this,doValidation(),Toast.LENGTH_LONG).show()
             }
         }
@@ -73,6 +75,7 @@ class RegisterActivity : AppCompatActivity() {
     }
     fun setDate(view: View?) {
         showDialog(999)
+        Log.e("dateeeee",date.text.toString())
     }
 
     override fun onCreateDialog(id: Int): Dialog? {
@@ -86,8 +89,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private val myDateListener =
         OnDateSetListener { _, year, month, day ->
-            date?.text = StringBuilder().append(day).append("-")
-                .append(month+1).append("-").append(year)
+            date?.text = StringBuilder().append(year).append("-")
+                .append(month+1).append("-").append(day)
         }
     private fun doValidation(): String{
         if(TextUtils.isEmpty(nameTxt.trim())){
@@ -119,25 +122,14 @@ class RegisterActivity : AppCompatActivity() {
     }
     private fun register(data: JsonObject) {
         userPreferences = UserPreferences(this@RegisterActivity)
-        Log.e("dataaa",data.toString())
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("users",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                 if (response.code() == 200) {
                     val resp = response.body()
                     val registerResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                     Util.user = registerResp
-                    /*val token = resp?.get("token").toString()
-                    lifecycleScope.launch {
-                        userPreferences.saveAuthToken(token)
-                        userPreferences.saveUserId(registerResp.id)
-                    }
-
-                    Log.e("Status", resp?.get("status").toString())
-                    Log.e("result", resp?.get("result").toString())
-                    Log.e("result", registerResp.toString())*/
                     val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                     startActivity(intent)
                 } else {

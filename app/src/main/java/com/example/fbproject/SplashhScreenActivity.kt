@@ -19,7 +19,6 @@ class SplashhScreenActivity : AppCompatActivity() {
 
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) { it ->
-            Log.e("token################", it)
             if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()){
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
@@ -27,6 +26,15 @@ class SplashhScreenActivity : AppCompatActivity() {
             } else {
                 userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
+                }
+                userPreferences.isNightModeEnabled.asLiveData().observe(this) { it ->
+                    if (it == null){
+                        Util.isNight = false
+                    }else{
+                        Util.isNight = it
+                    }
+
+                    Log.e("isnight",it.toString())
                 }
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)

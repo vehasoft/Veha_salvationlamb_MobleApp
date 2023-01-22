@@ -9,7 +9,7 @@ import com.example.fragments.ProfileFragment
 import com.example.util.Util
 
 
-internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int, userType: String) : FragmentPagerAdapter(fm!!) {
+internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : FragmentPagerAdapter(fm!!) {
     var context: Context
     var totalTabs: Int
 
@@ -22,10 +22,10 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int, user
         var b : Any ? =null
         return when (position) {
             0 -> {
-                HomeFragment(context,"user")
+                HomeFragment.getInstance("user")
             }
             1 -> {
-                ProfileFragment(Util.userId,context,"me")
+                ProfileFragment.getInstance(Util.userId,"me")
             }
             else -> b as Fragment
         }

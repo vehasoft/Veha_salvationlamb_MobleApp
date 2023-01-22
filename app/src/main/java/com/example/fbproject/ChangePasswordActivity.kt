@@ -9,7 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.example.models.UserRslt
+import com.example.util.UserRslt
 import com.example.util.UserPreferences
 import com.example.util.Util
 import com.google.gson.Gson
@@ -23,7 +23,7 @@ import retrofit2.Response
 class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var passwordTxt: String
     private lateinit var cnfmPasswordTxt: String
-
+    private lateinit var oldPasswordTxt: String
     private lateinit var userPreferences: UserPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,15 +31,16 @@ class ChangePasswordActivity : AppCompatActivity() {
         setContentView(R.layout.activity_change_password)
 
         userPreferences = UserPreferences(this)
-
         val email = intent.getStringExtra("email")
         val otp = intent.getStringExtra("otp")
-        if (TextUtils.isEmpty(email?.trim())) old_pwd.visibility = View.VISIBLE else old_pwd.visibility = View.GONE
+        if (TextUtils.isEmpty(email?.trim())) old_pwd_op.visibility = View.VISIBLE else old_pwd_op.visibility = View.GONE
 
-        passwordTxt = new_pwd.text.toString()
-        cnfmPasswordTxt = cnfm_pwd.text.toString()
 
         change_pwd_btn.setOnClickListener {
+            passwordTxt = new_pwd.text.toString()
+            cnfmPasswordTxt = cnfm_pwd.text.toString()
+            oldPasswordTxt = old_pwd.text.toString()
+            Log.e("password",passwordTxt)
             if(!Util.isValidPassword(passwordTxt)){
                 new_pwd.error = "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
             } else if(TextUtils.isEmpty(passwordTxt.trim())){
@@ -50,10 +51,12 @@ class ChangePasswordActivity : AppCompatActivity() {
             else {
                 if (TextUtils.isEmpty(email?.trim())){
                     val data = JsonObject()
-                    data.addProperty("oldPassword",passwordTxt)
-                    data.addProperty("newPassword",cnfmPasswordTxt)
+                    data.addProperty("oldPassword",oldPasswordTxt)
+                    data.addProperty("newPassword",passwordTxt)
+                    Log.e("ok",data.toString())
                     changePassword(data)
                 } else {
+                    Log.e("ok1","asdfghj")
                     val data = JsonObject()
                     data.addProperty("email",email)
                     data.addProperty("otp",otp)
@@ -62,24 +65,31 @@ class ChangePasswordActivity : AppCompatActivity() {
                 }
             }
         }
+        cancel_btn.setOnClickListener {
+            finish()
+        }
 
 
     }
     private fun changePassword(data: JsonObject) {
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
-            Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postCallHead("/users/change-password","Bearer $it", data)
+                val call: Call<JsonObject?>? = retrofit.postChangePassword("Bearer $it", data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
-                            val resp = response.body()
-                            Log.e("userrrrr", resp.toString())
-                            val loginresp: com.example.util.UserRslt =
-                                Gson().fromJson(resp?.get("result"), com.example.util.UserRslt::class.java)
+                            Log.e("ok",response.code().toString())
+                            finish()
+                        }else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(),JsonObject::class.java)
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("result", errorMessage)
+                            Log.e("ok",response.body().toString())
+
                         }
+                        Log.e("ok",response.code().toString())
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ", "Posts")
@@ -98,19 +108,17 @@ class ChangePasswordActivity : AppCompatActivity() {
     }
     private fun forgotPassword(data: JsonObject) {
         val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.postCall("password/confirm-password",data)
+        val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                 if (response.code() == 200) {
-                    val resp = response.body()
 
-                    Log.e("Status", resp?.get("status").toString())
-                    Log.e("result", resp?.get("result").toString())
-
+                    Log.e("ok1",response.code().toString())
                     finish()
                 } else {
                     val resp = response.errorBody()
+                    Log.e("responseeeee",response.toString())
+                    Log.e("responseeeee",resp.toString())
                     val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                     val status = registerResp.get("status").toString()
                     val errorMessage = registerResp.get("errorMessage").toString()

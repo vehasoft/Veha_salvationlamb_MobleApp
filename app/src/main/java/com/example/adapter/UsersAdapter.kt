@@ -13,7 +13,7 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.R
 import com.example.fbproject.ViewProfileActivity
-import com.example.models.PostUser
+import com.example.util.PostUser
 import com.example.util.AllFollowerList
 import com.example.util.UserPreferences
 import com.example.util.Util
@@ -53,81 +53,15 @@ class UsersAdapter(private  val follows:  ArrayList<PostUser>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val follow : PostUser = follows[position]
+        val follow: PostUser = follows[position]
         holder.name.text = follow.name
-        if (!follow.picture.isNullOrEmpty()){
+        if (!follow.picture.isNullOrEmpty()) {
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
         holder.listLinear.setOnClickListener {
-            val intent = Intent(context,ViewProfileActivity::class.java)
-            intent.putExtra("userId",follow.id)
-            context.startActivity(intent)
-        }
-        /*if(!myFollowList.containsKey(Util.userId)){
-            holder.followBtn.text = "follow"
-        } else {
-            holder.followBtn.text = "unfollow"
-        }
-        if(myFollowList.containsValue(Util.userId)){
-            holder.followBtn.text = "follow"
-        } else {
-            holder.followBtn.text = "unfollow"
-        }*/
-        /*holder.followListLinear.setOnClickListener {
             val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("userId",follow.followerId)
+            intent.putExtra("userId", follow.id)
             context.startActivity(intent)
         }
-        holder.followBtn.setOnClickListener {
-            if (holder.followBtn.text.equals("follow")){
-                follow(follow.userId,follow.followerId)
-                holder.followBtn.text = "unfollow"
-            } else {
-                follow(follow.userId,follow.followerId)
-                holder.followBtn.text = "follow"
-            }
-        }*/
-    }/*
-    private fun follow(userId: String, followerId: String) {
-        val followData = JsonObject()
-        followData.addProperty("userId",userId)
-        followData.addProperty("followerId",followerId)
-        // Log.e("data",data.toString())
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(owner) {
-            // Log.e("token################", it)
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            Log.e("Follow",response.body().toString())
-                            //Toast.makeText(context,"Followed",Toast.LENGTH_LONG).show()
-                            if (myFollowList.containsKey(followerId)){
-                                myFollowList.remove(followerId)
-                            }
-                            else{
-                                myFollowList.put(followerId,userId)
-                            }
-                            Log.e("myfollowlist ===",myFollowList.toString())
-                        } else {
-                            Log.e("failFollow",response.errorBody().toString())
-                            //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            }
-        }
-    }*/
+    }
 }
