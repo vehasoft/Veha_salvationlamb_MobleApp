@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -55,7 +56,7 @@ class EditProfileActivity : AppCompatActivity() {
     lateinit var countrySP : Spinner
     lateinit var stateSp : Spinner
     lateinit var citySp : Spinner
-    private val year = 1960
+    private var year = 1960
     private  var month:Int = 0
     private  var day:Int = 1
     private lateinit var userPreferences: UserPreferences
@@ -110,7 +111,6 @@ class EditProfileActivity : AppCompatActivity() {
         saveBtn = findViewById(R.id.save_btn)
         cancelBtn = findViewById(R.id.cancel_btn)
         warrior = findViewById(R.id.warrior)
-
         getCountries()
         getMyDetails(this)
 
@@ -194,48 +194,13 @@ class EditProfileActivity : AppCompatActivity() {
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
             if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
+            popup.menu.findItem(R.id.edit_profile).isVisible = false
             val night: MenuItem = popup.menu.findItem(R.id.nightmode)
             if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-                        builder.setMessage("You will become warrior after the admin approval")
-                        builder.setTitle("Alert !")
-                        val view = View.inflate(myContext,R.layout.child_warrior,null)
-                        builder.setView(view)
-                        val religion: Spinner = view.findViewById(R.id.religion)
-                        val church: EditText = view.findViewById(R.id.church)
-                        val list = Util.getReligion()
-                        var rel = ""
-                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, list)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        religion.adapter = adapter
-                        religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                                if (list[pos] != "Select"){
-                                    rel = list[pos].toString()
-                                }
-                            }
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
-                        }
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
-                            if (rel.isNullOrEmpty() || rel == "Select"){
-                                Toast.makeText(this@EditProfileActivity,"Please select Religion",Toast.LENGTH_LONG).show()
-                            } else if(church.text.isNullOrEmpty()){
-                                Toast.makeText(this@EditProfileActivity,"Please Enter ChurchName",Toast.LENGTH_LONG).show()
-                            } else {
-                                val data = JsonObject()
-                                data.addProperty("religion",rel)
-                                data.addProperty("church",church.text.toString())
-                            }
-                        }
-                        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-                        Toast.makeText(this@EditProfileActivity, "Waiting for admin Approval", Toast.LENGTH_SHORT).show()
+                        Commons().makeWarrior(this)
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
@@ -254,11 +219,6 @@ class EditProfileActivity : AppCompatActivity() {
 
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
-                    }
-
-                    R.id.edit_profile ->{
-                        val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
                     }
                     R.id.fav ->{
                         val intent = Intent(this@EditProfileActivity, FavoritesActivity::class.java)
@@ -311,139 +271,8 @@ class EditProfileActivity : AppCompatActivity() {
         cancelBtn.setOnClickListener{finish()}
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-                builder.setMessage("You will become warrior after the admin approval")
-                builder.setTitle("Alert !")
-                val view = View.inflate(this,R.layout.child_warrior,null)
-                builder.setView(view)
-                val religion: Spinner = view.findViewById(R.id.religion)
-                val church: EditText = view.findViewById(R.id.church)
-                val list = Util.getReligion()
-                var rel = ""
-                val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, list)
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                religion.adapter = adapter
-                religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                        if (list[pos] != "Select"){
-                            rel = list[pos].toString()
-                        }
-                    }
-                    override fun onNothingSelected(parent: AdapterView<*>?) {}
-                }
-                builder.setCancelable(false)
-                builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
-                    if (rel.isNullOrEmpty() || rel == "Select"){
-                        Toast.makeText(this@EditProfileActivity,"Please select Religion",Toast.LENGTH_LONG).show()
-                    } else if(church.text.isNullOrEmpty()){
-                        Toast.makeText(this@EditProfileActivity,"Please Enter ChurchName",Toast.LENGTH_LONG).show()
-                    } else {
-                        val data = JsonObject()
-                        data.addProperty("religion",rel)
-                        data.addProperty("church",church.text.toString())
-                        Toast.makeText(this@EditProfileActivity, "Waiting for admin Approval", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                val alertDialog: AlertDialog = builder.create()
-                alertDialog.show()
-
+                Commons().makeWarrior(this)
             }
-        }
-        menu.setOnClickListener {
-            val myContext: Context = ContextThemeWrapper(this@EditProfileActivity, R.style.menuStyle)
-            val popup = PopupMenu(myContext, menu)
-            popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
-            val night: MenuItem = popup.menu.findItem(R.id.nightmode)
-            if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
-            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
-                    R.id.warrior -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-                        builder.setMessage("You will become warrior after the admin approval")
-                        builder.setTitle("Alert !")
-                        val view = View.inflate(this,R.layout.child_warrior,null)
-                        builder.setView(view)
-                        val religion: Spinner = view.findViewById(R.id.religion)
-                        val church: EditText = view.findViewById(R.id.church)
-                        val list = Util.getReligion()
-                        var rel = ""
-                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, list)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        religion.adapter = adapter
-                        religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                                if (list[pos] != "Select"){
-                                    rel = list[pos].toString()
-                                }
-                            }
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
-                        }
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
-                            if (rel.isNullOrEmpty() || rel == "Select"){
-                                Toast.makeText(this@EditProfileActivity,"Please select Religion",Toast.LENGTH_LONG).show()
-                            } else if(church.text.isNullOrEmpty()){
-                                Toast.makeText(this@EditProfileActivity,"Please Enter ChurchName",Toast.LENGTH_LONG).show()
-                            } else {
-                                val data = JsonObject()
-                                data.addProperty("religion",rel)
-                                data.addProperty("church",church.text.toString())
-                                Toast.makeText(this@EditProfileActivity, "Waiting for admin Approval", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-
-                    }
-                    R.id.logout ->{
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-                        builder.setMessage("Do you want to Logout ?")
-                        builder.setTitle("Alert !")
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
-                            lifecycleScope.launch {
-                                userPreferences.deleteAuthToken()
-                                userPreferences.deleteUserId()
-                            }
-                            val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                        }
-                        builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-                    }
-
-                    R.id.edit_profile ->{
-                        val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
-                    }
-                    R.id.fav ->{
-                        val intent = Intent(this@EditProfileActivity, FavoritesActivity::class.java)
-                        startActivity(intent)
-                    }
-                    R.id.nightmode ->{
-                        if (Util.isNight){
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }
-                }
-                true
-            })
-            popup.show()
         }
 
     }
@@ -496,11 +325,27 @@ class EditProfileActivity : AppCompatActivity() {
                             if(!TextUtils.isEmpty(loginresp.address)) address.text = Editable.Factory.getInstance().newEditable(loginresp.address)
                             if(!TextUtils.isEmpty(loginresp.email)) email.text = Editable.Factory.getInstance().newEditable(loginresp.email)
                             if(!TextUtils.isEmpty(loginresp.mobile)) mobile.text = Editable.Factory.getInstance().newEditable(loginresp.mobile)
-                            if(!TextUtils.isEmpty(loginresp.dateOfBirth)) date.text = Editable.Factory.getInstance().newEditable(Util.formatDate(loginresp.dateOfBirth))
+                            if(!TextUtils.isEmpty(loginresp.dateOfBirth)) {
+                                date.text = Editable.Factory.getInstance().newEditable(Util.formatDate(loginresp.dateOfBirth))
+                                var dateArr = Util.formatDate(loginresp.dateOfBirth).split("-")
+                                year = dateArr[0].toInt()
+                                month = dateArr[1].toInt()-1
+                                day = dateArr[2].toInt()
+                            }
                             if(!TextUtils.isEmpty(loginresp.pinCode)) pincode.text = Editable.Factory.getInstance().newEditable(loginresp.pinCode)
                             if(!TextUtils.isEmpty(loginresp.language)) language.text = Editable.Factory.getInstance().newEditable(loginresp.language)
-                            if(!TextUtils.isEmpty(loginresp.language)) language.text = Editable.Factory.getInstance().newEditable(loginresp.language)
-                            if(!TextUtils.isEmpty(loginresp.language)) language.text = Editable.Factory.getInstance().newEditable(loginresp.language)
+                            if(!TextUtils.isEmpty(loginresp.country)) {
+                                Log.e("country",country.indexOf(loginresp.country).toString())
+                                countrySP.setSelection(country.indexOf(loginresp.country))
+                            }
+                            if(!TextUtils.isEmpty(loginresp.state)) {
+                                Log.e("state",state.indexOf(loginresp.state).toString())
+                                stateSp.setSelection(state.indexOf(loginresp.state))
+                            }
+                            if(!TextUtils.isEmpty(loginresp.city)) {
+                                Log.e("country",city.indexOf(loginresp.city).toString())
+                                citySp.setSelection(city.indexOf(loginresp.city))
+                            }
                             if(!TextUtils.isEmpty(loginresp.gender)){
                                 when(loginresp.gender) {
                                     "male" -> genderbtn = R.id.male
@@ -593,6 +438,7 @@ class EditProfileActivity : AppCompatActivity() {
                 val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 countrySP.adapter = adapter
+                getMyDetails(this@EditProfileActivity)
             }
 
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
@@ -613,6 +459,7 @@ class EditProfileActivity : AppCompatActivity() {
                 val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 stateSp.adapter = adapter
+                getMyDetails(this@EditProfileActivity)
             }
 
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
@@ -633,6 +480,7 @@ class EditProfileActivity : AppCompatActivity() {
                 val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 citySp.adapter = adapter
+                getMyDetails(this@EditProfileActivity)
             }
 
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {}

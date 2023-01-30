@@ -21,6 +21,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.example.adapter.TabAdapter
+import com.example.util.Commons
 import com.example.util.UserPreferences
 import com.example.util.UserRslt
 import com.example.util.Util
@@ -93,43 +94,7 @@ class MainActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-                        builder.setMessage("You will become warrior after the admin approval")
-                        builder.setTitle("Alert !")
-                        val view = View.inflate(myContext,R.layout.child_warrior,null)
-                        builder.setView(view)
-                        val religion: Spinner = view.findViewById(R.id.religion)
-                        val church: EditText = view.findViewById(R.id.church)
-                        val list = Util.getReligion()
-                        var rel = ""
-                        val adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_text, list)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        religion.adapter = adapter
-                        religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                                if (list[pos] != "Select"){
-                                    rel = list[pos].toString()
-                                }
-                            }
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
-                        }
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
-                            if (rel.isNullOrEmpty() || rel == "Select"){
-                                Toast.makeText(this@MainActivity,"Please select Religion",Toast.LENGTH_LONG).show()
-                            } else if(church.text.isNullOrEmpty()){
-                                Toast.makeText(this@MainActivity,"Please Enter ChurchName",Toast.LENGTH_LONG).show()
-                            } else {
-                                val data = JsonObject()
-                                data.addProperty("religion",rel)
-                                data.addProperty("church",church.text.toString())
-                                Toast.makeText(this@MainActivity, "Waiting for admin Approval", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
+                        Commons().makeWarrior(this)
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)

@@ -13,6 +13,12 @@
             android:backgroundTint="@color/home_bg"
             android:background="@android:drawable/btn_dropdown"
             android:spinnerMode="dropdown"/>
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="please select religion"
+              android:visibility="gone"
+              android:id="@+id/err_rel"
+    />
     <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/church_op"
             android:layout_marginTop="10dp"

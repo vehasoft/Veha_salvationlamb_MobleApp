@@ -32,9 +32,12 @@ public class Util {
     public static ArrayList getReligion(){
         religion = new ArrayList<>();
         religion.add("Select");
-        religion.add("Hindu");
-        religion.add("Christian");
-        religion.add("Muslim");
+        religion.add("Roman Catholic");
+        religion.add("Other Catholic");
+        religion.add("Protestant");
+        religion.add("Pentecost");
+        religion.add("CSI");
+        religion.add("Others");
 
         return religion;
     }
