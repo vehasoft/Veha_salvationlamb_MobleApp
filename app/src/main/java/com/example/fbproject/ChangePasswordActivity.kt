@@ -51,12 +51,11 @@ class ChangePasswordActivity : AppCompatActivity() {
             else {
                 if (TextUtils.isEmpty(email?.trim())){
                     val data = JsonObject()
+                    data.addProperty("userId",Util.userId)
                     data.addProperty("oldPassword",oldPasswordTxt)
                     data.addProperty("newPassword",passwordTxt)
-                    Log.e("ok",data.toString())
                     changePassword(data)
                 } else {
-                    Log.e("ok1","asdfghj")
                     val data = JsonObject()
                     data.addProperty("email",email)
                     data.addProperty("otp",otp)
@@ -85,6 +84,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                             val resp = response.errorBody()
                             val loginresp: JsonObject = Gson().fromJson(resp?.string(),JsonObject::class.java)
                             val errorMessage = loginresp.get("errorMessage").toString()
+                            Toast.makeText(this@ChangePasswordActivity,errorMessage,Toast.LENGTH_LONG).show()
                             Log.e("result", errorMessage)
                             Log.e("ok",response.body().toString())
 

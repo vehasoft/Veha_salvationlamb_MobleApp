@@ -16,6 +16,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.adapter.HomeAdapter
 import com.example.fbproject.AddPostActivity
 import com.example.fbproject.LoginActivity
@@ -33,7 +34,7 @@ import retrofit2.Call
 import retrofit2.Response
 
 
-class HomeFragment: Fragment() {
+class HomeFragment: Fragment(){
     lateinit var userPreferences: UserPreferences
     lateinit var list : RecyclerView
     lateinit var nodata: LinearLayout
@@ -42,11 +43,12 @@ class HomeFragment: Fragment() {
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
     lateinit var addPost: FloatingActionButton
+    lateinit var refresh: SwipeRefreshLayout
 
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var myFollowMap: HashMap<String,String>
     private lateinit var myFavMap: HashMap<String,String>
-    private var page: Int = 0
+    private var page: Int = 1
     private var showCreatePost: Boolean = false
 
     private var myLikes: String = ""
@@ -78,6 +80,7 @@ class HomeFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
         list = view.findViewById(R.id.list)
+        refresh = view.findViewById(R.id.refresh)
         nodata = view.findViewById(R.id.no_data)
         addPost = view.findViewById(R.id.add_post)
         getMyDetails(viewLifecycleOwner)
@@ -90,6 +93,13 @@ class HomeFragment: Fragment() {
         adapter = HomeAdapter(ArrayList(), contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
         list.layoutManager = LinearLayoutManager(activity)
         list.adapter = adapter
+
+        refresh.setOnRefreshListener {
+            refresh.isRefreshing = false
+            requireFragmentManager().beginTransaction().detach(this).attach(this).commit()
+
+        }
+
         return  view
     }
 
@@ -150,30 +160,30 @@ class HomeFragment: Fragment() {
         var count: Int
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
-            //Log.e("token################", it)
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                 val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it",page,10)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        Log.e("responsee",response.code().toString())
                         if (response.code()==200){
                             val resp = response.body()
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                             count = Integer.parseInt(resp?.get("count").toString())
                             count /= 10
+                            Log.e("responsee",count.toString())
                             for (post in loginresp){
                                 val pos = Gson().fromJson(post,Posts::class.java)
                                 postlist.add(pos)
-
                             }
-                            list.findViewHolderForLayoutPosition(2)
-                            if (postlist.size <= 0){
+                            Log.e("responsee",postlist.toString())
+                            if (postlist.size <= 0 && page == 0){
                                 list.visibility = View.GONE
                                 nodata.visibility = View.VISIBLE
                             } else{
                                 list.visibility = View.VISIBLE
                                 nodata.visibility = View.GONE
+                                //list.adapter = HomeAdapter(postlist, contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
                                 adapter.addItem(postlist)
-
                                 list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                     override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                         if (!recyclerView.canScrollVertically(1)) {

@@ -1,17 +1,22 @@
 package com.example.fbproject
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
@@ -34,7 +39,25 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var search: Button
     var userType: String = ""
+    private fun requestPermission() {
+        //on below line we are requesting the read external storage permissions.
+        ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 200)
+    }
+    private fun checkPermission(): Boolean {
+        // in this method we are checking if the permissions are granted or not and returning the result.
+        val result = ContextCompat.checkSelfPermission(applicationContext, READ_EXTERNAL_STORAGE)
+        val result1 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE)
+        val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
+        if( !(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)){
+            requestPermission()
+            return false
+        }
+        return true
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(!checkPermission()){
+            requestPermission()
+        }
         userPreferences = UserPreferences(this@MainActivity)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -61,9 +84,6 @@ class MainActivity : AppCompatActivity() {
 
 
         menu.setOnClickListener {
-            openOptionsMenu()
-        }
-        menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
@@ -74,15 +94,42 @@ class MainActivity : AppCompatActivity() {
                 when(item.itemId) {
                     R.id.warrior -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-                        builder.setMessage("Make me warrior")
+                        builder.setMessage("You will become warrior after the admin approval")
                         builder.setTitle("Alert !")
+                        val view = View.inflate(myContext,R.layout.child_warrior,null)
+                        builder.setView(view)
+                        val religion: Spinner = view.findViewById(R.id.religion)
+                        val church: EditText = view.findViewById(R.id.church)
+                        val list = Util.getReligion()
+                        var rel = ""
+                        val adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_text, list)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        religion.adapter = adapter
+                        religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
+                                if (list[pos] != "Select"){
+                                    rel = list[pos].toString()
+                                }
+                            }
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
                         builder.setCancelable(false)
-                        builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int -> finish()}
+                        builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
+                            if (rel.isNullOrEmpty() || rel == "Select"){
+                                Toast.makeText(this@MainActivity,"Please select Religion",Toast.LENGTH_LONG).show()
+                            } else if(church.text.isNullOrEmpty()){
+                                Toast.makeText(this@MainActivity,"Please Enter ChurchName",Toast.LENGTH_LONG).show()
+                            } else {
+                                val data = JsonObject()
+                                data.addProperty("religion",rel)
+                                data.addProperty("church",church.text.toString())
+                                Toast.makeText(this@MainActivity, "Waiting for admin Approval", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
 
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
-                        Toast.makeText(this@MainActivity, "You Clicked : " + item.title, Toast.LENGTH_SHORT).show()
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
@@ -200,6 +247,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
     }
 
 }

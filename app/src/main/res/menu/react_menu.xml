@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/smile"
+      android:icon="@drawable/ic_smile"
+      app:showAsAction="always"
+      android:title="Smile"/>
+    <item android:id="@+id/love"
+          android:icon="@drawable/ic_love"
+          app:showAsAction="always"
+          android:title="Love"/>
+    <item android:id="@+id/cry"
+          android:icon="@drawable/ic_cry"
+          app:showAsAction="always"
+          android:title="cry"/>
+    <item android:id="@+id/wow"
+          android:icon="@drawable/ic_wow"
+          app:showAsAction="always"
+          android:title="Wow"/>
+    <item android:id="@+id/angry"
+          android:icon="@drawable/ic_angry"
+          app:showAsAction="always"
+          android:title="angry"/>
+    <item android:id="@+id/haha"
+          android:icon="@drawable/ic_haha"
+          app:showAsAction="always"
+          android:title="haha"/>
+</menu>

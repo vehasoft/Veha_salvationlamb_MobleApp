@@ -251,7 +251,6 @@
                         android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
             <Spinner
                     android:id="@+id/country"
                     android:layout_width="match_parent"

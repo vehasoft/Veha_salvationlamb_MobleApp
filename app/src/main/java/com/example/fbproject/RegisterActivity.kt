@@ -17,13 +17,13 @@ import com.example.util.Util
 import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.date
 import kotlinx.android.synthetic.main.activity_register.email
 import kotlinx.android.synthetic.main.activity_register.gender
 import kotlinx.android.synthetic.main.activity_register.mobile
-import kotlinx.android.synthetic.main.activity_register.name
+import kotlinx.android.synthetic.main.activity_register.fname
+import kotlinx.android.synthetic.main.activity_register.lname
 import retrofit2.Call
 import retrofit2.Response
 
@@ -38,15 +38,15 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var genderTxt: String
     private var genderId: Int = -1
     private lateinit var dobTxt: String
-    private val year = 0
+    private val year = 1960
     private  var month:Int = 0
-    private  var day:Int = 0
+    private  var day:Int = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         register_btn.setOnClickListener {
-            nameTxt = name.text.toString()
+            nameTxt = fname.text.toString()+lname.text.toString()
             emailTxt = email.text.toString()
             mobileTxt = mobile.text.toString()
             passwordTxt = password.text.toString()
@@ -80,10 +80,12 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreateDialog(id: Int): Dialog? {
         return if (id == 999) {
-            DatePickerDialog(
-                this,
+            val datePickerDialog = DatePickerDialog(
+                this,android.R.style.Theme_Holo_Dialog_MinWidth,
                 myDateListener, year, month, day
             )
+            datePickerDialog.datePicker.maxDate = System.currentTimeMillis() - 1000
+            datePickerDialog
         } else null
     }
 
@@ -94,7 +96,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     private fun doValidation(): String{
         if(TextUtils.isEmpty(nameTxt.trim())){
-            name.error = "Enter name"
+            fname.error = "Enter name"
             return "error"
         } else if(TextUtils.isEmpty(emailTxt.trim())){
             email.error ="Enter email"

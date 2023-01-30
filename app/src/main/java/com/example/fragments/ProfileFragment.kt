@@ -16,10 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.HomeAdapter
-import com.example.fbproject.AboutActivity
-import com.example.fbproject.FollowerActivity
-import com.example.fbproject.LoginActivity
-import com.example.fbproject.R
+import com.example.fbproject.*
 import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -35,6 +32,7 @@ class ProfileFragment: Fragment() {
     private lateinit var contexts: Context
     private lateinit var userId: String
     private lateinit var who: String
+    private lateinit var picture: String
     private var myLikesMap: HashMap<String,String> = HashMap()
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var followersList: ArrayList<AllFollowerList>
@@ -109,6 +107,13 @@ class ProfileFragment: Fragment() {
         }
         else {
             editProfile.visibility = View.VISIBLE
+        }
+        profilePic.setOnClickListener {
+            if (!picture.isNullOrEmpty()) {
+                val intent = Intent(context, ImageDetailActivity::class.java)
+                intent.putExtra("profilePic", picture)
+                startActivity(intent)
+            }
         }
 
         editProfile.setOnClickListener {
@@ -322,9 +327,12 @@ class ProfileFragment: Fragment() {
                             val resp = response.body()
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             if (!loginresp.picture.isNullOrEmpty()){
+                                picture = loginresp.picture
                                 Picasso.with(context).load(loginresp.picture).into(profilePic)
                             }
-                            profileName.text = loginresp.name
+                            val role = if (loginresp.role == "admin") { "Admin"} else if(loginresp.isWarrior.toBoolean()){ "Warrior" } else{""}
+                            if (who == "other") { profileName.text = loginresp.name + " - " + role }
+                            else { profileName.text = loginresp.name }
                         }
                     }
 

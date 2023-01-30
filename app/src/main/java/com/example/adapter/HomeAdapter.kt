@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.*
-import com.example.fragments.ProfileFragment
 import com.example.util.Posts
 import com.example.util.*
 import com.google.gson.Gson
@@ -157,13 +157,41 @@ class HomeAdapter(
             true
         }
         holder.likeBtn.setOnClickListener {
-            holder.likeLayout.visibility = View.VISIBLE
+            Log.e("likebtn","bascxghavxahgvgh")
+            val myContext: Context = ContextThemeWrapper(context, R.style.menuStyle)
+            val popup = PopupMenu(myContext, holder.likeBtn)
+            popup.menuInflater.inflate(R.menu.react_menu, popup.menu)
+            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                when(item.itemId) {
+                    R.id.smile -> {
+                        likePost(post,SMILE,holder)
+                    }
+                    R.id.love -> {
+                        likePost(post,LOVE,holder)
+                    }
+                    R.id.cry -> {
+                        likePost(post,CRY,holder)
+                    }
+                    R.id.wow -> {
+                        likePost(post,WOW,holder)
+                    }
+                    R.id.angry -> {
+                        likePost(post,ANGRY,holder)
+                    }
+                    R.id.haha -> {
+                        likePost(post,HAHA,holder)
+                    }
+                }
+                true
+            })
+            popup.show()
+            /*holder.likeLayout.visibility = View.VISIBLE
             holder.likeBtn.postDelayed(
                 {
                     holder.likeLayout.visibility = View.GONE
                 },10000
             )
-            true
+            true*/
         }
         holder.likeBtn.setOnLongClickListener {
             holder.likeLayout.visibility = View.VISIBLE

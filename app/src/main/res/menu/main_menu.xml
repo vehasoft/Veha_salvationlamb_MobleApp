@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item  android:id="@+id/warrior"
-           android:title="Make me warrior"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item  android:id="@+id/edit_profile"
+           android:icon="@drawable/menu"
            android:title="Edit Profile"/>
     <item  android:id="@+id/fav"
            android:title="Saved Posts"/>
     <item  android:id="@+id/nightmode"
            android:title="Night Mode"/>
+    <item  android:id="@+id/warrior"
+           android:title="Make me warrior"/>
     <item  android:id="@+id/logout"
            android:title="Logout"
            />

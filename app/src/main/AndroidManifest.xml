@@ -16,6 +16,9 @@
             android:theme="@style/Theme.Design.NoActionBar"
             android:usesCleartextTraffic="true">
         <activity
+                android:name=".ImageDetailActivity"
+                android:exported="false"/>
+        <activity
                 android:name=".AddPostActivity"
                 android:exported="false"/>
         <activity

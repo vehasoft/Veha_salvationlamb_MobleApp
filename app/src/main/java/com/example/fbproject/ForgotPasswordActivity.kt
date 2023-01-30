@@ -30,8 +30,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
                 checkValid(email.text.toString())
             }
         }
-
-
+        cancel_btn.setOnClickListener {
+            finish()
+        }
 
     }
     private fun checkValid(emailtxt: String) {

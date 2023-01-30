@@ -24,10 +24,20 @@ public class Util {
     public static final String WARRIOR = "Warrior";
     public static final String USER = "User";
     public static Boolean isNight;
+    private static ArrayList<String> religion;
     public static Boolean isWarrior;
     public static UserRslt user;
-    public static Map<String,String> countryMap = new HashMap();
     private static RetrofitAPI retrofitAPI;
+
+    public static ArrayList getReligion(){
+        religion = new ArrayList<>();
+        religion.add("Select");
+        religion.add("Hindu");
+        religion.add("Christian");
+        religion.add("Muslim");
+
+        return religion;
+    }
 
     public static RetrofitAPI getRetrofit(){
         if(retrofitAPI != null){
@@ -46,7 +56,7 @@ public class Util {
     public static String formatDate(String date) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date past = format.parse(date);
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return formatter.format(past);
     }
     public static String getTimeAgo(String date){
