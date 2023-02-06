@@ -5,20 +5,26 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.example.fragments.HomeFragment
 import com.example.util.Commons
 import com.example.util.UserPreferences
 import com.example.util.Util
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 
 class FavoritesActivity : AppCompatActivity() {
 
@@ -43,7 +49,7 @@ class FavoritesActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        Commons().makeWarrior(this)
+                        makeMeWarior(Commons().makeWarrior(this))
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@FavoritesActivity)
@@ -65,7 +71,7 @@ class FavoritesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@FavoritesActivity, EditProfileActivity::class.java)
+                        val intent = Intent(this@FavoritesActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
@@ -89,6 +95,42 @@ class FavoritesActivity : AppCompatActivity() {
                 true
             })
             popup.show()
+        }
+    }
+    private fun makeMeWarior(data: JsonObject) {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code()==200){
+                            Toast.makeText(this@FavoritesActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = loginresp.get("status").toString()
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)
+                            Toast.makeText(this@FavoritesActivity,errorMessage,Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ","Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@FavoritesActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@FavoritesActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 }

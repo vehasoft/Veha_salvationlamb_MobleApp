@@ -4,6 +4,7 @@ package com.example.fbproject
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -30,6 +31,7 @@ import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     private val SUCCESS = "success"
     private lateinit var nameTxt: String
     private lateinit var emailTxt: String
@@ -44,6 +46,10 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
 
         register_btn.setOnClickListener {
             nameTxt = fname.text.toString()+lname.text.toString()
@@ -123,6 +129,7 @@ class RegisterActivity : AppCompatActivity() {
         return SUCCESS
     }
     private fun register(data: JsonObject) {
+        dialog.show()
         userPreferences = UserPreferences(this@RegisterActivity)
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("users",data)
@@ -143,6 +150,7 @@ class RegisterActivity : AppCompatActivity() {
                     Log.e("result", errorMessage)
                     Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
+                dialog.hide()
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

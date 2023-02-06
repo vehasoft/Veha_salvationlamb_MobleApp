@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -33,6 +34,7 @@ import retrofit2.Response
 class ViewLikesActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     lateinit var list : RecyclerView
     lateinit var nodata : LinearLayout
 
@@ -42,6 +44,10 @@ class ViewLikesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_likes)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         list = findViewById(R.id.likesListRecycler)
         nodata = findViewById(R.id.no_data)
         userPreferences = UserPreferences(this@ViewLikesActivity)
@@ -59,7 +65,7 @@ class ViewLikesActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        Commons().makeWarrior(this)
+                        makeMeWarior(Commons().makeWarrior(this))
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewLikesActivity)
@@ -81,7 +87,7 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
+                        val intent = Intent(this@ViewLikesActivity, ViewLikesActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
@@ -108,6 +114,7 @@ class ViewLikesActivity : AppCompatActivity() {
         }
     }
     fun getALlLikes(context: Context){
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -132,6 +139,7 @@ class ViewLikesActivity : AppCompatActivity() {
                                 list.adapter = ViewLikesAdapter(likeslist, context)
                             }
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -148,6 +156,41 @@ class ViewLikesActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    private fun makeMeWarior(data: JsonObject) {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code()==200){
+                            Toast.makeText(this@ViewLikesActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = loginresp.get("status").toString()
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)
+                            Toast.makeText(this@ViewLikesActivity,errorMessage,Toast.LENGTH_LONG).show()
+                        }
+                    }
 
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ","Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@ViewLikesActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@ViewLikesActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 }

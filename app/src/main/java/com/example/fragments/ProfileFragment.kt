@@ -1,5 +1,6 @@
 package com.example.fragments
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -44,6 +45,7 @@ class ProfileFragment: Fragment() {
     var postCount = 0
 
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     private lateinit var list : RecyclerView
     private lateinit var profilePic: ImageView
     private lateinit var profileName: TextView
@@ -87,6 +89,10 @@ class ProfileFragment: Fragment() {
         who = arguments?.get("who").toString()
 
         userPreferences = UserPreferences(contexts)
+        dialog = ProgressDialog(contexts)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         getallLikes(viewLifecycleOwner)
         val view : View =  inflater.inflate(R.layout.fragment_profile, container, false)
 
@@ -141,6 +147,7 @@ class ProfileFragment: Fragment() {
     }
 
     private fun getallPosts(context: Context,owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()){
+        dialog.show()
         var count: Int
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
@@ -177,7 +184,7 @@ class ProfileFragment: Fragment() {
                                 })
                             }
                         }
-
+                        dialog.hide()
                         getallFollowers(owner)
                     }
 
@@ -198,7 +205,7 @@ class ProfileFragment: Fragment() {
 
     }
     fun getallLikes(owner: LifecycleOwner){
-        var count: Int
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -217,7 +224,7 @@ class ProfileFragment: Fragment() {
                                 myLikesMap.put(pos.postId,pos.reaction)
                             }
                         }
-
+                        dialog.hide()
                         getallPosts(contexts,owner)
                     }
 
@@ -238,6 +245,7 @@ class ProfileFragment: Fragment() {
 
     }
     private fun getallFollowers(owner: LifecycleOwner) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -256,7 +264,7 @@ class ProfileFragment: Fragment() {
                             followerCount = followersList.size
                             profileFollowers.text = followerCount.toString()
                         }
-
+                        dialog.hide()
                         getallFollowing(owner)
                     }
 
@@ -276,6 +284,7 @@ class ProfileFragment: Fragment() {
         }
     }
     private fun getallFollowing(owner: LifecycleOwner) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -296,7 +305,7 @@ class ProfileFragment: Fragment() {
                         } else{
                             Log.e("following","fails - "+response.code())
                         }
-
+                        dialog.hide()
                         getmyDetails(contexts,owner)
                     }
 
@@ -316,6 +325,7 @@ class ProfileFragment: Fragment() {
         }
     }
     private fun getmyDetails(context: Context,owner: LifecycleOwner) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -330,10 +340,11 @@ class ProfileFragment: Fragment() {
                                 picture = loginresp.picture
                                 Picasso.with(context).load(loginresp.picture).into(profilePic)
                             }
-                            val role = if (loginresp.role == "admin") { "Admin"} else if(loginresp.isWarrior.toBoolean()){ "Warrior" } else{""}
+                            val role = if (loginresp.role == "admin") { "Admin"} else if(loginresp.isWarrior.toBoolean()){ Util.WARRIOR } else{""}
                             if (who == "other") { profileName.text = loginresp.name + " - " + role }
                             else { profileName.text = loginresp.name }
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

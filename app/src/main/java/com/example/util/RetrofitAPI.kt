@@ -37,6 +37,8 @@ interface RetrofitAPI {
 
     @POST("api/v1/{url}")
     fun postCallHead(@Header(value="Authorization") head: String,@Path (value = "url") url: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
+    @POST("api/v1/users/warrior")
+    fun postWarrior(@Header(value="Authorization") head: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
 //use it for like post changepassword
     @POST("api/v1/follows")
     fun postFollow(@Header(value="Authorization") head: String,@Body dataModal: JsonObject?): Call<JsonObject?>?

@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -33,12 +34,17 @@ class AboutActivity : AppCompatActivity() {
     private lateinit var changePass: Button
 
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
         userPreferences = UserPreferences(this)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         name = findViewById(R.id.about_name)
         dob = findViewById(R.id.about_dob)
         phone = findViewById(R.id.about_phone)
@@ -59,6 +65,7 @@ class AboutActivity : AppCompatActivity() {
         }
     }
     private fun getmyDetails() {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -84,6 +91,7 @@ class AboutActivity : AppCompatActivity() {
                             if(!TextUtils.isEmpty(loginResp.createdAt)) join.text = Util.getTimeAgo(loginResp.createdAt)
 
                         }
+                        dialog.hide()
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ", "Posts")

@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -32,6 +33,7 @@ class FollowerActivity : AppCompatActivity() {
 
 
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     private lateinit var followList: ArrayList<PostUser>
 
     lateinit var lists: RecyclerView
@@ -45,6 +47,10 @@ class FollowerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follower)
         userPreferences = UserPreferences(this)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         userId = intent.extras!!.get("userId").toString()
         if(intent.extras!!.get("page") == "follower")
             getallFollowers(this)
@@ -63,7 +69,8 @@ class FollowerActivity : AppCompatActivity() {
             if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
-                    R.id.warrior -> {Commons().makeWarrior(this)
+                    R.id.warrior -> {
+                        makeMeWarior(Commons().makeWarrior(this))
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@FollowerActivity)
@@ -85,7 +92,7 @@ class FollowerActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@FollowerActivity, EditProfileActivity::class.java)
+                        val intent = Intent(this@FollowerActivity, FollowerActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
@@ -113,6 +120,7 @@ class FollowerActivity : AppCompatActivity() {
 
     }
     private fun getallFollowers(context: Context) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -140,6 +148,7 @@ class FollowerActivity : AppCompatActivity() {
                             }
 
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -150,6 +159,7 @@ class FollowerActivity : AppCompatActivity() {
         }
     }
     private fun getallFollowing(context: Context) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -176,12 +186,49 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.adapter = FollowAdapter(followList, context,followingMap,this@FollowerActivity)
                             }
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ", "Posts")
                     }
                 })
+            }
+        }
+    }
+    private fun makeMeWarior(data: JsonObject) {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code()==200){
+                            Toast.makeText(this@FollowerActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = loginresp.get("status").toString()
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)
+                            Toast.makeText(this@FollowerActivity,errorMessage,Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ","Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@FollowerActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@FollowerActivity, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.adapter
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
@@ -31,6 +32,7 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
 
 
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
 
 
@@ -45,6 +47,11 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
         var layoutInflater : LayoutInflater = LayoutInflater.from(parent.context)
         var items : View = layoutInflater.inflate(R.layout.child_follow,parent,false)
         var viewHolder = ViewHolder(items)
+
+        dialog = ProgressDialog(context)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
 
         return viewHolder
     }
@@ -85,6 +92,7 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
         }
     }
     private fun follow(userId: String, followerId: String) {
+        dialog.show()
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("followerId",followerId)
@@ -110,6 +118,7 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

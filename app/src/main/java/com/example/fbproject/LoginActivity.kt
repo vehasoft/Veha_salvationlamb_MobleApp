@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,9 +21,14 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         setContentView(R.layout.activity_login)
         signup_btn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -49,6 +55,7 @@ class LoginActivity : AppCompatActivity() {
 
     }
     private fun login(data: JsonObject) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -81,6 +88,7 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity,"INVALID USER",Toast.LENGTH_LONG).show()
                     }
                 }
+                dialog.hide()
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                 Toast.makeText(this@LoginActivity,"No Internet",Toast.LENGTH_LONG).show()

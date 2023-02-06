@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -16,6 +17,7 @@ import retrofit2.Response
 
 class ViewPostActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     val name : TextView = findViewById(R.id.name_post)
     val time : TextView = findViewById(R.id.post_time)
     val tags : TextView = findViewById(R.id.tags)
@@ -41,10 +43,15 @@ class ViewPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
         userPreferences = UserPreferences(this)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         var postId: String = intent.extras!!.get("postId").toString()
         getPost(postId)
     }
     fun getPost(postId: String) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -64,6 +71,7 @@ class ViewPostActivity : AppCompatActivity() {
                             val status = loginresp.get("status").toString()
                             val errorMessage = loginresp.get("errorMessage").toString()
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

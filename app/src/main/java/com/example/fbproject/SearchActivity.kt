@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -34,11 +35,16 @@ class SearchActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var profilelist: ArrayList<PostUser>
     lateinit var postlist: ArrayList<Posts>
+    lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
         userPreferences = UserPreferences(this)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         tabLayout = findViewById(R.id.tabLayout)
         search = findViewById(R.id.search)
         val home = tabLayout.newTab()
@@ -74,6 +80,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun getContent(text: String) {
+        dialog.show()
         val data = JsonObject()
         data.addProperty("query",text)
         val retrofit = Util.getRetrofit()
@@ -100,7 +107,7 @@ class SearchActivity : AppCompatActivity() {
                             }
                             viewPager.adapter = SearchAdapter(this@SearchActivity,supportFragmentManager,tabLayout.tabCount,profilelist,postlist)
                         }
-
+                        dialog.hide()
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ","Posts")

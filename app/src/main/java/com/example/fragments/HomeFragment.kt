@@ -1,5 +1,6 @@
 package com.example.fragments
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -36,6 +37,7 @@ import retrofit2.Response
 
 class HomeFragment: Fragment(){
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     lateinit var list : RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var userType: String
@@ -79,10 +81,14 @@ class HomeFragment: Fragment(){
         myLikesMap = HashMap()
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
+        dialog = ProgressDialog(contexts)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         list = view.findViewById(R.id.list)
-        refresh = view.findViewById(R.id.refresh)
         nodata = view.findViewById(R.id.no_data)
         addPost = view.findViewById(R.id.add_post)
+        refresh = view.findViewById(R.id.refresh)
         getMyDetails(viewLifecycleOwner)
 
         addPost.setOnClickListener {
@@ -91,19 +97,31 @@ class HomeFragment: Fragment(){
         }
         getallLikes(viewLifecycleOwner)
         adapter = HomeAdapter(ArrayList(), contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
-        list.layoutManager = LinearLayoutManager(activity)
+        val layoutManager = LinearLayoutManager(activity)
+        list.layoutManager = layoutManager
         list.adapter = adapter
 
-        refresh.setOnRefreshListener {
-            refresh.isRefreshing = false
-            requireFragmentManager().beginTransaction().detach(this).attach(this).commit()
+        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
+                if (!recyclerView.canScrollVertically(-1)) {
+                    refresh.isEnabled = true
+                    Log.e("toppp","Top")
+                    refresh.setOnRefreshListener {
+                        refresh.isRefreshing = false
+                        requireFragmentManager().beginTransaction().detach(this@HomeFragment).attach(this@HomeFragment).commit()
+                    }
+                } else {
+                    refresh.isEnabled = false
+                }
+            }
+        })
 
-        }
 
         return  view
     }
 
     fun getfavPosts(context: Context,owner: LifecycleOwner){
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -138,6 +156,7 @@ class HomeFragment: Fragment(){
                             list.visibility = View.GONE
                             nodata.visibility = View.VISIBLE
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -157,6 +176,7 @@ class HomeFragment: Fragment(){
 
     }
     fun getallPosts(context: Context,owner: LifecycleOwner,postlist: ArrayList<Posts> = ArrayList()){
+        dialog.show()
         var count: Int
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
@@ -164,18 +184,15 @@ class HomeFragment: Fragment(){
                 val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it",page,10)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        Log.e("responsee",response.code().toString())
                         if (response.code()==200){
                             val resp = response.body()
                             val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                             count = Integer.parseInt(resp?.get("count").toString())
                             count /= 10
-                            Log.e("responsee",count.toString())
                             for (post in loginresp){
                                 val pos = Gson().fromJson(post,Posts::class.java)
                                 postlist.add(pos)
                             }
-                            Log.e("responsee",postlist.toString())
                             if (postlist.size <= 0 && page == 0){
                                 list.visibility = View.GONE
                                 nodata.visibility = View.VISIBLE
@@ -205,6 +222,7 @@ class HomeFragment: Fragment(){
                             list.visibility = View.GONE
                             nodata.visibility = View.VISIBLE
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -224,6 +242,7 @@ class HomeFragment: Fragment(){
 
     }
     fun getallLikes(owner: LifecycleOwner){
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -242,6 +261,7 @@ class HomeFragment: Fragment(){
                                 myLikesMap.put(pos.postId,pos.reaction)
                             }
                         }
+                        dialog.hide()
                         getallFav(owner)
                     }
 
@@ -261,6 +281,7 @@ class HomeFragment: Fragment(){
         }
     }
     private fun getallFollowers(owner: LifecycleOwner){
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -276,6 +297,7 @@ class HomeFragment: Fragment(){
                                 myFollowMap.put(pos.id,Util.userId)
                             }
                         }
+                        dialog.hide()
                         if (type == "fav") getfavPosts(contexts,owner) else getallPosts(contexts,owner)
                     }
 
@@ -296,6 +318,7 @@ class HomeFragment: Fragment(){
     }
 
     fun getallFav(owner: LifecycleOwner){
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -311,6 +334,7 @@ class HomeFragment: Fragment(){
                                 myFavMap.put(pos.postId,pos.userId)
                             }
                         }
+                        dialog.hide()
                         getallFollowers(owner)
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -329,6 +353,7 @@ class HomeFragment: Fragment(){
         }
     }
     private fun getMyDetails(owner: LifecycleOwner) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -348,6 +373,7 @@ class HomeFragment: Fragment(){
                                 addPost.visibility = View.GONE
                             }
                         }
+                        dialog.hide()
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ", "Posts")

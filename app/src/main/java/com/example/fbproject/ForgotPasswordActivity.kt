@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,9 +18,14 @@ import retrofit2.Call
 import retrofit2.Response
 
 class ForgotPasswordActivity : AppCompatActivity() {
+    lateinit var dialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
 
         forgot_btn.setOnClickListener {
             if (TextUtils.isEmpty(email.text!!.trim())){
@@ -36,6 +42,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     }
     private fun checkValid(emailtxt: String) {
+        dialog.show()
         val data = JsonObject()
         data.addProperty("email",emailtxt)
         Log.e("data",data.toString())
@@ -68,6 +75,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     email.error = errorMessage
                     Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
                 }
+                dialog.hide()
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                 Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()
@@ -76,6 +84,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         })
     }
     private fun checkOtp(emailtxt: String,otpTxt: String) {
+        dialog.show()
         val data = JsonObject()
         data.addProperty("email",emailtxt)
         data.addProperty("otp",otpTxt)
@@ -100,6 +109,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     otp.error = errorMessage
                     Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
                 }
+                dialog.hide()
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                 Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()

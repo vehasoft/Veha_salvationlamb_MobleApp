@@ -2,6 +2,7 @@ package com.example.fbproject
 
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -60,6 +61,7 @@ class EditProfileActivity : AppCompatActivity() {
     private  var month:Int = 0
     private  var day:Int = 1
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
     private var state: ArrayList<String> = ArrayList()
     private var city: ArrayList<String> = ArrayList()
@@ -108,6 +110,10 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
         userPreferences = UserPreferences(this)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         saveBtn = findViewById(R.id.save_btn)
         cancelBtn = findViewById(R.id.cancel_btn)
         warrior = findViewById(R.id.warrior)
@@ -200,7 +206,7 @@ class EditProfileActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        Commons().makeWarrior(this)
+                        makeMeWarior(Commons().makeWarrior(this))
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
@@ -271,12 +277,13 @@ class EditProfileActivity : AppCompatActivity() {
         cancelBtn.setOnClickListener{finish()}
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                Commons().makeWarrior(this)
+                makeMeWarior(Commons().makeWarrior(this))
             }
         }
 
     }
     private fun edit(data: JsonObject) {
+        dialog.show()
         userPreferences = UserPreferences(this@EditProfileActivity)
         val retrofit = Util.getRetrofit()
 
@@ -298,6 +305,7 @@ class EditProfileActivity : AppCompatActivity() {
                             Log.e("respppresult", errorMessage)
                             Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_LONG).show()
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -308,6 +316,7 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
     private fun getMyDetails(context: Context) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -354,6 +363,7 @@ class EditProfileActivity : AppCompatActivity() {
                                 gender.check(genderbtn)
                             }
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -372,6 +382,7 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
     private fun updateProfilePic(context: Context,data: JsonObject) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -382,6 +393,7 @@ class EditProfileActivity : AppCompatActivity() {
                         if (response.code() == 200) {
                             Toast.makeText(context,"Waiting For Admin Approval",Toast.LENGTH_LONG).show()
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -485,5 +497,41 @@ class EditProfileActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
         })
+    }
+    private fun makeMeWarior(data: JsonObject) {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code()==200){
+                            Toast.makeText(this@EditProfileActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = loginresp.get("status").toString()
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)
+                            Toast.makeText(this@EditProfileActivity,errorMessage,Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ","Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@EditProfileActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 }

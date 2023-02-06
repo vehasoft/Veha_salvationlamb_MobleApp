@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,12 +26,18 @@ class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var cnfmPasswordTxt: String
     private lateinit var oldPasswordTxt: String
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_change_password)
 
         userPreferences = UserPreferences(this)
+
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         val email = intent.getStringExtra("email")
         val otp = intent.getStringExtra("otp")
         if (TextUtils.isEmpty(email?.trim())) old_pwd_op.visibility = View.VISIBLE else old_pwd_op.visibility = View.GONE
@@ -71,6 +78,7 @@ class ChangePasswordActivity : AppCompatActivity() {
 
     }
     private fun changePassword(data: JsonObject) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -89,7 +97,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                             Log.e("ok",response.body().toString())
 
                         }
-                        Log.e("ok",response.code().toString())
+                        dialog.hide()
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("fail ", "Posts")
@@ -107,6 +115,7 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
     }
     private fun forgotPassword(data: JsonObject) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -126,6 +135,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                     Log.e("result", errorMessage)
                     Toast.makeText(this@ChangePasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
+                dialog.hide()
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

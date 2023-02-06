@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -26,12 +27,18 @@ class AddPostActivity : AppCompatActivity() {
     lateinit var tags: EditText
 
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
 
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
 
         userPreferences = UserPreferences(this@AddPostActivity)
+        postBtn.isEnabled = true
 
         postBtn = findViewById(R.id.post_btn)
         title = findViewById(R.id.title)
@@ -41,6 +48,7 @@ class AddPostActivity : AppCompatActivity() {
             if (content.text.toString().trim().isNullOrEmpty()){
                 content.error = "Content must not be empty"
             }else {
+                postBtn.isEnabled = false
                 val data = JsonObject()
                 data.addProperty("title",title.text.toString())
                 data.addProperty("content",content.text.toString())
@@ -52,6 +60,7 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     private fun postData(data: JsonObject) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -61,10 +70,12 @@ class AddPostActivity : AppCompatActivity() {
                         if (response.code()==200){
                             title.text.clear()
                             content.text.clear()
+                            postBtn.isEnabled = true
                             val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                             startActivity(intent)
                         }
                         else{
+                            postBtn.isEnabled = true
                             val resp = response.errorBody()
                             val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                             val status = loginresp.get("status").toString()
@@ -72,6 +83,7 @@ class AddPostActivity : AppCompatActivity() {
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

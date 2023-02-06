@@ -1,5 +1,6 @@
 package com.example.adapter
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -35,6 +36,7 @@ class HomeAdapter(
 
 ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
     private val SMILE: String = "smile"
     private val LOVE: String = "love"
@@ -74,6 +76,10 @@ class HomeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
+        dialog = ProgressDialog(context)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         var layoutInflater : LayoutInflater = LayoutInflater.from(context)
         var items : View = layoutInflater.inflate(R.layout.child_post,parent,false)
         var viewHolder = ViewHolder(items)
@@ -185,13 +191,6 @@ class HomeAdapter(
                 true
             })
             popup.show()
-            /*holder.likeLayout.visibility = View.VISIBLE
-            holder.likeBtn.postDelayed(
-                {
-                    holder.likeLayout.visibility = View.GONE
-                },10000
-            )
-            true*/
         }
         holder.likeBtn.setOnLongClickListener {
             holder.likeLayout.visibility = View.VISIBLE
@@ -270,6 +269,7 @@ class HomeAdapter(
     }
 
     private fun likePost(post: Posts,reaction: String,holder: ViewHolder) {
+        dialog.show()
         val data = JsonObject()
         data.addProperty("userId",Util.userId)
         data.addProperty("postId",post.id)
@@ -310,6 +310,7 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -323,6 +324,7 @@ class HomeAdapter(
 
     private fun deletePost(post: Posts) {
         Log.e("postid  ==== ",post.id)
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -340,6 +342,7 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -352,6 +355,7 @@ class HomeAdapter(
     }
 
     private fun follow(userId: String, followerId: String,holder: ViewHolder) {
+        dialog.show()
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("followerId",followerId)
@@ -382,6 +386,7 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -393,6 +398,7 @@ class HomeAdapter(
         }
     }
     fun favPost(userId: String, postId: String,holder: ViewHolder) {
+        dialog.show()
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("postId",postId)
@@ -426,6 +432,7 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("errorMessage", errorMessage)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -437,6 +444,7 @@ class HomeAdapter(
         }
     }
     fun getPost(postId: String,holder: ViewHolder) {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             Log.e("token################", it)
@@ -456,6 +464,7 @@ class HomeAdapter(
                             val errorMessage = loginresp.get("errorMessage").toString()
                             Log.e("Status", status)
                         }
+                        dialog.hide()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

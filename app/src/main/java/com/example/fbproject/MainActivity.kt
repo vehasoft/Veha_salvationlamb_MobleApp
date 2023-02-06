@@ -1,6 +1,7 @@
 package com.example.fbproject
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,7 +11,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +37,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: ProgressDialog
 
     lateinit var search: Button
     var userType: String = ""
@@ -56,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         return true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         if(!checkPermission()){
             requestPermission()
         }
@@ -94,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        Commons().makeWarrior(this)
+                        makeMeWarior(Commons().makeWarrior(this))
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
@@ -116,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+                        val intent = Intent(this@MainActivity, MainActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
@@ -183,6 +188,7 @@ class MainActivity : AppCompatActivity() {
         alertDialog.show()
     }
     private fun getMyDetails() {
+        dialog.show()
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -196,6 +202,7 @@ class MainActivity : AppCompatActivity() {
                             val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
                             userType = if(isWarrior) Util.WARRIOR else Util.USER
+                            dialog.hide()
                         }
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -212,7 +219,41 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
     }
+    private fun makeMeWarior(data: JsonObject) {
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code()==200){
+                            Toast.makeText(this@MainActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val resp = response.errorBody()
+                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = loginresp.get("status").toString()
+                            val errorMessage = loginresp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)
+                            Toast.makeText(this@MainActivity,errorMessage,Toast.LENGTH_LONG).show()
+                        }
+                    }
 
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("fail ","Posts")
+                    }
+                })
+            } else {
+                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+    }
 }
