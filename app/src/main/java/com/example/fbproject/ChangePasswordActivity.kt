@@ -78,7 +78,9 @@ class ChangePasswordActivity : AppCompatActivity() {
 
     }
     private fun changePassword(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -97,10 +99,16 @@ class ChangePasswordActivity : AppCompatActivity() {
                             Log.e("ok",response.body().toString())
 
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@ChangePasswordActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -115,7 +123,9 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
     }
     private fun forgotPassword(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -135,12 +145,22 @@ class ChangePasswordActivity : AppCompatActivity() {
                     Log.e("result", errorMessage)
                     Toast.makeText(this@ChangePasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
-                dialog.hide()
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                Toast.makeText(this@ChangePasswordActivity, "No Internet", Toast.LENGTH_LONG).show()
                 Log.e("responseee", "fail")
             }
         })
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

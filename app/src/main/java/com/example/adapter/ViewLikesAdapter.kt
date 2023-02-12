@@ -26,15 +26,15 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name : TextView = view.findViewById(R.id.name_fol)
         val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
-        val emoji : ImageView = view.findViewById(R.id.like_symbol)
+        //val emoji : ImageView = view.findViewById(R.id.like_symbol)
+        val react : TextView = view.findViewById(R.id.react_txt)
         val likeListLinear : LinearLayout = view.findViewById(R.id.like_list_linear)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewLikesAdapter.ViewHolder {
-        var layoutInflater : LayoutInflater = LayoutInflater.from(context)
-        var items : View = layoutInflater.inflate(R.layout.child_likes_list,parent,false)
-        var viewHolder = ViewLikesAdapter.ViewHolder(items)
-        return  viewHolder
+        var layoutInflater: LayoutInflater = LayoutInflater.from(context)
+        var items: View = layoutInflater.inflate(R.layout.child_likes_list, parent, false)
+        return ViewHolder(items)
     }
 
     override fun getItemCount(): Int {
@@ -44,14 +44,16 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post : PostLikes = posts[position]
 
-        when(post.reaction){
+        holder.react.text = post.reaction
+
+        /*when(post.reaction){
             "smile" -> holder.emoji.setImageResource(R.drawable.ic_smile)
             "love" -> holder.emoji.setImageResource(R.drawable.ic_love)
             "cry" -> holder.emoji.setImageResource(R.drawable.ic_cry)
             "wow" -> holder.emoji.setImageResource(R.drawable.ic_wow)
             "angry" -> holder.emoji.setImageResource(R.drawable.ic_angry)
             "haha" -> holder.emoji.setImageResource(R.drawable.ic_haha)
-        }
+        }*/
 
         holder.name.text = post.user.name
         if (!post.user.picture.isNullOrEmpty()){

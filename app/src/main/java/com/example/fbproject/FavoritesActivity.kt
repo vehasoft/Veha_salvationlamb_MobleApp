@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -29,10 +30,22 @@ import retrofit2.Response
 class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var userPreferences: UserPreferences
+    private lateinit var logo: ImageView
+    private lateinit var dialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
+
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         userPreferences = UserPreferences(this)
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         val viewProfile = HomeFragment.getInstance("fav")
         val ft = supportFragmentManager.beginTransaction()
@@ -98,6 +111,9 @@ class FavoritesActivity : AppCompatActivity() {
         }
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -116,10 +132,17 @@ class FavoritesActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@FavoritesActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@FavoritesActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -132,5 +155,13 @@ class FavoritesActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

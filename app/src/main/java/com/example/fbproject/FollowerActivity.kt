@@ -40,6 +40,8 @@ class FollowerActivity : AppCompatActivity() {
     lateinit var nodata: LinearLayout
     private lateinit var userId: String
 
+    lateinit var logo: ImageView
+
     private var myFollowerMap: HashMap<String,String> = HashMap()
     private var followingMap: HashMap<String,String> = HashMap()
 
@@ -56,7 +58,11 @@ class FollowerActivity : AppCompatActivity() {
             getallFollowers(this)
         if(intent.extras!!.get("page") == "following")
             getallFollowing(this)
-
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         lists = findViewById(R.id.my_follow_list)
         nodata = findViewById(R.id.no_data)
 
@@ -120,7 +126,9 @@ class FollowerActivity : AppCompatActivity() {
 
     }
     private fun getallFollowers(context: Context) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -148,18 +156,26 @@ class FollowerActivity : AppCompatActivity() {
                             }
 
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             }
         }
     }
     private fun getallFollowing(context: Context) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -186,17 +202,26 @@ class FollowerActivity : AppCompatActivity() {
                                 lists.adapter = FollowAdapter(followList, context,followingMap,this@FollowerActivity)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             }
         }
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -215,10 +240,17 @@ class FollowerActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@FollowerActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -231,5 +263,9 @@ class FollowerActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

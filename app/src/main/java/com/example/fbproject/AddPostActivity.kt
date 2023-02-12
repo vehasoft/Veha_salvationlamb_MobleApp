@@ -38,12 +38,12 @@ class AddPostActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
 
         userPreferences = UserPreferences(this@AddPostActivity)
-        postBtn.isEnabled = true
 
         postBtn = findViewById(R.id.post_btn)
         title = findViewById(R.id.title)
         content = findViewById(R.id.content)
         tags = findViewById(R.id.tags)
+        postBtn.isEnabled = true
         postBtn.setOnClickListener {
             if (content.text.toString().trim().isNullOrEmpty()){
                 content.error = "Content must not be empty"
@@ -58,9 +58,10 @@ class AddPostActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun postData(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -83,11 +84,17 @@ class AddPostActivity : AppCompatActivity() {
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@AddPostActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -100,5 +107,9 @@ class AddPostActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

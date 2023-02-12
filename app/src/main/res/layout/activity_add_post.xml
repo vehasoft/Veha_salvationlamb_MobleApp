@@ -57,6 +57,7 @@
         <Button android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="Post"
+                android:textColor="@color/white"
                 android:id="@+id/post_btn"
                 android:background="@drawable/rounded_border_login_register"
                 android:backgroundTint="@color/primary_blue"

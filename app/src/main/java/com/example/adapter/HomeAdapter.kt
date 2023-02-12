@@ -116,9 +116,7 @@ class HomeAdapter(
         }
 
         likesCount = post.likesCount.toInt()
-        if (post.userId == Util.userId){
-            holder.followBtn.visibility = View.GONE
-        }
+        if (post.userId == Util.userId) holder.followBtn.visibility = View.GONE else holder.followBtn.visibility = View.VISIBLE
         if (!myFavList.containsKey(post.id)) {
             holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_border_24)
         } else {
@@ -163,7 +161,6 @@ class HomeAdapter(
             true
         }
         holder.likeBtn.setOnClickListener {
-            Log.e("likebtn","bascxghavxahgvgh")
             val myContext: Context = ContextThemeWrapper(context, R.style.menuStyle)
             val popup = PopupMenu(myContext, holder.likeBtn)
             popup.menuInflater.inflate(R.menu.react_menu, popup.menu)
@@ -269,7 +266,9 @@ class HomeAdapter(
     }
 
     private fun likePost(post: Posts,reaction: String,holder: ViewHolder) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val data = JsonObject()
         data.addProperty("userId",Util.userId)
         data.addProperty("postId",post.id)
@@ -310,10 +309,15 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
@@ -323,8 +327,10 @@ class HomeAdapter(
     }
 
     private fun deletePost(post: Posts) {
-        Log.e("postid  ==== ",post.id)
-        dialog.show()
+        Log.e("deleted post : postid  ==== ",post.id)
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -342,10 +348,15 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
@@ -355,7 +366,9 @@ class HomeAdapter(
     }
 
     private fun follow(userId: String, followerId: String,holder: ViewHolder) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("followerId",followerId)
@@ -386,10 +399,15 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
@@ -398,7 +416,9 @@ class HomeAdapter(
         }
     }
     fun favPost(userId: String, postId: String,holder: ViewHolder) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("postId",postId)
@@ -432,10 +452,15 @@ class HomeAdapter(
                             Log.e("Status", status)
                             Log.e("errorMessage", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
@@ -443,8 +468,10 @@ class HomeAdapter(
             }
         }
     }
-    fun getPost(postId: String,holder: ViewHolder) {
-        dialog.show()
+    fun getPost(postId: String) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             Log.e("token################", it)
@@ -454,7 +481,6 @@ class HomeAdapter(
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
                             val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
-                            holder.reacts.text = "${post.likesCount} people reacts"
 
                         } else {
                             Log.e("fail fav",response.errorBody().toString())
@@ -464,10 +490,15 @@ class HomeAdapter(
                             val errorMessage = loginresp.get("errorMessage").toString()
                             Log.e("Status", status)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
@@ -477,6 +508,6 @@ class HomeAdapter(
     }
     fun addItem(post: ArrayList<Posts>){
         posts.addAll(post)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(posts.size,post.size)
     }
 }

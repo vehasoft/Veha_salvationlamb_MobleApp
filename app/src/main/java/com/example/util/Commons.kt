@@ -2,23 +2,15 @@ package com.example.util
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.graphics.Color
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
-import com.example.fbproject.LoginActivity
-import com.example.fbproject.MainActivity
 import com.example.fbproject.R
-import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Commons {
     fun makeWarrior(context: Context): JsonObject{
@@ -64,11 +56,25 @@ class Commons {
                 data.addProperty("userId",Util.userId)
                 data.addProperty("isWarrior",true)
                 data.addProperty("religion",rel)
-                data.addProperty("church",church.text.toString())
+                data.addProperty("churchName",church.text.toString())
                 wantToCloseDialog = true
             }
             if (wantToCloseDialog) alertDialog.dismiss()
         }
         return data
+    }
+    fun getDate(date: String): String{
+        return date.toDate().formatTo()
+    }
+    fun String.toDate(): Date {
+        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        parser.timeZone = TimeZone.getTimeZone("UTC")
+        return parser.parse(this)
+    }
+
+    fun Date.formatTo(): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        formatter.timeZone = TimeZone.getDefault()
+        return formatter.format(this)
     }
 }

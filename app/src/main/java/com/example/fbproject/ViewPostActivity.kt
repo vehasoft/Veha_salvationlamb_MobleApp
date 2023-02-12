@@ -1,6 +1,7 @@
 package com.example.fbproject
 
 import android.app.ProgressDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -33,12 +34,7 @@ class ViewPostActivity : AppCompatActivity() {
     val likeBtn : Button = findViewById(R.id.like_btn)
     val shareBtn : Button = findViewById(R.id.share_btn)
     val fav : ImageButton = findViewById(R.id.fav)
-    val smile : ImageView = findViewById(R.id.smile)
-    val love : ImageView = findViewById(R.id.love)
-    val cry : ImageView = findViewById(R.id.cry)
-    val wow : ImageView = findViewById(R.id.wow)
-    val angry : ImageView = findViewById(R.id.angry)
-    val haha : ImageView = findViewById(R.id.haha)
+    val logo : ImageView = findViewById(R.id.prod_logo)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -47,11 +43,17 @@ class ViewPostActivity : AppCompatActivity() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         var postId: String = intent.extras!!.get("postId").toString()
         getPost(postId)
     }
     fun getPost(postId: String) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -71,7 +73,9 @@ class ViewPostActivity : AppCompatActivity() {
                             val status = loginresp.get("status").toString()
                             val errorMessage = loginresp.get("errorMessage").toString()
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -81,5 +85,9 @@ class ViewPostActivity : AppCompatActivity() {
                 })
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

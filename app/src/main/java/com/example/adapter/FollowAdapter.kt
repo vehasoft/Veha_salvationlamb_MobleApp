@@ -92,7 +92,9 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
         }
     }
     private fun follow(userId: String, followerId: String) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val followData = JsonObject()
         followData.addProperty("userId",userId)
         followData.addProperty("followerId",followerId)
@@ -118,10 +120,15 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                         Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }

@@ -147,7 +147,9 @@ class ProfileFragment: Fragment() {
     }
 
     private fun getallPosts(context: Context,owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         var count: Int
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
@@ -184,12 +186,18 @@ class ProfileFragment: Fragment() {
                                 })
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getallFollowers(owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -205,7 +213,9 @@ class ProfileFragment: Fragment() {
 
     }
     fun getallLikes(owner: LifecycleOwner){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -224,12 +234,18 @@ class ProfileFragment: Fragment() {
                                 myLikesMap.put(pos.postId,pos.reaction)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getallPosts(contexts,owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -245,7 +261,9 @@ class ProfileFragment: Fragment() {
 
     }
     private fun getallFollowers(owner: LifecycleOwner) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -264,12 +282,18 @@ class ProfileFragment: Fragment() {
                             followerCount = followersList.size
                             profileFollowers.text = followerCount.toString()
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getallFollowing(owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -284,7 +308,9 @@ class ProfileFragment: Fragment() {
         }
     }
     private fun getallFollowing(owner: LifecycleOwner) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -305,12 +331,18 @@ class ProfileFragment: Fragment() {
                         } else{
                             Log.e("following","fails - "+response.code())
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getmyDetails(contexts,owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -325,7 +357,9 @@ class ProfileFragment: Fragment() {
         }
     }
     private fun getmyDetails(context: Context,owner: LifecycleOwner) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -344,11 +378,17 @@ class ProfileFragment: Fragment() {
                             if (who == "other") { profileName.text = loginresp.name + " - " + role }
                             else { profileName.text = loginresp.name }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {

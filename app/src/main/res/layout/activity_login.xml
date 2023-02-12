@@ -142,6 +142,7 @@
         <Button android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Login"
+                android:textColor="@color/white"
                 android:id="@+id/login_btn"
                 android:background="@drawable/rounded_border_login_register"
                 android:backgroundTint="@color/primary_blue"

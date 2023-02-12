@@ -42,7 +42,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     }
     private fun checkValid(emailtxt: String) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val data = JsonObject()
         data.addProperty("email",emailtxt)
         Log.e("data",data.toString())
@@ -75,16 +77,23 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     email.error = errorMessage
                     Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
                 }
-                dialog.hide()
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                 Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()
                 Log.e("responseee","fail")
             }
         })
     }
     private fun checkOtp(emailtxt: String,otpTxt: String) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val data = JsonObject()
         data.addProperty("email",emailtxt)
         data.addProperty("otp",otpTxt)
@@ -109,12 +118,21 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     otp.error = errorMessage
                     Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
                 }
-                dialog.hide()
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                 Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()
                 Log.e("responseee","fail")
             }
         })
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

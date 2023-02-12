@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -12,7 +13,9 @@ import android.util.Log
 import android.view.View
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.util.UserRslt
 import com.example.util.Util
 import com.example.util.UserPreferences
@@ -25,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_register.gender
 import kotlinx.android.synthetic.main.activity_register.mobile
 import kotlinx.android.synthetic.main.activity_register.fname
 import kotlinx.android.synthetic.main.activity_register.lname
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
@@ -78,6 +82,19 @@ class RegisterActivity : AppCompatActivity() {
             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
             startActivity(intent)
         }
+        terms_conditions.setOnClickListener {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this@RegisterActivity)
+            builder.setMessage("Terms and conditions here......")
+            builder.setTitle("Terms and Conditions")
+            builder.setCancelable(false)
+            builder.setPositiveButton("Ok") { dialog: DialogInterface?, _: Int ->
+                dialog!!.cancel()
+            }
+            //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.show()
+        }
     }
     fun setDate(view: View?) {
         showDialog(999)
@@ -129,7 +146,9 @@ class RegisterActivity : AppCompatActivity() {
         return SUCCESS
     }
     private fun register(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         userPreferences = UserPreferences(this@RegisterActivity)
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("users",data)
@@ -150,12 +169,22 @@ class RegisterActivity : AppCompatActivity() {
                     Log.e("result", errorMessage)
                     Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
-                dialog.hide()
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
             }
 
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                Toast.makeText(this@RegisterActivity, "No Internet", Toast.LENGTH_LONG).show()
                 Log.e("responseee", "fail")
             }
         })
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

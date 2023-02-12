@@ -37,6 +37,7 @@ class ViewLikesActivity : AppCompatActivity() {
     lateinit var dialog: ProgressDialog
     lateinit var list : RecyclerView
     lateinit var nodata : LinearLayout
+    lateinit var logo : ImageView
 
     lateinit var likeslist: ArrayList<PostLikes>
 
@@ -53,6 +54,11 @@ class ViewLikesActivity : AppCompatActivity() {
         userPreferences = UserPreferences(this@ViewLikesActivity)
         val indent = intent
         postId = indent.getStringExtra("postId").toString()
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         getALlLikes(this@ViewLikesActivity)
 
         menu.setOnClickListener {
@@ -114,7 +120,9 @@ class ViewLikesActivity : AppCompatActivity() {
         }
     }
     fun getALlLikes(context: Context){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -139,11 +147,17 @@ class ViewLikesActivity : AppCompatActivity() {
                                 list.adapter = ViewLikesAdapter(likeslist, context)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@ViewLikesActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -158,6 +172,9 @@ class ViewLikesActivity : AppCompatActivity() {
         }
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -176,10 +193,17 @@ class ViewLikesActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@ViewLikesActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@ViewLikesActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -192,5 +216,9 @@ class ViewLikesActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

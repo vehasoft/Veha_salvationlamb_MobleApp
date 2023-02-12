@@ -43,6 +43,9 @@ class UserPreferences (context: Context) {
 
     val isNightModeEnabled: Flow<Boolean>
         get() = dataStorePref.data.map { preferences ->
+            if (preferences[IS_NIGHT] == null){
+                return@map false
+            }
             preferences[IS_NIGHT] as Boolean
         }
 
@@ -56,11 +59,31 @@ class UserPreferences (context: Context) {
             it.remove(IS_NIGHT)
         }
     }
+    val isFirstTime: Flow<Boolean>
+        get() = dataStorePref.data.map { preferences ->
+            if (preferences[IS_FIRST] == null){
+                return@map true
+            }
+            preferences[IS_FIRST] as Boolean
+        }
+
+    suspend fun saveIsFirstTime(isFirst: Boolean){
+        dataStorePref.edit { preferences ->
+            preferences[IS_FIRST] = isFirst
+        }
+    }
+    suspend fun deleteIsFirstTime(){
+        dataStorePref.edit {
+            it.remove(IS_FIRST)
+        }
+    }
+
 
 
     companion object{
         private val AUTH_TOKEN = preferencesKey<String>("token")
         private val USER_ID = preferencesKey<String>("userId")
         private val IS_NIGHT = preferencesKey<Boolean>("isNight")
+        private val IS_FIRST = preferencesKey<Boolean>("isFirst")
     }
 }

@@ -22,6 +22,7 @@ data class Loginresp(
     val state: String,
     val pinCode: String,
     val country: String,
+    val churchName: String,
     val religion: String,
     val language: String,
     val blocked: String,
@@ -112,8 +113,12 @@ data class UserRslt(
     val state: String,
     val pinCode: String,
     val country: String,
+    val churchName: String,
+    val religion: String,
     val city: String,
     val language: String,
+    val userGroup: String,
+    val isFreshUser: String,
     val blocked: String,
 )
 data class Posts(

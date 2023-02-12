@@ -80,7 +80,9 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun getContent(text: String) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val data = JsonObject()
         data.addProperty("query",text)
         val retrofit = Util.getRetrofit()
@@ -107,10 +109,16 @@ class SearchActivity : AppCompatActivity() {
                             }
                             viewPager.adapter = SearchAdapter(this@SearchActivity,supportFragmentManager,tabLayout.tabCount,profilelist,postlist)
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@SearchActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -123,5 +131,9 @@ class SearchActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

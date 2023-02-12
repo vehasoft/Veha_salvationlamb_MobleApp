@@ -62,6 +62,7 @@ class EditProfileActivity : AppCompatActivity() {
     private  var day:Int = 1
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
+    lateinit var logo: ImageView
 
     private var state: ArrayList<String> = ArrayList()
     private var city: ArrayList<String> = ArrayList()
@@ -123,6 +124,11 @@ class EditProfileActivity : AppCompatActivity() {
         countrySP = findViewById(R.id.country)
         stateSp = findViewById(R.id.state)
         citySp = findViewById(R.id.city)
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         if (Util.isWarrior){
             warrior.visibility = View.GONE
@@ -184,7 +190,7 @@ class EditProfileActivity : AppCompatActivity() {
                 } else if (items[item] == "Choose from Gallery") {
                     if (result) galleryIntent()
                 } else if (items[item] == "Cancel") {
-                    dialog.dismiss()
+                            dialog.dismiss()
                 }
             }
             builder1.show()
@@ -283,7 +289,9 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
     private fun edit(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         userPreferences = UserPreferences(this@EditProfileActivity)
         val retrofit = Util.getRetrofit()
 
@@ -305,10 +313,16 @@ class EditProfileActivity : AppCompatActivity() {
                             Log.e("respppresult", errorMessage)
                             Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_LONG).show()
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
                         Log.e("responseee", "fail")
                     }
                 })
@@ -316,7 +330,9 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
     private fun getMyDetails(context: Context) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -363,11 +379,17 @@ class EditProfileActivity : AppCompatActivity() {
                                 gender.check(genderbtn)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -382,7 +404,9 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
     private fun updateProfilePic(context: Context,data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -393,7 +417,9 @@ class EditProfileActivity : AppCompatActivity() {
                         if (response.code() == 200) {
                             Toast.makeText(context,"Waiting For Admin Approval",Toast.LENGTH_LONG).show()
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -436,6 +462,9 @@ class EditProfileActivity : AppCompatActivity() {
                 .append(month+1).append("-").append(day)
         }
     private fun getCountries() {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val call = Util.getRetrofit().getCountries()
         call!!.enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -453,10 +482,19 @@ class EditProfileActivity : AppCompatActivity() {
                 getMyDetails(this@EditProfileActivity)
             }
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                Log.e("responseee", "fail")
+            }
         })
     }
     private fun getStates(countryId: String) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val call = Util.getRetrofit().getState(countryId)
         call!!.enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -474,10 +512,19 @@ class EditProfileActivity : AppCompatActivity() {
                 getMyDetails(this@EditProfileActivity)
             }
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                Log.e("responseee", "fail")
+            }
         })
     }
     private fun getCities(stateId: String) {
+        if (!dialog.isShowing) {
+        dialog.show()
+    }
         val call = Util.getRetrofit().getCity(stateId)
         call!!.enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -495,10 +542,19 @@ class EditProfileActivity : AppCompatActivity() {
                 getMyDetails(this@EditProfileActivity)
             }
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                Log.e("responseee", "fail")
+            }
         })
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -517,10 +573,17 @@ class EditProfileActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@EditProfileActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@EditProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -533,5 +596,9 @@ class EditProfileActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

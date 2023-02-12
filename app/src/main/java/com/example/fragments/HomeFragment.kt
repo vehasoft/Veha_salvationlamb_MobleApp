@@ -96,6 +96,7 @@ class HomeFragment: Fragment(){
             startActivity(intent)
         }
         getallLikes(viewLifecycleOwner)
+        page = 1
         adapter = HomeAdapter(ArrayList(), contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
@@ -105,7 +106,6 @@ class HomeFragment: Fragment(){
             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                 if (!recyclerView.canScrollVertically(-1)) {
                     refresh.isEnabled = true
-                    Log.e("toppp","Top")
                     refresh.setOnRefreshListener {
                         refresh.isRefreshing = false
                         requireFragmentManager().beginTransaction().detach(this@HomeFragment).attach(this@HomeFragment).commit()
@@ -116,12 +116,13 @@ class HomeFragment: Fragment(){
             }
         })
 
-
         return  view
     }
 
     fun getfavPosts(context: Context,owner: LifecycleOwner){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -156,11 +157,17 @@ class HomeFragment: Fragment(){
                             list.visibility = View.GONE
                             nodata.visibility = View.VISIBLE
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -176,7 +183,9 @@ class HomeFragment: Fragment(){
 
     }
     fun getallPosts(context: Context,owner: LifecycleOwner,postlist: ArrayList<Posts> = ArrayList()){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         var count: Int
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
@@ -222,11 +231,17 @@ class HomeFragment: Fragment(){
                             list.visibility = View.GONE
                             nodata.visibility = View.VISIBLE
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -242,7 +257,9 @@ class HomeFragment: Fragment(){
 
     }
     fun getallLikes(owner: LifecycleOwner){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -261,12 +278,18 @@ class HomeFragment: Fragment(){
                                 myLikesMap.put(pos.postId,pos.reaction)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getallFav(owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -281,7 +304,9 @@ class HomeFragment: Fragment(){
         }
     }
     private fun getallFollowers(owner: LifecycleOwner){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -297,12 +322,18 @@ class HomeFragment: Fragment(){
                                 myFollowMap.put(pos.id,Util.userId)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         if (type == "fav") getfavPosts(contexts,owner) else getallPosts(contexts,owner)
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -318,7 +349,9 @@ class HomeFragment: Fragment(){
     }
 
     fun getallFav(owner: LifecycleOwner){
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -334,11 +367,17 @@ class HomeFragment: Fragment(){
                                 myFavMap.put(pos.postId,pos.userId)
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                         getallFollowers(owner)
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -353,7 +392,9 @@ class HomeFragment: Fragment(){
         }
     }
     private fun getMyDetails(owner: LifecycleOwner) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(owner) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -373,10 +414,16 @@ class HomeFragment: Fragment(){
                                 addPost.visibility = View.GONE
                             }
                         }
-                        dialog.hide()
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.hide()
+                        }
+                        Toast.makeText(contexts, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -389,5 +436,14 @@ class HomeFragment: Fragment(){
                 startActivity(intent)
             }
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

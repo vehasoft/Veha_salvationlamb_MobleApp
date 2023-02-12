@@ -107,6 +107,10 @@ interface RetrofitAPI {
     fun putUser(@Header(value="Authorization") head: String,@Path (value = "userId") userId: String,@Body dataModal: JsonObject?): Call<JsonObject?>?
 //same as register
 
+    @PUT("api/v1/users/freshUser/{userId}")
+    fun putFreshUser(@Header(value="Authorization") head: String,@Path (value = "userId") userId: String): Call<JsonObject?>?
+
+
 
 
 

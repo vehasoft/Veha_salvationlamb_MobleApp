@@ -21,6 +21,7 @@ public class Util {
     public static final String SUCCESS = "success";
     public static String url = "http://salvation-env.eba-nhpvydpr.us-east-1.elasticbeanstalk.com/";
     public static String userId;
+    public static Boolean isFirst = true;
     public static final String WARRIOR = "Warrior";
     public static final String USER = "User";
     public static Boolean isNight;
@@ -67,7 +68,7 @@ public class Util {
         try
         {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            Date past = format.parse(date);
+            Date past = format.parse(new Commons().getDate(date));
             Date now = new Date();
             long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
             long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());

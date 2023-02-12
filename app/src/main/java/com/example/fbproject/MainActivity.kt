@@ -1,16 +1,17 @@
 package com.example.fbproject
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Layout
 import android.text.TextUtils
 import android.util.Log
-import android.view.ContextThemeWrapper
-import android.view.MenuItem
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var dialog: ProgressDialog
 
     lateinit var search: Button
+    lateinit var logo: ImageView
     var userType: String = ""
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
@@ -57,21 +59,104 @@ class MainActivity : AppCompatActivity() {
         return true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+
         dialog = ProgressDialog(this)
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        Log.e("ialog.isShowing",dialog.isShowing.toString())
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         if(!checkPermission()){
             requestPermission()
         }
         userPreferences = UserPreferences(this@MainActivity)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        /*val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+        //builder.setMessage("Welcome to salvation Lamb")
+        //builder.setTitle("Welcome")
+        val img = ImageView(this)
+        img.layoutParams = ViewGroup.LayoutParams(50000, 10000)
+        //img.background = getDrawable(R.mipmap.welcome_img_foreground)
+        img.setImageResource(R.drawable.ic_sl_logo_01_svg)
+        builder.setView(img)
+        //builder.setView(R.mipmap.welcome_img_foreground)
+        builder.setCancelable(false)
+        builder.setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
+            lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
+        }
+        //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //alertDialog.setContentView(R.layout.preview_image)
+        alertDialog.show()*/
+
+        /*val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
+        nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        nagDialog.setCancelable(false)
+        nagDialog.setContentView(R.layout.preview_image)
+        val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
+        btnClose.setOnClickListener {
+                nagif (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+            }
+
+        nagDialog.show()*/
+
+        if (Util.isFirst != null && Util.isFirst){
+
+            val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
+            nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            nagDialog.setCancelable(false)
+            nagDialog.setContentView(R.layout.preview_image)
+            val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
+            val img: ImageView = nagDialog.findViewById(R.id.iv_preview_image)
+            img.setImageResource(R.drawable.ic_sl_logo_01_svg)
+            btnClose.setOnClickListener {
+                firstTime()
+                nagDialog.dismiss()
+                }
+
+            nagDialog.show()
+        /*
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity,android.R.style.Theme_Black_NoTitleBar)
+            *//*builder.setMessage("Welcome to salvation Lamb")
+            builder.setTitle("Welcome")*//*
+            val alertDialog: AlertDialog = builder.create()
+            val view = View.inflate(this, R.layout.preview_image,null)
+            builder.setView(view)
+            builder.setCancelable(false)
+            val btnClose: Button = view.findViewById(R.id.btnIvClose)
+            btnClose.setOnClickListener {
+                lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
+                alertDialog.dismiss()
+            }
+            *//*builder.setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
+                lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
+            }*//*
+            //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+
+            //val alertDialog: AlertDialog = builder.create()
+            alertDialog.show()*/
+        }
+
+
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         getMyDetails()
         userPreferences.isNightModeEnabled.asLiveData().observe(this) {
             if(it){ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) } else{ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
         }
-
+        logo = findViewById(R.id.prod_logo)
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
             if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
@@ -87,7 +172,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
-
+        /*logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }*/
 
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
@@ -121,7 +209,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
@@ -181,14 +269,18 @@ class MainActivity : AppCompatActivity() {
         builder.setMessage("Do you want to exit ?")
         builder.setTitle("Alert !")
         builder.setCancelable(false)
-        builder.setPositiveButton("Exit") { _: DialogInterface?, _: Int -> finish()}
+        builder.setPositiveButton("Exit") { _: DialogInterface?, _: Int -> //finish()
+            finishAffinity()
+        }
         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
 
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
     }
     private fun getMyDetails() {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -202,11 +294,50 @@ class MainActivity : AppCompatActivity() {
                             val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
                             userType = if(isWarrior) Util.WARRIOR else Util.USER
-                            dialog.hide()
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
                         }
                     }
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ", "Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
+                    }
+                })
+            } else {
+                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+    }
+    private fun firstTime() {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
+        val retrofit = Util.getRetrofit()
+        userPreferences.authToken.asLiveData().observe(this) {
+            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                    }
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -221,6 +352,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -239,10 +373,17 @@ class MainActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@MainActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -255,5 +396,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
+    }
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
     }
 }

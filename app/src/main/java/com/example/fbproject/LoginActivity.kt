@@ -55,7 +55,9 @@ class LoginActivity : AppCompatActivity() {
 
     }
     private fun login(data: JsonObject) {
-        dialog.show()
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         val call: Call<JsonObject?>? = retrofit.postCall("login",data)
         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -88,13 +90,22 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity,"INVALID USER",Toast.LENGTH_LONG).show()
                     }
                 }
-                dialog.hide()
+                if (dialog.isShowing) {
+                    dialog.dismiss()
+                }
             }
             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                 Toast.makeText(this@LoginActivity,"No Internet",Toast.LENGTH_LONG).show()
                 Log.e("responseee","fail")
+                if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
             }
         })
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }
 

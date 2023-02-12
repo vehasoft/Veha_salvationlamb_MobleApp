@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -28,16 +29,26 @@ import retrofit2.Response
 
 class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
+    private lateinit var logo: ImageView
+    lateinit var dialog: ProgressDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_profile)
+        dialog = ProgressDialog(this)
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         userPreferences = UserPreferences(this)
         val userId = intent.getStringExtra("userId")
         val viewProfile = ProfileFragment.getInstance(userId!!,"other")
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.view_profile,viewProfile)
         ft.commit()
-
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@ViewProfileActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
@@ -97,6 +108,9 @@ class ViewProfileActivity : AppCompatActivity() {
         }
     }
     private fun makeMeWarior(data: JsonObject) {
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         val retrofit = Util.getRetrofit()
         userPreferences.authToken.asLiveData().observe(this) {
             if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -115,10 +129,17 @@ class ViewProfileActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@ViewProfileActivity,errorMessage,Toast.LENGTH_LONG).show()
                         }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("fail ","Posts")
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Toast.makeText(this@ViewProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
+                        Log.e("responseee", "fail")
                     }
                 })
             } else {
@@ -131,5 +152,14 @@ class ViewProfileActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }
