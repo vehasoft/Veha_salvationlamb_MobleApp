@@ -25,6 +25,7 @@ data class Loginresp(
     val churchName: String,
     val religion: String,
     val language: String,
+    val isFreshUser: String,
     val blocked: String,
     val token: String,
 )

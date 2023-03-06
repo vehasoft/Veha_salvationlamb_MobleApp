@@ -8,6 +8,8 @@
            android:title="Saved Posts"/>
     <item  android:id="@+id/nightmode"
            android:title="Night Mode"/>
+    <item  android:id="@+id/settings"
+           android:title="Settings"/>
     <item  android:id="@+id/warrior"
            android:title="Make me warrior"/>
     <item  android:id="@+id/logout"

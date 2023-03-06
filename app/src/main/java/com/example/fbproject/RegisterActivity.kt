@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.util.Commons
 import com.example.util.UserRslt
 import com.example.util.Util
 import com.example.util.UserPreferences
@@ -114,8 +115,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private val myDateListener =
         OnDateSetListener { _, year, month, day ->
-            date?.text = StringBuilder().append(year).append("-")
-                .append(month+1).append("-").append(day)
+            date?.text = StringBuilder().append(day).append("-")
+                .append(month+1).append("-").append(year)
         }
     private fun doValidation(): String{
         if(TextUtils.isEmpty(nameTxt.trim())){
@@ -146,42 +147,43 @@ class RegisterActivity : AppCompatActivity() {
         return SUCCESS
     }
     private fun register(data: JsonObject) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        userPreferences = UserPreferences(this@RegisterActivity)
-        val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.postCall("users",data)
-        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.code() == 200) {
-                    val resp = response.body()
-                    val registerResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                    Util.user = registerResp
-                    val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    val resp = response.errorBody()
-                    val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                    val status = registerResp.get("status").toString()
-                    val errorMessage = registerResp.get("errorMessage").toString()
-                    Log.e("Status", status)
-                    Log.e("result", errorMessage)
-                    Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            userPreferences = UserPreferences(this@RegisterActivity)
+            val retrofit = Util.getRetrofit()
+            val call: Call<JsonObject?>? = retrofit.postCall("users", data)
+            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    if (response.code() == 200) {
+                        val resp = response.body()
+                        val registerResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                        Util.user = registerResp
+                        val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        val resp = response.errorBody()
+                        val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                        val status = registerResp.get("status").toString()
+                        val errorMessage = registerResp.get("errorMessage").toString()
+                        Log.e("Status", status)
+                        Log.e("result", errorMessage)
+                        Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
+                    }
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
                 }
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-            }
 
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                Toast.makeText(this@RegisterActivity, "No Internet", Toast.LENGTH_LONG).show()
-                Log.e("responseee", "fail")
-            }
-        })
+                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    Log.e("REGISTER", "fail")
+                }
+            })
+        }
     }
     override fun onDestroy() {
         super.onDestroy()

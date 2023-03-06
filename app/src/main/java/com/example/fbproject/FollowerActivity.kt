@@ -55,9 +55,9 @@ class FollowerActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         userId = intent.extras!!.get("userId").toString()
         if(intent.extras!!.get("page") == "follower")
-            getallFollowers(this)
+            getAllFollowers(this)
         if(intent.extras!!.get("page") == "following")
-            getallFollowing(this)
+            getAllFollowing(this)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -76,7 +76,7 @@ class FollowerActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        makeMeWarior(Commons().makeWarrior(this))
+                        Commons().makeWarrior(this,this)
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@FollowerActivity)
@@ -96,13 +96,16 @@ class FollowerActivity : AppCompatActivity() {
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
                     }
-
                     R.id.edit_profile ->{
                         val intent = Intent(this@FollowerActivity, FollowerActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{
                         val intent = Intent(this@FollowerActivity, FavoritesActivity::class.java)
+                        startActivity(intent)
+                    }
+                    R.id.settings -> {
+                        val intent = Intent(this@FollowerActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.nightmode ->{
@@ -125,144 +128,108 @@ class FollowerActivity : AppCompatActivity() {
         }
 
     }
-    private fun getallFollowers(context: Context) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            val resp = response.body()
-                            val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-                            followList = ArrayList()
-                            for (likes in loginresp) {
-                                val pos = Gson().fromJson(likes, PostUser::class.java)
-                                followList.add(pos)
-                                myFollowerMap.put(Util.userId,pos.id)
-                            }
-                            if (followList.size <= 0){
-                                lists.visibility = View.GONE
-                                nodata.visibility = View.VISIBLE
-                            } else{
-                                lists.visibility = View.VISIBLE
-                                nodata.visibility = View.GONE
-                                lists.layoutManager = LinearLayoutManager(context)
-                                lists.adapter = FollowAdapter(followList, context,myFollowerMap,this@FollowerActivity)
-                            }
-
-                        }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
+    private fun getAllFollowers(context: Context) {
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
             }
-        }
-    }
-    private fun getallFollowing(context: Context) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            val resp = response.body()
-                            val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-                            followList = ArrayList()
-                            for (followings in loginresp) {
-                                val pos = Gson().fromJson(followings, PostUser::class.java)
-                                followList.add(pos)
-                                followingMap.put(pos.id,Util.userId)
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                val resp = response.body()
+                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                followList = ArrayList()
+                                for (likes in loginresp) {
+                                    val pos = Gson().fromJson(likes, PostUser::class.java)
+                                    followList.add(pos)
+                                    myFollowerMap.put(Util.userId, pos.id)
+                                }
+                                if (followList.size <= 0) {
+                                    lists.visibility = View.GONE
+                                    nodata.visibility = View.VISIBLE
+                                } else {
+                                    lists.visibility = View.VISIBLE
+                                    nodata.visibility = View.GONE
+                                    lists.layoutManager = LinearLayoutManager(context)
+                                    lists.adapter =
+                                        FollowAdapter(followList, context, myFollowerMap, this@FollowerActivity)
+                                }
+
                             }
-                            if (followList.size <= 0){
-                                lists.visibility = View.GONE
-                                nodata.visibility = View.VISIBLE
-                            } else{
-                                lists.visibility = View.VISIBLE
-                                nodata.visibility = View.GONE
-                                lists.layoutManager = LinearLayoutManager(context)
-                                lists.adapter = FollowAdapter(followList, context,followingMap,this@FollowerActivity)
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
                             }
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
 
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Log.e("FollowerActivity.getAllFollowers", "fail")
                         }
-                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            }
-        }
-    }
-    private fun makeMeWarior(data: JsonObject) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code()==200){
-                            Toast.makeText(this@FollowerActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
-                        }
-                        else{
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)
-                            Toast.makeText(this@FollowerActivity,errorMessage,Toast.LENGTH_LONG).show()
-                        }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this@FollowerActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
+                    })
                 }
-                val intent = Intent(this@FollowerActivity, LoginActivity::class.java)
-                startActivity(intent)
             }
         }
+    }
+    private fun getAllFollowing(context: Context) {
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                val resp = response.body()
+                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                followList = ArrayList()
+                                for (followings in loginresp) {
+                                    val pos = Gson().fromJson(followings, PostUser::class.java)
+                                    followList.add(pos)
+                                    followingMap.put(pos.id, Util.userId)
+                                }
+                                if (followList.size <= 0) {
+                                    lists.visibility = View.GONE
+                                    nodata.visibility = View.VISIBLE
+                                } else {
+                                    lists.visibility = View.VISIBLE
+                                    nodata.visibility = View.GONE
+                                    lists.layoutManager = LinearLayoutManager(context)
+                                    lists.adapter =
+                                        FollowAdapter(followList, context, followingMap, this@FollowerActivity)
+                                }
+                            }
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
+                            Log.e("FollowerActivity.getAllFollowing", "fail")
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
     }
     override fun onDestroy() {
         super.onDestroy()

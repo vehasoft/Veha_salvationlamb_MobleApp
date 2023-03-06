@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.example.util.Commons
 import com.example.util.UserPreferences
 import com.example.util.UserRslt
 import com.example.util.Util
@@ -65,54 +66,63 @@ class AboutActivity : AppCompatActivity() {
         }
     }
     private fun getmyDetails() {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            val resp = response.body()
-                            val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                            var add = ""
-                            if(!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
-                            if(!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text = Util.formatDate(loginResp.dateOfBirth)
-                            if(!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
-                            if(!TextUtils.isEmpty(loginResp.gender)) gender.text = loginResp.gender
-                            if(!TextUtils.isEmpty(loginResp.address)) add = loginResp.address
-                            if(!TextUtils.isEmpty(loginResp.city)) add += ",${loginResp.city}"
-                            if(!TextUtils.isEmpty(loginResp.pinCode)) add += ",${loginResp.pinCode}"
-                            if(!TextUtils.isEmpty(loginResp.state)) add += ",${loginResp.state}"
-                            if(!TextUtils.isEmpty(loginResp.country)) add += ",${loginResp.country}"
-                            address.text = add
-                            if(!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
-                            if(!TextUtils.isEmpty(loginResp.createdAt)) join.text = Util.getTimeAgo(loginResp.createdAt)
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                val resp = response.body()
+                                val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                var add = ""
+                                if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
+                                if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
+                                    Util.formatDate(loginResp.dateOfBirth)
+                                if (!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
+                                if (!TextUtils.isEmpty(loginResp.gender)) gender.text = loginResp.gender
+                                if (!TextUtils.isEmpty(loginResp.address)) add = loginResp.address
+                                if (!TextUtils.isEmpty(loginResp.city)) add += ",${loginResp.city}"
+                                if (!TextUtils.isEmpty(loginResp.pinCode)) add += ",${loginResp.pinCode}"
+                                if (!TextUtils.isEmpty(loginResp.state)) add += ",${loginResp.state}"
+                                if (!TextUtils.isEmpty(loginResp.country)) add += ",${loginResp.country}"
+                                address.text = add
+                                if (!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
+                                if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
+                                    Util.getTimeAgo(loginResp.createdAt)
 
+                            }
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            call.cancel()
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Log.e("AboutActivity.getMyDetails", "fail")
                         }
+                    })
+                } else {
+                    Toast.makeText(
+                        this@AboutActivity,
+                        "Somthing Went Wrong \nLogin again to continue",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    lifecycleScope.launch {
+                        userPreferences.deleteAuthToken()
+                        userPreferences.deleteUserId()
                     }
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@AboutActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this@AboutActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
+                    val intent = Intent(this@AboutActivity, LoginActivity::class.java)
+                    startActivity(intent)
                 }
-                val intent = Intent(this@AboutActivity, LoginActivity::class.java)
-                startActivity(intent)
             }
         }
     }

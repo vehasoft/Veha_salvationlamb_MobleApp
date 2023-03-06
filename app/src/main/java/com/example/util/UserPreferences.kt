@@ -79,11 +79,34 @@ class UserPreferences (context: Context) {
     }
 
 
+    val textSize: Flow<Float>
+        get() = dataStorePref.data.map { preferences ->
+            if (preferences[TEXT_SIZE] == null){
+                return@map 10.0F
+            }
+            preferences[TEXT_SIZE]!!
+        }
+
+    suspend fun saveTextSize(textSize: Float){
+        dataStorePref.edit { preferences ->
+            preferences[TEXT_SIZE] = textSize
+        }
+    }
+    suspend fun deleteTextSize(){
+        dataStorePref.edit {
+            it.remove(TEXT_SIZE)
+        }
+    }
+
+
+
+
 
     companion object{
         private val AUTH_TOKEN = preferencesKey<String>("token")
         private val USER_ID = preferencesKey<String>("userId")
         private val IS_NIGHT = preferencesKey<Boolean>("isNight")
         private val IS_FIRST = preferencesKey<Boolean>("isFirst")
+        private val TEXT_SIZE = preferencesKey<Float>("textSize")
     }
 }

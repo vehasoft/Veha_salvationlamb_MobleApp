@@ -59,7 +59,7 @@ class ViewProfileActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        makeMeWarior(Commons().makeWarrior(this))
+                       Commons().makeWarrior(this,this)
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewProfileActivity)
@@ -88,6 +88,10 @@ class ViewProfileActivity : AppCompatActivity() {
                         val intent = Intent(this@ViewProfileActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+                    R.id.settings -> {
+                        val intent = Intent(this@ViewProfileActivity, SettingsActivity::class.java)
+                        startActivity(intent)
+                    }
                     R.id.nightmode ->{
                         if (Util.isNight){
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -105,52 +109,6 @@ class ViewProfileActivity : AppCompatActivity() {
                 true
             })
             popup.show()
-        }
-    }
-    private fun makeMeWarior(data: JsonObject) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code()==200){
-                            Toast.makeText(this@ViewProfileActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
-                        }
-                        else{
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)
-                            Toast.makeText(this@ViewProfileActivity,errorMessage,Toast.LENGTH_LONG).show()
-                        }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@ViewProfileActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
-                }
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            }
         }
     }
 

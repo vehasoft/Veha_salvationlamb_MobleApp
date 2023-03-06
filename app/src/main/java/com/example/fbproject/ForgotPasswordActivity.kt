@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.example.util.Commons
 import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -42,94 +43,97 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     }
     private fun checkValid(emailtxt: String) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val data = JsonObject()
-        data.addProperty("email",emailtxt)
-        Log.e("data",data.toString())
-        val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.postForgotPassword(data)
-        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.code()==200){
-                    val resp = response.body()
-                    Toast.makeText(this@ForgotPasswordActivity,resp?.get("message").toString(), Toast.LENGTH_LONG).show()
-                    otp_op.visibility = View.VISIBLE
-                    forgot_btn.text = "confirm"
-                    if (forgot_btn.text != "verify"){
-                        forgot_btn.setOnClickListener {
-                            if (TextUtils.isEmpty(otp.text!!.trim())){
-                                otp.error = "Enter OTP"
-                                Toast.makeText(this@ForgotPasswordActivity,"Enter Email", Toast.LENGTH_LONG).show()
-                            }
-                            else{
-                                checkOtp(email.text.toString(),otp.text.toString())
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val data = JsonObject()
+            data.addProperty("email", emailtxt)
+            Log.e("data", data.toString())
+            val retrofit = Util.getRetrofit()
+            val call: Call<JsonObject?>? = retrofit.postForgotPassword(data)
+            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    if (response.code() == 200) {
+                        val resp = response.body()
+                        Toast.makeText(this@ForgotPasswordActivity, resp?.get("message").toString(), Toast.LENGTH_LONG)
+                            .show()
+                        otp_op.visibility = View.VISIBLE
+                        forgot_btn.text = "confirm"
+                        if (forgot_btn.text != "verify") {
+                            forgot_btn.setOnClickListener {
+                                if (TextUtils.isEmpty(otp.text!!.trim())) {
+                                    otp.error = "Enter OTP"
+                                    Toast.makeText(this@ForgotPasswordActivity, "Enter Email", Toast.LENGTH_LONG).show()
+                                } else {
+                                    checkOtp(email.text.toString(), otp.text.toString())
+                                }
                             }
                         }
+                    } else {
+                        val resp = response.errorBody()
+                        val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                        val status = loginresp.get("status").toString()
+                        val errorMessage = loginresp.get("errorMessage").toString()
+                        email.error = errorMessage
+                        Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
+                    }
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
                     }
                 }
-                else{
-                    val resp = response.errorBody()
-                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                    val status = loginresp.get("status").toString()
-                    val errorMessage = loginresp.get("errorMessage").toString()
-                    email.error = errorMessage
-                    Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
+
+                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    Log.e("ForgotPasswordActivity.checkValid", "fail")
                 }
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-            }
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()
-                Log.e("responseee","fail")
-            }
-        })
+            })
+        }
     }
     private fun checkOtp(emailtxt: String,otpTxt: String) {
-        if (!dialog.isShowing) {
-            dialog.show()
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val data = JsonObject()
+            data.addProperty("email", emailtxt)
+            data.addProperty("otp", otpTxt)
+            Log.e("data", data.toString())
+            val retrofit = Util.getRetrofit()
+            val call: Call<JsonObject?>? = retrofit.postForgotPasswordOtp(data)
+            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    if (response.code() == 200) {
+                        val resp = response.body()
+                        Toast.makeText(this@ForgotPasswordActivity, resp?.get("message").toString(), Toast.LENGTH_LONG)
+                            .show()
+                        val intent = Intent(this@ForgotPasswordActivity, ChangePasswordActivity::class.java)
+                        intent.putExtra("email", emailtxt)
+                        intent.putExtra("otp", otpTxt)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        val resp = response.errorBody()
+                        val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                        val errorMessage = loginresp.get("errorMessage").toString()
+                        otp.error = errorMessage
+                        Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
+                    }
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                }
+
+                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    Log.e("ForgotPasswordActivity.checkOTP", "fail")
+                }
+            })
         }
-        val data = JsonObject()
-        data.addProperty("email",emailtxt)
-        data.addProperty("otp",otpTxt)
-        Log.e("data",data.toString())
-        val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.postForgotPasswordOtp(data)
-        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.code()==200){
-                    val resp = response.body()
-                    Toast.makeText(this@ForgotPasswordActivity,resp?.get("message").toString(), Toast.LENGTH_LONG).show()
-                    val intent = Intent(this@ForgotPasswordActivity, ChangePasswordActivity::class.java)
-                    intent.putExtra("email",emailtxt)
-                    intent.putExtra("otp",otpTxt)
-                    startActivity(intent)
-                    finish()
-                }
-                else{
-                    val resp = response.errorBody()
-                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                    val errorMessage = loginresp.get("errorMessage").toString()
-                    otp.error = errorMessage
-                    Toast.makeText(this@ForgotPasswordActivity,errorMessage, Toast.LENGTH_LONG).show()
-                }
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-            }
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                Toast.makeText(this@ForgotPasswordActivity,"No Internet", Toast.LENGTH_LONG).show()
-                Log.e("responseee","fail")
-            }
-        })
     }
     override fun onDestroy() {
         super.onDestroy()

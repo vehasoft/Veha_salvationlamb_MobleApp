@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">salvation-env.eba-nhpvydpr.us-east-1.elasticbeanstalk.com</domain>
+        <domain includeSubdomains="true">salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com</domain>
     </domain-config>
 </network-security-config>

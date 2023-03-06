@@ -42,16 +42,24 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var search: Button
     lateinit var logo: ImageView
+    var i = 0
     var userType: String = ""
     private fun requestPermission() {
+
+        Log.e("req per","called")
         //on below line we are requesting the read external storage permissions.
-        ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 200)
+        ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 255)
+        dialog.dismiss()
     }
     private fun checkPermission(): Boolean {
         // in this method we are checking if the permissions are granted or not and returning the result.
         val result = ContextCompat.checkSelfPermission(applicationContext, READ_EXTERNAL_STORAGE)
         val result1 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE)
         val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
+        Log.e("READ_EXTERNAL_STORAGE",result.toString())
+        Log.e("CAMERA_SERVICE",result1.toString())
+        Log.e("NOTIFICATION_SERVICE",result2.toString())
+        Log.e("READ_EXTERNAL_STORAGE",PackageManager.PERMISSION_GRANTED.toString())
         if( !(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)){
             requestPermission()
             return false
@@ -60,20 +68,22 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        userPreferences = UserPreferences(this@MainActivity)
+
         dialog = ProgressDialog(this)
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        Log.e("ialog.isShowing",dialog.isShowing.toString())
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+
+        Log.e("permission check",checkPermission().toString())
         if(!checkPermission()){
             requestPermission()
+            dialog.dismiss()
         }
-        userPreferences = UserPreferences(this@MainActivity)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        dialog.dismiss()
+
 
         /*val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
         //builder.setMessage("Welcome to salvation Lamb")
@@ -124,26 +134,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
             nagDialog.show()
-        /*
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity,android.R.style.Theme_Black_NoTitleBar)
-            *//*builder.setMessage("Welcome to salvation Lamb")
-            builder.setTitle("Welcome")*//*
-            val alertDialog: AlertDialog = builder.create()
-            val view = View.inflate(this, R.layout.preview_image,null)
-            builder.setView(view)
-            builder.setCancelable(false)
-            val btnClose: Button = view.findViewById(R.id.btnIvClose)
-            btnClose.setOnClickListener {
-                lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
-                alertDialog.dismiss()
-            }
-            *//*builder.setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
-                lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
-            }*//*
-            //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-            //val alertDialog: AlertDialog = builder.create()
-            alertDialog.show()*/
         }
 
 
@@ -172,10 +162,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
-        /*logo.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }*/
 
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
@@ -187,7 +173,7 @@ class MainActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
-                        makeMeWarior(Commons().makeWarrior(this))
+                       Commons().makeWarrior(this,this)
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
@@ -214,6 +200,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.fav ->{
                         val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
+                        startActivity(intent)
+                    }
+                    R.id.settings -> {
+                        val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.nightmode ->{
@@ -278,122 +268,91 @@ class MainActivity : AppCompatActivity() {
         alertDialog.show()
     }
     private fun getMyDetails() {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            val resp = response.body()
-                            val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                            Util.user = loginresp
-                            val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
-                            Util.isWarrior = isWarrior
-                            userType = if(isWarrior) Util.WARRIOR else Util.USER
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                val resp = response.body()
+                                val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                Util.user = loginresp
+                                val isWarrior: Boolean =
+                                    loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                                Util.isWarrior = isWarrior
+                                userType = if (isWarrior) Util.WARRIOR else Util.USER
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                             if (dialog.isShowing) {
                                 dialog.dismiss()
                             }
+                            Log.e("MainActivity.getDetails", "fail")
                         }
+                    })
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Somthing Went Wrong \nLogin again to continue",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    lifecycleScope.launch {
+                        userPreferences.deleteAuthToken()
+                        userPreferences.deleteUserId()
                     }
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
+                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                    startActivity(intent)
                 }
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
             }
         }
     }
     private fun firstTime() {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue",Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
-                }
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
             }
-        }
-    }
-    private fun makeMeWarior(data: JsonObject) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it",data)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code()==200){
-                            Toast.makeText(this@MainActivity,"Waiting for Admin Approval",Toast.LENGTH_LONG).show()
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            Log.e("firstttime", response.code().toString())
+                            Util.isFirst = false
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
                         }
-                        else{
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)
-                            Toast.makeText(this@MainActivity,errorMessage,Toast.LENGTH_LONG).show()
-                        }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
 
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Log.e("MainActivity.firstTime", "fail")
                         }
-                        Toast.makeText(this@MainActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
+                    })
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Somthing Went Wrong \nLogin again to continue",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    lifecycleScope.launch {
+                        userPreferences.deleteAuthToken()
+                        userPreferences.deleteUserId()
                     }
-                })
-            } else {
-                Toast.makeText(this@MainActivity,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
+                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                    startActivity(intent)
                 }
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
             }
         }
     }

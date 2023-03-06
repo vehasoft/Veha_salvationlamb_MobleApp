@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.example.util.Commons
 import com.example.util.UserPreferences
 import com.example.util.UserRslt
 import com.example.util.Util
@@ -63,6 +64,9 @@ class SplashhScreenActivity : AppCompatActivity() {
                 userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
+                userPreferences.textSize.asLiveData().observe(this){
+                    Util.fontSize = it
+                }
                 userPreferences.isNightModeEnabled.asLiveData().observe(this) {
                     if (it == null || !it) {
                         Util.isNight = false
@@ -77,31 +81,35 @@ class SplashhScreenActivity : AppCompatActivity() {
         }
     }
     private fun getMyDetails(token: String) {
-        val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
-        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.code() == 200) {
-                    val resp = response.body()
-                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                    Util.user = loginresp
-                    val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
-                    Util.isWarrior = isWarrior
-                    Util.isFirst = loginresp.isFreshUser.toBoolean()
-                    val intent = Intent(this@SplashhScreenActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+        if (Commons().isNetworkAvailable(this)) {
+            val retrofit = Util.getRetrofit()
+            val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
+            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    if (response.code() == 200) {
+                        val resp = response.body()
+                        val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                        Util.user = loginresp
+                        val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                        Util.isWarrior = isWarrior
+                        Util.isFirst = loginresp.isFreshUser.toBoolean()
+                        lifecycleScope.launch {
+                            userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
+                            Util.isFirst = loginresp.isFreshUser.toBoolean()
+                        }
+                        Thread.sleep(2000)
+                        val intent = Intent(this@SplashhScreenActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                         Log.e("responseee", "fail")
+                    }
                 }
-                else{
-                    Toast.makeText(this@SplashhScreenActivity, "Something Went Wrong", Toast.LENGTH_LONG).show()
-                    Log.e("responseee", "fail")
-                }
-            }
 
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                Toast.makeText(this@SplashhScreenActivity, "No Internet", Toast.LENGTH_LONG).show()
-                Log.e("responseee", "fail")
-            }
-        })
+                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                    Log.e("Splashscreen", "fail")
+                }
+            })
+        }
     }
 }

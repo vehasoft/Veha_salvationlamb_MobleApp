@@ -15,10 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.example.adapter.SearchAdapter
 import com.example.adapter.TabAdapter
-import com.example.util.PostUser
-import com.example.util.Posts
-import com.example.util.UserPreferences
-import com.example.util.Util
+import com.example.util.*
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -80,55 +77,65 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun getContent(text: String) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val data = JsonObject()
-        data.addProperty("query",text)
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(this) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.getSearch("Bearer $it", text)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code()==200){
-                            val resp = response.body()
-                            profilelist = ArrayList()
-                            postlist = ArrayList()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.get("results"), JsonObject::class.java)
-                            val allProfiles: JsonArray = Gson().fromJson(loginresp.get("users"), JsonArray::class.java)
-                            val allPosts: JsonArray = Gson().fromJson(loginresp.get("posts"), JsonArray::class.java)
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val data = JsonObject()
+            data.addProperty("query", text)
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(this) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.getSearch("Bearer $it", text)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                val resp = response.body()
+                                profilelist = ArrayList()
+                                postlist = ArrayList()
+                                val loginresp: JsonObject =
+                                    Gson().fromJson(resp?.get("results"), JsonObject::class.java)
+                                val allProfiles: JsonArray =
+                                    Gson().fromJson(loginresp.get("users"), JsonArray::class.java)
+                                val allPosts: JsonArray = Gson().fromJson(loginresp.get("posts"), JsonArray::class.java)
 
-                            for (post in allPosts){
-                                val pos = Gson().fromJson(post, Posts::class.java)
-                                postlist.add(pos)
+                                for (post in allPosts) {
+                                    val pos = Gson().fromJson(post, Posts::class.java)
+                                    postlist.add(pos)
+                                }
+                                for (profile in allProfiles) {
+                                    val pos = Gson().fromJson(profile, PostUser::class.java)
+                                    profilelist.add(pos)
+                                }
+                                viewPager.adapter = SearchAdapter(
+                                    this@SearchActivity,
+                                    supportFragmentManager,
+                                    tabLayout.tabCount,
+                                    profilelist,
+                                    postlist
+                                )
                             }
-                            for (profile in allProfiles){
-                                val pos = Gson().fromJson(profile, PostUser::class.java)
-                                profilelist.add(pos)
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
                             }
-                            viewPager.adapter = SearchAdapter(this@SearchActivity,supportFragmentManager,tabLayout.tabCount,profilelist,postlist)
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Log.e("SearchActivity.getContent", "fail")
                         }
+                    })
+                } else {
+                    Toast.makeText(this, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                    lifecycleScope.launch {
+                        userPreferences.deleteAuthToken()
+                        userPreferences.deleteUserId()
                     }
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                        Toast.makeText(this@SearchActivity, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
-            } else {
-                Toast.makeText(this,"Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                lifecycleScope.launch {
-                    userPreferences.deleteAuthToken()
-                    userPreferences.deleteUserId()
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
                 }
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
             }
         }
     }

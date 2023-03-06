@@ -7,10 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.util.Loginresp
-import com.example.util.Util
-import com.example.util.UserPreferences
-import com.example.util.UserRslt
+import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_login.*
@@ -55,53 +52,55 @@ class LoginActivity : AppCompatActivity() {
 
     }
     private fun login(data: JsonObject) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val retrofit = Util.getRetrofit()
-        val call: Call<JsonObject?>? = retrofit.postCall("login",data)
-        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                if (response.code()==200){
-                    val resp = response.body()
-                    val loginresp: Loginresp = Gson().fromJson(resp?.get("result"),Loginresp::class.java)
-                    lifecycleScope.launch {
-                        userPreferences.saveAuthToken(loginresp.token)
-                        userPreferences.saveUserId(loginresp.id)
-                        userPreferences.saveIsNightModeEnabled(false)
-                        Util.userId = loginresp.id
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    }
-
-                }
-                else{
-                    val resp = response.errorBody()
-                    val loginresp: JsonObject = Gson().fromJson(resp?.string(),JsonObject::class.java)
-                    val status = loginresp.get("status").toString()
-                    val errorMessage = loginresp.get("errorMessage").toString()
-                    Log.e("Status", status)
-                    Log.e("result", errorMessage)
-                    if (errorMessage.contains("Invalid password",true)){
-                        Toast.makeText(this@LoginActivity,"INVALID PASSWORD",Toast.LENGTH_LONG).show()
-                    }
-                    else if (errorMessage.contains("Invalid Email-Id",true)){
-                        Toast.makeText(this@LoginActivity,"INVALID USER",Toast.LENGTH_LONG).show()
-                    }
-                }
-                if (dialog.isShowing) {
-                    dialog.dismiss()
-                }
+        if (Commons().isNetworkAvailable(this)) {
+            if (!dialog.isShowing) {
+                dialog.show()
             }
-            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                Toast.makeText(this@LoginActivity,"No Internet",Toast.LENGTH_LONG).show()
-                Log.e("responseee","fail")
-                if (dialog.isShowing) {
-                            dialog.dismiss()
+            val retrofit = Util.getRetrofit()
+            val call: Call<JsonObject?>? = retrofit.postCall("login", data)
+            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    if (response.code() == 200) {
+                        val resp = response.body()
+                        val loginresp: Loginresp = Gson().fromJson(resp?.get("result"), Loginresp::class.java)
+                        Util.isFirst = loginresp.isFreshUser.toBoolean()
+                        lifecycleScope.launch {
+                            userPreferences.saveAuthToken(loginresp.token)
+                            userPreferences.saveUserId(loginresp.id)
+                            userPreferences.saveIsNightModeEnabled(false)
+                            userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
+                            Util.userId = loginresp.id
+                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
-            }
-        })
+
+                    } else {
+                        val resp = response.errorBody()
+                        val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                        val status = loginresp.get("status").toString()
+                        val errorMessage = loginresp.get("errorMessage").toString()
+                        Log.e("Status", status)
+                        Log.e("result", errorMessage)
+                        if (errorMessage.contains("Invalid password", true)) {
+                            Toast.makeText(this@LoginActivity, "INVALID PASSWORD", Toast.LENGTH_LONG).show()
+                        } else if (errorMessage.contains("Invalid Email-Id", true)) {
+                            Toast.makeText(this@LoginActivity, "INVALID USER", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                }
+
+                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                    Log.e("LoginActivity.login()", "fail")
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                }
+            })
+        }
     }
     override fun onDestroy() {
         super.onDestroy()

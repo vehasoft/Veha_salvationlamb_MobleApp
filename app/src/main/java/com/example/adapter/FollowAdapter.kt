@@ -14,26 +14,23 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.R
 import com.example.fbproject.ViewProfileActivity
-import com.example.util.PostUser
-import com.example.util.AllFollowerList
-import com.example.util.UserPreferences
-import com.example.util.Util
+import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Response
 
-class FollowAdapter(private  val follows:  ArrayList<PostUser>,
-                    private val context: Context,
-                    private var myFollowList: HashMap<String,String>,
-                    private  var owner: LifecycleOwner
+class FollowAdapter(
+    private val follows: ArrayList<PostUser>,
+    private val context: Context,
+    private var myFollowList: HashMap<String, String>,
+    private var owner: LifecycleOwner
 ) : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
 
 
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
-
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -44,8 +41,8 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var layoutInflater : LayoutInflater = LayoutInflater.from(parent.context)
-        var items : View = layoutInflater.inflate(R.layout.child_follow,parent,false)
+        var layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
+        var items: View = layoutInflater.inflate(R.layout.child_follow, parent, false)
         var viewHolder = ViewHolder(items)
 
         dialog = ProgressDialog(context)
@@ -61,78 +58,80 @@ class FollowAdapter(private  val follows:  ArrayList<PostUser>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val follow : PostUser = follows[position]
+        val follow: PostUser = follows[position]
         holder.name.text = follow.name
-        if (!follow.picture.isNullOrEmpty()){
+        if (!follow.picture.isNullOrEmpty()) {
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
-        if(!myFollowList.containsKey(Util.userId)){
+        if (!myFollowList.containsKey(Util.userId)) {
             holder.followBtn.text = "follow"
         } else {
             holder.followBtn.text = "unfollow"
         }
-        if(myFollowList.containsValue(Util.userId)){
+        if (myFollowList.containsValue(Util.userId)) {
             holder.followBtn.text = "follow"
         } else {
             holder.followBtn.text = "unfollow"
         }
         holder.followListLinear.setOnClickListener {
             val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("userId",follow.id)
+            intent.putExtra("userId", follow.id)
             context.startActivity(intent)
         }
         holder.followBtn.setOnClickListener {
-            if (holder.followBtn.text.equals("follow")){
-                follow(Util.userId,follow.id)
+            if (holder.followBtn.text.equals("follow")) {
+                follow(Util.userId, follow.id)
                 holder.followBtn.text = "unfollow"
             } else {
-                follow(Util.userId,follow.id)
+                follow(Util.userId, follow.id)
                 holder.followBtn.text = "follow"
             }
         }
     }
-    private fun follow(userId: String, followerId: String) {
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
-        val followData = JsonObject()
-        followData.addProperty("userId",userId)
-        followData.addProperty("followerId",followerId)
-        val retrofit = Util.getRetrofit()
-        userPreferences.authToken.asLiveData().observe(owner) {
-            if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
-                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                        if (response.code() == 200) {
-                            if (myFollowList.containsKey(followerId)){
-                                myFollowList.remove(followerId)
-                            }
-                            else{
-                                myFollowList.put(followerId,userId)
-                            }
-                        } else {
-                            Log.e("failFollow",response.errorBody().toString())
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)
-                        }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-                    }
 
-                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+    private fun follow(userId: String, followerId: String) {
+        if (Commons().isNetworkAvailable(context)) {
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+            val followData = JsonObject()
+            followData.addProperty("userId", userId)
+            followData.addProperty("followerId", followerId)
+            val retrofit = Util.getRetrofit()
+            userPreferences.authToken.asLiveData().observe(owner) {
+                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                    val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
+                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            if (response.code() == 200) {
+                                if (myFollowList.containsKey(followerId)) {
+                                    myFollowList.remove(followerId)
+                                } else {
+                                    myFollowList.put(followerId, userId)
+                                }
+                            } else {
+                                Log.e("failFollow", response.errorBody().toString())
+                                val resp = response.errorBody()
+                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                val status = loginresp.get("status").toString()
+                                val errorMessage = loginresp.get("errorMessage").toString()
+                                Log.e("Status", status)
+                                Log.e("result", errorMessage)
+                            }
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            call.cancel()
                         }
-                        Toast.makeText(context, "No Internet", Toast.LENGTH_LONG).show()
-                        Log.e("responseee", "fail")
-                    }
-                })
+
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                            Log.e("FollowAdapter.follow", "fail")
+                        }
+                    })
+                }
             }
         }
     }

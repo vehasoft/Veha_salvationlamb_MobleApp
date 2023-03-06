@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 
 public class Util {
     public static final String SUCCESS = "success";
-    public static String url = "http://salvation-env.eba-nhpvydpr.us-east-1.elasticbeanstalk.com/";
+    public static Float fontSize = 10.0F;
+    public static String url = "http://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com/";
     public static String userId;
     public static Boolean isFirst = true;
     public static final String WARRIOR = "Warrior";

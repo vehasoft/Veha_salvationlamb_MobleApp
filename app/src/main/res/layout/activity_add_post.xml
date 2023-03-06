@@ -25,6 +25,7 @@
                   android:textSize="20dp"
                   android:id="@+id/title"
                   android:layout_marginTop="10dp"
+                  android:inputType="textCapWords"
                   android:hint="Title"
                   android:textColor="@color/black"
                   android:textColorHint="@color/hintcolor"
