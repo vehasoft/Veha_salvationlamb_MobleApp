@@ -25,26 +25,13 @@ import java.util.*
 
 class Commons {
     fun makeWarrior(context: Context,owner: LifecycleOwner) {
-        val data = JsonObject()
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setMessage("If you want to become a warrior, you must strictly follow our Terms & Conditions as you acknowledged earlier during the Signup process.\n" +
-                "1.\tINTRODUCTION\n" +
-                "A Warrior in “The Army of Salvation Lamb” community, is given the privilege to do the post on this “SalvationLamb” platform. The privilege include (text/image) post. The warrior has the whole responsibility for their post. Once post is done, it cannot be edit/delete. If you wish to edit/delete, you must contact the admin to do such thing. So, we strictly urge the warrior should be keen and careful about the post. Each post is monitored and each post undergo the verification/approval process. The approved post only visible to the platform for the other users. If the post violates our rules, then it will be immediately removed. Even it may cause to terminate your account without any prior notice.\n" +
-                "\n" +
-                "If you do not read our Terms & Conditions, we strictly advice to read it fully and then decide to become a warrior here. As we mentioned in our Terms & Conditions, the post should not be irrelevant to the “Christianity” content. It should not oppose the “Word of GOD” at any cause.\n" +
-                "\n" +
-                "2.\tQUALIFICATION\n" +
-                "The first and foremost quality to become a warrior is, you must have the holy gift of “Tongues”. It is mandatory for a warrior. If you don’t have this holy gift of “Tongues”, then it is not advisable to become a warrior.\n" +
-                "\n" +
-                "\n" +
-                "\n" +
-                "3.\tVERIFICATION\n" +
-                "If you want to become a warrior, you are strictly undergoing our verification including your (Account information, Contact information including email id/mobile number, Location, Nationality, Mother Tongue & Church details). If needed we may also contact your over the phone or email. If you wish to co-operate all the verification process taken care from our side, then it would be very helpful to us to know/understand about you in a much better way.\n" +
-                "\n" +
-                "4.\tWHEN TO CHANGE YOU A WARRIOR\n" +
-                "If you are qualified with our minimum requirements and your verification process is satisfied to us, then we will promote you as a warrior by granting the privilege to do the post (text/image post) on our platform. We will also send you a welcome note about you to become as a warrior during your first login after becoming as a warrior.\n")
+        val data = JsonObject()
+        //builder.setMessage(R.string.make_me_warrior)
         builder.setTitle("BECOME A WARRIOR")
         val view = View.inflate(context, R.layout.child_warrior,null)
+        val warriotTxt = view.findViewById<TextView>(R.id.warrior_txt)
+        //warriotTxt.setText(R.string.make_me_warrior)
         builder.setView(view)
         val religion: Spinner = view.findViewById(R.id.religion)
         val church: EditText = view.findViewById(R.id.church)
@@ -69,26 +56,40 @@ class Commons {
         }
         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
 
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            var wantToCloseDialog = false
-            if (rel.isNullOrEmpty() || rel == "Select"){
-                error.setTextColor(Color.RED)
-                error.visibility = View.VISIBLE
-            } else if(church.text.isNullOrEmpty()){
-                church.error = "Please Enter ChurchName"
-            } else {
-                data.addProperty("userId",Util.userId)
-                data.addProperty("isWarrior",true)
-                data.addProperty("religion",rel)
-                data.addProperty("churchName",church.text.toString())
-                wantToCloseDialog = true
-            }
-            if (wantToCloseDialog) alertDialog.dismiss()
+        /*val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()*/
 
-            makeMeWarior(data,context,owner)
+        val builder1: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder1.setMessage(R.string.make_me_warrior)
+        builder1.setTitle("BECOME A WARRIOR")
+        builder1.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.show()
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                var wantToCloseDialog = false
+                if (rel.isNullOrEmpty() || rel == "Select"){
+                    error.setTextColor(Color.RED)
+                    error.visibility = View.VISIBLE
+                } else if(church.text.isNullOrEmpty()){
+                    church.error = "Please Enter ChurchName"
+                } else {
+                    data.addProperty("userId",Util.userId)
+                    data.addProperty("isWarrior",true)
+                    data.addProperty("religion",rel)
+                    data.addProperty("churchName",church.text.toString())
+                    wantToCloseDialog = true
+                }
+                if (wantToCloseDialog){
+                    alertDialog.dismiss()
+                    makeMeWarior(data,context,owner)
+                }
+
+
+            }
         }
+        val alertDialog: AlertDialog = builder1.create()
+        alertDialog.show()
+
     }
     private fun makeMeWarior(data: JsonObject,context: Context,owner: LifecycleOwner) {
         if (isNetworkAvailable(context)) {
@@ -115,7 +116,7 @@ class Commons {
                                 val errorMessage = loginresp.get("errorMessage").toString()
                                 Log.e("Status", status)
                                 Log.e("result", errorMessage)
-                                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                                //Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                             }
                             if (dialog.isShowing) {
                                 dialog.dismiss()

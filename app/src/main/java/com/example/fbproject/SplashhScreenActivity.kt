@@ -62,6 +62,11 @@ class SplashhScreenActivity : AppCompatActivity() {
                 finish()
             } else {
                 userPreferences.userId.asLiveData().observe(this) {
+                    if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()) {
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                     Util.userId = it
                 }
                 userPreferences.textSize.asLiveData().observe(this){
@@ -76,10 +81,11 @@ class SplashhScreenActivity : AppCompatActivity() {
 
                     Log.e("isnight", it.toString())
                 }
+
+                Thread.sleep(2000)
                 getMyDetails(it)
             }
         }
-        Thread.sleep(2000)
     }
     private fun getMyDetails(token: String) {
         if (Commons().isNetworkAvailable(this)) {
