@@ -29,8 +29,6 @@ class UsersAdapter(private  val follows:  ArrayList<PostUser>,
 ) : RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
 
 
-    private lateinit var userPreferences: UserPreferences
-
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

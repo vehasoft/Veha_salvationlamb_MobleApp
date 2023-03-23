@@ -79,6 +79,7 @@ class SplashhScreenActivity : AppCompatActivity() {
                 getMyDetails(it)
             }
         }
+        Thread.sleep(2000)
     }
     private fun getMyDetails(token: String) {
         if (Commons().isNetworkAvailable(this)) {

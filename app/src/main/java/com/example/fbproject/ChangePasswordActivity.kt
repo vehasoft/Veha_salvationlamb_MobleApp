@@ -43,7 +43,6 @@ class ChangePasswordActivity : AppCompatActivity() {
         val otp = intent.getStringExtra("otp")
         if (TextUtils.isEmpty(email?.trim())) old_pwd_op.visibility = View.VISIBLE else old_pwd_op.visibility = View.GONE
 
-
         change_pwd_btn.setOnClickListener {
             passwordTxt = new_pwd.text.toString()
             cnfmPasswordTxt = cnfm_pwd.text.toString()
@@ -75,7 +74,6 @@ class ChangePasswordActivity : AppCompatActivity() {
         cancel_btn.setOnClickListener {
             finish()
         }
-
 
     }
     private fun changePassword(data: JsonObject) {
@@ -157,7 +155,6 @@ class ChangePasswordActivity : AppCompatActivity() {
                     if (dialog.isShowing) {
                         dialog.dismiss()
                     }
-
                     call.cancel()
                 }
 

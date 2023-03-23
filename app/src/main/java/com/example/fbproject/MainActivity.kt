@@ -33,20 +33,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
-
-
 class MainActivity : AppCompatActivity() {
-
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
-
     lateinit var search: Button
     lateinit var logo: ImageView
     var i = 0
     var userType: String = ""
     private fun requestPermission() {
-
-        Log.e("req per","called")
         //on below line we are requesting the read external storage permissions.
         ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 255)
         dialog.dismiss()
@@ -56,10 +50,6 @@ class MainActivity : AppCompatActivity() {
         val result = ContextCompat.checkSelfPermission(applicationContext, READ_EXTERNAL_STORAGE)
         val result1 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE)
         val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
-        Log.e("READ_EXTERNAL_STORAGE",result.toString())
-        Log.e("CAMERA_SERVICE",result1.toString())
-        Log.e("NOTIFICATION_SERVICE",result2.toString())
-        Log.e("READ_EXTERNAL_STORAGE",PackageManager.PERMISSION_GRANTED.toString())
         if( !(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)){
             requestPermission()
             return false
@@ -67,15 +57,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-
         userPreferences = UserPreferences(this@MainActivity)
-
         dialog = ProgressDialog(this)
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
 
-        Log.e("permission check",checkPermission().toString())
         if(!checkPermission()){
             requestPermission()
             dialog.dismiss()
@@ -83,51 +70,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         dialog.dismiss()
-
-
-        /*val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-        //builder.setMessage("Welcome to salvation Lamb")
-        //builder.setTitle("Welcome")
-        val img = ImageView(this)
-        img.layoutParams = ViewGroup.LayoutParams(50000, 10000)
-        //img.background = getDrawable(R.mipmap.welcome_img_foreground)
-        img.setImageResource(R.drawable.ic_sl_logo_01_svg)
-        builder.setView(img)
-        //builder.setView(R.mipmap.welcome_img_foreground)
-        builder.setCancelable(false)
-        builder.setPositiveButton("Ok") { _: DialogInterface?, _: Int ->
-            lifecycleScope.launch { userPreferences.saveIsFirstTime(false) }
-        }
-        //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(false)
-        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        //alertDialog.setContentView(R.layout.preview_image)
-        alertDialog.show()*/
-
-        /*val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
-        nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        nagDialog.setCancelable(false)
-        nagDialog.setContentView(R.layout.preview_image)
-        val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
-        btnClose.setOnClickListener {
-                nagif (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
-            }
-
-        nagDialog.show()*/
-
         if (Util.isFirst != null && Util.isFirst){
-
             val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
             nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             nagDialog.setCancelable(false)
             nagDialog.setContentView(R.layout.preview_image)
             val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
             val img: ImageView = nagDialog.findViewById(R.id.iv_preview_image)
-            img.setImageResource(R.drawable.ic_sl_logo_01_svg)
+            img.setImageResource(R.drawable.covre_pic)
             btnClose.setOnClickListener {
                 firstTime()
                 nagDialog.dismiss()
@@ -135,8 +85,6 @@ class MainActivity : AppCompatActivity() {
 
             nagDialog.show()
         }
-
-
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -162,7 +110,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
-
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
@@ -231,12 +178,9 @@ class MainActivity : AppCompatActivity() {
         profile.tag = "Profile"
         home.text = "Home"
         profile.text = "Profile"
-
         tabLayout.addTab(home,0)
         tabLayout.addTab(profile,1)
-
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
-
         val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
         val viewPager : ViewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
@@ -253,19 +197,6 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
-    }
-    override fun onBackPressed() {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-        builder.setMessage("Do you want to exit ?")
-        builder.setTitle("Alert !")
-        builder.setCancelable(false)
-        builder.setPositiveButton("Exit") { _: DialogInterface?, _: Int -> //finish()
-            finishAffinity()
-        }
-        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
     }
     private fun getMyDetails() {
         if (Commons().isNetworkAvailable(this)) {
@@ -356,7 +287,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

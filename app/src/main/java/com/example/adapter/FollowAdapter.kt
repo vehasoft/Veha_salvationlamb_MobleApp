@@ -20,43 +20,33 @@ import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Response
-
 class FollowAdapter(
     private val follows: ArrayList<PostUser>,
     private val context: Context,
     private var myFollowList: HashMap<String, String>,
     private var owner: LifecycleOwner
 ) : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
-
-
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
-
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_fol)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic_fol)
         val followBtn: Button = view.findViewById(R.id.follow_btn)
         val followListLinear: LinearLayout = view.findViewById(R.id.follow_list_linear)
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
         var items: View = layoutInflater.inflate(R.layout.child_follow, parent, false)
         var viewHolder = ViewHolder(items)
-
         dialog = ProgressDialog(context)
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-
         return viewHolder
     }
-
     override fun getItemCount(): Int {
         return follows.size
     }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val follow: PostUser = follows[position]
         holder.name.text = follow.name
@@ -88,7 +78,6 @@ class FollowAdapter(
             }
         }
     }
-
     private fun follow(userId: String, followerId: String) {
         if (Commons().isNetworkAvailable(context)) {
             if (!dialog.isShowing) {

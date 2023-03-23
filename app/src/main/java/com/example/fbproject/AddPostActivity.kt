@@ -91,8 +91,8 @@ class AddPostActivity : AppCompatActivity() {
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(this) {
                 if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
+                    call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                         override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                             if (response.code() == 200) {
                                 title.text.clear()
@@ -100,6 +100,7 @@ class AddPostActivity : AppCompatActivity() {
                                 postBtn.isEnabled = true
                                 val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                                 startActivity(intent)
+                                finish()
                             } else {
                                 postBtn.isEnabled = true
                                 val resp = response.errorBody()
@@ -112,7 +113,7 @@ class AddPostActivity : AppCompatActivity() {
                             if (dialog.isShowing) {
                                 dialog.dismiss()
                             }
-                            call.cancel()
+                            call1.cancel()
                         }
 
                         override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -152,9 +153,6 @@ class AddPostActivity : AppCompatActivity() {
             val builder1 = AlertDialog.Builder(this@AddPostActivity)
             builder1.setTitle("Add Picture!")
             builder1.setItems(items) { dialog, item ->
-
-                //com.sun.org.apache.bcel.internal.classfile.Utility.checkPermission(this@EditProfileActivity)
-
                 if (items[item] == "Take Photo") {
                     cameraIntent()
                 } else if (items[item] == "Choose from Gallery") {
@@ -170,7 +168,7 @@ class AddPostActivity : AppCompatActivity() {
             builder2.setTitle("Permission Restricted")
             builder2.setMessage("We need CAMERA and STORAGE permission to serve you for updating your profile picture.\nplease enable this permission through your device's settings")
             builder2.setPositiveButton("cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-            builder2.setNegativeButton("settings") { dialog: DialogInterface, _: Int ->
+            builder2.setNegativeButton("settings") { _: DialogInterface, _: Int ->
                 val intent = Intent()
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 val uri: Uri = Uri.fromParts("package", applicationContext.packageName, null)

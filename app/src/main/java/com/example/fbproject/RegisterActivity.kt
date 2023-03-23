@@ -84,22 +84,14 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
         terms_conditions.setOnClickListener {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this@RegisterActivity)
-            builder.setMessage("Terms and conditions here......")
-            builder.setTitle("Terms and Conditions")
-            builder.setCancelable(false)
-            builder.setPositiveButton("Ok") { dialog: DialogInterface?, _: Int ->
-                dialog!!.cancel()
-            }
-            //builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
 
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.show()
+            val intent = Intent(this@RegisterActivity, WebViewActivity::class.java)
+            intent.putExtra("WebPageName","terms")
+            startActivity(intent)
         }
     }
     fun setDate(view: View?) {
         showDialog(999)
-        Log.e("dateeeee",date.text.toString())
     }
 
     override fun onCreateDialog(id: Int): Dialog? {

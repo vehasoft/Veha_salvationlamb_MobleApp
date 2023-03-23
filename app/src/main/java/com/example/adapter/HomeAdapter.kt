@@ -23,8 +23,6 @@ import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Response
-
-
 class HomeAdapter(
     private var posts: ArrayList<Posts>,
     private var context: Context,
@@ -33,47 +31,29 @@ class HomeAdapter(
     private var myFollowList: HashMap<String, String>,
     private var myFavList: HashMap<String, String>,
     private var owner: LifecycleOwner,
-
     ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
-
-    private val SMILE: String = "smile"
-    private val LOVE: String = "love"
-    private val CRY: String = "cry"
-    private val WOW: String = "wow"
-    private val ANGRY: String = "angry"
-    private val HAHA: String = "haha"
     private var likesCount = 0
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_post)
         val time: TextView = view.findViewById(R.id.post_time)
+        val fullTime: TextView = view.findViewById(R.id.post_full_time)
         val tags: TextView = view.findViewById(R.id.tags)
         val title: TextView = view.findViewById(R.id.title)
         val content: TextView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
         val postPic: ImageView = view.findViewById(R.id.post_pic)
-        val likePic: ImageView = view.findViewById(R.id.like_pic)
         val reactBtn: LinearLayout = view.findViewById(R.id.react_btn)
         val postContainer: LinearLayout = view.findViewById(R.id.post_layout)
         val headLinear: LinearLayout = view.findViewById(R.id.head_linear)
-        val likeLayout: LinearLayout = view.findViewById(R.id.like_layout)
         val likeBtn: Button = view.findViewById(R.id.like_btn)
         val shareBtn: Button = view.findViewById(R.id.share_btn)
         val followBtn: Button = view.findViewById(R.id.follow_post_btn)
         val deleteBtn: Button = view.findViewById(R.id.Delete_btn)
         val fav: ImageButton = view.findViewById(R.id.fav)
-        val smile: ImageView = view.findViewById(R.id.smile)
-        val love: ImageView = view.findViewById(R.id.love)
-        val cry: ImageView = view.findViewById(R.id.cry)
-        val wow: ImageView = view.findViewById(R.id.wow)
-        val angry: ImageView = view.findViewById(R.id.angry)
-        val haha: ImageView = view.findViewById(R.id.haha)
     }
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
         dialog = ProgressDialog(context)
@@ -101,11 +81,9 @@ class HomeAdapter(
         }
         return viewHolder
     }
-
     override fun getItemCount(): Int {
         return posts.size
     }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post: Posts = posts[position]
 
@@ -130,38 +108,21 @@ class HomeAdapter(
             holder.followBtn.text = "unfollow"
         }
         if (myList.contains(post.id)) {
-            //holder.likePic.visibility = View.VISIBLE
             holder.likeBtn.text = myList[post.id]
-            /*when (myList[post.id]) {
-                SMILE -> holder.likePic.setImageResource(R.drawable.ic_smile)
-                LOVE -> holder.likePic.setImageResource(R.drawable.ic_love)
-                CRY -> holder.likePic.setImageResource(R.drawable.ic_cry)
-                WOW -> holder.likePic.setImageResource(R.drawable.ic_wow)
-                ANGRY -> holder.likePic.setImageResource(R.drawable.ic_angry)
-                HAHA -> holder.likePic.setImageResource(R.drawable.ic_haha)
-            }*/
         } else {
             holder.likeBtn.text = "React"
-            holder.likePic.visibility = View.GONE
         }
         holder.name.text = post.user.name
         holder.tags.text = post.tags
         holder.title.text = post.title
         holder.time.text = Util.getTimeAgo(post.createdAt)
+        holder.fullTime.text = post.createdAt
         holder.content.text = post.content
         holder.reacts.text = "$likesCount people reacts"
         if (!post.user.picture.isNullOrEmpty()) {
             Picasso.with(context).load(post.user.picture).into(holder.profilePic)
-        }
-
-        holder.reactBtn.setOnLongClickListener {
-            holder.likeLayout.visibility = View.VISIBLE
-            holder.reactBtn.postDelayed(
-                {
-                    holder.likeLayout.visibility = View.GONE
-                }, 10000
-            )
-            true
+        } else {
+            holder.profilePic.setImageResource(R.drawable.ic_profile)
         }
         holder.likeBtn.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(context, R.style.menuStyle)
@@ -169,42 +130,26 @@ class HomeAdapter(
             popup.menuInflater.inflate(R.menu.react_menu, popup.menu)
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.smile -> {
-                        likePost(post, SMILE, holder)
-                    }
+                    R.id.react1 -> { likePost(post, myContext.getString(R.string.react1), holder) }
+                    R.id.react2 -> { likePost(post, myContext.getString(R.string.react2), holder) }
+                    R.id.react3 -> { likePost(post, myContext.getString(R.string.react3), holder) }
+                    R.id.react4 -> { likePost(post, myContext.getString(R.string.react4), holder) }
+                    R.id.react5 -> { likePost(post, myContext.getString(R.string.react5), holder) }
+                    R.id.react6 -> { likePost(post, myContext.getString(R.string.react6), holder) }
+                    R.id.react7 -> { likePost(post, myContext.getString(R.string.react7), holder) }
+                    R.id.react8 -> { likePost(post, myContext.getString(R.string.react8), holder) }
+                    R.id.react9 -> { likePost(post, myContext.getString(R.string.react9), holder) }
+                    R.id.react10 -> { likePost(post, myContext.getString(R.string.react10), holder) }
+                    R.id.react11 -> { likePost(post, myContext.getString(R.string.react11), holder) }
+                    R.id.react12 -> { likePost(post, myContext.getString(R.string.react12), holder) }
+                    R.id.react13 -> { likePost(post, myContext.getString(R.string.react13), holder) }
+                    R.id.react14 -> { likePost(post, myContext.getString(R.string.react14), holder) }
+                    R.id.react15 -> { likePost(post, myContext.getString(R.string.react15), holder) }
 
-                    R.id.love -> {
-                        likePost(post, LOVE, holder)
-                    }
-
-                    R.id.cry -> {
-                        likePost(post, CRY, holder)
-                    }
-
-                    R.id.wow -> {
-                        likePost(post, WOW, holder)
-                    }
-
-                    R.id.angry -> {
-                        likePost(post, ANGRY, holder)
-                    }
-
-                    R.id.haha -> {
-                        likePost(post, HAHA, holder)
-                    }
                 }
                 true
             })
             popup.show()
-        }
-        holder.likeBtn.setOnLongClickListener {
-            holder.likeLayout.visibility = View.VISIBLE
-            holder.likeBtn.postDelayed(
-                {
-                    holder.likeLayout.visibility = View.GONE
-                }, 10000
-            )
-            true
         }
         holder.shareBtn.setOnClickListener {
             try {
@@ -213,7 +158,7 @@ class HomeAdapter(
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
                 var shareMessage = "${post.content} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
-                    ${shareMessage + "http://salvationlamb.vehasoft.com/" + post.id}                    
+                    ${shareMessage + "https://salvationlamb.com/" + post.id}                    
                     """.trimIndent()
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
@@ -232,24 +177,6 @@ class HomeAdapter(
             val intent = Intent(context, ViewLikesActivity::class.java)
             intent.putExtra("postId", post.id)
             context.startActivity(intent)
-        }
-        holder.smile.setOnClickListener {
-            likePost(post, SMILE, holder)
-        }
-        holder.love.setOnClickListener {
-            likePost(post, LOVE, holder)
-        }
-        holder.cry.setOnClickListener {
-            likePost(post, CRY, holder)
-        }
-        holder.wow.setOnClickListener {
-            likePost(post, WOW, holder)
-        }
-        holder.angry.setOnClickListener {
-            likePost(post, ANGRY, holder)
-        }
-        holder.haha.setOnClickListener {
-            likePost(post, HAHA, holder)
         }
         holder.headLinear.setOnClickListener {
             if (page != "profile" && page != "OtherProfile") {
@@ -296,22 +223,10 @@ class HomeAdapter(
                                     Gson().fromJson(response.body()!!.get("likesCount"), String::class.java)
                                 if (msg == "liked") {
                                     myList.put(post.id, reaction)
-                                    holder.likePic.visibility = View.VISIBLE
-                                    holder.likeLayout.visibility = View.GONE
                                     holder.likeBtn.text = reaction
-                                   /* when (reaction) {
-                                        SMILE -> holder.likePic.setImageResource(R.drawable.ic_smile)
-                                        LOVE -> holder.likePic.setImageResource(R.drawable.ic_love)
-                                        CRY -> holder.likePic.setImageResource(R.drawable.ic_cry)
-                                        WOW -> holder.likePic.setImageResource(R.drawable.ic_wow)
-                                        ANGRY -> holder.likePic.setImageResource(R.drawable.ic_angry)
-                                        HAHA -> holder.likePic.setImageResource(R.drawable.ic_haha)
-                                    }*/
                                     holder.reacts.text = "$likesCount people reacts"
                                 } else if (msg == "unliked") {
-                                    holder.likePic.visibility = View.GONE
                                     myList.remove(post.id)
-                                    holder.likeLayout.visibility = View.GONE
                                     holder.reacts.text = "$likesCount people reacts"
                                 }
                             } else {

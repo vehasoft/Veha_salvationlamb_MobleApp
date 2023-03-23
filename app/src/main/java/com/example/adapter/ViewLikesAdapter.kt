@@ -26,7 +26,6 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name : TextView = view.findViewById(R.id.name_fol)
         val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
-        //val emoji : ImageView = view.findViewById(R.id.like_symbol)
         val react : TextView = view.findViewById(R.id.react_txt)
         val likeListLinear : LinearLayout = view.findViewById(R.id.like_list_linear)
     }
@@ -45,16 +44,6 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
         val post : PostLikes = posts[position]
 
         holder.react.text = post.reaction
-
-        /*when(post.reaction){
-            "smile" -> holder.emoji.setImageResource(R.drawable.ic_smile)
-            "love" -> holder.emoji.setImageResource(R.drawable.ic_love)
-            "cry" -> holder.emoji.setImageResource(R.drawable.ic_cry)
-            "wow" -> holder.emoji.setImageResource(R.drawable.ic_wow)
-            "angry" -> holder.emoji.setImageResource(R.drawable.ic_angry)
-            "haha" -> holder.emoji.setImageResource(R.drawable.ic_haha)
-        }*/
-
         holder.name.text = post.user.name
         if (!post.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(post.user.picture).into(holder.profilePic)

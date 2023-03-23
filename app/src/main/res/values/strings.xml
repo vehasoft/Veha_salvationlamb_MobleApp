@@ -12,4 +12,21 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="react1">Praise the LORD</string>
+    <string name="react2">Praise the LORD, O my sou</string>
+    <string name="react3">Ave Maria</string>
+    <string name="react4">Amen</string>
+    <string name="react5">Hallelujah</string>
+    <string name="react6">Hosanna</string>
+    <string name="react7">I Bless the name of the LORD</string>
+    <string name="react8">LORD, please forgive me</string>
+    <string name="react9">LORD, please redeem me</string>
+    <string name="react10">LORD, please heal me</string>
+    <string name="react11">LORD, please strengthen me</string>
+    <string name="react12">LORD, please save me</string>
+    <string name="react13">LORD, please comfort me</string>
+    <string name="react14">LORD, have mercy on me</string>
+    <string name="react15">My Mother, please pray for me</string>
+
+
 </resources>

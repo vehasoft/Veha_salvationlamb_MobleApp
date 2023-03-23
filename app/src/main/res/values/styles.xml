@@ -6,6 +6,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:statusBarColor">@color/primary_blue</item>
     </style>
     <style name="menuStyle">
         <item name="android:layoutDirection">ltr</item>

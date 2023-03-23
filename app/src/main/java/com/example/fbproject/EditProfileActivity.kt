@@ -85,7 +85,6 @@ class EditProfileActivity : AppCompatActivity() {
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE //
         startActivityForResult(intent, 150)
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100) {
@@ -105,7 +104,6 @@ class EditProfileActivity : AppCompatActivity() {
         data.addProperty("base64Image", profilestr)
         data.addProperty("name", Util.user.name + " picture")
         updateProfilePic(this, data)
-
     }
 
     fun encodeTobase64(image: Bitmap): String? {
@@ -137,11 +135,9 @@ class EditProfileActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
         if (Util.isWarrior) {
             warrior.visibility = View.GONE
         }
-
         state.add("State")
         val adapter1 = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -199,9 +195,6 @@ class EditProfileActivity : AppCompatActivity() {
                     val builder1 = AlertDialog.Builder(this@EditProfileActivity)
                     builder1.setTitle("Add Picture!")
                     builder1.setItems(items) { dialog, item ->
-
-                        //com.sun.org.apache.bcel.internal.classfile.Utility.checkPermission(this@EditProfileActivity)
-
                         if (items[item] == "Take Photo") {
                             cameraIntent()
                         } else if (items[item] == "Choose from Gallery") {
@@ -335,7 +328,6 @@ class EditProfileActivity : AppCompatActivity() {
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             Commons().makeWarrior(this, this)
         }
-
     }
 
     private fun edit(data: JsonObject) {
@@ -418,13 +410,14 @@ class EditProfileActivity : AppCompatActivity() {
                                 }
                                 loginresp.isWarrior.toBoolean()
                                 if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
+                                    var dateArr = Util.formatDate(loginresp.dateOfBirth,"dd-MM-yyyy").split("-")
+                                    year = dateArr[2].toInt()
+                                    month = dateArr[1].toInt() - 1
+                                    day = dateArr[0].toInt()
+                                    //val viewDate: String = day + "" + month + "" + year
                                     date.text =
                                         Editable.Factory.getInstance()
-                                            .newEditable(Util.formatDate(loginresp.dateOfBirth))
-                                    var dateArr = Util.formatDate(loginresp.dateOfBirth).split("-")
-                                    year = dateArr[0].toInt()
-                                    month = dateArr[1].toInt() - 1
-                                    day = dateArr[2].toInt()
+                                            .newEditable(Util.formatDate(loginresp.dateOfBirth,"dd-MM-yyyy"))
                                 }
                                 if (!TextUtils.isEmpty(loginresp.pinCode)) pincode.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.pinCode)
@@ -530,18 +523,15 @@ class EditProfileActivity : AppCompatActivity() {
                 this, android.R.style.Theme_Holo_Dialog_MinWidth,
                 myDateListener, year, month, day
             )
-
             datePickerDialog.datePicker.maxDate = System.currentTimeMillis() - 1000
-
             datePickerDialog
 
         } else null
     }
-
     private val myDateListener =
         DatePickerDialog.OnDateSetListener { _, year, month, day ->
-            date?.text = StringBuilder().append(year).append("-")
-                .append(month + 1).append("-").append(day)
+            date?.text = StringBuilder().append(day).append("-")
+                .append(month+1).append("-").append(year)
         }
 
     private fun getCountries() {
@@ -552,6 +542,7 @@ class EditProfileActivity : AppCompatActivity() {
             val call = Util.getRetrofit().getCountries()
             call!!.enqueue(object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    Log.e("country",response.body().toString())
                     val data = response.body()!!["results"] as JsonObject
                     val array = data["countries"] as JsonArray
                     country = ArrayList()

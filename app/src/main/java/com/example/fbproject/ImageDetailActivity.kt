@@ -18,29 +18,21 @@ class ImageDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_detail)
-
         imgPath = intent.getStringExtra("profilePic")
-
         imageView = findViewById(R.id.idIVImage)
-
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
-
         if (imgPath!=null) {
             Picasso.with(this).load(imgPath).into(imageView)
         }
     }
-
     override fun onTouchEvent(motionEvent: MotionEvent): Boolean {
         scaleGestureDetector!!.onTouchEvent(motionEvent)
         return true
     }
-
     private inner class ScaleListener : SimpleOnScaleGestureListener() {
         override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
-
             mScaleFactor *= scaleGestureDetector.scaleFactor
             mScaleFactor = 0.1f.coerceAtLeast(mScaleFactor.coerceAtMost(10.0f))
-
             imageView!!.scaleX = mScaleFactor
             imageView!!.scaleY = mScaleFactor
             return true

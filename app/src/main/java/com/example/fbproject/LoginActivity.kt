@@ -35,6 +35,16 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
             startActivity(intent)
         }
+        terms.setOnClickListener {
+            val intent = Intent(this@LoginActivity, WebViewActivity::class.java)
+            intent.putExtra("WebPageName","terms")
+            startActivity(intent)
+        }
+        privacy.setOnClickListener {
+            val intent = Intent(this@LoginActivity, WebViewActivity::class.java)
+            intent.putExtra("WebPageName","privacy")
+            startActivity(intent)
+        }
         login_btn.setOnClickListener {
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()

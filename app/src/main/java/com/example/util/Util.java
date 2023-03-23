@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class Util {
     public static final String SUCCESS = "success";
     public static Float fontSize = 10.0F;
-    public static String url = "http://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com/";
+    public static String url = "https://server.salvationlamb.com";
     public static String userId;
     public static Boolean isFirst = true;
     public static final String WARRIOR = "Warrior";
@@ -58,10 +58,10 @@ public class Util {
         retrofitAPI = retrofit.create(RetrofitAPI.class);
         return retrofitAPI;
     }
-    public static String formatDate(String date) throws ParseException {
+    public static String formatDate(String date,String pattern) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date past = format.parse(date);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         return formatter.format(past);
     }
     public static String getTimeAgo(String date){

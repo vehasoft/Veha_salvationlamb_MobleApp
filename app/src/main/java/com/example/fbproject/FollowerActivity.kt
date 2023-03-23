@@ -30,18 +30,13 @@ import retrofit2.Call
 import retrofit2.Response
 
 class FollowerActivity : AppCompatActivity() {
-
-
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
     private lateinit var followList: ArrayList<PostUser>
-
     lateinit var lists: RecyclerView
     lateinit var nodata: LinearLayout
     private lateinit var userId: String
-
     lateinit var logo: ImageView
-
     private var myFollowerMap: HashMap<String,String> = HashMap()
     private var followingMap: HashMap<String,String> = HashMap()
 
@@ -126,7 +121,6 @@ class FollowerActivity : AppCompatActivity() {
             })
             popup.show()
         }
-
     }
     private fun getAllFollowers(context: Context) {
         if (Commons().isNetworkAvailable(this)) {

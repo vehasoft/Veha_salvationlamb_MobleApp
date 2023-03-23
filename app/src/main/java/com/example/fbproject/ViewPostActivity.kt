@@ -31,7 +31,6 @@ class ViewPostActivity : AppCompatActivity() {
     val reactBtn: LinearLayout = findViewById(R.id.react_btn)
     val postContainer: LinearLayout = findViewById(R.id.post_layout)
     val headLinear: LinearLayout = findViewById(R.id.head_linear)
-    val likeLayout: LinearLayout = findViewById(R.id.like_layout)
     val likeBtn: Button = findViewById(R.id.like_btn)
     val shareBtn: Button = findViewById(R.id.share_btn)
     val fav: ImageButton = findViewById(R.id.fav)

@@ -49,7 +49,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
             val data = JsonObject()
             data.addProperty("email", emailtxt)
-            Log.e("data", data.toString())
             val retrofit = Util.getRetrofit()
             val call: Call<JsonObject?>? = retrofit.postForgotPassword(data)
             call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -125,7 +124,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
                         dialog.dismiss()
                     }
                 }
-
                 override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                     if (dialog.isShowing) {
                         dialog.dismiss()

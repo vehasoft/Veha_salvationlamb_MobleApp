@@ -83,14 +83,14 @@ class AboutActivity : AppCompatActivity() {
                                 var add = ""
                                 if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
                                 if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
-                                    Util.formatDate(loginResp.dateOfBirth)
+                                    Util.formatDate(loginResp.dateOfBirth,"dd-MM-yyyy")
                                 if (!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
                                 if (!TextUtils.isEmpty(loginResp.gender)) gender.text = loginResp.gender
-                                if (!TextUtils.isEmpty(loginResp.address)) add = loginResp.address
-                                if (!TextUtils.isEmpty(loginResp.city)) add += ",${loginResp.city}"
-                                if (!TextUtils.isEmpty(loginResp.pinCode)) add += ",${loginResp.pinCode}"
-                                if (!TextUtils.isEmpty(loginResp.state)) add += ",${loginResp.state}"
-                                if (!TextUtils.isEmpty(loginResp.country)) add += ",${loginResp.country}"
+                                if (!TextUtils.isEmpty(loginResp.address)) add = "${loginResp.address},"
+                                if (!TextUtils.isEmpty(loginResp.city)) add += "${loginResp.city},"
+                                if (!TextUtils.isEmpty(loginResp.pinCode)) add += "-${loginResp.pinCode}"
+                                if (!TextUtils.isEmpty(loginResp.state)) add += "${loginResp.state},"
+                                if (!TextUtils.isEmpty(loginResp.country)) add += "${loginResp.country}"
                                 address.text = add
                                 if (!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
                                 if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
