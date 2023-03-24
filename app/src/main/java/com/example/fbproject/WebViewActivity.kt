@@ -25,7 +25,9 @@ class WebViewActivity : AppCompatActivity() {
         // this will enable the javascript settings, it can also allow xss vulnerabilities
         webView.settings.javaScriptEnabled = true
 
+        webView.settings.domStorageEnabled = true;
+
         // if you want to enable zoom feature
-        webView.settings.setSupportZoom(true)
+        //webView.settings.setSupportZoom(true)
     }
 }
