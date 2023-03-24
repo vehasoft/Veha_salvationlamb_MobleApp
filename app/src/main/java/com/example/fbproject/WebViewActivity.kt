@@ -10,11 +10,10 @@ class WebViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
         val page: String = intent.getStringExtra("WebPageName").toString()
-        var url: String
-        if (page.contentEquals("terms")){
-            url = "https://salvationlamb.com/terms"
+        val url: String = if (page.contentEquals("terms")){
+            "https://salvationlamb.com/terms"
         } else {
-            url = "https://salvationlamb.com/privacy"
+            "https://salvationlamb.com/privacy"
         }
 
         webView.webViewClient = WebViewClient()
