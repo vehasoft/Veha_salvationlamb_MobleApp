@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         userPreferences.isNightModeEnabled.asLiveData().observe(this) {
             if(it){ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) } else{ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
         }
-        logo = findViewById(R.id.prod_logo)
+        //logo = findViewById(R.id.prod_logo)
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
             if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
@@ -174,12 +174,16 @@ class MainActivity : AppCompatActivity() {
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
+        val pdf = tabLayout.newTab()
         home.tag = "Home"
         profile.tag = "Profile"
+        pdf.tag = "Files"
         home.text = "Home"
         profile.text = "Profile"
+        pdf.text = "Files"
         tabLayout.addTab(home,0)
         tabLayout.addTab(profile,1)
+        tabLayout.addTab(pdf,2)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
         val viewPager : ViewPager = findViewById(R.id.viewPager)

@@ -35,11 +35,14 @@
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_change_password.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_edit_profile.xml" value="0.2714819427148194" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_favorites.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_file_list.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_follower.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_forgot_password.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_image_detail.xml" value="0.2890625" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_login.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_main.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_pdf.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_pdf2.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_register.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_search.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_settings.xml" value="0.29010416666666666" />
@@ -49,6 +52,7 @@
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_view_profile.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_web_view.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/add_post.xml" value="0.264" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_folders.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_follow.xml" value="0.1" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_likes_list.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_post.xml" value="0.217578125" />

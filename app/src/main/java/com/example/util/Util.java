@@ -21,6 +21,7 @@ public class Util {
     public static final String SUCCESS = "success";
     public static Float fontSize = 10.0F;
     public static String url = "https://server.salvationlamb.com";
+    //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static String userId;
     public static Boolean isFirst = true;
     public static final String WARRIOR = "Warrior";
@@ -34,12 +35,41 @@ public class Util {
     public static ArrayList getReligion(){
         religion = new ArrayList<>();
         religion.add("Select");
-        religion.add("Roman Catholic");
-        religion.add("Other Catholic");
-        religion.add("Protestant");
-        religion.add("Pentecost");
-        religion.add("CSI");
+        religion.add("Adventist");
+        religion.add("Anglican / Episcopal");
+        religion.add("Apostolic");
+        religion.add("Assembly of God (A.G)");
+        religion.add("Assyrian");
+        religion.add("Baptist");
+        religion.add("Born Again");
+        religion.add("Brethren");
+        religion.add("Calvinist");
+        religion.add("Christian");
+        religion.add("Church of God");
+        religion.add("Church of South India (C.S.I)");
+        religion.add("Congregational");
+        religion.add("Evangelical");
+        religion.add("Jacobite");
+        religion.add("Jehovah`s Witnesses");
+        religion.add("Jewish");
+        religion.add("Latin Catholic");
+        religion.add("Latter day saints");
+        religion.add("Lutheran");
+        religion.add("Malankara");
+        religion.add("Marthoma");
+        religion.add("Melkite");
+        religion.add("Mennonite");
+        religion.add("Methodist");
+        religion.add("Moravian");
+        religion.add("Orthodox");
         religion.add("Others");
+        religion.add("Pentecostal");
+        religion.add("Presbyterian");
+        religion.add("Protestant");
+        religion.add("Roman Catholic");
+        religion.add("Seventh-day Adventist");
+        religion.add("Syrian Catholic");
+        religion.add("Syro Malabar");
 
         return religion;
     }

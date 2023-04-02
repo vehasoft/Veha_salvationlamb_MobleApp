@@ -300,7 +300,9 @@ class EditProfileActivity : AppCompatActivity() {
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
                 val data = JsonObject()
-                data.addProperty("name", name.text.toString())
+                data.addProperty("firstName", fname.text.toString())
+                data.addProperty("lastName", lname.text.toString())
+                data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
                 data.addProperty("email", email.text.toString())
                 data.addProperty("mobile", mobile.text.toString())
                 data.addProperty("address", address.text.toString())
@@ -391,7 +393,9 @@ class EditProfileActivity : AppCompatActivity() {
                                     imgStr = loginresp.picture
                                     Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
                                 }
-                                if (!TextUtils.isEmpty(loginresp.name)) name.text =
+                                if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
+                                    Editable.Factory.getInstance().newEditable(loginresp.name)
+                                if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.name)
                                 if (!TextUtils.isEmpty(loginresp.address)) address.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.address)

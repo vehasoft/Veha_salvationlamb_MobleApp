@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.example.fragments.FilesFragment
 import com.example.fragments.HomeFragment
 import com.example.fragments.ProfileFragment
 import com.example.util.Util
@@ -26,6 +27,9 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
             }
             1 -> {
                 ProfileFragment.getInstance(Util.userId,"me")
+            }
+            2 -> {
+                FilesFragment()
             }
             else -> b as Fragment
         }

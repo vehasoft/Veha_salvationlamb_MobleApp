@@ -94,6 +94,9 @@ interface RetrofitAPI {
     @GET("api/v1/post/{postId}")
     fun getPost(@Header("Authorization") dataModal: String?,@Path (value = "postId") postId: String): Call<JsonObject?>?
 
+    @GET("api/v1/files/{folderId}")
+    fun getFilesAndFolders(@Header("Authorization") dataModal: String?,@Path (value = "folderId") folderId: String): Call<JsonObject?>?
+
 
     @GET("api/v1/Country")
     fun getCountries(): Call<JsonObject>?

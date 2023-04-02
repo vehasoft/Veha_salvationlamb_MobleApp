@@ -30,12 +30,16 @@ class Commons {
         //builder.setMessage(R.string.make_me_warrior)
         builder.setTitle("BECOME A WARRIOR")
         val view = View.inflate(context, R.layout.child_warrior,null)
-        val warriotTxt = view.findViewById<TextView>(R.id.warrior_txt)
-        //warriotTxt.setText(R.string.make_me_warrior)
         builder.setView(view)
+        var gift = ""
         val religion: Spinner = view.findViewById(R.id.religion)
         val church: EditText = view.findViewById(R.id.church)
         val error: TextView = view.findViewById(R.id.err_rel)
+        val gift1: CheckBox = view.findViewById(R.id.gift1)
+        val gift2: CheckBox = view.findViewById(R.id.gift2)
+        val gift3: CheckBox = view.findViewById(R.id.gift3)
+        val gift4: CheckBox = view.findViewById(R.id.gift4)
+        val gift5: CheckBox = view.findViewById(R.id.gift5)
         error.setTextColor(Color.RED)
         error.visibility = View.GONE
         val list = Util.getReligion()
@@ -55,10 +59,6 @@ class Commons {
         builder.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
         }
         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-        /*val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()*/
-
         val builder1: AlertDialog.Builder = AlertDialog.Builder(context)
         builder1.setMessage(R.string.make_me_warrior)
         builder1.setTitle("BECOME A WARRIOR")
@@ -73,10 +73,21 @@ class Commons {
                 } else if(church.text.isNullOrEmpty()){
                     church.error = "Please Enter ChurchName"
                 } else {
+                   if(gift1.isChecked)
+                       gift += gift1.text.toString() + ","
+                   if(gift2.isChecked)
+                       gift += gift2.text.toString() + ","
+                   if(gift3.isChecked)
+                       gift += gift3.text.toString() + ","
+                   if(gift4.isChecked)
+                       gift += gift4.text.toString() + ","
+                   if(gift5.isChecked)
+                       gift += gift5.text.toString() + ","
                     data.addProperty("userId",Util.userId)
                     data.addProperty("isWarrior",true)
                     data.addProperty("religion",rel)
                     data.addProperty("churchName",church.text.toString())
+                    data.addProperty("gift", gift)
                     wantToCloseDialog = true
                 }
                 if (wantToCloseDialog){

@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -13,15 +12,14 @@ import android.util.Log
 import android.view.View
 import android.widget.RadioButton
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.example.util.Commons
 import com.example.util.UserRslt
 import com.example.util.Util
 import com.example.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.date
 import kotlinx.android.synthetic.main.activity_register.email
@@ -29,7 +27,6 @@ import kotlinx.android.synthetic.main.activity_register.gender
 import kotlinx.android.synthetic.main.activity_register.mobile
 import kotlinx.android.synthetic.main.activity_register.fname
 import kotlinx.android.synthetic.main.activity_register.lname
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
@@ -38,7 +35,8 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
     private val SUCCESS = "success"
-    private lateinit var nameTxt: String
+    private lateinit var fNameTxt: String
+    private lateinit var lNameTxt: String
     private lateinit var emailTxt: String
     private lateinit var mobileTxt: String
     private lateinit var passwordTxt: String
@@ -57,7 +55,8 @@ class RegisterActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
 
         register_btn.setOnClickListener {
-            nameTxt = fname.text.toString()+lname.text.toString()
+            fNameTxt = fname.text.toString()+lname.text.toString()
+            lNameTxt = lname.text.toString()+lname.text.toString()
             emailTxt = email.text.toString()
             mobileTxt = mobile.text.toString()
             passwordTxt = password.text.toString()
@@ -66,7 +65,9 @@ class RegisterActivity : AppCompatActivity() {
 
             if (doValidation() == SUCCESS){
                 val data = JsonObject()
-                data.addProperty("name",nameTxt)
+                data.addProperty("firstName",fNameTxt)
+                data.addProperty("lastName",fNameTxt)
+                data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
                 data.addProperty("email",emailTxt)
                 data.addProperty("mobile",mobileTxt)
                 data.addProperty("gender",findViewById<RadioButton>(genderId).text.toString().toLowerCase())
@@ -111,7 +112,7 @@ class RegisterActivity : AppCompatActivity() {
                 .append(month+1).append("-").append(year)
         }
     private fun doValidation(): String{
-        if(TextUtils.isEmpty(nameTxt.trim())){
+        if(TextUtils.isEmpty(fNameTxt.trim())){
             fname.error = "Enter name"
             return "error"
         } else if(TextUtils.isEmpty(emailTxt.trim())){

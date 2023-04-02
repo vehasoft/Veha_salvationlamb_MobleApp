@@ -114,17 +114,17 @@
             </androidx.cardview.widget.CardView>
             </androidx.constraintlayout.widget.ConstraintLayout>
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/name_op"
+                android:id="@+id/fname_op"
                 android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColorHint="@color/black"
                 android:background="@color/home_bg"
-                android:hint="Full Name">
+                android:hint="First Name">
 
             <!--this is the actual edit text which takes the input-->
             <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/name"
+                    android:id="@+id/fname"
                     android:textColorHint="@color/black"
                     android:textColor="@color/black"
                     android:inputType="textCapSentences"
@@ -132,6 +132,25 @@
                     android:layout_height="wrap_content" />
 
         </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/lname_op"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:background="@color/home_bg"
+                    android:hint="Last Name">
+
+                <!--this is the actual edit text which takes the input-->
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/lname"
+                        android:textColorHint="@color/black"
+                        android:textColor="@color/black"
+                        android:inputType="textCapSentences"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+            </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/email_op"
                     android:layout_marginTop="10dp"

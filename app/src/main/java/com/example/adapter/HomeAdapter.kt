@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
@@ -16,13 +17,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.*
-import com.example.util.Posts
 import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Response
+
 class HomeAdapter(
     private var posts: ArrayList<Posts>,
     private var context: Context,
@@ -92,6 +93,14 @@ class HomeAdapter(
             Picasso.with(context).load(post.picture).into(holder.postPic)
         } else {
             holder.postPic.visibility = View.GONE
+        }
+        holder.postPic.setOnClickListener {
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            val type = "image/*"
+            intent.setDataAndType(Uri.parse(post.picture), type)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
         }
 
         likesCount = post.likesCount.toInt()

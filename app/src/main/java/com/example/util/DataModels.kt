@@ -55,6 +55,18 @@ data class AllFollowerList(
     val updatedAt: String,
     val user: PostUser,
 )
+data class FilesAndFolders(
+    val id: String,
+    val parentId: String,
+    val name: String,
+    val type: String,
+    val size: String,
+    val url: String,
+    val permission: String,
+    val createdBy: String,
+    val createdAt: String,
+    val updatedAt: String,
+)
 data class Countries(
     val id: String,
     val name: String,
@@ -98,6 +110,8 @@ data class City(
 data class UserRslt(
     val id: String,
     val name: String,
+    val firstName: String,
+    val lastName: String,
     val gender: String,
     val email: String,
     val mobile: String,
