@@ -53,22 +53,19 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e("type", selectedFile.getType());
-                if (selectedFile.getType().equals("folder")) {
-                    Intent intent = new Intent(context, FileListActivity.class);
-                    intent.putExtra("folderId", selectedFile.getId());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                } else {
-                    Intent intent = new Intent(context, PdfActivity2.class);
-                    intent.putExtra("url", selectedFile.getUrl());
-                    intent.putExtra("fileName", selectedFile.getName());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                }
+        holder.itemView.setOnClickListener(v -> {
+            Log.e("type", selectedFile.getType());
+            if (selectedFile.getType().equals("folder")) {
+                Intent intent = new Intent(context, FileListActivity.class);
+                intent.putExtra("folderId", selectedFile.getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } else {
+                Intent intent = new Intent(context, PdfActivity2.class);
+                intent.putExtra("url", selectedFile.getUrl());
+                intent.putExtra("fileName", selectedFile.getName());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
             }
         });
 

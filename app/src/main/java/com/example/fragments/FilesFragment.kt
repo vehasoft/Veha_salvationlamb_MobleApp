@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -38,7 +39,7 @@ class FilesFragment : Fragment() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
     lateinit var recyclerView: RecyclerView
-    lateinit var noFilesText: TextView
+    lateinit var noFilesText: LinearLayout
     lateinit var header_main: ConstraintLayout
 
     var filesAndFolders: ArrayList<FilesAndFolders> = ArrayList()
@@ -66,7 +67,7 @@ class FilesFragment : Fragment() {
 
 
         recyclerView = view.findViewById(R.id.recycler_view)
-        noFilesText = view.findViewById(R.id.nofiles_textview)
+        noFilesText = view.findViewById(R.id.no_data)
         header_main = view.findViewById(R.id.header_main)
         header_main.visibility = View.GONE
 

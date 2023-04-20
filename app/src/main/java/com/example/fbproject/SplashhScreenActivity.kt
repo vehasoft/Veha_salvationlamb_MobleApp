@@ -96,6 +96,7 @@ class SplashhScreenActivity : AppCompatActivity() {
                     if (response.code() == 200) {
                         val resp = response.body()
                         val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                        Log.e("response", loginresp.toString())
                         Util.user = loginresp
                         val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                         Util.isWarrior = isWarrior

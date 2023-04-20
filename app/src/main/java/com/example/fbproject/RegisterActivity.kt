@@ -55,8 +55,8 @@ class RegisterActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
 
         register_btn.setOnClickListener {
-            fNameTxt = fname.text.toString()+lname.text.toString()
-            lNameTxt = lname.text.toString()+lname.text.toString()
+            fNameTxt = fname.text.toString()
+            lNameTxt = lname.text.toString()
             emailTxt = email.text.toString()
             mobileTxt = mobile.text.toString()
             passwordTxt = password.text.toString()
@@ -66,8 +66,8 @@ class RegisterActivity : AppCompatActivity() {
             if (doValidation() == SUCCESS){
                 val data = JsonObject()
                 data.addProperty("firstName",fNameTxt)
-                data.addProperty("lastName",fNameTxt)
-                data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
+                data.addProperty("lastName",lNameTxt)
+                data.addProperty("name", "$fNameTxt $lNameTxt")
                 data.addProperty("email",emailTxt)
                 data.addProperty("mobile",mobileTxt)
                 data.addProperty("gender",findViewById<RadioButton>(genderId).text.toString().toLowerCase())

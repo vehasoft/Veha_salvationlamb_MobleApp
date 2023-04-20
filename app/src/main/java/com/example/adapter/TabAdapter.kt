@@ -25,10 +25,10 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
             0 -> {
                 HomeFragment.getInstance("user")
             }
-            1 -> {
+            2 -> {
                 ProfileFragment.getInstance(Util.userId,"me")
             }
-            2 -> {
+            1 -> {
                 FilesFragment()
             }
             else -> b as Fragment

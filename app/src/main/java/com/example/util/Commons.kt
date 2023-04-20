@@ -184,21 +184,6 @@ class Commons {
             }
         }
         Toast.makeText(context,"No Internet ",Toast.LENGTH_LONG).show()
-       /* val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setMessage("Your are Not connected to Internet")
-        builder.setTitle("Alert !")
-        builder.setCancelable(false)
-        builder.setPositiveButton("Retry") { _: DialogInterface?, _: Int ->
-            val activity = context as Activity
-            activity.recreate()
-        }
-        val alertDialog: AlertDialog = builder.create()
-        if (alertDialog.isShowing){
-            alertDialog.hide()
-            alertDialog.dismiss()
-        } else {
-            alertDialog.show()
-        }*/
         return false
     }
     private fun showAlert(context: Context){

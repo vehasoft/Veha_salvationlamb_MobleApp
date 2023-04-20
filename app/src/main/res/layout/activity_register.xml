@@ -137,6 +137,7 @@
                     android:id="@+id/mobile"
                     android:textColorHint="@color/black"
                     android:textColor="@color/black"
+                    android:maxLength="15"
                     android:layout_width="match_parent"
                     android:inputType="phone"
                     android:layout_height="wrap_content" />
@@ -231,7 +232,7 @@
         <Button android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Sign Up"
-                android:textColor="@color/white"
+                android:textColor="@color/always_white"
                 android:id="@+id/register_btn"
                 android:background="@drawable/rounded_border_login_register"
                 android:backgroundTint="@color/primary_blue"

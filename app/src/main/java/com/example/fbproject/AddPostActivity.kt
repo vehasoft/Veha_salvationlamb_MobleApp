@@ -75,6 +75,7 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("content",content.text.toString())
                 data.addProperty("tags",tags.text.toString())
                 data.addProperty("image",postPicStr)
+                data.addProperty("type","image")
                 data.addProperty("userId", Util.userId)
                 postData(data)
             }

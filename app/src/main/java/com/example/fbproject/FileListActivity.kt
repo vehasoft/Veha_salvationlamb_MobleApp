@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +29,7 @@ import java.io.File
 class FileListActivity : AppCompatActivity() {
     var path: String = ""
     lateinit var recyclerView: RecyclerView
-    lateinit var noFilesText: TextView
+    lateinit var noFilesText: LinearLayout
     lateinit var logo: ImageView
     var filesAndFolders: ArrayList<FilesAndFolders> = ArrayList()
 
@@ -43,7 +44,7 @@ class FileListActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         recyclerView = findViewById(R.id.recycler_view)
-        noFilesText = findViewById(R.id.nofiles_textview)
+        noFilesText = findViewById(R.id.no_data)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -71,7 +72,7 @@ class FileListActivity : AppCompatActivity() {
                                 val resp = response.body()
                                 val loginresp: JsonArray = Gson().fromJson(resp?.get("files"), JsonArray::class.java)
                                 for (files in loginresp) {
-                                    Log.e("files",files.toString())
+                                    Log.e("filesa",files.toString())
                                     val pos = Gson().fromJson(files, FilesAndFolders::class.java)
                                     filesAndFolders.add(pos)
                                 }

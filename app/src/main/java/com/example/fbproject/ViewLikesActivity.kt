@@ -67,6 +67,7 @@ class ViewLikesActivity : AppCompatActivity() {
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
             if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
             val night: MenuItem = popup.menu.findItem(R.id.nightmode)
+            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
             if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
@@ -93,7 +94,7 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@ViewLikesActivity, ViewLikesActivity::class.java)
+                        val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{

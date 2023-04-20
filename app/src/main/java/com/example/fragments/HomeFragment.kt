@@ -290,7 +290,6 @@ class HomeFragment: Fragment(){
                             }
                             getallFav(owner)
                         }
-
                         override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                             if (dialog.isShowing) {
                                 dialog.hide()

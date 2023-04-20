@@ -33,10 +33,12 @@ class SearchActivity : AppCompatActivity() {
     lateinit var profilelist: ArrayList<PostUser>
     lateinit var postlist: ArrayList<Posts>
     lateinit var dialog: ProgressDialog
+    var currentTab: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        Log.e("current tab", currentTab.toString())
         userPreferences = UserPreferences(this)
         dialog = ProgressDialog(this)
         dialog.setMessage("Please Wait")
@@ -60,11 +62,16 @@ class SearchActivity : AppCompatActivity() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 if (tab != null) {
                     viewPager.currentItem = tab.position
+                    currentTab = tab.position
                 }
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
             override fun onTabReselected(tab: TabLayout.Tab?) {
+                if (tab != null) {
+                    viewPager.currentItem = tab.position
+                    currentTab = tab.position
+                }
             }
         })
         search.addTextChangedListener {
@@ -114,6 +121,8 @@ class SearchActivity : AppCompatActivity() {
                                     profilelist,
                                     postlist
                                 )
+                                Log.e("current tab", currentTab.toString())
+                                viewPager.currentItem = currentTab
                             }
                             if (dialog.isShowing) {
                                 dialog.dismiss()

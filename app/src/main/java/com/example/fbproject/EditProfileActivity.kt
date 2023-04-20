@@ -35,8 +35,11 @@ import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_edit_profile.email
+import kotlinx.android.synthetic.main.activity_edit_profile.fname
 import kotlinx.android.synthetic.main.activity_edit_profile.gender
+import kotlinx.android.synthetic.main.activity_edit_profile.lname
 import kotlinx.android.synthetic.main.activity_edit_profile.mobile
+import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.date
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -183,11 +186,8 @@ class EditProfileActivity : AppCompatActivity() {
             builder.setTitle("Do you want to update")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                val result1 = ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                val result2 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE) == PackageManager.PERMISSION_GRANTED
-                val result3 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE) == PackageManager.PERMISSION_GRANTED
-                val result = result1 && result2 && result3
-                if (result){
+                val result = ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+               if (result){
                     val items = arrayOf<CharSequence>(
                         "Take Photo", "Choose from Gallery",
                         "Cancel"
@@ -233,7 +233,9 @@ class EditProfileActivity : AppCompatActivity() {
             if (Util.isWarrior) {
                 popup.menu.findItem(R.id.warrior).isVisible = false
             }
+            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
             popup.menu.findItem(R.id.edit_profile).isVisible = false
+            popup.menu.findItem(R.id.logout).isVisible = false
             val night: MenuItem = popup.menu.findItem(R.id.nightmode)
             if (Util.isNight) {
                 night.title = "Day Mode"
@@ -246,7 +248,7 @@ class EditProfileActivity : AppCompatActivity() {
                         Commons().makeWarrior(this, this)
                     }
 
-                    R.id.logout -> {
+                    /*R.id.logout -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
                         builder.setMessage("Do you want to Logout ?")
                         builder.setTitle("Alert !")
@@ -264,7 +266,7 @@ class EditProfileActivity : AppCompatActivity() {
 
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
-                    }
+                    }*/
 
                     R.id.fav -> {
                         val intent = Intent(this@EditProfileActivity, FavoritesActivity::class.java)
@@ -299,28 +301,30 @@ class EditProfileActivity : AppCompatActivity() {
             builder.setTitle("Alert")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                val data = JsonObject()
-                data.addProperty("firstName", fname.text.toString())
-                data.addProperty("lastName", lname.text.toString())
-                data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
-                data.addProperty("email", email.text.toString())
-                data.addProperty("mobile", mobile.text.toString())
-                data.addProperty("address", address.text.toString())
-                data.addProperty(
-                    "gender",
-                    findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
-                )
-                data.addProperty("dateOfBirth", date.text.toString())
-                data.addProperty("isWarrior", warriorStr)
-                data.addProperty("country", countrystr)
-                data.addProperty("state", statestr)
-                data.addProperty("city", citystr)
-                data.addProperty("religion", religion)
-                data.addProperty("churchName", churchName)
-                data.addProperty("picture", imgStr)
-                data.addProperty("language", language.text.toString())
-                data.addProperty("pinCode", pincode.text.toString())
-                edit(data)
+                if(doValidation().contentEquals("success")){
+                    val data = JsonObject()
+                    data.addProperty("firstName", fname.text.toString())
+                    data.addProperty("lastName", lname.text.toString())
+                    data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
+                    data.addProperty("email", email.text.toString())
+                    data.addProperty("mobile", mobile.text.toString())
+                    data.addProperty("address", address.text.toString())
+                    data.addProperty(
+                        "gender",
+                        findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
+                    )
+                    data.addProperty("dateOfBirth", date.text.toString())
+                    data.addProperty("isWarrior", warriorStr)
+                    data.addProperty("country", countrystr)
+                    data.addProperty("state", statestr)
+                    data.addProperty("city", citystr)
+                    data.addProperty("religion", religion)
+                    data.addProperty("churchName", churchName)
+                    data.addProperty("picture", imgStr)
+                    data.addProperty("language", language.text.toString())
+                    data.addProperty("pinCode", pincode.text.toString())
+                    edit(data)
+                }
             }
             builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
             val alertDialog: AlertDialog = builder.create()
@@ -330,6 +334,23 @@ class EditProfileActivity : AppCompatActivity() {
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             Commons().makeWarrior(this, this)
         }
+    }
+
+    private fun doValidation(): String{
+        if(TextUtils.isEmpty(fname.text.toString().trim())){
+            fname.error = "Enter name"
+            return "error"
+        } else if(TextUtils.isEmpty(lname.text.toString().trim())){
+            lname.error = "Enter name"
+            return "error"
+        }  else if(TextUtils.isEmpty(mobile.text.toString().trim())){
+            mobile.error = "Enter mobile number"
+            return "error"
+        } else if(TextUtils.isEmpty(date.text.toString().trim()) || date.text.toString().equals("Date of birth",true)){
+            date.error = "Select Date of birth"
+            return "error"
+        }
+        return "SUCCESS"
     }
 
     private fun edit(data: JsonObject) {
@@ -394,9 +415,9 @@ class EditProfileActivity : AppCompatActivity() {
                                     Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
                                 }
                                 if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.name)
+                                    Editable.Factory.getInstance().newEditable(loginresp.firstName)
                                 if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.name)
+                                    Editable.Factory.getInstance().newEditable(loginresp.lastName)
                                 if (!TextUtils.isEmpty(loginresp.address)) address.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.address)
                                 if (!TextUtils.isEmpty(loginresp.email)) email.text =
@@ -430,14 +451,26 @@ class EditProfileActivity : AppCompatActivity() {
                                 if (!TextUtils.isEmpty(loginresp.country)) {
                                     Log.e("country", country.indexOf(loginresp.country).toString())
                                     countrySP.setSelection(country.indexOf(loginresp.country))
+                                } else{
+                                    if (dialog.isShowing) {
+                                        dialog.dismiss()
+                                    }
                                 }
                                 if (!TextUtils.isEmpty(loginresp.state)) {
                                     Log.e("state", state.indexOf(loginresp.state).toString())
                                     stateSp.setSelection(state.indexOf(loginresp.state))
+                                } else{
+                                    if (dialog.isShowing) {
+                                        dialog.dismiss()
+                                    }
                                 }
                                 if (!TextUtils.isEmpty(loginresp.city)) {
                                     Log.e("country", city.indexOf(loginresp.city).toString())
                                     citySp.setSelection(city.indexOf(loginresp.city))
+                                } else{
+                                    if (dialog.isShowing) {
+                                        dialog.dismiss()
+                                    }
                                 }
                                 if (!TextUtils.isEmpty(loginresp.gender)) {
                                     when (loginresp.gender) {
@@ -446,9 +479,6 @@ class EditProfileActivity : AppCompatActivity() {
                                     }
                                     gender.check(genderbtn)
                                 }
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
                             }
                         }
 
@@ -623,6 +653,9 @@ class EditProfileActivity : AppCompatActivity() {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     citySp.adapter = adapter
                     getMyDetails(this@EditProfileActivity)
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
                 }
 
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {

@@ -8,7 +8,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.text.Layout
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
@@ -36,7 +35,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: ProgressDialog
-    lateinit var search: Button
+    lateinit var search: ImageView
     lateinit var logo: ImageView
     var i = 0
     var userType: String = ""
@@ -116,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
             if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
             val night: MenuItem = popup.menu.findItem(R.id.nightmode)
+            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
             if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
@@ -182,8 +182,8 @@ class MainActivity : AppCompatActivity() {
         profile.text = "Profile"
         pdf.text = "Files"
         tabLayout.addTab(home,0)
-        tabLayout.addTab(profile,1)
-        tabLayout.addTab(pdf,2)
+        tabLayout.addTab(pdf,1)
+        tabLayout.addTab(profile,2)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
         val viewPager : ViewPager = findViewById(R.id.viewPager)
@@ -216,7 +216,9 @@ class MainActivity : AppCompatActivity() {
                             if (response.code() == 200) {
                                 val resp = response.body()
                                 val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                Log.e("resp", loginresp.toString())
                                 Util.user = loginresp
+                                Util.isFirst = loginresp.isFreshUser.toBoolean()
                                 val isWarrior: Boolean =
                                     loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                                 Util.isWarrior = isWarrior

@@ -59,6 +59,9 @@ class FavoritesActivity : AppCompatActivity() {
             if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
             val night: MenuItem = popup.menu.findItem(R.id.nightmode)
             if (Util.isNight){ night.title = "Day Mode" } else{ night.title = "Night Mode" }
+            popup.menu.findItem(R.id.logout).isVisible = false
+            popup.menu.findItem(R.id.fav).isVisible = false
+            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.warrior -> {
@@ -84,7 +87,7 @@ class FavoritesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@FavoritesActivity, FavoritesActivity::class.java)
+                        val intent = Intent(this@FavoritesActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.fav ->{

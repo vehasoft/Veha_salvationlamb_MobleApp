@@ -143,6 +143,8 @@ data class Posts(
     val tags: String,
     val userId: String,
     val picture: String,
+    val type: String,
+    val url: String,
     val likesCount: String,
     val shareCount: String,
     val createdAt: String,

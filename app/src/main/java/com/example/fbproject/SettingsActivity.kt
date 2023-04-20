@@ -93,7 +93,7 @@ class SettingsActivity : AppCompatActivity() {
                         Commons().makeWarrior(this, this)
                     }
                     R.id.edit_profile ->{
-                        val intent = Intent(this@SettingsActivity, FavoritesActivity::class.java)
+                        val intent = Intent(this@SettingsActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
                     R.id.logout -> {

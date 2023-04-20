@@ -380,17 +380,13 @@ class ProfileFragment: Fragment() {
                                     picture = ""
                                 }
                                 val role = if (loginresp.role == "admin") {
-                                    "Admin"
+                                    " - " +"Admin"
                                 } else if (loginresp.isWarrior.toBoolean()) {
-                                    Util.WARRIOR
+                                    " - " +Util.WARRIOR
                                 } else {
                                     ""
                                 }
-                                if (who == "other") {
-                                    profileName.text = loginresp.name + " - " + role
-                                } else {
-                                    profileName.text = loginresp.name
-                                }
+                                profileName.text = loginresp.name +  role
                             }
                             if (dialog.isShowing) {
                                 dialog.hide()
