@@ -1,28 +1,40 @@
 package com.example.adapter
 
+import android.app.ActionBar.LayoutParams
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebView
 import android.widget.*
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fbproject.*
-import com.example.util.*
+import com.example.util.Commons
+import com.example.util.Posts
+import com.example.util.UserPreferences
+import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
+import java.lang.StringBuilder
 
 class HomeAdapter(
     private var posts: ArrayList<Posts>,
@@ -34,7 +46,7 @@ class HomeAdapter(
     private var owner: LifecycleOwner,
     ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: android.app.AlertDialog
     private var likesCount = 0
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_post)
@@ -42,12 +54,15 @@ class HomeAdapter(
         val fullTime: TextView = view.findViewById(R.id.post_full_time)
         val tags: TextView = view.findViewById(R.id.tags)
         val title: TextView = view.findViewById(R.id.title)
-        val content: TextView = view.findViewById(R.id.post_content)
+        val content: ExpandableView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
         val postPic: ImageView = view.findViewById(R.id.post_pic)
-        val reactBtn: LinearLayout = view.findViewById(R.id.react_btn)
-        val postContainer: LinearLayout = view.findViewById(R.id.post_layout)
+        val postVideo: WebView = view.findViewById(R.id.post_video)
+        val audioLayout: LinearLayout = view.findViewById(R.id.audio_layout)
+        val pauseBtn: ImageView = view.findViewById(R.id.pause_btn)
+        val playBtn: ImageView = view.findViewById(R.id.play_btn)
+        val seekbar: SeekBar = view.findViewById(R.id.seekBar)
         val headLinear: LinearLayout = view.findViewById(R.id.head_linear)
         val likeBtn: Button = view.findViewById(R.id.like_btn)
         val shareBtn: Button = view.findViewById(R.id.share_btn)
@@ -57,23 +72,29 @@ class HomeAdapter(
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
-        dialog = ProgressDialog(context)
+        dialog = SpotsDialog.Builder().setContext(context).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         var layoutInflater: LayoutInflater = LayoutInflater.from(context)
         var items: View = layoutInflater.inflate(R.layout.child_post, parent, false)
         var viewHolder = ViewHolder(items)
-        viewHolder.title.textSize = Util.fontSize.toFloat()
+        viewHolder.title.textSize = 20F
         viewHolder.content.textSize = Util.fontSize.toFloat()
         viewHolder.tags.textSize = Util.fontSize.toFloat()
+        viewHolder.tags.setTextColor(context.getColor(R.color.primary_blue))
+
+        viewHolder.postVideo.settings.javaScriptEnabled = true
+        viewHolder.postVideo.settings.domStorageEnabled = true
+        viewHolder.postVideo.webChromeClient = WebChromeClient()
+
         if (page.contentEquals("home")) {
             viewHolder.followBtn.visibility = View.VISIBLE
             viewHolder.deleteBtn.visibility = View.GONE
             viewHolder.fav.visibility = View.VISIBLE
         } else if (page.contentEquals("profile")) {
             viewHolder.followBtn.visibility = View.GONE
-            viewHolder.deleteBtn.visibility = View.VISIBLE
+            viewHolder.deleteBtn.visibility = View.GONE
             viewHolder.fav.visibility = View.GONE
         } else if (page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) {
             viewHolder.followBtn.visibility = View.GONE
@@ -85,22 +106,92 @@ class HomeAdapter(
     override fun getItemCount(): Int {
         return posts.size
     }
+    fun getTags(tags: String): String{
+        var opTags = ""
+        if (!TextUtils.isEmpty(tags)) {
+            val tagArray = tags.split(",")
+            tagArray.forEach {
+                opTags += "#$it"
+            }
+        }
+
+        return opTags
+    }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post: Posts = posts[position]
+        holder.content.setText(post.content)
+        holder.content.setOnClickListener { holder.content.expand() }
+        if (!post.type.isNullOrEmpty()){
+            when (post.type){
+                "image" -> {
+                    holder.audioLayout.visibility = View.GONE
+                    holder.postVideo.visibility = View.GONE
+                    if (!post.picture.isNullOrEmpty()) {
+                        holder.postPic.visibility = View.VISIBLE
+                        Picasso.with(context).load(post.picture).fit().into(holder.postPic)
+                    } else {
+                        holder.postPic.visibility = View.GONE
+                    }
+                    holder.postPic.setOnClickListener {
+                        if (!post.picture.isNullOrEmpty()) {
+                            val intent = Intent(context, ImageDetailActivity::class.java)
+                            intent.putExtra("profilePic", post.picture)
+                            context.startActivity(intent)
+                        }
+                    }
+                }
+                "audio" -> {
+                    holder.postVideo.visibility = View.GONE
+                    holder.postPic.visibility = View.GONE
+                    val mediaPlayer = MediaPlayer()
+                    val myHandler = Handler()
+                    if (!post.url.isNullOrEmpty()){
+                        holder.audioLayout.visibility = View.VISIBLE
+                        mediaPlayer.setDataSource(post.url)
+                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+                        mediaPlayer.prepare()
+                    }
+                    else {
+                        holder.audioLayout.visibility = View.GONE
+                    }
+                    holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                        override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                        override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) {mediaPlayer.seekTo(progress) } }
+                    })
+                    val updateSongTime: Runnable = object : Runnable {
+                        override fun run() {
+                            myHandler.postDelayed(this, 500)
+                            holder.seekbar.progress = mediaPlayer.currentPosition
+                        }
+                    }
+                    holder.playBtn.setOnClickListener {
+                        mediaPlayer.start()
+                        holder.seekbar.max = mediaPlayer.duration
+                        holder.seekbar.progress = mediaPlayer.currentPosition
+                        myHandler.postDelayed(updateSongTime,0)
+                        holder.playBtn.visibility = View.GONE
+                        holder.pauseBtn.visibility = View.VISIBLE
+                    }
+                    holder.pauseBtn.setOnClickListener {
+                        mediaPlayer.pause()
+                        holder.pauseBtn.visibility = View.GONE
+                        holder.playBtn.visibility = View.VISIBLE
+                    }
 
-        if (!post.picture.isNullOrEmpty()) {
-            holder.postPic.visibility = View.VISIBLE
-            Picasso.with(context).load(post.picture).into(holder.postPic)
-        } else {
-            holder.postPic.visibility = View.GONE
-        }
-        holder.postPic.setOnClickListener {
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            val type = "image/*"
-            intent.setDataAndType(Uri.parse(post.picture), type)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
+                }
+                "video" -> {
+                    holder.audioLayout.visibility = View.GONE
+                    holder.postPic.visibility = View.GONE
+                    if (!post.url.isNullOrEmpty()){
+                        holder.postVideo.visibility = View.VISIBLE
+                        holder.postVideo.loadUrl(Util.getVideo(post.url))
+                    }
+                    else {
+                        holder.postVideo.visibility = View.GONE
+                    }
+                }
+            }
         }
 
         likesCount = post.likesCount.toInt()
@@ -122,11 +213,10 @@ class HomeAdapter(
             holder.likeBtn.text = "React"
         }
         holder.name.text = post.user.name
-        holder.tags.text = post.tags
+        holder.tags.text = getTags(post.tags)
         holder.title.text = post.title
         holder.time.text = Util.getTimeAgo(post.createdAt)
         holder.fullTime.text = post.createdAt
-        holder.content.text = post.content
         holder.reacts.text = "$likesCount people reacts"
         if (!post.user.picture.isNullOrEmpty()) {
             Picasso.with(context).load(post.user.picture).into(holder.profilePic)

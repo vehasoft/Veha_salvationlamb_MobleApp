@@ -5,6 +5,7 @@
                                                    android:layout_height="wrap_content"
                                                    android:background="@color/white"
                                                    android:layout_marginTop="10dp"
+                                                   xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
                                                    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
             android:layout_width="match_parent"
@@ -31,7 +32,7 @@
                         android:layout_gravity="center">
 
                     <ImageView
-                            android:layout_width="match_parent"
+                            android:layout_width="44dp"
                             android:layout_height="match_parent"
                             android:id="@+id/profile_pic"
                             android:src="@drawable/ic_profile"
@@ -77,7 +78,7 @@
                     android:id="@+id/follow_post_btn"
                     android:text="follow"
                     android:layout_gravity="center"
-                    android:textColor="@color/white"
+                    android:textColor="@color/always_white"
                     android:backgroundTint="@color/primary_blue"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/rounded_border_login_register"/>
@@ -89,6 +90,16 @@
                       android:orientation="vertical"
                       android:id="@+id/post_layout"
         >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="@color/black"
+                      android:textSize="20dp"
+                      android:layout_marginTop="5dp"
+                      android:id="@+id/title"
+                      android:textStyle="bold"
+                      android:layout_gravity="left"
+            />
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textColor="@color/black"
@@ -97,23 +108,46 @@
                       android:id="@+id/tags"
                       android:layout_gravity="left"
             />
-
-            <TextView android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textColor="@color/black"
-                      android:textSize="20dp"
-                      android:layout_marginTop="5dp"
-                      android:id="@+id/title"
-                      android:layout_gravity="left"
-            />
             <ImageView android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
+                       android:layout_height="300dp"
                        android:id="@+id/post_pic"
                        android:padding="2dp"
                        android:src="@drawable/ic_profile"
                        android:visibility="gone"
             />
-            <TextView android:layout_width="wrap_content"
+            <WebView android:layout_width="match_parent"
+                     android:layout_height="200dp"
+                     android:id="@+id/post_video"
+                     android:padding="2dp"
+                     android:visibility="gone"
+                     tools:ignore="WebViewLayout"
+            />
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:gravity="center"
+                          android:visibility="gone"
+                          android:orientation="horizontal"
+                          android:id="@+id/audio_layout"
+            >
+                <ImageView android:layout_width="30dp"
+                           android:layout_height="30dp"
+                           android:visibility="gone"
+                           android:id="@+id/pause_btn"
+                           android:src="@drawable/ic_baseline_pause_24"
+                />
+                <ImageView android:layout_width="30dp"
+                           android:layout_height="30dp"
+                           android:id="@+id/play_btn"
+                           android:src="@drawable/ic_baseline_play_arrow_24"
+                />
+                <SeekBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/seekBar"/>
+            </LinearLayout>
+
+            <com.example.fbproject.ExpandableView
+                    android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textColor="@color/black"
                       android:id="@+id/post_content"
@@ -184,7 +218,8 @@
             android:id="@+id/Delete_btn"
             android:text="Delete"
             android:layout_gravity="top"
-            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textColor="@color/always_white"
             android:backgroundTint="@color/primary_blue"
             android:layout_marginLeft="10dp"
             app:layout_constraintRight_toRightOf="parent"

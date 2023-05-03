@@ -87,6 +87,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             super(itemView);
             textView = itemView.findViewById(R.id.file_name_text_view);
             imageView = itemView.findViewById(R.id.icon_view);
+            Log.e("txtcolor", String.valueOf(textView.getCurrentTextColor()));
+            Log.e("txtcolor1", String.valueOf(context.getColor(R.color.black)));
         }
     }
 }

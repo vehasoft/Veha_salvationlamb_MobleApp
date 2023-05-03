@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adapter.FileAdapter
@@ -21,6 +23,7 @@ import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -31,15 +34,16 @@ class FileListActivity : AppCompatActivity() {
     lateinit var recyclerView: RecyclerView
     lateinit var noFilesText: LinearLayout
     lateinit var logo: ImageView
+    lateinit var listIcon: ImageView
     var filesAndFolders: ArrayList<FilesAndFolders> = ArrayList()
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
         userPreferences = UserPreferences(this@FileListActivity)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
@@ -49,6 +53,17 @@ class FileListActivity : AppCompatActivity() {
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+        }
+        listIcon = findViewById(R.id.view_icon)
+        if (Util.listview){
+            listIcon.setImageResource(R.drawable.ic_baseline_list_24)
+        } else {
+            listIcon.setImageResource(R.drawable.ic_baseline_grid_view_24)
+        }
+        listIcon.setOnClickListener {
+            Util.listview = !Util.listview
+            startActivity(intent)
+            finish()
         }
         path = intent.getStringExtra("folderId").toString()
         getFilesAndFolder(path,this)
@@ -72,7 +87,6 @@ class FileListActivity : AppCompatActivity() {
                                 val resp = response.body()
                                 val loginresp: JsonArray = Gson().fromJson(resp?.get("files"), JsonArray::class.java)
                                 for (files in loginresp) {
-                                    Log.e("filesa",files.toString())
                                     val pos = Gson().fromJson(files, FilesAndFolders::class.java)
                                     filesAndFolders.add(pos)
                                 }
@@ -83,7 +97,11 @@ class FileListActivity : AppCompatActivity() {
                                     noFilesText.visibility = View.GONE
                                     recyclerView.visibility = View.VISIBLE
 
-                                    recyclerView.layoutManager = LinearLayoutManager(context)
+                                    if (Util.listview){
+                                        recyclerView.layoutManager = LinearLayoutManager(context)
+                                    } else {
+                                        recyclerView.layoutManager = GridLayoutManager(context,3)
+                                    }
                                     recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders)
                                 }
                             }

@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -20,6 +21,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -32,7 +34,7 @@ class SearchActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var profilelist: ArrayList<PostUser>
     lateinit var postlist: ArrayList<Posts>
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     var currentTab: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +42,7 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         Log.e("current tab", currentTab.toString())
         userPreferences = UserPreferences(this)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
@@ -53,8 +55,8 @@ class SearchActivity : AppCompatActivity() {
         home.text = "Posts"
         profile.text = "Profiles"
 
-        tabLayout.addTab(profile,0)
-        tabLayout.addTab(home,1)
+        tabLayout.addTab(home,0)
+        tabLayout.addTab(profile,1)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         viewPager = findViewById(R.id.viewPager)
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))

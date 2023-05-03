@@ -1,5 +1,6 @@
 package com.example.fragments
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -30,6 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -37,7 +39,8 @@ import retrofit2.Response
 
 class HomeFragment: Fragment(){
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    //lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     lateinit var list : RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var userType: String
@@ -81,8 +84,10 @@ class HomeFragment: Fragment(){
         myLikesMap = HashMap()
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
-        dialog = ProgressDialog(contexts)
+        dialog = SpotsDialog.Builder().setContext(contexts).build()
+        //dialog = ProgressDialog(contexts)
         dialog.setMessage("Please Wait")
+        //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         list = view.findViewById(R.id.list)

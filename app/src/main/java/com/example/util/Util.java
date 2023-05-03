@@ -1,5 +1,6 @@
 package com.example.util;
 
+import android.util.Log;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,6 +18,7 @@ public class Util {
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static String userId;
     public static Boolean isFirst = true;
+    public static boolean listview = true;
     public static final String WARRIOR = "Warrior";
     public static final String USER = "User";
     public static Boolean isNight;
@@ -92,7 +94,9 @@ public class Util {
         try
         {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            //SimpleDateFormat format1 = ;
             Date past = format.parse(new Commons().getDate(date));
+            Log.e("timeAgo", new SimpleDateFormat("dd MMM yyyy HH:mm a").format(past));
             Date now = new Date();
             long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
             long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
@@ -104,11 +108,22 @@ public class Util {
                 timeAgo = (minutes+" minutes ago");
             else if(hours<24)
                 timeAgo = (hours+" hours ago");
-            else
-                timeAgo = (days+" days ago");
+            else if(days>=1){
+                if (days == 1) {
+                    timeAgo = "today";
+                }
+                else if (days == 2) {
+                    timeAgo = "yesterday";
+                }
+                else {
+                    timeAgo = new SimpleDateFormat("dd MMM yyyy, HH:mm a").format(past);
+                }
+            }
+            Log.e("timeAgo",timeAgo);
         }
         catch (Exception j){
             j.printStackTrace();
+            Log.e("timeAgo",j.toString());
         }
         return timeAgo;
     }

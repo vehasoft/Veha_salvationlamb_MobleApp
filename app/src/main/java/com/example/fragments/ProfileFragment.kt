@@ -1,5 +1,6 @@
 package com.example.fragments
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -23,6 +24,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -45,7 +47,7 @@ class ProfileFragment: Fragment() {
     var postCount = 0
 
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     private lateinit var list : RecyclerView
     private lateinit var profilePic: ImageView
     private lateinit var profileName: TextView
@@ -89,7 +91,7 @@ class ProfileFragment: Fragment() {
         who = arguments?.get("who").toString()
 
         userPreferences = UserPreferences(contexts)
-        dialog = ProgressDialog(contexts)
+        dialog = SpotsDialog.Builder().setContext(contexts).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

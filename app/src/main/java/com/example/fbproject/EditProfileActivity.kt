@@ -1,9 +1,9 @@
 package com.example.fbproject
 
 import android.Manifest
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -11,6 +11,8 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
@@ -21,8 +23,8 @@ import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemSelectedListener
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -33,6 +35,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import com.theartofdev.edmodo.cropper.CropImage
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_edit_profile.email
 import kotlinx.android.synthetic.main.activity_edit_profile.fname
@@ -46,6 +50,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class EditProfileActivity : AppCompatActivity() {
@@ -61,14 +68,14 @@ class EditProfileActivity : AppCompatActivity() {
     var warriorStr: Boolean = false
     lateinit var warrior: CheckBox
     lateinit var cancelBtn: Button
-    lateinit var countrySP: Spinner
-    lateinit var stateSp: Spinner
-    lateinit var citySp: Spinner
+    lateinit var countrySP: AutoCompleteTextView
+    lateinit var stateSp: AutoCompleteTextView
+    lateinit var citySp: AutoCompleteTextView
     private var year = 1960
     private var month: Int = 0
     private var day: Int = 1
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     lateinit var logo: ImageView
 
     private var state: ArrayList<String> = ArrayList()
@@ -82,6 +89,12 @@ class EditProfileActivity : AppCompatActivity() {
         intent.action = Intent.ACTION_GET_CONTENT //
         startActivityForResult(Intent.createChooser(intent, "Select File"), 100)
     }
+    fun getImageUri( inImage: Bitmap): Uri? {
+        val bytes = ByteArrayOutputStream()
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(this.contentResolver, inImage, "Title", null)
+        return Uri.parse(path)
+    }
 
     private fun cameraIntent() {
         val intent = Intent()
@@ -90,25 +103,34 @@ class EditProfileActivity : AppCompatActivity() {
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.e(requestCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE.toString())
+        Log.e(resultCode.toString(), RESULT_OK.toString())
+        Log.e(resultCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE.toString())
         if (requestCode == 100) {
             if (data?.data != null) {
-                val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, data.data)
-                profilestr = encodeTobase64(bitmap)
+                CropImage.activity(data.data).start(this@EditProfileActivity)
+
             }
         } else if (requestCode == 150) {
-            if (data?.extras!!["data"] != null) {
-                val bitmap = data.extras!!["data"] as Bitmap?
-                val bytes = ByteArrayOutputStream()
-                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 90, bytes)
-                profilestr = encodeTobase64(bitmap)
+            if (data!!.extras!!["data"] != null) {
+                CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap)).start(this@EditProfileActivity)
             }
-        }
+        } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode === RESULT_OK) {
+                    val resultUri = result.uri
+                    val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
+                    profilestr = encodeTobase64(bitmap)
+                } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    val error = result.error
+                    Log.e("errorrr", error.toString())
+                }
+            }
         val data = JsonObject()
         data.addProperty("base64Image", profilestr)
         data.addProperty("name", Util.user.name + " picture")
         updateProfilePic(this, data)
     }
-
     fun encodeTobase64(image: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
@@ -118,12 +140,14 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val builder = VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.activity_edit_profile)
         userPreferences = UserPreferences(this)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
+        //dialog.setInverseBackgroundForced(false)
         saveBtn = findViewById(R.id.save_btn)
         cancelBtn = findViewById(R.id.cancel_btn)
         warrior = findViewById(R.id.warrior)
@@ -144,22 +168,30 @@ class EditProfileActivity : AppCompatActivity() {
         state.add("State")
         val adapter1 = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        stateSp.adapter = adapter1
+        stateSp.setAdapter(adapter1)
         city.add("City")
         val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        citySp.adapter = adapter
+        citySp.setAdapter(adapter)
 
-        countrySP.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                if (country[pos] != "Country") {
-                    countrystr = country[pos]
-                    getStates(countrystr)
-                }
+        countrySP.onItemClickListener = OnItemClickListener { parent, view, pos, id ->
+            if (countrySP.text.toString() != "Country" && !countrySP.text.toString().isNullOrEmpty()) {
+                countrystr = countrySP.text.toString()
+                getStates(countrystr)
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+        stateSp.onItemClickListener = OnItemClickListener { parent, view, pos, id ->
+            if (stateSp.text.toString() != "Country" && !stateSp.text.toString().isNullOrEmpty()) {
+                statestr = stateSp.text.toString()
+                getCities(statestr)
+            }
+        }
+        citySp.onItemClickListener = OnItemClickListener { parent, view, pos, id ->
+            if (citySp.text.toString() != "Country" && !citySp.text.toString().isNullOrEmpty()) {
+                citystr = citySp.text.toString()
+            }
+        }
+
         stateSp.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
                 if (state[pos] != "State") {
@@ -295,13 +327,22 @@ class EditProfileActivity : AppCompatActivity() {
             })
             popup.show()
         }
+        countrySP.setOnFocusChangeListener { _, _ ->
+            countrySP.showDropDown()
+        }
+        stateSp.setOnFocusChangeListener { _, _ ->
+            stateSp.showDropDown()
+        }
+        citySp.setOnFocusChangeListener { _, _ ->
+            citySp.showDropDown()
+        }
         saveBtn.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
             builder.setMessage("Do you want to edit")
             builder.setTitle("Alert")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                if(doValidation().contentEquals("success")){
+                if(doValidation().contentEquals("success",true)){
                     val data = JsonObject()
                     data.addProperty("firstName", fname.text.toString())
                     data.addProperty("lastName", lname.text.toString())
@@ -370,6 +411,7 @@ class EditProfileActivity : AppCompatActivity() {
                             if (response.code() == 200) {
                                 val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
                                 startActivity(intent)
+                                finish()
                             } else {
                                 val resp = response.errorBody()
                                 val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
@@ -410,6 +452,7 @@ class EditProfileActivity : AppCompatActivity() {
                             if (response.code() == 200) {
                                 val resp = response.body()
                                 val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                Log.e("mydetails",loginresp.toString())
                                 if (!loginresp.picture.isNullOrEmpty()) {
                                     imgStr = loginresp.picture
                                     Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
@@ -580,14 +623,13 @@ class EditProfileActivity : AppCompatActivity() {
                     val data = response.body()!!["results"] as JsonObject
                     val array = data["countries"] as JsonArray
                     country = ArrayList()
-                    country.add("Country")
                     for (i in 0 until array.size()) {
                         val cityobj: City = Gson().fromJson(array[i], City::class.java)
                         country.add(cityobj.name)
                     }
                     val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    countrySP.adapter = adapter
+                    countrySP.setAdapter(adapter)
                     getMyDetails(this@EditProfileActivity)
                 }
 
@@ -612,14 +654,13 @@ class EditProfileActivity : AppCompatActivity() {
                     val data = response.body()!!["results"] as JsonObject
                     state = ArrayList()
                     val array = data["states"] as JsonArray
-                    state.add("State")
                     for (i in 0 until array.size()) {
                         val stateobj: State = Gson().fromJson(array[i], State::class.java)
                         state.add(stateobj.name)
                     }
                     val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    stateSp.adapter = adapter
+                    stateSp.setAdapter(adapter)
                     getMyDetails(this@EditProfileActivity)
                 }
 
@@ -644,14 +685,13 @@ class EditProfileActivity : AppCompatActivity() {
                     val data = response.body()!!["results"] as JsonObject
                     val array = data["cities"] as JsonArray
                     city = ArrayList()
-                    city.add("City")
                     for (i in 0 until array.size()) {
                         val cityObj: City = Gson().fromJson(array[i], City::class.java)
                         city.add(cityObj.name)
                     }
                     val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    citySp.adapter = adapter
+                    citySp.setAdapter(adapter)
                     getMyDetails(this@EditProfileActivity)
                     if (dialog.isShowing) {
                         dialog.dismiss()

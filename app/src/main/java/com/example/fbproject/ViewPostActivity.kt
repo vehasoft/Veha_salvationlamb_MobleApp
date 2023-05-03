@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -14,12 +15,13 @@ import com.example.util.UserPreferences
 import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
 
 class ViewPostActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     val name: TextView = findViewById(R.id.name_post)
     val time: TextView = findViewById(R.id.post_time)
     val tags: TextView = findViewById(R.id.tags)
@@ -39,7 +41,7 @@ class ViewPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
         userPreferences = UserPreferences(this)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

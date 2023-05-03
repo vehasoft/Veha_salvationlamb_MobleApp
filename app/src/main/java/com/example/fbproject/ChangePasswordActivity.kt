@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_change_password.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -27,7 +29,7 @@ class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var cnfmPasswordTxt: String
     private lateinit var oldPasswordTxt: String
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +37,7 @@ class ChangePasswordActivity : AppCompatActivity() {
 
         userPreferences = UserPreferences(this)
 
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

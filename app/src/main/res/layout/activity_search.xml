@@ -41,6 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:tabTextColor="@color/always_white"
+                app:tabIndicatorHeight="5dp"
                 app:tabSelectedTextColor="@color/home_bg"
                 android:background="@color/primary_blue"
         >

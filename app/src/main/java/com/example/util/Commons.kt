@@ -1,7 +1,6 @@
 package com.example.util
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
@@ -18,6 +17,7 @@ import androidx.lifecycle.asLiveData
 import com.example.fbproject.R
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -62,6 +62,7 @@ class Commons {
         val builder1: AlertDialog.Builder = AlertDialog.Builder(context)
         builder1.setMessage(R.string.make_me_warrior)
         builder1.setTitle("BECOME A WARRIOR")
+        builder1.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
         builder1.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
@@ -104,7 +105,7 @@ class Commons {
     }
     private fun makeMeWarior(data: JsonObject,context: Context,owner: LifecycleOwner) {
         if (isNetworkAvailable(context)) {
-            val dialog = ProgressDialog(context)
+            val dialog = SpotsDialog.Builder().setContext(context).build()
             dialog.setMessage("Please Wait")
             dialog.setCancelable(false)
             dialog.setInverseBackgroundForced(false)

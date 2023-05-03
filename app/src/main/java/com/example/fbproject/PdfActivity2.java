@@ -39,6 +39,9 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
         setContentView(R.layout.activity_pdf2);
         pdfView = (PDFView)findViewById(R.id.pdfView1);
         tv_header = (TextView) findViewById(R.id.pdf_header);
+        tv_header.setOnClickListener(v -> {
+
+        });
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
         pdfFileName = intent.getStringExtra("fileName");

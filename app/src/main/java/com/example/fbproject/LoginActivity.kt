@@ -1,5 +1,6 @@
 package com.example.fbproject
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.email
 import kotlinx.coroutines.launch
@@ -18,11 +20,11 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
@@ -74,12 +76,15 @@ class LoginActivity : AppCompatActivity() {
                         val resp = response.body()
                         val loginresp: Loginresp = Gson().fromJson(resp?.get("result"), Loginresp::class.java)
                         Util.isFirst = loginresp.isFreshUser.toBoolean()
+                        Util.isWarrior = loginresp.isWarrior.toBoolean()
+                        Util.userId = loginresp.id
+                        Log.e(Util.isFirst.toString(),loginresp.isFreshUser)
+                        Log.e(Util.isWarrior.toString(),loginresp.isWarrior)
                         lifecycleScope.launch {
                             userPreferences.saveAuthToken(loginresp.token)
                             userPreferences.saveUserId(loginresp.id)
                             userPreferences.saveIsNightModeEnabled(false)
                             userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
-                            Util.userId = loginresp.id
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             startActivity(intent)
                             finish()

@@ -5,7 +5,6 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/rounded_border_login_register"
         tools:context="com.example.fbproject.EditProfileActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header_main"
@@ -26,40 +25,6 @@
                    app:layout_constraintLeft_toLeftOf="parent"
                    app:layout_constraintTop_toTopOf="parent"
                    app:layout_constraintBottom_toBottomOf="parent"/>
-        <!--<EditText android:layout_width="100dp"
-                  android:layout_height="wrap_content"
-                  android:background="@drawable/search_corner_round"
-                  app:layout_constraintTop_toTopOf="parent"
-                  app:layout_constraintBottom_toBottomOf="parent"
-                  app:layout_constraintLeft_toRightOf="@+id/prodName"
-                  android:layout_marginLeft="10dp"
-                  android:hint="search"
-                  android:textColorHint="@color/black"
-                  android:padding="5dp"
-        />-->
-        <!--<ImageButton
-                android:id="@+id/night_mode"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@null"
-                android:contentDescription="@null"
-                app:layout_constraintRight_toLeftOf="@+id/menu"
-                app:layout_constraintTop_toTopOf="parent"
-                android:tint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:src="@drawable/moon" />
-        <ImageButton
-                android:id="@+id/day_mode"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@null"
-                android:contentDescription="@null"
-                app:layout_constraintRight_toLeftOf="@+id/menu"
-                app:layout_constraintTop_toTopOf="parent"
-                android:tint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:visibility="gone"
-                android:src="@drawable/sun" />-->
 
         <ImageButton
                 android:id="@+id/menu"
@@ -71,11 +36,11 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:tint="@color/always_white"
-                android:src="@drawable/menu" />
+                android:src="@drawable/ic_baseline_grid_view_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <ScrollView android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="70dp"
                 app:layout_constraintTop_toBottomOf="@+id/header_main"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -278,30 +243,36 @@
                         android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
-            <Spinner
+            <AutoCompleteTextView
                     android:id="@+id/country"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
+                    android:hint="Country"
+                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
                     android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
-            <Spinner
+            <AutoCompleteTextView
                     android:id="@+id/state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
+                    android:hint="State"
+                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
                     android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
-            <Spinner
+            <AutoCompleteTextView
                     android:id="@+id/city"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
+                    android:hint="City"
+                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
                     android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
@@ -352,7 +323,7 @@
                     android:background="@drawable/rounded_border_login_register"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/primary_blue"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="50dp"
                     android:layout_marginTop="15dp"
                     android:shadowColor="@color/primary_blue"
             />

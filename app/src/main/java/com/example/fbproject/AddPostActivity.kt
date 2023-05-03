@@ -30,6 +30,7 @@ import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -46,12 +47,12 @@ class AddPostActivity : AppCompatActivity() {
     var postPicStr = ""
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
 
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

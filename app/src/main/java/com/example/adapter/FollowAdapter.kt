@@ -1,5 +1,6 @@
 package com.example.adapter
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -18,6 +19,7 @@ import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
 class FollowAdapter(
@@ -27,7 +29,7 @@ class FollowAdapter(
     private var owner: LifecycleOwner
 ) : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: AlertDialog
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_fol)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic_fol)
@@ -38,7 +40,7 @@ class FollowAdapter(
         var layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
         var items: View = layoutInflater.inflate(R.layout.child_follow, parent, false)
         var viewHolder = ViewHolder(items)
-        dialog = ProgressDialog(context)
+        dialog = SpotsDialog.Builder().setContext(context).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

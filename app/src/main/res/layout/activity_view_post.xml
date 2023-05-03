@@ -71,7 +71,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:tint="@color/white"
-                android:src="@drawable/menu" />
+                android:src="@drawable/ic_baseline_grid_view_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
         <LinearLayout
                 android:layout_width="match_parent"

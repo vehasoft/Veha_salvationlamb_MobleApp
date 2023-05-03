@@ -22,6 +22,7 @@ import com.example.util.UserPreferences
 import com.example.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -30,11 +31,11 @@ import retrofit2.Response
 class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_profile)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)

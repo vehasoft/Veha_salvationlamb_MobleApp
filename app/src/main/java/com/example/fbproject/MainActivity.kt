@@ -28,13 +28,14 @@ import com.example.util.Util
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: android.app.AlertDialog
     lateinit var search: ImageView
     lateinit var logo: ImageView
     var i = 0
@@ -57,11 +58,10 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         userPreferences = UserPreferences(this@MainActivity)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-
         if(!checkPermission()){
             requestPermission()
             dialog.dismiss()
@@ -70,19 +70,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         dialog.dismiss()
         if (Util.isFirst != null && Util.isFirst){
-            val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
-            nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            nagDialog.setCancelable(false)
-            nagDialog.setContentView(R.layout.preview_image)
-            val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
-            val img: ImageView = nagDialog.findViewById(R.id.iv_preview_image)
-            img.setImageResource(R.drawable.covre_pic)
-            btnClose.setOnClickListener {
-                firstTime()
-                nagDialog.dismiss()
+            if (Util.isWarrior) {
+                val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
+                nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                nagDialog.setCancelable(false)
+                nagDialog.setContentView(R.layout.preview_image)
+                val btnClose: Button = nagDialog.findViewById(R.id.btnIvClose)
+                val img: ImageView = nagDialog.findViewById(R.id.iv_preview_image)
+                img.setImageResource(R.drawable.covre_pic)
+                btnClose.setOnClickListener {
+                    firstTime()
+                    nagDialog.dismiss()
                 }
 
-            nagDialog.show()
+                nagDialog.show()
+            } else{
+                Commons().makeWarrior(this,this)
+                firstTime()
+            }
         }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
@@ -175,12 +180,15 @@ class MainActivity : AppCompatActivity() {
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         val pdf = tabLayout.newTab()
+        home.icon = getDrawable(R.drawable.ic_baseline_home_24)
+        profile.icon = getDrawable(R.drawable.profile)
+        pdf.icon = getDrawable(R.drawable.ic_baseline_folder_24)
         home.tag = "Home"
         profile.tag = "Profile"
-        pdf.tag = "Files"
+        pdf.tag = "Files"/*
         home.text = "Home"
         profile.text = "Profile"
-        pdf.text = "Files"
+        pdf.text = "Files"*/
         tabLayout.addTab(home,0)
         tabLayout.addTab(pdf,1)
         tabLayout.addTab(profile,2)

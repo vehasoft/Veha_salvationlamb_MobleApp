@@ -74,6 +74,7 @@ class RegisterActivity : AppCompatActivity() {
                 data.addProperty("password",passwordTxt)
                 data.addProperty("dateOfBirth",dobTxt)
                 data.addProperty("isWarrior",false)
+                data.addProperty("isFreshUser",true)
                 register(data)
             }
             else {

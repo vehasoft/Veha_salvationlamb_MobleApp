@@ -24,6 +24,7 @@ import com.example.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -31,7 +32,7 @@ import retrofit2.Response
 
 class FollowerActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
+    lateinit var dialog: android.app.AlertDialog
     private lateinit var followList: ArrayList<PostUser>
     lateinit var lists: RecyclerView
     lateinit var nodata: LinearLayout
@@ -44,7 +45,7 @@ class FollowerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follower)
         userPreferences = UserPreferences(this)
-        dialog = ProgressDialog(this)
+        dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
