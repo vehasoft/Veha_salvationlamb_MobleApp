@@ -2,12 +2,61 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.example.fragments.FilesFragment">
+             tools:context="com.veha.fragments.FilesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/hello_blank_fragment"/>
+    <LinearLayout
+                  android:background="@color/white"
+                  android:layout_width="match_parent"
+                  android:orientation="vertical"
+                  android:layout_height="match_parent">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/no_data"
+                      android:visibility="gone"
+                      android:gravity="center"
+                      android:orientation="vertical">
+            <ImageView android:layout_width="300dp"
+                       android:layout_height="300dp"
+                       android:src="@drawable/ic_no_record"/>
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="No Data found"
+                      android:textSize="30dp"
+                      android:textColor="@color/black"
+                      android:gravity="center"
+                      android:padding="5dp"/>
+
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/file_head_layout"
+                      android:orientation="horizontal"
+        >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Files"
+                      android:padding="5dp"
+                      android:layout_weight="1"
+                      android:layout_gravity="left"
+                      android:textStyle="bold"
+                      android:textSize="20dp"
+            />
+            <ImageView android:layout_width="30dp"
+                       android:layout_height="30dp"
+                       android:layout_gravity="center"
+                       android:id="@+id/view_icon"
+                       android:src="@drawable/ic_baseline_list_24"
+            />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/home_bg"
+                android:id="@+id/recycler_view"/>
+
+    </LinearLayout>
 
 </FrameLayout>

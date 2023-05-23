@@ -181,7 +181,7 @@
                                 android:layout_height="20dp"
                                 android:id="@+id/like_pic"
                                 android:visibility="gone"
-                                android:src="@mipmap/ic_launcher_round"
+                                android:src="@mipmap/fav_icon_round"
                                 android:scaleType="centerCrop"/>
                     </androidx.cardview.widget.CardView>
                     <TextView android:layout_width="wrap_content"

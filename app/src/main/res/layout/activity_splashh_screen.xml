@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:background="#F0F3F9"
         android:layout_height="match_parent"
-        tools:context="com.example.fbproject.SplashhScreenActivity">
+        tools:context="com.veha.activity.SplashhScreenActivity">
     <ImageView android:layout_width="match_parent"
                android:layout_height="match_parent"
                android:src="@drawable/splash_screen"/>

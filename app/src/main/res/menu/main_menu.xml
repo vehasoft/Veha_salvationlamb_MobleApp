@@ -6,8 +6,8 @@
            android:title="Edit Profile"/>
     <item  android:id="@+id/fav"
            android:title="Saved Posts"/>
-    <item  android:id="@+id/nightmode"
-           android:title="Night Mode"/>
+    <!--<item  android:id="@+id/nightmode"
+           android:title="Night Mode"/>-->
     <item  android:id="@+id/settings"
            android:title="Settings"/>
     <item  android:id="@+id/warrior"

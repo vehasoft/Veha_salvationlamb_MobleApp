@@ -32,7 +32,7 @@
                         android:layout_gravity="center">
 
                     <ImageView
-                            android:layout_width="44dp"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:id="@+id/profile_pic"
                             android:src="@drawable/ic_profile"
@@ -146,7 +146,7 @@
                         android:id="@+id/seekBar"/>
             </LinearLayout>
 
-            <com.example.fbproject.ExpandableView
+            <com.veha.activity.ExpandableView
                     android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textColor="@color/black"
