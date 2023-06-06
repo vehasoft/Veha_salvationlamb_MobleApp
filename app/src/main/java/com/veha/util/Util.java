@@ -130,8 +130,14 @@ public class Util {
     public static boolean isValidEmail(String email){
         return Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE).matcher(email).find();
     }
+    public static boolean isValidName(String name){
+        return Pattern.compile("^[a-zA-Z\\s]+\\.?$", Pattern.CASE_INSENSITIVE).matcher(name).find();
+    }
     public static boolean isValidPassword(String password){
         return Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$").matcher(password).find();
+    }
+    public static boolean isValidMobile(String mobile){
+        return Pattern.compile("^(\\+?\\d{1,4}[\\s-])?(?!0+\\s+,?$)\\d{10}\\s*,?$").matcher(mobile).find();
     }
     public static String getVideo(String url){
         url ="https://salvationlamb.com/video/" + url;

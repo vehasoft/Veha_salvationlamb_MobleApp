@@ -45,16 +45,15 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 255)
         dialog.dismiss()
     }
-    private fun checkPermission(): Boolean {
+    private fun checkPermission() {
         // in this method we are checking if the permissions are granted or not and returning the result.
         val result = ContextCompat.checkSelfPermission(applicationContext, READ_EXTERNAL_STORAGE)
         val result1 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE)
         val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
         if( !(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)){
             requestPermission()
-            return false
+            dialog.dismiss()
         }
-        return true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         userPreferences = UserPreferences(this@MainActivity)
@@ -62,14 +61,12 @@ class MainActivity : AppCompatActivity() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if(!checkPermission()){
-            requestPermission()
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        getMyDetails()
         dialog.dismiss()
+        checkPermission()
+        getMyDetails()
         if (Util.isFirst != null && Util.isFirst){
             if (Util.isWarrior) {
                 val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)

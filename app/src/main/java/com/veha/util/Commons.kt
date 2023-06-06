@@ -25,7 +25,6 @@ class Commons {
     fun makeWarrior(context: Context,owner: LifecycleOwner) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         val data = JsonObject()
-        //builder.setMessage(R.string.make_me_warrior)
         builder.setTitle("BECOME A WARRIOR")
         val view = View.inflate(context, R.layout.child_warrior,null)
         builder.setView(view)

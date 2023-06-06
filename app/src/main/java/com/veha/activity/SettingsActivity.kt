@@ -80,16 +80,16 @@ class SettingsActivity : AppCompatActivity() {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         Util.isNight = Util.DAY
                         userPreferences.saveIsNightModeEnabled(Util.DAY)
-                        /*val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
                         finish()
-                        startActivity(intent)*/
+                        startActivity(intent)
                     } else if (items[item] == Util.NIGHT) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         Util.isNight = Util.NIGHT
                         userPreferences.saveIsNightModeEnabled(Util.NIGHT)
-                        /*val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
                         finish()
-                        startActivity(intent)*/
+                        startActivity(intent)
                     }
                     else if (items[item] == Util.DEFAULT) {
                         userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
@@ -118,7 +118,9 @@ class SettingsActivity : AppCompatActivity() {
                         }*/
 
                     }
-                    Log.e("isnight",Util.isNight.toString())
+                    val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+                    finish()
+                    startActivity(intent)
                 }
             }
             builder1.show()
@@ -129,71 +131,5 @@ class SettingsActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        /*menu.setOnClickListener {
-            val myContext: Context = ContextThemeWrapper(this@SettingsActivity, R.style.menuStyle)
-            val popup = PopupMenu(myContext, menu)
-            popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior) {
-                popup.menu.findItem(R.id.warrior).isVisible = false
-            }
-            popup.menu.findItem(R.id.settings).isVisible = false
-            val night: MenuItem = popup.menu.findItem(R.id.nightmode)
-            if (Util.isNight) {
-                night.title = "Day Mode"
-            } else {
-                night.title = "Night Mode"
-            }
-            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.warrior -> {
-                        Commons().makeWarrior(this, this)
-                    }
-                    R.id.edit_profile ->{
-                        val intent = Intent(this@SettingsActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
-                    }
-                    R.id.logout -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@SettingsActivity)
-                        builder.setMessage("Do you want to Logout ?")
-                        builder.setTitle("Alert !")
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                            finish()
-                            lifecycleScope.launch {
-                                userPreferences.deleteAuthToken()
-                                userPreferences.deleteUserId()
-                            }
-                            val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                        }
-                        builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-                    }
-
-                    R.id.fav -> {
-                        val intent = Intent(this@SettingsActivity, FavoritesActivity::class.java)
-                        startActivity(intent)
-                    }
-
-                    R.id.nightmode -> {
-                        if (Util.isNight) {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }
-                }
-                true
-            })
-            popup.show()
-        }*/
     }
 }

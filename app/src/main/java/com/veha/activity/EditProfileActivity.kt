@@ -660,9 +660,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun getStates(countryId: String) {
         if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
             val call = Util.getRetrofit().getState(countryId)
             call!!.enqueue(object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -690,9 +687,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun getCities(stateId: String) {
         if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
             val call = Util.getRetrofit().getCity(stateId)
             call!!.enqueue(object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {

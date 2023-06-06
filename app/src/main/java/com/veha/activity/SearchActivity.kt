@@ -85,9 +85,9 @@ class SearchActivity : AppCompatActivity() {
     }
     private fun getContent(text: String) {
         if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
+            /*if (!dialog.isShowing) {
                 dialog.show()
-            }
+            }*/
             val data = JsonObject()
             data.addProperty("query", text)
             val retrofit = Util.getRetrofit()

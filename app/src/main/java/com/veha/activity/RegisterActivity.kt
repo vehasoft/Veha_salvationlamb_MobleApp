@@ -116,27 +116,33 @@ class RegisterActivity : AppCompatActivity() {
     private fun doValidation(): String{
         if(TextUtils.isEmpty(fNameTxt.trim())){
             fname.error = "Enter name"
-            return "error"
+            return "Enter name"
+        } else if(!Util.isValidName(fNameTxt)){
+            fname.error = "Enter valid name"
+            return "Enter valid name"
         } else if(TextUtils.isEmpty(emailTxt.trim())){
             email.error ="Enter email"
-            return "error"
-        } else if(TextUtils.isEmpty(mobileTxt.trim())){
-            mobile.error = "Enter mobile number"
-            return "error"
-        } else if(TextUtils.isEmpty(passwordTxt.trim())){
-            password.error =  "Enter Password"
-            return "error"
-        } else if(TextUtils.isEmpty(dobTxt.trim()) || dobTxt.equals("Date of birth",true)){
-            date.error = "Select Date of birth"
-            return "error"
-        } else if(genderId == -1 || TextUtils.isEmpty(genderId.toString())){
-            return "Select Gender"
+            return "Enter email"
         } else if(!Util.isValidEmail(emailTxt)){
             email.error = "Invalid Email"
-            return "error"
+            return "Invalid Email"
+        } else if(TextUtils.isEmpty(mobileTxt.trim())){
+            mobile.error = "Enter mobile number"
+            return "Enter mobile number"
+        } else if(!Util.isValidMobile(mobileTxt.trim())){
+            mobile.error = "Enter valid mobile number"
+            return "Enter valid mobile number"
+        } else if(TextUtils.isEmpty(passwordTxt.trim())){
+            password.error =  "Enter Password"
+            return "Enter Password"
         } else if(!Util.isValidPassword(passwordTxt)){
             password.error = "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
-            return "error"
+            return "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
+        } else if(TextUtils.isEmpty(dobTxt.trim()) || dobTxt.equals("Date of birth",true)){
+            date.error = "Select Date of birth"
+            return "Select Date of birth"
+        } else if(genderId == -1 || TextUtils.isEmpty(genderId.toString())){
+            return "Select Gender"
         }
 
         return SUCCESS
