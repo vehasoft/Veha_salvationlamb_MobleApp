@@ -309,7 +309,7 @@ class EditProfileActivity : AppCompatActivity() {
         saveBtn.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
             builder.setMessage("Do you want to edit")
-            builder.setTitle("Alert")
+            builder.setTitle("Edit")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
                 if(doValidation().contentEquals("success",true)){
@@ -360,16 +360,25 @@ class EditProfileActivity : AppCompatActivity() {
     private fun doValidation(): String{
         if(TextUtils.isEmpty(fname.text.toString().trim())){
             fname.error = "Enter name"
-            return "error"
-        } else if(TextUtils.isEmpty(lname.text.toString().trim())){
-            lname.error = "Enter name"
-            return "error"
-        }  else if(TextUtils.isEmpty(mobile.text.toString().trim())){
+            return "Enter name"
+        } else if(!Util.isValidName(fname.text.toString())){
+            fname.error = "Enter valid name"
+            return "Enter valid name"
+        } else if(TextUtils.isEmpty(email.text.toString().trim())){
+            email.error ="Enter email"
+            return "Enter email"
+        } else if(!Util.isValidEmail(email.text.toString())){
+            email.error = "Invalid Email"
+            return "Invalid Email"
+        } else if(TextUtils.isEmpty(mobile.text.toString().trim())){
             mobile.error = "Enter mobile number"
-            return "error"
+            return "Enter mobile number"
+        } else if(!Util.isValidMobile(mobile.text.toString().trim())){
+            mobile.error = "Enter valid mobile number"
+            return "Enter valid mobile number"
         } else if(TextUtils.isEmpty(date.text.toString().trim()) || date.text.toString().equals("Date of birth",true)){
             date.error = "Select Date of birth"
-            return "error"
+            return "Select Date of birth"
         }
         return "SUCCESS"
     }
