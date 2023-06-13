@@ -125,7 +125,7 @@ class HomeAdapter(
                     holder.postVideo.visibility = View.GONE
                     if (!post.picture.isNullOrEmpty()) {
                         holder.postPic.visibility = View.VISIBLE
-                        Picasso.with(context).load(post.picture).fit().into(holder.postPic)
+                        Picasso.with(context).load(post.picture).fit().centerInside().into(holder.postPic)
                     } else {
                         holder.postPic.visibility = View.GONE
                     }
@@ -146,7 +146,11 @@ class HomeAdapter(
                         holder.audioLayout.visibility = View.VISIBLE
                         mediaPlayer.setDataSource(post.url)
                         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                        mediaPlayer.prepare()
+                        try {
+                            mediaPlayer.prepare()
+                        }catch (e: java.lang.Exception){
+                            Log.e("exception",e.toString())
+                        }
                     }
                     else {
                         holder.audioLayout.visibility = View.GONE
@@ -160,12 +164,15 @@ class HomeAdapter(
                         override fun run() {
                             myHandler.postDelayed(this, 500)
                             holder.seekbar.progress = mediaPlayer.currentPosition
+                            Log.e("duration",mediaPlayer.currentPosition.toString())
                         }
                     }
                     holder.playBtn.setOnClickListener {
                         mediaPlayer.start()
                         holder.seekbar.max = mediaPlayer.duration
+                        Log.e("duration",mediaPlayer.duration.toString())
                         holder.seekbar.progress = mediaPlayer.currentPosition
+                        Log.e("duration",mediaPlayer.currentPosition.toString())
                         myHandler.postDelayed(updateSongTime,0)
                         holder.playBtn.visibility = View.GONE
                         holder.pauseBtn.visibility = View.VISIBLE

@@ -59,7 +59,7 @@ class Commons {
         val builder1: AlertDialog.Builder = AlertDialog.Builder(context)
         builder1.setMessage(R.string.make_me_warrior)
         builder1.setTitle("BECOME A WARRIOR")
-        builder1.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+        builder1.setNegativeButton("Skip") { dialog: DialogInterface, _: Int -> dialog.cancel() }
         builder1.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
@@ -71,8 +71,17 @@ class Commons {
                 } else if(church.text.isNullOrEmpty()){
                     church.error = "Please Enter ChurchName"
                 } else {
-                   if(gift1.isChecked)
-                       gift += gift1.text.toString() + ","
+                   if(gift1.isChecked) {
+                       gift += gift1.text.toString()
+                       gift2.isChecked = false
+                       gift3.isChecked = false
+                       gift4.isChecked = false
+                       gift5.isChecked = false
+                       gift2.isEnabled = false
+                       gift3.isEnabled = false
+                       gift4.isEnabled = false
+                       gift4.isEnabled = false
+                   }
                    if(gift2.isChecked)
                        gift += gift2.text.toString() + ","
                    if(gift3.isChecked)

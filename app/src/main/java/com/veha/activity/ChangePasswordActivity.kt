@@ -88,7 +88,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                     call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                         override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                             if (response.code() == 200) {
-                                Log.e("ok", response.code().toString())
+                                Toast.makeText(this@ChangePasswordActivity, "Password changed successfully", Toast.LENGTH_LONG).show()
                                 finish()
                             } else {
                                 val resp = response.errorBody()

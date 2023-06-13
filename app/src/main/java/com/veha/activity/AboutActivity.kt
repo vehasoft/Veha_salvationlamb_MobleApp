@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
@@ -83,20 +84,21 @@ class AboutActivity : AppCompatActivity() {
                                 val resp = response.body()
                                 val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                 var add = ""
+                                gender.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                                 if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
                                 if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
-                                    Util.formatDate(loginResp.dateOfBirth,"dd-MM-yyyy")
+                                    Util.formatDate(loginResp.dateOfBirth,"dd MMMM yyyy")
                                 if (!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
-                                if (!TextUtils.isEmpty(loginResp.gender)) gender.text = loginResp.gender
-                                if (!TextUtils.isEmpty(loginResp.address)) add = "${loginResp.address},"
-                                if (!TextUtils.isEmpty(loginResp.city)) add += "${loginResp.city},"
-                                if (!TextUtils.isEmpty(loginResp.pinCode)) add += "-${loginResp.pinCode}"
-                                if (!TextUtils.isEmpty(loginResp.state)) add += "${loginResp.state},"
+                                if (!TextUtils.isEmpty(loginResp.gender)) gender.text = loginResp.gender.capitalize()
+                                if (!TextUtils.isEmpty(loginResp.address)) add = "${loginResp.address}, "
+                                if (!TextUtils.isEmpty(loginResp.city)) add += "${loginResp.city}"
+                                if (!TextUtils.isEmpty(loginResp.pinCode)) add += " - ${loginResp.pinCode}\n"
+                                if (!TextUtils.isEmpty(loginResp.state)) add += "${loginResp.state}, "
                                 if (!TextUtils.isEmpty(loginResp.country)) add += "${loginResp.country}"
                                 address.text = add
                                 if (!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
                                 if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
-                                    Util.getTimeAgo(loginResp.createdAt)
+                                    Util.formatDate(loginResp.createdAt,"dd MMMM yyyy")
 
                             }
                             if (dialog.isShowing) {

@@ -69,7 +69,7 @@ class FilesFragment : Fragment() {
         if (Util.listview){
             listIcon.setImageResource(R.drawable.ic_baseline_list_24)
         } else {
-            listIcon.setImageResource(R.drawable.ic_baseline_grid_view_24)
+            listIcon.setImageResource(R.drawable.ic_baseline_grid_on_24)
         }
         listIcon.setOnClickListener {
             Util.listview = !Util.listview

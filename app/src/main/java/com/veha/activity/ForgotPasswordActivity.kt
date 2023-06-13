@@ -35,7 +35,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         if(page.contentEquals("verify")){
             emailID = intent.getStringExtra("email").toString()
             forgot_pwd_head.text = "OTP Verification"
-            forgot_pwd_content.text = "Please Enter otp to verify your account"
+            forgot_pwd_content.text = "Welcome to SalvationLamb. Please enter otp to verify your account"
             email.text =  Editable.Factory.getInstance().newEditable(emailID)
             otp_op.visibility = View.VISIBLE
             cancel_btn.visibility = View.VISIBLE
@@ -59,7 +59,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         } else {
             forgot_pwd_head.text = "Forgot Password"
-            forgot_pwd_content.text = "Welcome to Salvationlamb, please enter your email-id."
+            forgot_pwd_content.text = "Welcome to SalvationLamb. Please enter your email-id."
             forgot_btn.setOnClickListener {
                 if (TextUtils.isEmpty(email.text!!.trim())){
                     email.error = "Enter Email"

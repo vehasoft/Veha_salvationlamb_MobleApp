@@ -79,6 +79,7 @@ class EditProfileActivity : AppCompatActivity() {
     private var city: ArrayList<String> = ArrayList()
     private var country: ArrayList<String> = ArrayList()
 
+    private lateinit var myDetails: UserRslt
 
     private fun galleryIntent() {
         val intent = Intent()
@@ -118,15 +119,15 @@ class EditProfileActivity : AppCompatActivity() {
                     val resultUri = result.uri
                     val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
                     profilestr = encodeTobase64(bitmap)
+                    val data = JsonObject()
+                    data.addProperty("base64Image", profilestr)
+                    data.addProperty("name", Util.user.name + " picture")
+                    updateProfilePic(this, data)
                 } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     val error = result.error
                     Log.e("errorrr", error.toString())
                 }
             }
-        val data = JsonObject()
-        data.addProperty("base64Image", profilestr)
-        data.addProperty("name", Util.user.name + " picture")
-        updateProfilePic(this, data)
     }
     fun encodeTobase64(image: Bitmap): String? {
         val baos = ByteArrayOutputStream()
@@ -144,7 +145,6 @@ class EditProfileActivity : AppCompatActivity() {
         dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
-        //dialog.setInverseBackgroundForced(false)
         saveBtn = findViewById(R.id.save_btn)
         cancelBtn = findViewById(R.id.cancel_btn)
         warrior = findViewById(R.id.warrior)
@@ -190,8 +190,8 @@ class EditProfileActivity : AppCompatActivity() {
         }
         profile_pic_edit.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-            builder.setMessage("Edit Profile pic only updated after admin approval")
-            builder.setTitle("Do you want to update")
+            builder.setMessage("Modified profile picture can be updated only after the admin's approval.")
+            builder.setTitle("Do you want to change your profile picture?")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
                 val result = ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -249,45 +249,10 @@ class EditProfileActivity : AppCompatActivity() {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
                     }
-
-                    /*R.id.logout -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-                        builder.setMessage("Do you want to Logout ?")
-                        builder.setTitle("Alert !")
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                            finish()
-                            lifecycleScope.launch {
-                                userPreferences.deleteAuthToken()
-                                userPreferences.deleteUserId()
-                            }
-                            val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                        }
-                        builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-                    }*/
-
                     R.id.fav -> {
                         val intent = Intent(this@EditProfileActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
-
-                    /*R.id.nightmode -> {
-                        if (Util.isNight) {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }*/
                     R.id.settings -> {
                         val intent = Intent(this@EditProfileActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -307,54 +272,82 @@ class EditProfileActivity : AppCompatActivity() {
             citySp.showDropDown()
         }
         saveBtn.setOnClickListener {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
-            builder.setMessage("Do you want to edit")
-            builder.setTitle("Edit")
-            builder.setCancelable(false)
-            builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                if(doValidation().contentEquals("success",true)){
-                    val data = JsonObject()
-                    data.addProperty("firstName", fname.text.toString())
-                    data.addProperty("lastName", lname.text.toString())
-                    data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
-                    data.addProperty("email", email.text.toString())
-                    data.addProperty("mobile", mobile.text.toString())
-                    data.addProperty("address", address.text.toString())
-                    data.addProperty(
-                        "gender",
-                        findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
-                    )
-                    data.addProperty("dateOfBirth", date.text.toString())
-                    data.addProperty("isWarrior", warriorStr)
-                    data.addProperty("country", countrystr)
-                    data.addProperty("state", statestr)
-                    data.addProperty("city", citystr)
-                    data.addProperty("religion", religion)
-                    data.addProperty("churchName", churchName)
-                    data.addProperty("picture", imgStr)
-                    data.addProperty("language", language.text.toString())
-                    data.addProperty("pinCode", pincode.text.toString())
-                    edit(data)
-                }
-                /*if (!mobileTxt.contentEquals(mobile.text)){
-                    if(TextUtils.isEmpty(mobile.text.toString().trim())){
-                        mobile.error = "Enter mobile number"
-                    } else {
+            if (isDataChanged()){
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
+                builder.setMessage("Do you want to save the changes?")
+                builder.setTitle("Edit - Profile")
+                builder.setCancelable(false)
+                builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
+                    if(doValidation().contentEquals("success",true)){
                         val data = JsonObject()
+                        data.addProperty("firstName", fname.text.toString())
+                        data.addProperty("lastName", lname.text.toString())
+                        data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
                         data.addProperty("email", email.text.toString())
                         data.addProperty("mobile", mobile.text.toString())
-                        editMobile(data)
+                        data.addProperty("address", address.text.toString())
+                        data.addProperty(
+                            "gender",
+                            findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
+                        )
+                        data.addProperty("dateOfBirth", date.text.toString())
+                        data.addProperty("isWarrior", warriorStr)
+                        data.addProperty("country", countrystr)
+                        data.addProperty("state", statestr)
+                        data.addProperty("city", citystr)
+                        data.addProperty("religion", religion)
+                        data.addProperty("churchName", churchName)
+                        data.addProperty("picture", imgStr)
+                        data.addProperty("language", language.text.toString())
+                        data.addProperty("pinCode", pincode.text.toString())
+                        edit(data)
                     }
-                }*/
+                }
+                builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+                val alertDialog: AlertDialog = builder.create()
+                alertDialog.show()
+            } else {
+                val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
-            builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.show()
+
         }
         cancelBtn.setOnClickListener { finish() }
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             Commons().makeWarrior(this, this)
         }
+    }
+
+    private fun isDataChanged(): Boolean {
+        if (!fname.text!!.equals(myDetails.firstName)){
+            return true
+        }else if (!lname.text!!.equals(myDetails.lastName)){
+            return true
+        }else if (!mobile.text!!.equals(myDetails.mobile)){
+            return true
+        }else if (!address.text!!.equals(myDetails.address)){
+            return true
+        }else if (!fname.text!!.equals(myDetails.firstName)){
+            return true
+        }else if (!date.text!!.equals(myDetails.dateOfBirth)){
+            return true
+        }else if (!pincode.text!!.equals(myDetails.pinCode)){
+            return true
+        }else if (!language.text!!.equals(myDetails.language)){
+            return true
+        }else if (!countrySP.text!!.equals(myDetails.country)){
+            return true
+        }else if (!stateSp.text!!.equals(myDetails.state)){
+            return true
+        }else if (!citySp.text!!.equals(myDetails.city)){
+            return true
+        }else if (gender.checkedRadioButtonId == R.id.male && myDetails.gender != "male"){
+            return true
+        }else if (gender.checkedRadioButtonId == R.id.female && myDetails.gender != "female"){
+            return true
+        }
+        return false
     }
 
     private fun doValidation(): String{
@@ -426,50 +419,6 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
-   /* private fun editMobile(data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            userPreferences = UserPreferences(this@EditProfileActivity)
-            val retrofit = Util.getRetrofit()
-
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                Toast.makeText(this@EditProfileActivity, "Waiting For Admin Approval", Toast.LENGTH_LONG).show()
-                                val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                val resp = response.errorBody()
-                                val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = registerResp.get("status").toString()
-                                val errorMessage = registerResp.get("errorMessage").toString()
-                                Log.e("respppStatus", status)
-                                Log.e("respppresult", errorMessage)
-                                Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_LONG).show()
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
-
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            Log.e("EditProfileActivity.edit", "fail")
-                        }
-                    })
-                }
-            }
-        }
-    }*/
 
     private fun getMyDetails(context: Context) {
         if (Commons().isNetworkAvailable(this)) {
@@ -485,6 +434,7 @@ class EditProfileActivity : AppCompatActivity() {
                             if (response.code() == 200) {
                                 val resp = response.body()
                                 val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                myDetails = loginresp
                                 Log.e("mydetails",loginresp.toString())
                                 if (!loginresp.picture.isNullOrEmpty()) {
                                     imgStr = loginresp.picture

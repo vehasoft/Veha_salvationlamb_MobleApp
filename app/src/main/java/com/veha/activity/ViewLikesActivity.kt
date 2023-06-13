@@ -73,8 +73,8 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
                     R.id.logout ->{
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewLikesActivity)
-                        builder.setMessage("Do you want to Logout ?")
-                        builder.setTitle("Alert !")
+                        builder.setMessage("Do you want to Logout?")
+                        builder.setTitle("Logout")
                         builder.setCancelable(false)
                         builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
                             lifecycleScope.launch {

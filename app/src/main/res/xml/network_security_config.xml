@@ -3,4 +3,10 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com</domain>
     </domain-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
 </network-security-config>

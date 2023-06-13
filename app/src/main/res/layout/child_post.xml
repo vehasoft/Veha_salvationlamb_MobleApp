@@ -109,14 +109,16 @@
                       android:layout_gravity="left"
             />
             <ImageView android:layout_width="match_parent"
-                       android:layout_height="300dp"
+                       android:layout_height="400dp"
                        android:id="@+id/post_pic"
+                       android:background="#000000"
                        android:padding="2dp"
+                       android:layout_marginTop="10dp"
                        android:src="@drawable/ic_profile"
                        android:visibility="gone"
             />
             <WebView android:layout_width="match_parent"
-                     android:layout_height="200dp"
+                     android:layout_height="400dp"
                      android:id="@+id/post_video"
                      android:padding="2dp"
                      android:visibility="gone"

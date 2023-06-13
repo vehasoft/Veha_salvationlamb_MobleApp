@@ -202,7 +202,7 @@ class HomeFragment: Fragment(){
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(owner) {
                 if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", page, 10)
+                    val call: Call<JsonObject?>? = retrofit.getAudioPost("Bearer $it", page, 10)
                     call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                         override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                             if (response.code() == 200) {
@@ -225,7 +225,7 @@ class HomeFragment: Fragment(){
                                     list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                         override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                             if (!recyclerView.canScrollVertically(1)) {
-                                                list.isNestedScrollingEnabled = true
+                                                //list.isNestedScrollingEnabled = true
                                                 if (count > page) {
                                                     page++
                                                     getallPosts(context, owner)

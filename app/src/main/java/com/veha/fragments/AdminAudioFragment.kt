@@ -71,9 +71,7 @@ class AdminAudioFragment : Fragment() {
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
         dialog = SpotsDialog.Builder().setContext(contexts).build()
-        //dialog = ProgressDialog(contexts)
         dialog.setMessage("Please Wait")
-        //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         list = view.findViewById(R.id.list)

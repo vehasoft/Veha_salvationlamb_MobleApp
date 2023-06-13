@@ -1,10 +1,12 @@
 package com.veha.activity
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,13 +14,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
-import com.veha.adapter.SearchAdapter
-import com.veha.activity.R
-import com.veha.util.*
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.veha.adapter.SearchAdapter
+import com.veha.util.*
 import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -46,6 +47,9 @@ class SearchActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         tabLayout = findViewById(R.id.tabLayout)
         search = findViewById(R.id.search)
+        search.requestFocus()
+        val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT)
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         home.tag = "Posts"
