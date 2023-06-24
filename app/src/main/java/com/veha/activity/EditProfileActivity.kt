@@ -322,27 +322,25 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun isDataChanged(): Boolean {
-        if (!fname.text!!.equals(myDetails.firstName)){
+        if (!fname.text!!.contentEquals(myDetails.firstName,false)){
             return true
-        }else if (!lname.text!!.equals(myDetails.lastName)){
+        }else if (!lname.text!!.contentEquals(myDetails.lastName,false)){
             return true
-        }else if (!mobile.text!!.equals(myDetails.mobile)){
+        }else if (!mobile.text!!.contentEquals(myDetails.mobile,false)){
             return true
-        }else if (!address.text!!.equals(myDetails.address)){
+        }else if (!address.text!!.contentEquals(myDetails.address,false)){
             return true
-        }else if (!fname.text!!.equals(myDetails.firstName)){
+        }else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth,"dd-MM-yyyy"),false)){
             return true
-        }else if (!date.text!!.equals(myDetails.dateOfBirth)){
+        }else if (!pincode.text!!.contentEquals(myDetails.pinCode,false)){
             return true
-        }else if (!pincode.text!!.equals(myDetails.pinCode)){
+        }else if (!language.text!!.contentEquals(myDetails.language,false)){
             return true
-        }else if (!language.text!!.equals(myDetails.language)){
+        }else if (!countrySP.text!!.contentEquals(myDetails.country)){
             return true
-        }else if (!countrySP.text!!.equals(myDetails.country)){
+        }else if (!stateSp.text!!.contentEquals(myDetails.state)){
             return true
-        }else if (!stateSp.text!!.equals(myDetails.state)){
-            return true
-        }else if (!citySp.text!!.equals(myDetails.city)){
+        }else if (!citySp.text!!.contentEquals(myDetails.city)){
             return true
         }else if (gender.checkedRadioButtonId == R.id.male && myDetails.gender != "male"){
             return true
@@ -456,13 +454,6 @@ class EditProfileActivity : AppCompatActivity() {
                                 }
                                 if (!TextUtils.isEmpty(loginresp.religion)) religion = loginresp.religion
                                 if (!TextUtils.isEmpty(loginresp.churchName)) churchName = loginresp.churchName
-                                /*if (!TextUtils.isEmpty(loginresp.isWarrior)) warriorStr =
-                                    loginresp.isWarrior.toBoolean()
-                                if (warriorStr) {
-                                    warrior.visibility = View.GONE
-                                } else {
-                                    warrior.visibility = View.VISIBLE
-                                }*/
                                 loginresp.isWarrior.toBoolean()
                                 if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
                                     var dateArr = Util.formatDate(loginresp.dateOfBirth,"dd-MM-yyyy").split("-")
