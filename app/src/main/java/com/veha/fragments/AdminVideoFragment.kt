@@ -46,13 +46,6 @@ class AdminVideoFragment : Fragment() {
 
     private lateinit var myLikesMap: HashMap<String,String>
     private var myLikes: String = ""
-/*
-    companion object {
-        fun getInstance(): AdminVideoFragment{
-            val homeFrag = AdminVideoFragment()
-            return homeFrag
-        }
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,9 +65,7 @@ class AdminVideoFragment : Fragment() {
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
         dialog = SpotsDialog.Builder().setContext(contexts).build()
-        //dialog = ProgressDialog(contexts)
         dialog.setMessage("Please Wait")
-        //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         list = view.findViewById(R.id.list)
@@ -119,7 +110,6 @@ class AdminVideoFragment : Fragment() {
                                     list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                         override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                             if (!recyclerView.canScrollVertically(1)) {
-                                                list.isNestedScrollingEnabled = true
                                                 if (count > page) {
                                                     page++
                                                     getallPosts(context, owner)

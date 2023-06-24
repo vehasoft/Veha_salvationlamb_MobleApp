@@ -35,6 +35,17 @@ class SearchActivity : AppCompatActivity() {
     lateinit var postlist: ArrayList<Posts>
     lateinit var dialog: AlertDialog
     var currentTab: Int = 0
+    fun setEditTextFocus(searchEditText: EditText, isFocused: Boolean) {
+        searchEditText.isCursorVisible = isFocused
+        searchEditText.isFocusable = isFocused
+        searchEditText.isFocusableInTouchMode = isFocused
+        if (isFocused) {
+            searchEditText.requestFocus()
+        } else {
+            val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(searchEditText.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,9 +58,10 @@ class SearchActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         tabLayout = findViewById(R.id.tabLayout)
         search = findViewById(R.id.search)
-        search.requestFocus()
-        val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT)
+        setEditTextFocus(search,true)
+        //val imm: InputMethodManager =
+          //  getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        //imm.showSoftInput(search, InputMethodManager.SHOW_FORCED)
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         home.tag = "Posts"

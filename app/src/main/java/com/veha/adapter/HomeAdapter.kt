@@ -3,7 +3,6 @@ package com.veha.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.text.TextUtils
@@ -17,18 +16,18 @@ import android.webkit.WebView
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.squareup.picasso.Picasso
 import com.veha.activity.*
-import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.squareup.picasso.Picasso
 import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
@@ -66,6 +65,7 @@ class HomeAdapter(
         val followBtn: Button = view.findViewById(R.id.follow_post_btn)
         val deleteBtn: Button = view.findViewById(R.id.Delete_btn)
         val fav: ImageButton = view.findViewById(R.id.fav)
+        val overallLayout: ConstraintLayout = view.findViewById(R.id.child_post_layout)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
@@ -144,43 +144,58 @@ class HomeAdapter(
                     val myHandler = Handler()
                     if (!post.url.isNullOrEmpty()){
                         holder.audioLayout.visibility = View.VISIBLE
-                        mediaPlayer.setDataSource(post.url)
-                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                        try {
+                        //mediaPlayer.setDataSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3")
+                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/168735710115316871075951701686907491197+%281%29.mp3")
+                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/16871075951701686907491197.mp3")
+                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/ff-16b-1c-44100hz.aac")
+                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/1687282774781ff-16b-1c-44100hz.aac")
+                        try{
+                            mediaPlayer.setDataSource(post.url)
                             mediaPlayer.prepare()
-                        }catch (e: java.lang.Exception){
-                            Log.e("exception",e.toString())
+                            holder.seekbar.max = mediaPlayer.duration
+                            holder.seekbar.isClickable = true
+                            holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                                override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                                override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) { mediaPlayer.seekTo(progress) } }
+                            })
+                        } catch (e: Exception){
+                            holder.audioLayout.visibility = View.GONE
+                            holder.overallLayout.visibility = View.GONE
+                            posts.removeAt(position)
+                            Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
+                        }
+                        val updateSongTime: Runnable = object : Runnable {
+                            override fun run() {
+                                if (mediaPlayer.isPlaying) {
+                                    holder.seekbar.progress = mediaPlayer.currentPosition
+                                    myHandler.postDelayed(this, 100)
+                                } else {
+                                    myHandler.removeCallbacks(this)
+                                    holder.pauseBtn.visibility = View.GONE
+                                    holder.playBtn.visibility = View.VISIBLE
+
+                                }
+                            }
+                        }
+                        holder.playBtn.setOnClickListener {
+                            mediaPlayer.start()
+                            holder.seekbar.progress = mediaPlayer.currentPosition
+                            myHandler.postDelayed(updateSongTime,100)
+                            holder.playBtn.visibility = View.GONE
+                            holder.pauseBtn.visibility = View.VISIBLE
+                        }
+                        holder.pauseBtn.setOnClickListener {
+                            if (mediaPlayer.isPlaying) {
+                                myHandler.removeCallbacks(updateSongTime)
+                                mediaPlayer.pause()
+                            }
+                            holder.pauseBtn.visibility = View.GONE
+                            holder.playBtn.visibility = View.VISIBLE
                         }
                     }
                     else {
                         holder.audioLayout.visibility = View.GONE
-                    }
-                    holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                        override fun onStopTrackingTouch(seekBar: SeekBar) {}
-                        override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) {mediaPlayer.seekTo(progress) } }
-                    })
-                    val updateSongTime: Runnable = object : Runnable {
-                        override fun run() {
-                            myHandler.postDelayed(this, 500)
-                            holder.seekbar.progress = mediaPlayer.currentPosition
-                            Log.e("duration",mediaPlayer.currentPosition.toString())
-                        }
-                    }
-                    holder.playBtn.setOnClickListener {
-                        mediaPlayer.start()
-                        holder.seekbar.max = mediaPlayer.duration
-                        Log.e("duration",mediaPlayer.duration.toString())
-                        holder.seekbar.progress = mediaPlayer.currentPosition
-                        Log.e("duration",mediaPlayer.currentPosition.toString())
-                        myHandler.postDelayed(updateSongTime,0)
-                        holder.playBtn.visibility = View.GONE
-                        holder.pauseBtn.visibility = View.VISIBLE
-                    }
-                    holder.pauseBtn.setOnClickListener {
-                        mediaPlayer.pause()
-                        holder.pauseBtn.visibility = View.GONE
-                        holder.playBtn.visibility = View.VISIBLE
                     }
 
                 }

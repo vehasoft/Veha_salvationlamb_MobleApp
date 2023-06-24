@@ -117,7 +117,6 @@ class AdminAudioFragment : Fragment() {
                                     list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                         override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                             if (!recyclerView.canScrollVertically(1)) {
-                                                list.isNestedScrollingEnabled = true
                                                 if (count > page) {
                                                     page++
                                                     getallPosts(context, owner)

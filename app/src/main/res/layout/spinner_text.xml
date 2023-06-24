@@ -20,7 +20,8 @@
           android:id="@android:id/text1"
           style="?attr/spinnerDropDownItemStyle"
           android:singleLine="true"
-          android:textColor="@color/black"
+          android:textColor="@color/white"
+          android:background="@color/hintcolor"
           android:layout_width="match_parent"
           android:layout_height="?attr/dropdownListPreferredItemHeight"
           android:ellipsize="marquee"/>

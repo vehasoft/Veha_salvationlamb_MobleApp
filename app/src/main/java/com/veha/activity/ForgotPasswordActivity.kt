@@ -132,6 +132,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
             val data = JsonObject()
             data.addProperty("email", emailtxt)
             data.addProperty("otp", otpTxt)
+            if(page.contentEquals("verify")){
+                data.addProperty("isVerifyMail",true)
+            }
             Log.e("data", data.toString())
             val retrofit = Util.getRetrofit()
             val call: Call<JsonObject?>? = if(page.contentEquals("verify")) { retrofit.postVerifyUser(data) } else { retrofit.postForgotPasswordOtp(data) }

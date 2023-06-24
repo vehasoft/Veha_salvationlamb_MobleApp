@@ -41,7 +41,7 @@ class Commons {
         error.visibility = View.GONE
         val list = Util.getReligion()
         var rel = ""
-        val adapter = ArrayAdapter(context, R.layout.spinner_text, list)
+        val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, list)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         religion.adapter = adapter
         religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -63,6 +63,23 @@ class Commons {
         builder1.setPositiveButton("I agree") { _: DialogInterface?, _: Int ->
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
+            gift1.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked){
+                    gift2.isChecked = false
+                    gift3.isChecked = false
+                    gift4.isChecked = false
+                    gift5.isChecked = false
+                    gift2.isEnabled = false
+                    gift3.isEnabled = false
+                    gift4.isEnabled = false
+                    gift5.isEnabled = false
+                } else {
+                    gift2.isEnabled = true
+                    gift3.isEnabled = true
+                    gift4.isEnabled = true
+                    gift5.isEnabled = true
+                }
+            }
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 var wantToCloseDialog = false
                 if (rel.isNullOrEmpty() || rel == "Select"){
@@ -71,6 +88,7 @@ class Commons {
                 } else if(church.text.isNullOrEmpty()){
                     church.error = "Please Enter ChurchName"
                 } else {
+
                    if(gift1.isChecked) {
                        gift += gift1.text.toString()
                        gift2.isChecked = false

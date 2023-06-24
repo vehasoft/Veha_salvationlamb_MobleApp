@@ -82,10 +82,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 nagDialog.show()
-            } else{
+            } /*else{
                 Commons().makeWarrior(this,this)
                 firstTime()
-            }
+            }*/
         }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {

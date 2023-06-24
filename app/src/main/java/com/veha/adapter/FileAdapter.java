@@ -42,7 +42,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.textView.setText(selectedFile.getName());
 
         if (selectedFile.getType().equals("folder")) {
-            holder.imageView.setImageResource(R.drawable.ic_baseline_folder_24);
+            holder.imageView.setImageResource(R.drawable.folder_icon);
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24);
         }

@@ -41,6 +41,7 @@
                 android:exported="false"/>
         <activity
                 android:name=".SearchActivity"
+                android:windowSoftInputMode="stateVisible"
                 android:exported="false"/>
         <activity
                 android:name=".ChangePasswordActivity"

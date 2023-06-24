@@ -110,8 +110,10 @@ class EditProfileActivity : AppCompatActivity() {
 
             }
         } else if (requestCode == 150) {
-            if (data!!.extras!!["data"] != null) {
-                CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap)).start(this@EditProfileActivity)
+            if (data != null) {
+                if (data.extras!!["data"] != null) {
+                    CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap)).start(this@EditProfileActivity)
+                }
             }
         } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 val result = CropImage.getActivityResult(data)
@@ -603,7 +605,7 @@ class EditProfileActivity : AppCompatActivity() {
                         country.add(cityobj.name)
                     }
                     val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
                     countrySP.setAdapter(adapter)
                 }
 
