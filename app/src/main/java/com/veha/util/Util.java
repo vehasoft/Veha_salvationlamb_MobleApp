@@ -1,5 +1,6 @@
 package com.veha.util;
 
+import android.media.MediaPlayer;
 import android.util.Log;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -28,6 +29,7 @@ public class Util {
     public static Boolean isWarrior;
     public static UserRslt user;
     private static RetrofitAPI retrofitAPI;
+    public static MediaPlayer player = null;
 
     public static ArrayList getReligion(){
         religion = new ArrayList<>();
@@ -111,9 +113,6 @@ public class Util {
                 timeAgo = (hours+" hours ago");
             else if(days>=1){
                 if (days == 1) {
-                    timeAgo = "today";
-                }
-                else if (days == 2) {
                     timeAgo = "yesterday";
                 }
                 else {

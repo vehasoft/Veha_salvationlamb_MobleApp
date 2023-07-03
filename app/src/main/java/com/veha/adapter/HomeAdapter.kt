@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AlertDialog
@@ -81,9 +82,7 @@ class HomeAdapter(
         viewHolder.tags.textSize = Util.fontSize.toFloat()
         viewHolder.tags.setTextColor(context.getColor(R.color.primary_blue))
 
-        viewHolder.postVideo.settings.javaScriptEnabled = true
-        viewHolder.postVideo.settings.domStorageEnabled = true
-        viewHolder.postVideo.webChromeClient = WebChromeClient()
+
 
         if (page.contentEquals("home")) {
             viewHolder.followBtn.visibility = View.VISIBLE
@@ -111,7 +110,6 @@ class HomeAdapter(
                 opTags += "#$it"
             }
         }
-
         return opTags
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -140,7 +138,6 @@ class HomeAdapter(
                 "audio" -> {
                     holder.postVideo.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
-                    val mediaPlayer = MediaPlayer()
                     val myHandler = Handler()
                     if (!post.url.isNullOrEmpty()){
                         holder.audioLayout.visibility = View.VISIBLE
@@ -149,26 +146,11 @@ class HomeAdapter(
                         //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/16871075951701686907491197.mp3")
                         //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/ff-16b-1c-44100hz.aac")
                         //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/1687282774781ff-16b-1c-44100hz.aac")
-                        try{
-                            mediaPlayer.setDataSource(post.url)
-                            mediaPlayer.prepare()
-                            holder.seekbar.max = mediaPlayer.duration
-                            holder.seekbar.isClickable = true
-                            holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                                override fun onStopTrackingTouch(seekBar: SeekBar) {}
-                                override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) { mediaPlayer.seekTo(progress) } }
-                            })
-                        } catch (e: Exception){
-                            holder.audioLayout.visibility = View.GONE
-                            holder.overallLayout.visibility = View.GONE
-                            posts.removeAt(position)
-                            Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
-                        }
+
                         val updateSongTime: Runnable = object : Runnable {
                             override fun run() {
-                                if (mediaPlayer.isPlaying) {
-                                    holder.seekbar.progress = mediaPlayer.currentPosition
+                                if (Util.player.isPlaying) {
+                                    holder.seekbar.progress = Util.player.currentPosition
                                     myHandler.postDelayed(this, 100)
                                 } else {
                                     myHandler.removeCallbacks(this)
@@ -179,16 +161,38 @@ class HomeAdapter(
                             }
                         }
                         holder.playBtn.setOnClickListener {
-                            mediaPlayer.start()
-                            holder.seekbar.progress = mediaPlayer.currentPosition
+                            if (Util.player != null){
+                                Util.player.stop()
+                                Util.player.reset()
+                                Util.player.release()
+                                Util.player = null
+                                myHandler.removeCallbacks(updateSongTime)
+                            }
+                            try{
+                                Util.player = MediaPlayer()
+                                Util.player.setDataSource(post.url)
+                                Util.player.prepare()
+                                holder.seekbar.max = Util.player.duration
+                                holder.seekbar.isClickable = true
+                                holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                                    override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) { Util.player.seekTo(progress) } }
+                                })
+                            } catch (e: Exception){
+                                posts.removeAt(position)
+                                Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
+                            }
+                            Util.player.start()
+                            holder.seekbar.progress = Util.player.currentPosition
                             myHandler.postDelayed(updateSongTime,100)
                             holder.playBtn.visibility = View.GONE
                             holder.pauseBtn.visibility = View.VISIBLE
                         }
                         holder.pauseBtn.setOnClickListener {
-                            if (mediaPlayer.isPlaying) {
+                            if (Util.player.isPlaying) {
                                 myHandler.removeCallbacks(updateSongTime)
-                                mediaPlayer.pause()
+                                Util.player.pause()
                             }
                             holder.pauseBtn.visibility = View.GONE
                             holder.playBtn.visibility = View.VISIBLE
@@ -203,6 +207,10 @@ class HomeAdapter(
                     holder.audioLayout.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
                     if (!post.url.isNullOrEmpty()){
+                        holder.postVideo.settings.javaScriptEnabled = true
+                        holder.postVideo.settings.domStorageEnabled = true
+                        holder.postVideo.webChromeClient = WebChromeClient()
+                        holder.postVideo.webViewClient = WebViewClient()
                         holder.postVideo.visibility = View.VISIBLE
                         holder.postVideo.loadUrl(Util.getVideo(post.url))
                     }

@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.veha.adapter.TabAdapter
 import com.veha.activity.R
 import com.veha.util.Commons
@@ -33,11 +34,15 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
+import kotlin.system.exitProcess
+
 class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
     lateinit var search: ImageView
     lateinit var logo: ImageView
+    lateinit var viewPager : ViewPager
+    lateinit var addPost: FloatingActionButton
     var i = 0
     var userType: String = ""
     private fun requestPermission() {
@@ -64,7 +69,9 @@ class MainActivity : AppCompatActivity() {
         dialog.dismiss()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         checkPermission()
         getMyDetails()
         if (Util.isFirst != null && Util.isFirst){
@@ -87,12 +94,25 @@ class MainActivity : AppCompatActivity() {
                 firstTime()
             }*/
         }
+        if (Util.isWarrior){
+            banner.visibility = View.GONE
+        }
+        addPost = findViewById(R.id.add_post)
+        addPost.setOnClickListener {
+            val intent = Intent(this@MainActivity, AddPostActivity::class.java)
+            startActivity(intent)
+        }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        Log.e("isnight",Util.isNight.toString())
+        banner_close.setOnClickListener {
+            banner.visibility = View.GONE
+        }
+        banner.setOnClickListener {
+            Commons().makeWarrior(this@MainActivity,this)
+        }
         when (Util.isNight){
             Util.DAY -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -103,8 +123,6 @@ class MainActivity : AppCompatActivity() {
             Util.DEFAULT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
-
-
         }
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
@@ -150,7 +168,6 @@ class MainActivity : AppCompatActivity() {
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
                     }
-
                     R.id.edit_profile ->{
                         val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                         startActivity(intent)
@@ -163,19 +180,6 @@ class MainActivity : AppCompatActivity() {
                         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
-                    /*R.id.nightmode ->{
-                        if (Util.isNight){
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }*/
                 }
                 true
             })
@@ -196,10 +200,7 @@ class MainActivity : AppCompatActivity() {
         profile.tag = "Profile"
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
-        pdf.tag = "Files"/*
-        home.text = "Home"
-        profile.text = "Profile"
-        pdf.text = "Files"*/
+        pdf.tag = "Files"
         tabLayout.addTab(home,0)
         tabLayout.addTab(pdf,1)
         tabLayout.addTab(adminVideo,2)
@@ -207,11 +208,15 @@ class MainActivity : AppCompatActivity() {
         tabLayout.addTab(profile,4)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
-        val viewPager : ViewPager = findViewById(R.id.viewPager)
+        viewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                dialog.dismiss()
+                if (Util.player != null){
+                    Util.player.stop()
+                }
                 if (tab != null) {
                     viewPager.currentItem = tab.position
                 }
@@ -237,11 +242,15 @@ class MainActivity : AppCompatActivity() {
                             if (response.code() == 200) {
                                 val resp = response.body()
                                 val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                Log.e("resp", loginresp.toString())
                                 Util.user = loginresp
                                 Util.isFirst = loginresp.isFreshUser.toBoolean()
-                                val isWarrior: Boolean =
-                                    loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                                val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
+                                if (isWarrior) {
+                                    banner.visibility = View.GONE
+                                    addPost.visibility = View.VISIBLE
+                                } else {
+                                    addPost.visibility = View.GONE
+                                }
                                 Util.isWarrior = isWarrior
                                 userType = if (isWarrior) Util.WARRIOR else Util.USER
                                 if (dialog.isShowing) {
@@ -321,5 +330,13 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
+    }
+
+    override fun onBackPressed() {
+        if (viewPager.currentItem == 0){
+            exitProcess(-1)
+        } else {
+            viewPager.currentItem = 0
+        }
     }
 }

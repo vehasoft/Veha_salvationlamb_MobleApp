@@ -46,7 +46,6 @@ class HomeFragment: Fragment(){
     lateinit var type: String
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
-    lateinit var addPost: FloatingActionButton
     lateinit var refresh: SwipeRefreshLayout
 
     private lateinit var likeslist: ArrayList<PostLikes>
@@ -91,14 +90,8 @@ class HomeFragment: Fragment(){
         dialog.setInverseBackgroundForced(false)
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
-        addPost = view.findViewById(R.id.add_post)
         refresh = view.findViewById(R.id.refresh)
         getMyDetails(viewLifecycleOwner)
-
-        addPost.setOnClickListener {
-            val intent = Intent(contexts, AddPostActivity::class.java)
-            startActivity(intent)
-        }
         getallLikes(viewLifecycleOwner)
         page = 1
         adapter = HomeAdapter(ArrayList(), contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
@@ -421,11 +414,6 @@ class HomeFragment: Fragment(){
                                     loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                                 userType = if (isWarrior) Util.WARRIOR else Util.USER
                                 showCreatePost = (userType == Util.WARRIOR) && (type != "fav")
-                                if (showCreatePost) {
-                                    addPost.visibility = View.VISIBLE
-                                } else {
-                                    addPost.visibility = View.GONE
-                                }
                             }
                             if (dialog.isShowing) {
                                 dialog.hide()
@@ -454,10 +442,21 @@ class HomeFragment: Fragment(){
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
+        if (Util.player != null){
+            Util.player.stop()
+            Util.player.reset()
+            Util.player.release()
+            Util.player = null
+        }
     }
-
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
+        if (Util.player != null){
+            Util.player.stop()
+            Util.player.reset()
+            Util.player.release()
+            Util.player = null
+        }
     }
 }

@@ -338,10 +338,16 @@ class AdminAudioFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
+        if (Util.player != null){
+            Util.player.stop()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
+        if (Util.player != null){
+            Util.player.stop()
+        }
     }
 }

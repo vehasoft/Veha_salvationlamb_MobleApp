@@ -442,6 +442,7 @@ class EditProfileActivity : AppCompatActivity() {
                                 }
                                 if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.firstName)
+                                warriorStr = loginresp.isWarrior.toBoolean()
                                 if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
                                     Editable.Factory.getInstance().newEditable(loginresp.lastName)
                                 if (!TextUtils.isEmpty(loginresp.address)) address.text =
