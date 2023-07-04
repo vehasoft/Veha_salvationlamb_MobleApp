@@ -90,7 +90,7 @@ class HomeAdapter(
             viewHolder.fav.visibility = View.VISIBLE
         } else if (page.contentEquals("profile")) {
             viewHolder.followBtn.visibility = View.GONE
-            viewHolder.deleteBtn.visibility = View.GONE
+            viewHolder.deleteBtn.visibility = View.VISIBLE
             viewHolder.fav.visibility = View.GONE
         } else if (page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) {
             viewHolder.followBtn.visibility = View.GONE
@@ -318,7 +318,8 @@ class HomeAdapter(
             builder.setCancelable(false)
             builder.setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
                 deletePost(post)
-                posts.removeAt(posts.indexOf(post))
+                posts.removeAt(position)
+                notifyItemRemoved(position)
             }
             builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
 
@@ -397,7 +398,6 @@ class HomeAdapter(
                             if (response.code() == 200) {
                                 Toast.makeText(context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG)
                                     .show()
-                                notifyItemRemoved(posts.indexOf(post))
                             } else {
                                 val resp = response.errorBody()
                                 val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
