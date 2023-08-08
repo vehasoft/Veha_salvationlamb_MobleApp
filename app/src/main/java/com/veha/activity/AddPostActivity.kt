@@ -17,6 +17,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -41,8 +43,13 @@ class AddPostActivity : AppCompatActivity() {
     lateinit var postPic: ImageView
     lateinit var title: EditText
     lateinit var content: EditText
+    lateinit var video: EditText
     lateinit var tags: EditText
+    lateinit var postType: RadioGroup
+    lateinit var postImage: RadioButton
+    lateinit var postVideo: RadioButton
     var postPicStr = ""
+    var postTypeStr = "text"
 
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
@@ -62,10 +69,35 @@ class AddPostActivity : AppCompatActivity() {
         postPic = findViewById(R.id.post_img)
         title = findViewById(R.id.title)
         content = findViewById(R.id.content)
+        video = findViewById(R.id.video)
         tags = findViewById(R.id.tags)
+        postType = findViewById(R.id.post_type)
+        postImage = findViewById(R.id.image_btn)
+        postVideo = findViewById(R.id.video_btn)
+        postImage.setOnClickListener {
+            addImg()
+        }
+
+        postType.setOnCheckedChangeListener { group, checkedId ->
+            if (checkedId == R.id.image_btn){
+                postTypeStr = "image"
+
+            } else if(checkedId == R.id.video_btn){
+                video.visibility = View.VISIBLE
+                postPic.visibility = View.GONE
+                postTypeStr = "video"
+            }
+        }
+        /*postPic.setOnClickListener {
+
+        }*/
+
         postBtn.isEnabled = true
         postBtn.setOnClickListener {
-            if (content.text.toString().trim().isNullOrEmpty()){
+            if (postPicStr.isNullOrEmpty() && postTypeStr.contentEquals("image")){
+                postTypeStr = "text"
+            }
+            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("text")){
                 content.error = "Content must not be empty"
             }else {
                 postBtn.isEnabled = false
@@ -74,7 +106,8 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("content",content.text.toString())
                 data.addProperty("tags",tags.text.toString())
                 data.addProperty("image",postPicStr)
-                data.addProperty("type","image")
+                data.addProperty("url",video.text.toString())
+                data.addProperty("type",postTypeStr)
                 data.addProperty("userId", Util.userId)
                 postData(data)
             }
@@ -88,6 +121,7 @@ class AddPostActivity : AppCompatActivity() {
             if (!dialog.isShowing) {
                 dialog.show()
             }
+            Log.e("data",data.toString())
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(this) {
                 if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -200,6 +234,9 @@ class AddPostActivity : AppCompatActivity() {
                     postPic.setImageBitmap(bitmap)
                 }
                 postPicStr = encodeTobase64(bitmap).toString()
+                postTypeStr = "image"
+                postPic.visibility = View.VISIBLE
+                video.visibility = View.GONE
             }
         } else if (requestCode == 150) {
             if (data?.extras!!["data"] != null) {
@@ -207,10 +244,12 @@ class AddPostActivity : AppCompatActivity() {
                 val bytes = ByteArrayOutputStream()
                 bitmap!!.compress(Bitmap.CompressFormat.JPEG, 90, bytes)
                 if (bitmap != null) {
-                    postPic.visibility = View.VISIBLE
                     postPic.setImageBitmap(bitmap)
                 }
                 postPicStr = encodeTobase64(bitmap).toString()
+                postTypeStr = "image"
+                postPic.visibility = View.VISIBLE
+                video.visibility = View.GONE
             }
         }
     }

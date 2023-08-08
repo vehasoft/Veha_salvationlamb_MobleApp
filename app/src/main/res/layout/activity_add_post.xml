@@ -3,7 +3,7 @@
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
                                                    android:background="@color/white"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto">
+>
     <ScrollView android:layout_width="match_parent"
                 android:layout_height="match_parent">
     <LinearLayout android:layout_width="match_parent"
@@ -56,12 +56,53 @@
                   android:textColorHint="@color/hintcolor"
                   android:padding="5dp"
         />
+        <RadioGroup android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/post_type"
+                    android:visibility="gone"
+                    android:background="@color/home_bg"
+        >
+            <RadioButton android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/image_btn"
+                         android:text="Image"
+                         android:textSize="15dp"
+                         android:layout_weight="0.3"
+                         android:buttonTint="@color/black"
+                         android:textColor="@color/black"
+            />
+            <RadioButton android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:id="@+id/video_btn"
+                         android:text="Video"
+                         android:textSize="15dp"
+                         android:layout_weight="0.3"
+                         android:buttonTint="@color/black"
+                         android:textColor="@color/black"
+            />
+        </RadioGroup>
+        <EditText android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:background="@color/home_bg"
+                  android:textSize="20dp"
+                  android:id="@+id/video"
+                  android:layout_marginTop="10dp"
+                  android:hint="Video Url"
+                  android:visibility="gone"
+                  android:textColor="@color/black"
+                  android:textColorHint="@color/hintcolor"
+                  android:padding="5dp"
+        />
         <ImageView android:layout_width="350dp"
                    android:layout_height="350dp"
                    android:id="@+id/post_img"
+                   android:layout_marginTop="10dp"
                    android:visibility="gone"
                    android:layout_gravity="center"
-                   />
+        >
+        </ImageView>
         <Button android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="Add Image"

@@ -20,15 +20,13 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.veha.adapter.TabAdapter
-import com.veha.activity.R
-import com.veha.util.Commons
-import com.veha.util.UserPreferences
-import com.veha.util.UserRslt
-import com.veha.util.Util
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.veha.adapter.TabAdapter
+import com.veha.fragments.AdminVideoFragment
+import com.veha.util.*
 import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
@@ -36,14 +34,14 @@ import retrofit2.Call
 import retrofit2.Response
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(){
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
     lateinit var search: ImageView
     lateinit var logo: ImageView
     lateinit var viewPager : ViewPager
     lateinit var addPost: FloatingActionButton
-    var i = 0
     var userType: String = ""
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
@@ -219,6 +217,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (tab != null) {
                     viewPager.currentItem = tab.position
+                   /* if (tab.position != 2){
+                        Log.e("position",tab.position.toString())
+                        //this@MainActivity.supportFragmentManager.beginTransaction().detach(AdminVideoFragment()).commit()
+                        //AdminVideoFragment().fragmentManager?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
+                        //val af : AdminVideoFragment = supportFragmentManager.findFragmentByTag("video") as AdminVideoFragment
+                        //af.refreshAdapter()
+                        AdminVideoFragment().getFragmentManager()?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
+                        AdminVideoFragment().getFragmentManager()?.beginTransaction()?.attach(AdminVideoFragment())?.commit();
+                    }
+                    if (AdminVideoFragment().isDetached){
+                        Log.e("position","tab.position.toString()detacheddddd")
+                    }*/
                 }
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {

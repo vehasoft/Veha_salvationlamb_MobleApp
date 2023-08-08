@@ -337,4 +337,11 @@ class AdminVideoFragment : Fragment() {
         super.onDestroy()
         dialog.dismiss()
     }
+
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (!isVisibleToUser) {
+            fragmentManager?.beginTransaction()?.detach(this@AdminVideoFragment)?.attach(this@AdminVideoFragment)?.commit()
+        }
+    }
 }

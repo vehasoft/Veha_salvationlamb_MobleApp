@@ -11,9 +11,6 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +20,10 @@ import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.squareup.picasso.Picasso
 import com.veha.activity.*
 import com.veha.util.Commons
@@ -32,6 +33,7 @@ import com.veha.util.Util
 import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
+
 
 class HomeAdapter(
     private var posts: ArrayList<Posts>,
@@ -45,6 +47,7 @@ class HomeAdapter(
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
     private var likesCount = 0
+    private var currentHolder: ViewHolder? = null
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_post)
         val time: TextView = view.findViewById(R.id.post_time)
@@ -55,7 +58,7 @@ class HomeAdapter(
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
         val postPic: ImageView = view.findViewById(R.id.post_pic)
-        val postVideo: WebView = view.findViewById(R.id.post_video)
+        val postVideo: YouTubePlayerView = view.findViewById(R.id.post_video)
         val audioLayout: LinearLayout = view.findViewById(R.id.audio_layout)
         val pauseBtn: ImageView = view.findViewById(R.id.pause_btn)
         val playBtn: ImageView = view.findViewById(R.id.play_btn)
@@ -150,7 +153,7 @@ class HomeAdapter(
                         val updateSongTime: Runnable = object : Runnable {
                             override fun run() {
                                 if (Util.player.isPlaying) {
-                                    holder.seekbar.progress = Util.player.currentPosition
+                                    currentHolder!!.seekbar.progress = Util.player.currentPosition
                                     myHandler.postDelayed(this, 100)
                                 } else {
                                     myHandler.removeCallbacks(this)
@@ -161,19 +164,28 @@ class HomeAdapter(
                             }
                         }
                         holder.playBtn.setOnClickListener {
-                            if (Util.player != null){
+
+                            if (currentHolder != null && Util.player != null && Util.player.isPlaying){
+                                myHandler.removeCallbacks(updateSongTime)
+                                Util.player.pause()
+                                currentHolder!!.pauseBtn.visibility = View.GONE
+                                currentHolder!!.seekbar.progress = 0
+                                currentHolder!!.playBtn.visibility = View.VISIBLE
                                 Util.player.stop()
-                                Util.player.reset()
                                 Util.player.release()
                                 Util.player = null
-                                myHandler.removeCallbacks(updateSongTime)
                             }
+                            Util.player = MediaPlayer()
                             try{
-                                Util.player = MediaPlayer()
                                 Util.player.setDataSource(post.url)
                                 Util.player.prepare()
                                 holder.seekbar.max = Util.player.duration
                                 holder.seekbar.isClickable = true
+                                Util.player.start()
+                                holder.seekbar.progress = Util.player.currentPosition
+                                myHandler.postDelayed(updateSongTime,100)
+                                holder.playBtn.visibility = View.GONE
+                                holder.pauseBtn.visibility = View.VISIBLE
                                 holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                                     override fun onStopTrackingTouch(seekBar: SeekBar) {}
                                     override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -183,11 +195,7 @@ class HomeAdapter(
                                 posts.removeAt(position)
                                 Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
                             }
-                            Util.player.start()
-                            holder.seekbar.progress = Util.player.currentPosition
-                            myHandler.postDelayed(updateSongTime,100)
-                            holder.playBtn.visibility = View.GONE
-                            holder.pauseBtn.visibility = View.VISIBLE
+                            currentHolder = holder
                         }
                         holder.pauseBtn.setOnClickListener {
                             if (Util.player.isPlaying) {
@@ -207,12 +215,31 @@ class HomeAdapter(
                     holder.audioLayout.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
                     if (!post.url.isNullOrEmpty()){
-                        holder.postVideo.settings.javaScriptEnabled = true
+                        /*holder.postVideo.settings.javaScriptEnabled = true
                         holder.postVideo.settings.domStorageEnabled = true
                         holder.postVideo.webChromeClient = WebChromeClient()
                         holder.postVideo.webViewClient = WebViewClient()
                         holder.postVideo.visibility = View.VISIBLE
-                        holder.postVideo.loadUrl(Util.getVideo(post.url))
+                        holder.postVideo.loadUrl(Util.getVideo(post.url))*/
+                        holder.postVideo.visibility = View.VISIBLE
+                        (context as MainActivity).lifecycle.addObserver(holder.postVideo)
+                        val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
+                            override fun onReady(youTubePlayer: YouTubePlayer) {
+                                youTubePlayer.cueVideo(post.url, 0f)
+                            }
+                        }
+                        val iFramePlayerOptions = IFramePlayerOptions.Builder()
+                            .controls(1)
+                            .autoplay(0)
+                            .build()
+
+                        holder.postVideo.enableAutomaticInitialization = false
+                        try {
+
+                            holder.postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
+                        } catch (e: Exception){
+                            Log.e("Exception",e.toString());
+                        }
                     }
                     else {
                         holder.postVideo.visibility = View.GONE
@@ -328,12 +355,8 @@ class HomeAdapter(
 
         }
     }
-
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
         if (Commons().isNetworkAvailable(context)) {
-            /*if (!dialog.isShowing) {
-                dialog.show()
-            }*/
             val data = JsonObject()
             data.addProperty("userId", Util.userId)
             data.addProperty("postId", post.id)
@@ -386,9 +409,9 @@ class HomeAdapter(
     private fun deletePost(post: Posts) {
         if (Commons().isNetworkAvailable(context)) {
             Log.e("deleted post : postid  ==== ", post.id)
-            if (!dialog.isShowing) {
+            /*if (!dialog.isShowing) {
                 dialog.show()
-            }
+            }*/
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(owner) {
                 if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -407,14 +430,14 @@ class HomeAdapter(
                                 Log.e("result", errorMessage)
                             }
                             if (dialog.isShowing) {
-                                dialog.dismiss()
+                                dialog.hide()
                             }
                             call.cancel()
                         }
 
                         override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                             if (dialog.isShowing) {
-                                dialog.dismiss()
+                                dialog.hide()
                             }
                             Log.e("HomeAdapter.deletePost", "fail")
                         }
@@ -578,4 +601,5 @@ class HomeAdapter(
         posts.addAll(post)
         notifyItemRangeInserted(posts.size, post.size)
     }
+
 }

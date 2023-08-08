@@ -191,20 +191,20 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
         profile_pic_edit.setOnClickListener {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
+            /*val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
             builder.setMessage("Modified profile picture can be updated only after the admin's approval.")
             builder.setTitle("Do you want to change your profile picture?")
             builder.setCancelable(false)
-            builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
+            builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->*/
                 val result = ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                if (result){
                     val items = arrayOf<CharSequence>(
                         "Take Photo", "Choose from Gallery",
                         "Cancel"
                     )
-                    val builder1 = AlertDialog.Builder(this@EditProfileActivity)
-                    builder1.setTitle("Add Picture!")
-                    builder1.setItems(items) { dialog, item ->
+                    val builder = AlertDialog.Builder(this@EditProfileActivity)
+                    builder.setTitle("Add Picture!")
+                    builder.setItems(items) { dialog, item ->
                         if (items[item] == "Take Photo") {
                             cameraIntent()
                         } else if (items[item] == "Choose from Gallery") {
@@ -214,26 +214,28 @@ class EditProfileActivity : AppCompatActivity() {
                         }
 
                     }
-                    builder1.show()
+                   val alertDialog: AlertDialog = builder.create()
+                   alertDialog.show()
                 } else {
-                    val builder2 = AlertDialog.Builder(this@EditProfileActivity)
-                    builder2.setTitle("Permission Restricted")
-                    builder2.setMessage("We need CAMERA and STORAGE permission to serve you for updating your profile picture.\nplease enable this permission through your device's settings")
-                    builder2.setPositiveButton("cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-                    builder2.setNegativeButton("settings") { dialog: DialogInterface, _: Int ->
+                    val builder = AlertDialog.Builder(this@EditProfileActivity)
+                    builder.setTitle("Permission Restricted")
+                    builder.setMessage("We need CAMERA and STORAGE permission to serve you for updating your profile picture.\nplease enable this permission through your device's settings")
+                    builder.setPositiveButton("cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+                    builder.setNegativeButton("settings") { dialog: DialogInterface, _: Int ->
                         val intent = Intent()
                         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                         val uri: Uri = Uri.fromParts("package", applicationContext.packageName, null)
                         intent.data = uri
                         this.startActivity(intent)
                     }
-                    builder2.show()
+                   val alertDialog: AlertDialog = builder.create()
+                   alertDialog.show()
                 }
-            }
-            builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+           /* }
+            builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }*/
 
-            val alertDialog: AlertDialog = builder.create()
-            alertDialog.show()
+            /*val alertDialog: AlertDialog = builder.create()
+            alertDialog.show()*/
         }
 
         menu.setOnClickListener {
@@ -531,7 +533,8 @@ class EditProfileActivity : AppCompatActivity() {
 
                         override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                             if (response.code() == 200) {
-                                Toast.makeText(context, "Waiting For Admin Approval", Toast.LENGTH_LONG).show()
+                                val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
+                                startActivity(intent)
                             }
                             if (dialog.isShowing) {
                                 dialog.dismiss()
