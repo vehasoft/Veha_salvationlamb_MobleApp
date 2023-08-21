@@ -315,6 +315,8 @@ class EditProfileActivity : AppCompatActivity() {
                         data.addProperty("language", language.text.toString())
                         data.addProperty("pinCode", pincode.text.toString())
                         edit(data)
+                    } else {
+                        Toast.makeText(this@EditProfileActivity,doValidation(),Toast.LENGTH_LONG).show()
                     }
                 }
                 builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
@@ -465,7 +467,7 @@ class EditProfileActivity : AppCompatActivity() {
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
                                         Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
-                                    } else
+                                    }
                                     if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.firstName)
                                     warriorStr = loginresp.isWarrior.toBoolean()
