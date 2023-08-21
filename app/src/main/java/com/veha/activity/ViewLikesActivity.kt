@@ -34,9 +34,9 @@ class ViewLikesActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
-    lateinit var list : RecyclerView
-    lateinit var nodata : LinearLayout
-    lateinit var logo : ImageView
+    lateinit var list: RecyclerView
+    lateinit var nodata: LinearLayout
+    lateinit var logo: ImageView
 
     lateinit var likeslist: ArrayList<PostLikes>
 
@@ -64,19 +64,25 @@ class ViewLikesActivity : AppCompatActivity() {
             val myContext: Context = ContextThemeWrapper(this@ViewLikesActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
-            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
+            if (Util.isWarrior) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
+            if (Util.user.isReviewState.toBoolean()) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
+                when (item.itemId) {
                     R.id.warrior -> {
-                        Commons().makeWarrior(this,this)
+                        Commons().makeWarrior(this, this)
                     }
-                    R.id.logout ->{
+
+                    R.id.logout -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewLikesActivity)
                         builder.setMessage("Do you want to Logout?")
                         builder.setTitle("Logout")
                         builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
+                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
+                            finish()
                             lifecycleScope.launch {
                                 userPreferences.deleteAuthToken()
                                 userPreferences.deleteUserId()
@@ -90,14 +96,16 @@ class ViewLikesActivity : AppCompatActivity() {
                         alertDialog.show()
                     }
 
-                    R.id.edit_profile ->{
+                    R.id.edit_profile -> {
                         val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
-                    R.id.fav ->{
+
+                    R.id.fav -> {
                         val intent = Intent(this@ViewLikesActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.settings -> {
                         val intent = Intent(this@ViewLikesActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -121,63 +129,70 @@ class ViewLikesActivity : AppCompatActivity() {
             popup.show()
         }
     }
-    fun getALlLikes(context: Context){
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getPostLike("Bearer $it", postId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                likeslist = ArrayList()
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-                                for (post in loginresp) {
-                                    val pos = Gson().fromJson(post, PostLikes::class.java)
-                                    likeslist.add(pos)
-                                }
-                                if (likeslist.size <= 0) {
-                                    list.visibility = View.GONE
-                                    nodata.visibility = View.VISIBLE
-                                } else {
-                                    list.visibility = View.VISIBLE
-                                    nodata.visibility = View.GONE
-                                    list.layoutManager = LinearLayoutManager(context)
-                                    list.adapter = ViewLikesAdapter(likeslist, context)
-                                }
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+    fun getALlLikes(context: Context) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getPostLike("Bearer $it", postId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    likeslist = ArrayList()
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                    for (post in loginresp) {
+                                        val pos = Gson().fromJson(post, PostLikes::class.java)
+                                        likeslist.add(pos)
+                                    }
+                                    if (likeslist.size <= 0) {
+                                        list.visibility = View.GONE
+                                        nodata.visibility = View.VISIBLE
+                                    } else {
+                                        list.visibility = View.VISIBLE
+                                        nodata.visibility = View.GONE
+                                        list.layoutManager = LinearLayoutManager(context)
+                                        list.adapter = ViewLikesAdapter(likeslist, context)
+                                    }
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
                             }
-                            Log.e("ViewLikesActivity.getAllLikes", "fail")
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("ViewLikesActivity.getAllLikes", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@ViewLikesActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@ViewLikesActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@ViewLikesActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@ViewLikesActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("ViewLikesActivity.getAllLikes", e.toString())
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

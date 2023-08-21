@@ -34,25 +34,25 @@ class AdminAudioFragment : Fragment() {
 
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: AlertDialog
-    lateinit var list : RecyclerView
+    lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
 
     private lateinit var likeslist: ArrayList<PostLikes>
-    private lateinit var myFollowMap: HashMap<String,String>
-    private lateinit var myFavMap: HashMap<String,String>
+    private lateinit var myFollowMap: HashMap<String, String>
+    private lateinit var myFavMap: HashMap<String, String>
     private var page: Int = 1
 
-    private lateinit var myLikesMap: HashMap<String,String>
+    private lateinit var myLikesMap: HashMap<String, String>
     private var myLikes: String = ""
-/*
-    companion object {
-        fun getInstance(): AdminAudioFragment{
-            val homeFrag = AdminAudioFragment()
-            return homeFrag
-        }
-    }*/
+    /*
+        companion object {
+            fun getInstance(): AdminAudioFragment{
+                val homeFrag = AdminAudioFragment()
+                return homeFrag
+            }
+        }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,266 +79,301 @@ class AdminAudioFragment : Fragment() {
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         page = 1
-        adapter = HomeAdapter(ArrayList(), contexts,"home",myLikesMap,myFollowMap,myFavMap,this@AdminAudioFragment)
+        adapter = HomeAdapter(ArrayList(), contexts, "home", myLikesMap, myFollowMap, myFavMap, this@AdminAudioFragment)
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
         return view
     }
-    fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()){
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            var count: Int
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getAudioPost("Bearer $it", page, 10)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-                                count = Integer.parseInt(resp?.get("count").toString())
-                                count /= 10
-                                for (post in loginresp) {
-                                    val pos = Gson().fromJson(post, Posts::class.java)
-                                    postlist.add(pos)
-                                }
-                                if (postlist.size <= 0 && page == 1) {
-                                    list.visibility = View.GONE
-                                    nodata.visibility = View.VISIBLE
-                                } else {
-                                    list.visibility = View.VISIBLE
-                                    nodata.visibility = View.GONE
-                                    //list.adapter = HomeAdapter(postlist, contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
-                                    adapter.addItem(postlist)
-                                    list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                                        override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
-                                            if (!recyclerView.canScrollVertically(1)) {
-                                                if (count > page) {
-                                                    page++
-                                                    getallPosts(context, owner)
+
+    fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                var count: Int
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getAudioPost("Bearer $it", page, 10)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                    count = Integer.parseInt(resp?.get("count").toString())
+                                    count /= 10
+                                    for (post in loginresp) {
+                                        val pos = Gson().fromJson(post, Posts::class.java)
+                                        postlist.add(pos)
+                                    }
+                                    if (postlist.size <= 0 && page == 1) {
+                                        list.visibility = View.GONE
+                                        nodata.visibility = View.VISIBLE
+                                    } else {
+                                        list.visibility = View.VISIBLE
+                                        nodata.visibility = View.GONE
+                                        //list.adapter = HomeAdapter(postlist, contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
+                                        adapter.addItem(postlist)
+                                        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                                            override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
+                                                if (!recyclerView.canScrollVertically(1)) {
+                                                    if (count > page) {
+                                                        page++
+                                                        getallPosts(context, owner)
+                                                    }
                                                 }
                                             }
-                                        }
-                                    })
+                                        })
+                                    }
+                                } else {
+                                    /*val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("result", errorMessage)*/
+                                    list.visibility = View.GONE
+                                    nodata.visibility = View.VISIBLE
                                 }
-                            } else {
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("result", errorMessage)
-                                list.visibility = View.GONE
-                                nodata.visibility = View.VISIBLE
-                            }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                        }
-
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            Log.e("HomeFragment.getAllPosts", "fail")
-                        }
-                    })
-                } else {
-                    Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
-                    }
-                    val intent = Intent(contexts, LoginActivity::class.java)
-                    startActivity(intent)
-                }
-            }
-        }
-    }
-    fun getallLikes(owner: LifecycleOwner){
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                likeslist = ArrayList()
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-
-                                for (likes in loginresp) {
-                                    val pos = Gson().fromJson(likes, PostLikes::class.java)
-                                    likeslist.add(pos)
-                                    myLikes += pos.postId + " , "
-                                    myLikesMap.put(pos.postId, pos.reaction)
+                                if (dialog.isShowing) {
+                                    dialog.hide()
                                 }
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            getallFav(owner)
-                        }
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            Log.e("HomeFragment.getAllLikes", "fail")
-                        }
-                    })
-                } else {
-                    Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
-                    }
-                    val intent = Intent(contexts, LoginActivity::class.java)
-                    startActivity(intent)
-                }
-            }
-        }
-    }
-    private fun getallFollowers(owner: LifecycleOwner){
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
 
-                                for (likes in loginresp) {
-                                    val pos = Gson().fromJson(likes, PostUser::class.java)
-                                    myFollowMap.put(pos.id, Util.userId)
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
                                 }
+                                Log.e("AdminAudioFragment.getAllPosts", "fail")
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            getallPosts(contexts, owner)
+                        })
+                    } else {
+                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            Log.e("HomeFragment.getAllFollowers", "fail")
-                        }
-                    })
-                } else {
-                    Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(contexts, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("AdminAudioFragment.getAllPosts", e.toString())
         }
     }
 
-    fun getallFav(owner: LifecycleOwner){
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+    fun getallLikes(owner: LifecycleOwner) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    likeslist = ArrayList()
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
 
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("results"), JsonArray::class.java)
-                                for (likes in loginresp) {
-                                    val pos = Gson().fromJson(likes, AllFavList::class.java)
-                                    myFavMap.put(pos.postId, pos.userId)
+                                    for (likes in loginresp) {
+                                        val pos = Gson().fromJson(likes, PostLikes::class.java)
+                                        likeslist.add(pos)
+                                        myLikes += pos.postId + " , "
+                                        myLikesMap.put(pos.postId, pos.reaction)
+                                    }
                                 }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                getallFav(owner)
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            getallFollowers(owner)
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("AdminAudioFragment.getAllLikes", "fail")
                             }
-                            Log.e("HomeFragment.getAllFav", "fail")
+                        })
+                    } else {
+                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(contexts, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("AdminAudioFragment.getAllLikes", e.toString())
         }
     }
+
+    private fun getallFollowers(owner: LifecycleOwner) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+
+                                    for (likes in loginresp) {
+                                        val pos = Gson().fromJson(likes, PostUser::class.java)
+                                        myFollowMap.put(pos.id, Util.userId)
+                                    }
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                getallPosts(contexts, owner)
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("AdminAudioFragment.getAllFollowers", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AdminAudioFragment.getAllFollowers", e.toString())
+        }
+    }
+
+    fun getallFav(owner: LifecycleOwner) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                    for (likes in loginresp) {
+                                        val pos = Gson().fromJson(likes, AllFavList::class.java)
+                                        myFavMap.put(pos.postId, pos.userId)
+                                    }
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                getallFollowers(owner)
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("AdminAudioFragment.getAllFav", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AdminAudioFragment.getAllFav", e.toString())
+        }
+    }
+
     private fun getMyDetails(owner: LifecycleOwner) {
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                Util.user = loginresp
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    Util.user = loginresp
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("AdminAudioFragment.getMyDetails", "fail")
                             }
-                            Log.e("HomeFragment.getMyDetails", "fail")
+                        })
+                    } else {
+                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(contexts, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("AdminAudioFragment.getMyDetails", e.toString())
         }
     }
+
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
-        if (Util.player != null){
+        if (Util.player != null) {
             Util.player.stop()
         }
     }
@@ -346,7 +381,7 @@ class AdminAudioFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
-        if (Util.player != null){
+        if (Util.player != null) {
             Util.player.stop()
         }
     }

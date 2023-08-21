@@ -22,11 +22,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Commons {
-    fun makeWarrior(context: Context,owner: LifecycleOwner) {
+    fun makeWarrior(context: Context, owner: LifecycleOwner) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         val data = JsonObject()
         builder.setTitle("BECOME A WARRIOR")
-        val view = View.inflate(context, R.layout.child_warrior,null)
+        val view = View.inflate(context, R.layout.child_warrior, null)
         builder.setView(view)
         var gift = ""
         val religion: Spinner = view.findViewById(R.id.religion)
@@ -46,10 +46,11 @@ class Commons {
         religion.adapter = adapter
         religion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                if (list[pos] != "Select"){
+                if (list[pos] != "Select") {
                     rel = list[pos].toString()
                 }
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
         builder.setCancelable(false)
@@ -64,7 +65,7 @@ class Commons {
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
             gift1.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked){
+                if (isChecked) {
                     gift2.isChecked = false
                     gift3.isChecked = false
                     gift4.isChecked = false
@@ -82,42 +83,42 @@ class Commons {
             }
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 var wantToCloseDialog = false
-                if (rel.isNullOrEmpty() || rel == "Select"){
+                if (rel.isNullOrEmpty() || rel == "Select") {
                     error.setTextColor(Color.RED)
                     error.visibility = View.VISIBLE
-                } else if(church.text.isNullOrEmpty()){
+                } else if (church.text.isNullOrEmpty()) {
                     church.error = "Please Enter ChurchName"
                 } else {
 
-                   if(gift1.isChecked) {
-                       gift += gift1.text.toString()
-                       gift2.isChecked = false
-                       gift3.isChecked = false
-                       gift4.isChecked = false
-                       gift5.isChecked = false
-                       gift2.isEnabled = false
-                       gift3.isEnabled = false
-                       gift4.isEnabled = false
-                       gift4.isEnabled = false
-                   }
-                   if(gift2.isChecked)
-                       gift += gift2.text.toString() + ","
-                   if(gift3.isChecked)
-                       gift += gift3.text.toString() + ","
-                   if(gift4.isChecked)
-                       gift += gift4.text.toString() + ","
-                   if(gift5.isChecked)
-                       gift += gift5.text.toString() + ","
-                    data.addProperty("userId",Util.userId)
-                    data.addProperty("isWarrior",true)
-                    data.addProperty("religion",rel)
-                    data.addProperty("churchName",church.text.toString())
+                    if (gift1.isChecked) {
+                        gift += gift1.text.toString()
+                        gift2.isChecked = false
+                        gift3.isChecked = false
+                        gift4.isChecked = false
+                        gift5.isChecked = false
+                        gift2.isEnabled = false
+                        gift3.isEnabled = false
+                        gift4.isEnabled = false
+                        gift4.isEnabled = false
+                    }
+                    if (gift2.isChecked)
+                        gift += gift2.text.toString() + ","
+                    if (gift3.isChecked)
+                        gift += gift3.text.toString() + ","
+                    if (gift4.isChecked)
+                        gift += gift4.text.toString() + ","
+                    if (gift5.isChecked)
+                        gift += gift5.text.toString() + ","
+                    data.addProperty("userId", Util.userId)
+                    data.addProperty("isWarrior", true)
+                    data.addProperty("religion", rel)
+                    data.addProperty("churchName", church.text.toString())
                     data.addProperty("gift", gift)
                     wantToCloseDialog = true
                 }
-                if (wantToCloseDialog){
+                if (wantToCloseDialog) {
                     alertDialog.dismiss()
-                    makeMeWarior(data,context,owner)
+                    makeMeWarior(data, context, owner)
                 }
 
 
@@ -127,53 +128,39 @@ class Commons {
         alertDialog.show()
 
     }
-    private fun makeMeWarior(data: JsonObject,context: Context,owner: LifecycleOwner) {
-        if (isNetworkAvailable(context)) {
-            /*val dialog = SpotsDialog.Builder().setContext(context).build()
-            dialog.setMessage("Please Wait")
-            dialog.setCancelable(false)
-            dialog.setInverseBackgroundForced(false)*/
-            val userPreferences = UserPreferences(context)
-            /*if (!dialog.isShowing) {
-                dialog.show()
-            }*/
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it", data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
-                            } else {
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("result", errorMessage)
-                                //Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                            }
-                            /*if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }*/
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            /*if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }*/
-                            Log.e("<Make me warrior>", "fail")
-                        }
-                    })
+    private fun makeMeWarior(data: JsonObject, context: Context, owner: LifecycleOwner) {
+        try {
+            if (isNetworkAvailable(context)) {
+                val userPreferences = UserPreferences(context)
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it", data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
+                                }
+                                call.cancel()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("<Make me warrior>", "fail")
+                            }
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("<Make me warrior>", e.toString())
         }
     }
-    fun getDate(date: String): String{
+
+    fun getDate(date: String): String {
         return date.toDate().formatTo()
     }
+
     fun String.toDate(): Date {
         val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         parser.timeZone = TimeZone.getTimeZone("UTC")
@@ -185,6 +172,7 @@ class Commons {
         formatter.timeZone = TimeZone.getDefault()
         return formatter.format(this)
     }
+
     fun isNetworkAvailable(context: Context?): Boolean {
         val connectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -194,9 +182,11 @@ class Commons {
                     capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
                         return true
                     }
+
                     capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
                         return true
                     }
+
                     capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
                         return true
                     }
@@ -208,10 +198,11 @@ class Commons {
                 return true
             }
         }
-        Toast.makeText(context,"No Internet ",Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "No Internet ", Toast.LENGTH_LONG).show()
         return false
     }
-    private fun showAlert(context: Context){
+
+    private fun showAlert(context: Context) {
 
     }
 

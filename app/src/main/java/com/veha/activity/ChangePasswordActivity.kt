@@ -41,32 +41,33 @@ class ChangePasswordActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         val email = intent.getStringExtra("email")
         val otp = intent.getStringExtra("otp")
-        if (TextUtils.isEmpty(email?.trim())) old_pwd_op.visibility = View.VISIBLE else old_pwd_op.visibility = View.GONE
+        if (TextUtils.isEmpty(email?.trim())) old_pwd_op.visibility = View.VISIBLE else old_pwd_op.visibility =
+            View.GONE
 
         change_pwd_btn.setOnClickListener {
             passwordTxt = new_pwd.text.toString()
             cnfmPasswordTxt = cnfm_pwd.text.toString()
             oldPasswordTxt = old_pwd.text.toString()
-            Log.e("password",passwordTxt)
-            if(!Util.isValidPassword(passwordTxt)){
-                new_pwd.error = "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
-            } else if(TextUtils.isEmpty(passwordTxt.trim())){
-                new_pwd.error =  "Enter Password"
-            } else if(!passwordTxt.equals(cnfmPasswordTxt,false)){
+            Log.e("password", passwordTxt)
+            if (!Util.isValidPassword(passwordTxt)) {
+                new_pwd.error =
+                    "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
+            } else if (TextUtils.isEmpty(passwordTxt.trim())) {
+                new_pwd.error = "Enter Password"
+            } else if (!passwordTxt.equals(cnfmPasswordTxt, false)) {
                 cnfm_pwd.error = "Password is not same"
-            }
-            else {
-                if (TextUtils.isEmpty(email?.trim())){
+            } else {
+                if (TextUtils.isEmpty(email?.trim())) {
                     val data = JsonObject()
-                    data.addProperty("userId",Util.userId)
-                    data.addProperty("oldPassword",oldPasswordTxt)
-                    data.addProperty("newPassword",passwordTxt)
+                    data.addProperty("userId", Util.userId)
+                    data.addProperty("oldPassword", oldPasswordTxt)
+                    data.addProperty("newPassword", passwordTxt)
                     changePassword(data)
                 } else {
                     val data = JsonObject()
-                    data.addProperty("email",email)
-                    data.addProperty("otp",otp)
-                    data.addProperty("password",passwordTxt)
+                    data.addProperty("email", email)
+                    data.addProperty("otp", otp)
+                    data.addProperty("password", passwordTxt)
                     forgotPassword(data)
                 }
             }
@@ -76,97 +77,112 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
 
     }
+
     private fun changePassword(data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postChangePassword("Bearer $it", data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                Toast.makeText(this@ChangePasswordActivity, "Password changed successfully", Toast.LENGTH_LONG).show()
-                                finish()
-                            } else {
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Toast.makeText(this@ChangePasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
-                                Log.e("result", errorMessage)
-                                Log.e("ok", response.body().toString())
-
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            call.cancel()
-                        }
-
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            Log.e("ChangePasswordActivity.changePassword", "fail")
-                        }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@ChangePasswordActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
-                    }
-                    val intent = Intent(this@ChangePasswordActivity, LoginActivity::class.java)
-                    startActivity(intent)
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
                 }
-            }
-        }
-    }
-    private fun forgotPassword(data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
-            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                    if (response.code() == 200) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postChangePassword("Bearer $it", data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(
+                                        this@ChangePasswordActivity,
+                                        "Password changed successfully",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    finish()
+                                } else {
+                                   /* val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val errorMessage = loginresp.get("errorMessage").toString()*/
+                                    Toast.makeText(this@ChangePasswordActivity, "Something went wrong", Toast.LENGTH_LONG).show()
+                                    /*Log.e("result", errorMessage)
+                                    Log.e("ok", response.body().toString())*/
 
-                        Log.e("ok1", response.code().toString())
-                        finish()
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                call.cancel()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("ChangePasswordActivity.changePassword", "fail")
+                            }
+                        })
                     } else {
-                        val resp = response.errorBody()
-                        Log.e("responseeeee", response.toString())
-                        Log.e("responseeeee", resp.toString())
-                        val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                        val status = registerResp.get("status").toString()
-                        val errorMessage = registerResp.get("errorMessage").toString()
-                        Log.e("Status", status)
-                        Log.e("result", errorMessage)
-                        Toast.makeText(this@ChangePasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@ChangePasswordActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@ChangePasswordActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
-                    }
-                    call.cancel()
                 }
-
-                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
-                    }
-                    Log.e("ChangePasswordActivity.forgotPassword", "fail")
-                }
-            })
+            }
+        } catch (e: Exception) {
+            Log.e("ChangePasswordActivity.changePassword", e.toString())
         }
     }
+
+    private fun forgotPassword(data: JsonObject) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code() == 200) {
+
+                            Log.e("ok1", response.code().toString())
+                            finish()
+                        } else {
+                            /*val resp = response.errorBody()
+                            Log.e("responseeeee", response.toString())
+                            Log.e("responseeeee", resp.toString())
+                            val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val status = registerResp.get("status").toString()
+                            val errorMessage = registerResp.get("errorMessage").toString()
+                            Log.e("Status", status)
+                            Log.e("result", errorMessage)*/
+                            Toast.makeText(this@ChangePasswordActivity, "Something went wrong", Toast.LENGTH_LONG).show()
+                        }
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        call.cancel()
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Log.e("ChangePasswordActivity.forgotPassword", "fail")
+                    }
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("ChangePasswordActivity.forgotPassword", e.toString())
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

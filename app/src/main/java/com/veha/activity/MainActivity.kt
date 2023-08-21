@@ -35,44 +35,50 @@ import retrofit2.Response
 import kotlin.system.exitProcess
 
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
     lateinit var search: ImageView
     lateinit var logo: ImageView
-    lateinit var viewPager : ViewPager
+    lateinit var viewPager: ViewPager
     lateinit var addPost: FloatingActionButton
     var userType: String = ""
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
-        ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE), 255)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE),
+            255
+        )
         dialog.dismiss()
     }
+
     private fun checkPermission() {
         // in this method we are checking if the permissions are granted or not and returning the result.
         val result = ContextCompat.checkSelfPermission(applicationContext, READ_EXTERNAL_STORAGE)
         val result1 = ContextCompat.checkSelfPermission(applicationContext, CAMERA_SERVICE)
         val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
-        if( !(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)){
+        if (!(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)) {
             requestPermission()
             dialog.dismiss()
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
         userPreferences = UserPreferences(this@MainActivity)
         dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         dialog.dismiss()
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         if (dialog.isShowing) {
             dialog.dismiss()
         }
         checkPermission()
         getMyDetails()
-        if (Util.isFirst != null && Util.isFirst){
+        if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
                 val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
                 nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -92,7 +98,7 @@ class MainActivity : AppCompatActivity(){
                 firstTime()
             }*/
         }
-        if (Util.isWarrior){
+        if (Util.isWarrior) {
             banner.visibility = View.GONE
         }
         addPost = findViewById(R.id.add_post)
@@ -109,15 +115,17 @@ class MainActivity : AppCompatActivity(){
             banner.visibility = View.GONE
         }
         banner.setOnClickListener {
-            Commons().makeWarrior(this@MainActivity,this)
+            Commons().makeWarrior(this@MainActivity, this)
         }
-        when (Util.isNight){
+        when (Util.isNight) {
             Util.DAY -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+
             Util.NIGHT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
+
             Util.DEFAULT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
@@ -141,19 +149,25 @@ class MainActivity : AppCompatActivity(){
             val myContext: Context = ContextThemeWrapper(this@MainActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
-            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
+            if (Util.isWarrior) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
+            if (Util.user.isReviewState.toBoolean()) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
+                when (item.itemId) {
                     R.id.warrior -> {
-                       Commons().makeWarrior(this,this)
+                        Commons().makeWarrior(this, this)
                     }
-                    R.id.logout ->{
+
+                    R.id.logout -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
                         builder.setMessage("Do you want to Logout?")
                         builder.setTitle("Logout")
                         builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
+                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
+                            finish()
                             lifecycleScope.launch {
                                 userPreferences.deleteAuthToken()
                                 userPreferences.deleteUserId()
@@ -166,14 +180,17 @@ class MainActivity : AppCompatActivity(){
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
                     }
-                    R.id.edit_profile ->{
+
+                    R.id.edit_profile -> {
                         val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
-                    R.id.fav ->{
+
+                    R.id.fav -> {
                         val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.settings -> {
                         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -199,38 +216,39 @@ class MainActivity : AppCompatActivity(){
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
-        tabLayout.addTab(home,0)
-        tabLayout.addTab(pdf,1)
-        tabLayout.addTab(adminVideo,2)
-        tabLayout.addTab(adminAudio,3)
-        tabLayout.addTab(profile,4)
+        tabLayout.addTab(home, 0)
+        tabLayout.addTab(pdf, 1)
+        tabLayout.addTab(adminVideo, 2)
+        tabLayout.addTab(adminAudio, 3)
+        tabLayout.addTab(profile, 4)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
-        val adapter = TabAdapter(this@MainActivity,this@MainActivity.supportFragmentManager,tabLayout.tabCount)
+        val adapter = TabAdapter(this@MainActivity, this@MainActivity.supportFragmentManager, tabLayout.tabCount)
         viewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 dialog.dismiss()
-                if (Util.player != null){
+                if (Util.player != null) {
                     Util.player.stop()
                 }
                 if (tab != null) {
                     viewPager.currentItem = tab.position
-                   /* if (tab.position != 2){
-                        Log.e("position",tab.position.toString())
-                        //this@MainActivity.supportFragmentManager.beginTransaction().detach(AdminVideoFragment()).commit()
-                        //AdminVideoFragment().fragmentManager?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
-                        //val af : AdminVideoFragment = supportFragmentManager.findFragmentByTag("video") as AdminVideoFragment
-                        //af.refreshAdapter()
-                        AdminVideoFragment().getFragmentManager()?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
-                        AdminVideoFragment().getFragmentManager()?.beginTransaction()?.attach(AdminVideoFragment())?.commit();
-                    }
-                    if (AdminVideoFragment().isDetached){
-                        Log.e("position","tab.position.toString()detacheddddd")
-                    }*/
+                    /* if (tab.position != 2){
+                         Log.e("position",tab.position.toString())
+                         //this@MainActivity.supportFragmentManager.beginTransaction().detach(AdminVideoFragment()).commit()
+                         //AdminVideoFragment().fragmentManager?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
+                         //val af : AdminVideoFragment = supportFragmentManager.findFragmentByTag("video") as AdminVideoFragment
+                         //af.refreshAdapter()
+                         AdminVideoFragment().getFragmentManager()?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
+                         AdminVideoFragment().getFragmentManager()?.beginTransaction()?.attach(AdminVideoFragment())?.commit();
+                     }
+                     if (AdminVideoFragment().isDetached){
+                         Log.e("position","tab.position.toString()detacheddddd")
+                     }*/
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
 
@@ -238,112 +256,124 @@ class MainActivity : AppCompatActivity(){
             }
         })
     }
+
     private fun getMyDetails() {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                Util.user = loginresp
-                                Util.isFirst = loginresp.isFreshUser.toBoolean()
-                                val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
-                                if (isWarrior) {
-                                    banner.visibility = View.GONE
-                                    addPost.visibility = View.VISIBLE
-                                } else {
-                                    addPost.visibility = View.GONE
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    Util.user = loginresp
+                                    Util.isFirst = loginresp.isFreshUser.toBoolean()
+                                    val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
+                                    if (isWarrior) {
+                                        banner.visibility = View.GONE
+                                        addPost.visibility = View.VISIBLE
+                                    } else {
+                                        addPost.visibility = View.GONE
+                                    }
+                                    Util.isWarrior = isWarrior
+                                    userType = if (isWarrior) Util.WARRIOR else Util.USER
+                                    if (dialog.isShowing) {
+                                        dialog.dismiss()
+                                    }
                                 }
-                                Util.isWarrior = isWarrior
-                                userType = if (isWarrior) Util.WARRIOR else Util.USER
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("MainActivity.getDetails", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity.getMyDetails", e.toString())
+        }
+    }
+
+    private fun firstTime() {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                Log.e("firstttime", response.code().toString())
+                                Util.isFirst = false
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
                             }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("MainActivity.firstTime", "fail")
                             }
-                            Log.e("MainActivity.getDetails", "fail")
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("MainActivity.firstTime", e.toString())
         }
     }
-    private fun firstTime() {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            Log.e("firstttime", response.code().toString())
-                            Util.isFirst = false
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            Log.e("MainActivity.firstTime", "fail")
-                        }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
-                    }
-                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                    startActivity(intent)
-                }
-            }
-        }
-    }
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
     }
+
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
     }
 
     override fun onBackPressed() {
-        if (viewPager.currentItem == 0){
+        if (viewPager.currentItem == 0) {
             exitProcess(-1)
         } else {
             viewPager.currentItem = 0

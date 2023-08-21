@@ -79,10 +79,10 @@ class AddPostActivity : AppCompatActivity() {
         }
 
         postType.setOnCheckedChangeListener { group, checkedId ->
-            if (checkedId == R.id.image_btn){
+            if (checkedId == R.id.image_btn) {
                 postTypeStr = "image"
 
-            } else if(checkedId == R.id.video_btn){
+            } else if (checkedId == R.id.video_btn) {
                 video.visibility = View.VISIBLE
                 postPic.visibility = View.GONE
                 postTypeStr = "video"
@@ -94,20 +94,20 @@ class AddPostActivity : AppCompatActivity() {
 
         postBtn.isEnabled = true
         postBtn.setOnClickListener {
-            if (postPicStr.isNullOrEmpty() && postTypeStr.contentEquals("image")){
+            if (postPicStr.isNullOrEmpty() && postTypeStr.contentEquals("image")) {
                 postTypeStr = "text"
             }
-            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("text")){
+            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("text")) {
                 content.error = "Content must not be empty"
-            }else {
+            } else {
                 postBtn.isEnabled = false
                 val data = JsonObject()
-                data.addProperty("title",title.text.toString())
-                data.addProperty("content",content.text.toString())
-                data.addProperty("tags",tags.text.toString())
-                data.addProperty("image",postPicStr)
-                data.addProperty("url",video.text.toString())
-                data.addProperty("type",postTypeStr)
+                data.addProperty("title", title.text.toString())
+                data.addProperty("content", content.text.toString())
+                data.addProperty("tags", tags.text.toString())
+                data.addProperty("image", postPicStr)
+                data.addProperty("url", video.text.toString())
+                data.addProperty("type", postTypeStr)
                 data.addProperty("userId", Util.userId)
                 postData(data)
             }
@@ -116,70 +116,80 @@ class AddPostActivity : AppCompatActivity() {
             addImg()
         }
     }
-    private fun postData(data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            Log.e("data",data.toString())
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                    val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
-                    call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                title.text.clear()
-                                content.text.clear()
-                                postBtn.isEnabled = true
-                                val intent = Intent(this@AddPostActivity, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                postBtn.isEnabled = true
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("result", errorMessage)
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            call1.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+    private fun postData(data: JsonObject) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                Log.e("data", data.toString())
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
+                        call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    title.text.clear()
+                                    content.text.clear()
+                                    postBtn.isEnabled = true
+                                    val intent = Intent(this@AddPostActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    postBtn.isEnabled = true
+                                    /*val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                    Log.e("result", errorMessage)*/
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                call1.cancel()
                             }
-                            Log.e("AddPostActivity.postData", "fail")
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("AddPostActivity.postData", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@AddPostActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@AddPostActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@AddPostActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@AddPostActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("AddPostActivity.postData", e.toString())
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
     }
-    private fun addImg(){
-        val result = ContextCompat.checkSelfPermission(applicationContext,READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        if (result){
+
+    private fun addImg() {
+        val result = ContextCompat.checkSelfPermission(
+            applicationContext,
+            READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        if (result) {
             val items = arrayOf<CharSequence>(
                 "Take Photo", "Choose from Gallery",
                 "Cancel"
@@ -212,6 +222,7 @@ class AddPostActivity : AppCompatActivity() {
             builder2.show()
         }
     }
+
     private fun galleryIntent() {
         val intent = Intent()
         intent.type = "image/*"
@@ -224,6 +235,7 @@ class AddPostActivity : AppCompatActivity() {
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE //
         startActivityForResult(intent, 150)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100) {

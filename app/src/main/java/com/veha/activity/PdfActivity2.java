@@ -86,13 +86,11 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
             progressDialog.setTitle("Please wait");
             progressDialog.setMessage("Fetching PDF from server...");
             progressDialog.setCancelable(false);
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
-
         }
 
         @Override
@@ -133,7 +131,6 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
         }
     }
     private class DownloadFile extends AsyncTask<String, Void, Void>{
-
         @Override
         protected Void doInBackground(String... strings) {
             String fileUrl = strings[0];   // -> http://maven.apache.org/maven-1.x/maven.pdf

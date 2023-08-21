@@ -32,26 +32,29 @@ class SplashhScreenActivity : AppCompatActivity() {
             content.viewTreeObserver.addOnDrawListener { false }
         }
         userPreferences.isNightModeEnabled.asLiveData().observe(this) {
-            Log.e("isnight",it.toString())
+            Log.e("isnight", it.toString())
             when (it) {
                 Util.NIGHT -> {
                     Util.isNight = Util.NIGHT
                 }
+
                 Util.DAY -> {
                     Util.isNight = Util.DAY
                 }
+
                 Util.DEFAULT -> {
                     Util.isNight = Util.DEFAULT
                 }
+
                 else -> {
                     lifecycleScope.launch {
-                    userPreferences.saveIsNightModeEnabled(Util.DAY)
-                    Util.isNight = Util.DAY
-                }
+                        userPreferences.saveIsNightModeEnabled(Util.DAY)
+                        Util.isNight = Util.DAY
+                    }
                 }
             }
 
-            Log.e("isnight",Util.isNight)
+            Log.e("isnight", Util.isNight)
         }
         userPreferences.authToken.asLiveData().observe(this) { it ->
             if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()) {
@@ -67,7 +70,7 @@ class SplashhScreenActivity : AppCompatActivity() {
                     }
                     Util.userId = it
                 }
-                userPreferences.textSize.asLiveData().observe(this){
+                userPreferences.textSize.asLiveData().observe(this) {
                     Util.fontSize = it
                 }
 
@@ -76,44 +79,50 @@ class SplashhScreenActivity : AppCompatActivity() {
             }
         }
     }
-    private fun getMyDetails(token: String) {
-        if (Commons().isNetworkAvailable(this)) {
-            val retrofit = Util.getRetrofit()
-            val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
-            call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                    if (response.code() == 200) {
-                        val resp = response.body()
-                        val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                        Log.e("response", loginresp.toString())
-                        Util.user = loginresp
-                        val isWarrior: Boolean = loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
-                        Util.isWarrior = isWarrior
-                        Util.isFirst = loginresp.isFreshUser.toBoolean()
-                        lifecycleScope.launch {
-                            userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
-                            Util.isFirst = loginresp.isFreshUser.toBoolean()
-                        }
-                        Thread.sleep(2000)
-                        if(loginresp.isVerified.toBoolean()) {
-                            val intent = Intent(this@SplashhScreenActivity, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            val intent = Intent(this@SplashhScreenActivity, ForgotPasswordActivity::class.java)
-                            intent.putExtra("page","verify")
-                            intent.putExtra("email",loginresp.email)
-                            startActivity(intent)
-                        }
-                    } else {
-                         Log.e("responseee", "fail")
-                    }
-                }
 
-                override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                    Log.e("Splashscreen", "fail")
-                }
-            })
+    private fun getMyDetails(token: String) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code() == 200) {
+                            val resp = response.body()
+                            val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                            Log.e("response", loginresp.toString())
+                            Util.user = loginresp
+                            val isWarrior: Boolean =
+                                loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
+                            Util.isWarrior = isWarrior
+                            Util.isFirst = loginresp.isFreshUser.toBoolean()
+                            lifecycleScope.launch {
+                                userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
+                                Util.isFirst = loginresp.isFreshUser.toBoolean()
+                            }
+                            Thread.sleep(2000)
+                            if (loginresp.isVerified.toBoolean()) {
+                                val intent = Intent(this@SplashhScreenActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                val intent = Intent(this@SplashhScreenActivity, ForgotPasswordActivity::class.java)
+                                intent.putExtra("page", "verify")
+                                intent.putExtra("email", loginresp.email)
+                                startActivity(intent)
+                            }
+                        } else {
+                            Log.e("responseee", "fail")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("Splashscreen", "fail")
+                    }
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("Splashscreen", e.toString())
         }
     }
 }

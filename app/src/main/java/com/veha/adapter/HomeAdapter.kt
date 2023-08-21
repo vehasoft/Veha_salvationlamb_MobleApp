@@ -43,11 +43,12 @@ class HomeAdapter(
     private var myFollowList: HashMap<String, String>,
     private var myFavList: HashMap<String, String>,
     private var owner: LifecycleOwner,
-    ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: android.app.AlertDialog
     private var likesCount = 0
     private var currentHolder: ViewHolder? = null
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_post)
         val time: TextView = view.findViewById(R.id.post_time)
@@ -71,6 +72,7 @@ class HomeAdapter(
         val fav: ImageButton = view.findViewById(R.id.fav)
         val overallLayout: ConstraintLayout = view.findViewById(R.id.child_post_layout)
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
         dialog = SpotsDialog.Builder().setContext(context).build()
@@ -102,10 +104,12 @@ class HomeAdapter(
         }
         return viewHolder
     }
+
     override fun getItemCount(): Int {
         return posts.size
     }
-    fun getTags(tags: String): String{
+
+    fun getTags(tags: String): String {
         var opTags = ""
         if (!TextUtils.isEmpty(tags)) {
             val tagArray = tags.split(",")
@@ -115,12 +119,13 @@ class HomeAdapter(
         }
         return opTags
     }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post: Posts = posts[position]
         holder.content.setText(post.content)
         holder.content.setOnClickListener { holder.content.expand() }
-        if (!post.type.isNullOrEmpty()){
-            when (post.type){
+        if (!post.type.isNullOrEmpty()) {
+            when (post.type) {
                 "image" -> {
                     holder.audioLayout.visibility = View.GONE
                     holder.postVideo.visibility = View.GONE
@@ -138,11 +143,12 @@ class HomeAdapter(
                         }
                     }
                 }
+
                 "audio" -> {
                     holder.postVideo.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
                     val myHandler = Handler()
-                    if (!post.url.isNullOrEmpty()){
+                    if (!post.url.isNullOrEmpty()) {
                         holder.audioLayout.visibility = View.VISIBLE
                         //mediaPlayer.setDataSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3")
                         //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/168735710115316871075951701686907491197+%281%29.mp3")
@@ -165,7 +171,7 @@ class HomeAdapter(
                         }
                         holder.playBtn.setOnClickListener {
 
-                            if (currentHolder != null && Util.player != null && Util.player.isPlaying){
+                            if (currentHolder != null && Util.player != null && Util.player.isPlaying) {
                                 myHandler.removeCallbacks(updateSongTime)
                                 Util.player.pause()
                                 currentHolder!!.pauseBtn.visibility = View.GONE
@@ -176,22 +182,26 @@ class HomeAdapter(
                                 Util.player = null
                             }
                             Util.player = MediaPlayer()
-                            try{
+                            try {
                                 Util.player.setDataSource(post.url)
                                 Util.player.prepare()
                                 holder.seekbar.max = Util.player.duration
                                 holder.seekbar.isClickable = true
                                 Util.player.start()
                                 holder.seekbar.progress = Util.player.currentPosition
-                                myHandler.postDelayed(updateSongTime,100)
+                                myHandler.postDelayed(updateSongTime, 100)
                                 holder.playBtn.visibility = View.GONE
                                 holder.pauseBtn.visibility = View.VISIBLE
                                 holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                                     override fun onStopTrackingTouch(seekBar: SeekBar) {}
                                     override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) { if(fromUser) { Util.player.seekTo(progress) } }
+                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                                        if (fromUser) {
+                                            Util.player.seekTo(progress)
+                                        }
+                                    }
                                 })
-                            } catch (e: Exception){
+                            } catch (e: Exception) {
                                 posts.removeAt(position)
                                 Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
                             }
@@ -205,17 +215,16 @@ class HomeAdapter(
                             holder.pauseBtn.visibility = View.GONE
                             holder.playBtn.visibility = View.VISIBLE
                         }
-                    }
-                    else {
+                    } else {
                         holder.audioLayout.visibility = View.GONE
                     }
 
                 }
+
                 "video" -> {
                     holder.audioLayout.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
-                    if (!post.url.isNullOrEmpty()){
-                        /*holder.postVideo.settings.javaScriptEnabled = true
+                    if (!post.url.isNullOrEmpty()) {/*holder.postVideo.settings.javaScriptEnabled = true
                         holder.postVideo.settings.domStorageEnabled = true
                         holder.postVideo.webChromeClient = WebChromeClient()
                         holder.postVideo.webViewClient = WebViewClient()
@@ -228,20 +237,16 @@ class HomeAdapter(
                                 youTubePlayer.cueVideo(post.url, 0f)
                             }
                         }
-                        val iFramePlayerOptions = IFramePlayerOptions.Builder()
-                            .controls(1)
-                            .autoplay(0)
-                            .build()
+                        val iFramePlayerOptions = IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
 
                         holder.postVideo.enableAutomaticInitialization = false
                         try {
 
                             holder.postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
-                        } catch (e: Exception){
-                            Log.e("Exception",e.toString());
+                        } catch (e: Exception) {
+                            Log.e("Exception", e.toString());
                         }
-                    }
-                    else {
+                    } else {
                         holder.postVideo.visibility = View.GONE
                     }
                 }
@@ -283,21 +288,65 @@ class HomeAdapter(
             popup.menuInflater.inflate(R.menu.react_menu, popup.menu)
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.react1 -> { likePost(post, myContext.getString(R.string.react1), holder) }
-                    R.id.react2 -> { likePost(post, myContext.getString(R.string.react2), holder) }
-                    R.id.react3 -> { likePost(post, myContext.getString(R.string.react3), holder) }
-                    R.id.react4 -> { likePost(post, myContext.getString(R.string.react4), holder) }
-                    R.id.react5 -> { likePost(post, myContext.getString(R.string.react5), holder) }
-                    R.id.react6 -> { likePost(post, myContext.getString(R.string.react6), holder) }
-                    R.id.react7 -> { likePost(post, myContext.getString(R.string.react7), holder) }
-                    R.id.react8 -> { likePost(post, myContext.getString(R.string.react8), holder) }
-                    R.id.react9 -> { likePost(post, myContext.getString(R.string.react9), holder) }
-                    R.id.react10 -> { likePost(post, myContext.getString(R.string.react10), holder) }
-                    R.id.react11 -> { likePost(post, myContext.getString(R.string.react11), holder) }
-                    R.id.react12 -> { likePost(post, myContext.getString(R.string.react12), holder) }
-                    R.id.react13 -> { likePost(post, myContext.getString(R.string.react13), holder) }
-                    R.id.react14 -> { likePost(post, myContext.getString(R.string.react14), holder) }
-                    R.id.react15 -> { likePost(post, myContext.getString(R.string.react15), holder) }
+                    R.id.react1 -> {
+                        likePost(post, myContext.getString(R.string.react1), holder)
+                    }
+
+                    R.id.react2 -> {
+                        likePost(post, myContext.getString(R.string.react2), holder)
+                    }
+
+                    R.id.react3 -> {
+                        likePost(post, myContext.getString(R.string.react3), holder)
+                    }
+
+                    R.id.react4 -> {
+                        likePost(post, myContext.getString(R.string.react4), holder)
+                    }
+
+                    R.id.react5 -> {
+                        likePost(post, myContext.getString(R.string.react5), holder)
+                    }
+
+                    R.id.react6 -> {
+                        likePost(post, myContext.getString(R.string.react6), holder)
+                    }
+
+                    R.id.react7 -> {
+                        likePost(post, myContext.getString(R.string.react7), holder)
+                    }
+
+                    R.id.react8 -> {
+                        likePost(post, myContext.getString(R.string.react8), holder)
+                    }
+
+                    R.id.react9 -> {
+                        likePost(post, myContext.getString(R.string.react9), holder)
+                    }
+
+                    R.id.react10 -> {
+                        likePost(post, myContext.getString(R.string.react10), holder)
+                    }
+
+                    R.id.react11 -> {
+                        likePost(post, myContext.getString(R.string.react11), holder)
+                    }
+
+                    R.id.react12 -> {
+                        likePost(post, myContext.getString(R.string.react12), holder)
+                    }
+
+                    R.id.react13 -> {
+                        likePost(post, myContext.getString(R.string.react13), holder)
+                    }
+
+                    R.id.react14 -> {
+                        likePost(post, myContext.getString(R.string.react14), holder)
+                    }
+
+                    R.id.react15 -> {
+                        likePost(post, myContext.getString(R.string.react15), holder)
+                    }
 
                 }
                 true
@@ -355,245 +404,266 @@ class HomeAdapter(
 
         }
     }
-    private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
-        if (Commons().isNetworkAvailable(context)) {
-            val data = JsonObject()
-            data.addProperty("userId", Util.userId)
-            data.addProperty("postId", post.id)
-            data.addProperty("reaction", reaction)
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val msg: String = Gson().fromJson(response.body()!!.get("message"), String::class.java)
-                                val likesCount: String =
-                                    Gson().fromJson(response.body()!!.get("likesCount"), String::class.java)
-                                if (msg == "liked") {
-                                    myList.put(post.id, reaction)
-                                    holder.likeBtn.text = reaction
-                                    holder.reacts.text = "$likesCount people reacts"
-                                } else if (msg == "unliked") {
-                                    myList.remove(post.id)
-                                    holder.likeBtn.text = "React"
-                                    holder.reacts.text = "$likesCount people reacts"
-                                }
-                            } else {
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("result", errorMessage)
-                            }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+    private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                val data = JsonObject()
+                data.addProperty("userId", Util.userId)
+                data.addProperty("postId", post.id)
+                data.addProperty("reaction", reaction)
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val msg: String =
+                                        Gson().fromJson(response.body()!!.get("message"), String::class.java)
+                                    val likesCount: String =
+                                        Gson().fromJson(response.body()!!.get("likesCount"), String::class.java)
+                                    if (msg == "liked") {
+                                        myList.put(post.id, reaction)
+                                        holder.likeBtn.text = reaction
+                                        holder.reacts.text = "$likesCount people reacts"
+                                    } else if (msg == "unliked") {
+                                        myList.remove(post.id)
+                                        holder.likeBtn.text = "React"
+                                        holder.reacts.text = "$likesCount people reacts"
+                                    }
+                                } else {
+                                    val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                    Log.e("result", errorMessage)
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                call.cancel()
                             }
-                            Log.e("HomeAdapter.likePost", "fail")
-                        }
-                    })
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("HomeAdapter.likePost", "fail")
+                            }
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("HomeAdapter.likePost", e.toString())
         }
     }
 
     private fun deletePost(post: Posts) {
-        if (Commons().isNetworkAvailable(context)) {
-            Log.e("deleted post : postid  ==== ", post.id)
-            /*if (!dialog.isShowing) {
-                dialog.show()
-            }*/
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                Toast.makeText(context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG)
-                                    .show()
-                            } else {
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("result", errorMessage)
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                Log.e("deleted post : postid  ==== ", post.id)/*if (!dialog.isShowing) {
+                    dialog.show()
+                }*/
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(
+                                        context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                    Log.e("result", errorMessage)
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                call.cancel()
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("HomeAdapter.deletePost", "fail")
                             }
-                            Log.e("HomeAdapter.deletePost", "fail")
-                        }
-                    })
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("HomeAdapter.deletePost", e.toString())
         }
     }
 
     private fun follow(userId: String, followerId: String, holder: ViewHolder) {
-        if (Commons().isNetworkAvailable(context)) {
-            /*if (!dialog.isShowing) {
-                dialog.show()
-            }*/
-            val followData = JsonObject()
-            followData.addProperty("userId", userId)
-            followData.addProperty("followerId", followerId)
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val msg: String = Gson().fromJson(response.body()!!.get("message"), String::class.java)
-                                Log.e("msg follow", msg)
-                                if (msg == "unfollow") {
-                                    holder.followBtn.text = "Follow"
-                                    myFollowList.put(followerId, userId)
-                                } else if (msg == "follow") {
-                                    holder.followBtn.text = "unfollow"
-                                    myFollowList.remove(followerId)
+        try {
+            if (Commons().isNetworkAvailable(context)) {/*if (!dialog.isShowing) {
+                    dialog.show()
+                }*/
+                val followData = JsonObject()
+                followData.addProperty("userId", userId)
+                followData.addProperty("followerId", followerId)
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val msg: String =
+                                        Gson().fromJson(response.body()!!.get("message"), String::class.java)
+                                    Log.e("msg follow", msg)
+                                    if (msg == "unfollow") {
+                                        holder.followBtn.text = "Follow"
+                                        myFollowList.put(followerId, userId)
+                                    } else if (msg == "follow") {
+                                        holder.followBtn.text = "unfollow"
+                                        myFollowList.remove(followerId)
+                                    }
+                                    notifyDataSetChanged()
+                                } else {
+                                    Log.e("failFollow", response.errorBody().toString())
+                                    //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
+                                    val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                    Log.e("result", errorMessage)
                                 }
-                                notifyDataSetChanged()
-                            } else {
-                                Log.e("failFollow", response.errorBody().toString())
-                                //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("result", errorMessage)
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                call.cancel()
                             }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("HomeAdapter.follow", "fail")
                             }
-                            Log.e("HomeAdapter.follow", "fail")
-                        }
-                    })
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("HomeAdapter.follow", e.toString())
         }
     }
 
     fun favPost(userId: String, postId: String, holder: ViewHolder) {
-        if (Commons().isNetworkAvailable(context)) {
-            /*if (!dialog.isShowing) {
-                dialog.show()
-            }*/
-            val followData = JsonObject()
-            followData.addProperty("userId", userId)
-            followData.addProperty("postId", postId)
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                Log.e("token################", it)
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                Log.e("Follow", response.body().toString())
-                                val resp = response.body()
-                                val msg: String = Gson().fromJson(resp!!.get("message"), String::class.java)
-                                Log.e("Status", postId)
-                                Log.e("map bef", myFavList.toString())
-                                if (msg.equals("fav")) {
-                                    myFavList.put(postId, userId)
-                                    holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_24)
-                                } else if (msg.equals("unfav")) {
-                                    myFavList.remove(postId)
-                                    holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_border_24)
+        try {
+            if (Commons().isNetworkAvailable(context)) {/*if (!dialog.isShowing) {
+                    dialog.show()
+                }*/
+                val followData = JsonObject()
+                followData.addProperty("userId", userId)
+                followData.addProperty("postId", postId)
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    Log.e("token################", it)
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    Log.e("Follow", response.body().toString())
+                                    val resp = response.body()
+                                    val msg: String = Gson().fromJson(resp!!.get("message"), String::class.java)
+                                    Log.e("Status", postId)
+                                    Log.e("map bef", myFavList.toString())
+                                    if (msg.equals("fav")) {
+                                        myFavList.put(postId, userId)
+                                        holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_24)
+                                    } else if (msg.equals("unfav")) {
+                                        myFavList.remove(postId)
+                                        holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_border_24)
+                                    }
+                                    notifyDataSetChanged()
+                                } else {
+                                    Log.e("fail fav", response.errorBody().toString())
+                                    val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                    Log.e("errorMessage", errorMessage)
                                 }
-                                notifyDataSetChanged()
-                            } else {
-                                Log.e("fail fav", response.errorBody().toString())
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
-                                Log.e("errorMessage", errorMessage)
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                call.cancel()
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("HomeAdapter.favPost", "fail")
                             }
-                            Log.e("HomeAdapter.favPost", "fail")
-                        }
-                    })
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("HomeAdapter.favPost", e.toString())
         }
     }
 
     fun getPost(postId: String) {
-        if (Commons().isNetworkAvailable(context)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(owner) {
-                Log.e("token################", it)
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    Log.e("token################", it)
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
 
-                            } else {
-                                Log.e("fail fav", response.errorBody().toString())
-                                val resp = response.errorBody()
-                                val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = loginresp.get("status").toString()
-                                val errorMessage = loginresp.get("errorMessage").toString()
-                                Log.e("Status", status)
+                                } else {
+                                    Log.e("fail fav", response.errorBody().toString())
+                                    val resp = response.errorBody()
+                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                    val status = loginresp.get("status").toString()
+                                    val errorMessage = loginresp.get("errorMessage").toString()
+                                    Log.e("Status", status)
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                call.cancel()
                             }
-                            if (dialog.isShowing) {
-                                dialog.hide()
-                            }
-                            call.cancel()
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.hide()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.hide()
+                                }
+                                Log.e("HomeAdapter.getPost", "fail")
                             }
-                            Log.e("HomeAdapter.getPost", "fail")
-                        }
-                    })
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("HomeAdapter.getPost", e.toString())
         }
     }
 

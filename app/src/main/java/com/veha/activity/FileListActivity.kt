@@ -53,7 +53,7 @@ class FileListActivity : AppCompatActivity() {
             startActivity(intent)
         }
         listIcon = findViewById(R.id.view_icon)
-        if (Util.listview){
+        if (Util.listview) {
             listIcon.setImageResource(R.drawable.ic_baseline_list_24)
         } else {
             listIcon.setImageResource(R.drawable.ic_baseline_grid_view_24)
@@ -64,71 +64,75 @@ class FileListActivity : AppCompatActivity() {
             finish()
         }
         path = intent.getStringExtra("folderId").toString()
-        getFilesAndFolder(path,this)
+        getFilesAndFolder(path, this)
 
     }
 
-    private fun getFilesAndFolder(folderID: String , context: Context) {
-
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                filesAndFolders = ArrayList()
-                                val resp = response.body()
-                                val loginresp: JsonArray = Gson().fromJson(resp?.get("files"), JsonArray::class.java)
-                                for (files in loginresp) {
-                                    val pos = Gson().fromJson(files, FilesAndFolders::class.java)
-                                    filesAndFolders.add(pos)
-                                }
-                                if (filesAndFolders.size <= 0){
-                                    noFilesText.visibility = View.VISIBLE
-                                    recyclerView.visibility = View.GONE
-                                } else {
-                                    noFilesText.visibility = View.GONE
-                                    recyclerView.visibility = View.VISIBLE
-
-                                    if (Util.listview){
-                                        recyclerView.layoutManager = LinearLayoutManager(context)
-                                    } else {
-                                        recyclerView.layoutManager = GridLayoutManager(context,3)
+    private fun getFilesAndFolder(folderID: String, context: Context) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    filesAndFolders = ArrayList()
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("files"), JsonArray::class.java)
+                                    for (files in loginresp) {
+                                        val pos = Gson().fromJson(files, FilesAndFolders::class.java)
+                                        filesAndFolders.add(pos)
                                     }
-                                    recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders)
+                                    if (filesAndFolders.size <= 0) {
+                                        noFilesText.visibility = View.VISIBLE
+                                        recyclerView.visibility = View.GONE
+                                    } else {
+                                        noFilesText.visibility = View.GONE
+                                        recyclerView.visibility = View.VISIBLE
+
+                                        if (Util.listview) {
+                                            recyclerView.layoutManager = LinearLayoutManager(context)
+                                        } else {
+                                            recyclerView.layoutManager = GridLayoutManager(context, 3)
+                                        }
+                                        recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders)
+                                    }
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
                                 }
                             }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("FileListActivity.getFilesAndFolder", "fail")
                             }
-                            Log.e("MainActivity.getDetails", "fail")
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@FileListActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@FileListActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@FileListActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@FileListActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("FileListActivity.getFilesAndFolder", e.toString())
         }
     }
 }

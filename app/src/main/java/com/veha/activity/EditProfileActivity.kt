@@ -87,7 +87,8 @@ class EditProfileActivity : AppCompatActivity() {
         intent.action = Intent.ACTION_GET_CONTENT //
         startActivityForResult(Intent.createChooser(intent, "Select File"), 100)
     }
-    fun getImageUri( inImage: Bitmap): Uri? {
+
+    fun getImageUri(inImage: Bitmap): Uri? {
         val bytes = ByteArrayOutputStream()
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val path = MediaStore.Images.Media.insertImage(this.contentResolver, inImage, "Title", null)
@@ -99,6 +100,7 @@ class EditProfileActivity : AppCompatActivity() {
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE //
         startActivityForResult(intent, 150)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e(requestCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE.toString())
@@ -116,21 +118,22 @@ class EditProfileActivity : AppCompatActivity() {
                 }
             }
         } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-                val result = CropImage.getActivityResult(data)
-                if (resultCode === RESULT_OK) {
-                    val resultUri = result.uri
-                    val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
-                    profilestr = encodeTobase64(bitmap)
-                    val data = JsonObject()
-                    data.addProperty("base64Image", profilestr)
-                    data.addProperty("name", Util.user.name + " picture")
-                    updateProfilePic(this, data)
-                } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    val error = result.error
-                    Log.e("errorrr", error.toString())
-                }
+            val result = CropImage.getActivityResult(data)
+            if (resultCode === RESULT_OK) {
+                val resultUri = result.uri
+                val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
+                profilestr = encodeTobase64(bitmap)
+                val data = JsonObject()
+                data.addProperty("base64Image", profilestr)
+                data.addProperty("name", Util.user.name + " picture")
+                updateProfilePic(this, data)
+            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                val error = result.error
+                Log.e("errorrr", error.toString())
             }
+        }
     }
+
     fun encodeTobase64(image: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
@@ -196,43 +199,46 @@ class EditProfileActivity : AppCompatActivity() {
             builder.setTitle("Do you want to change your profile picture?")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->*/
-                val result = ContextCompat.checkSelfPermission(applicationContext,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-               if (result){
-                    val items = arrayOf<CharSequence>(
-                        "Take Photo", "Choose from Gallery",
-                        "Cancel"
-                    )
-                    val builder = AlertDialog.Builder(this@EditProfileActivity)
-                    builder.setTitle("Add Picture!")
-                    builder.setItems(items) { dialog, item ->
-                        if (items[item] == "Take Photo") {
-                            cameraIntent()
-                        } else if (items[item] == "Choose from Gallery") {
-                            galleryIntent()
-                        } else if (items[item] == "Cancel") {
-                            dialog.dismiss()
-                        }
+            val result = ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            if (result) {
+                val items = arrayOf<CharSequence>(
+                    "Take Photo", "Choose from Gallery",
+                    "Cancel"
+                )
+                val builder = AlertDialog.Builder(this@EditProfileActivity)
+                builder.setTitle("Add Picture!")
+                builder.setItems(items) { dialog, item ->
+                    if (items[item] == "Take Photo") {
+                        cameraIntent()
+                    } else if (items[item] == "Choose from Gallery") {
+                        galleryIntent()
+                    } else if (items[item] == "Cancel") {
+                        dialog.dismiss()
+                    }
 
-                    }
-                   val alertDialog: AlertDialog = builder.create()
-                   alertDialog.show()
-                } else {
-                    val builder = AlertDialog.Builder(this@EditProfileActivity)
-                    builder.setTitle("Permission Restricted")
-                    builder.setMessage("We need CAMERA and STORAGE permission to serve you for updating your profile picture.\nplease enable this permission through your device's settings")
-                    builder.setPositiveButton("cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-                    builder.setNegativeButton("settings") { dialog: DialogInterface, _: Int ->
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        val uri: Uri = Uri.fromParts("package", applicationContext.packageName, null)
-                        intent.data = uri
-                        this.startActivity(intent)
-                    }
-                   val alertDialog: AlertDialog = builder.create()
-                   alertDialog.show()
                 }
-           /* }
-            builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }*/
+                val alertDialog: AlertDialog = builder.create()
+                alertDialog.show()
+            } else {
+                val builder = AlertDialog.Builder(this@EditProfileActivity)
+                builder.setTitle("Permission Restricted")
+                builder.setMessage("We need CAMERA and STORAGE permission to serve you for updating your profile picture.\nplease enable this permission through your device's settings")
+                builder.setPositiveButton("cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+                builder.setNegativeButton("settings") { dialog: DialogInterface, _: Int ->
+                    val intent = Intent()
+                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    val uri: Uri = Uri.fromParts("package", applicationContext.packageName, null)
+                    intent.data = uri
+                    this.startActivity(intent)
+                }
+                val alertDialog: AlertDialog = builder.create()
+                alertDialog.show()
+            }
+            /* }
+             builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }*/
 
             /*val alertDialog: AlertDialog = builder.create()
             alertDialog.show()*/
@@ -245,7 +251,9 @@ class EditProfileActivity : AppCompatActivity() {
             if (Util.isWarrior) {
                 popup.menu.findItem(R.id.warrior).isVisible = false
             }
-            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
+            if (Util.user.isReviewState.toBoolean()) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
             popup.menu.findItem(R.id.edit_profile).isVisible = false
             popup.menu.findItem(R.id.logout).isVisible = false
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
@@ -253,10 +261,12 @@ class EditProfileActivity : AppCompatActivity() {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
                     }
+
                     R.id.fav -> {
                         val intent = Intent(this@EditProfileActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.settings -> {
                         val intent = Intent(this@EditProfileActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -276,13 +286,13 @@ class EditProfileActivity : AppCompatActivity() {
             citySp.showDropDown()
         }
         saveBtn.setOnClickListener {
-            if (isDataChanged()){
+            if (isDataChanged()) {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
                 builder.setMessage("Do you want to save the changes?")
                 builder.setTitle("Edit - Profile")
                 builder.setCancelable(false)
                 builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
-                    if(doValidation().contentEquals("success",true)){
+                    if (doValidation().contentEquals("success", true)) {
                         val data = JsonObject()
                         data.addProperty("firstName", fname.text.toString())
                         data.addProperty("lastName", lname.text.toString())
@@ -317,61 +327,67 @@ class EditProfileActivity : AppCompatActivity() {
             }
 
         }
-        cancelBtn.setOnClickListener { finish() }
+        cancelBtn.setOnClickListener {
+            val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
         warrior.setOnCheckedChangeListener { buttonView, isChecked ->
             Commons().makeWarrior(this, this)
         }
     }
 
     private fun isDataChanged(): Boolean {
-        if (!fname.text!!.contentEquals(myDetails.firstName,false)){
+        if (!fname.text!!.contentEquals(myDetails.firstName, false)) {
             return true
-        }else if (!lname.text!!.contentEquals(myDetails.lastName,false)){
+        } else if (!lname.text!!.contentEquals(myDetails.lastName, false)) {
             return true
-        }else if (!mobile.text!!.contentEquals(myDetails.mobile,false)){
+        } else if (!mobile.text!!.contentEquals(myDetails.mobile, false)) {
             return true
-        }else if (!address.text!!.contentEquals(myDetails.address,false)){
+        } else if (!address.text!!.contentEquals(myDetails.address, false)) {
             return true
-        }else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth,"dd-MM-yyyy"),false)){
+        } else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth, "dd-MM-yyyy"), false)) {
             return true
-        }else if (!pincode.text!!.contentEquals(myDetails.pinCode,false)){
+        } else if (!pincode.text!!.contentEquals(myDetails.pinCode, false)) {
             return true
-        }else if (!language.text!!.contentEquals(myDetails.language,false)){
+        } else if (!language.text!!.contentEquals(myDetails.language, false)) {
             return true
-        }else if (!countrySP.text!!.contentEquals(myDetails.country)){
+        } else if (!countrySP.text!!.contentEquals(myDetails.country)) {
             return true
-        }else if (!stateSp.text!!.contentEquals(myDetails.state)){
+        } else if (!stateSp.text!!.contentEquals(myDetails.state)) {
             return true
-        }else if (!citySp.text!!.contentEquals(myDetails.city)){
+        } else if (!citySp.text!!.contentEquals(myDetails.city)) {
             return true
-        }else if (gender.checkedRadioButtonId == R.id.male && myDetails.gender != "male"){
+        } else if (gender.checkedRadioButtonId == R.id.male && myDetails.gender != "male") {
             return true
-        }else if (gender.checkedRadioButtonId == R.id.female && myDetails.gender != "female"){
+        } else if (gender.checkedRadioButtonId == R.id.female && myDetails.gender != "female") {
             return true
         }
         return false
     }
 
-    private fun doValidation(): String{
-        if(TextUtils.isEmpty(fname.text.toString().trim())){
+    private fun doValidation(): String {
+        if (TextUtils.isEmpty(fname.text.toString().trim())) {
             fname.error = "Enter name"
             return "Enter name"
-        } else if(!Util.isValidName(fname.text.toString())){
+        } else if (!Util.isValidName(fname.text.toString())) {
             fname.error = "Enter valid name"
             return "Enter valid name"
-        } else if(TextUtils.isEmpty(email.text.toString().trim())){
-            email.error ="Enter email"
+        } else if (TextUtils.isEmpty(email.text.toString().trim())) {
+            email.error = "Enter email"
             return "Enter email"
-        } else if(!Util.isValidEmail(email.text.toString())){
+        } else if (!Util.isValidEmail(email.text.toString())) {
             email.error = "Invalid Email"
             return "Invalid Email"
-        } else if(TextUtils.isEmpty(mobile.text.toString().trim())){
+        } else if (TextUtils.isEmpty(mobile.text.toString().trim())) {
             mobile.error = "Enter mobile number"
             return "Enter mobile number"
-        } else if(!Util.isValidMobile(mobile.text.toString().trim())){
+        } else if (!Util.isValidMobile(mobile.text.toString().trim())) {
             mobile.error = "Enter valid mobile number"
             return "Enter valid mobile number"
-        } else if(TextUtils.isEmpty(date.text.toString().trim()) || date.text.toString().equals("Date of birth",true)){
+        } else if (TextUtils.isEmpty(date.text.toString().trim()) || date.text.toString()
+                .equals("Date of birth", true)
+        ) {
             date.error = "Select Date of birth"
             return "Select Date of birth"
         }
@@ -379,186 +395,204 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun edit(data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            userPreferences = UserPreferences(this@EditProfileActivity)
-            val retrofit = Util.getRetrofit()
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                userPreferences = UserPreferences(this@EditProfileActivity)
+                val retrofit = Util.getRetrofit()
 
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                val resp = response.errorBody()
-                                val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                val status = registerResp.get("status").toString()
-                                val errorMessage = registerResp.get("errorMessage").toString()
-                                Log.e("respppStatus", status)
-                                Log.e("respppresult", errorMessage)
-                                Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_LONG).show()
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    /* val resp = response.errorBody()
+                                     val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                                     val status = registerResp.get("status").toString()
+                                     val errorMessage = registerResp.get("errorMessage").toString()
+                                     Log.e("respppStatus", status)
+                                     Log.e("respppresult", errorMessage)*/
+                                    Toast.makeText(
+                                        this@EditProfileActivity,
+                                        "Something Went wrong \n please try after sometime",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
                             }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("EditProfileActivity.edit", "fail")
                             }
-                            Log.e("EditProfileActivity.edit", "fail")
-                        }
-                    })
+                        })
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.edit", e.toString())
         }
     }
 
     private fun getMyDetails(context: Context) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val resp = response.body()
-                                val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                myDetails = loginresp
-                                Log.e("mydetails",loginresp.toString())
-                                if (!loginresp.picture.isNullOrEmpty()) {
-                                    imgStr = loginresp.picture
-                                    Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
-                                }
-                                if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.firstName)
-                                warriorStr = loginresp.isWarrior.toBoolean()
-                                if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.lastName)
-                                if (!TextUtils.isEmpty(loginresp.address)) address.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.address)
-                                if (!TextUtils.isEmpty(loginresp.email)) email.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.email)
-                                if (!TextUtils.isEmpty(loginresp.mobile)) {
-                                    mobile.text = Editable.Factory.getInstance().newEditable(loginresp.mobile)
-                                    mobileTxt = loginresp.mobile
-                                }
-                                if (!TextUtils.isEmpty(loginresp.religion)) religion = loginresp.religion
-                                if (!TextUtils.isEmpty(loginresp.churchName)) churchName = loginresp.churchName
-                                loginresp.isWarrior.toBoolean()
-                                if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
-                                    var dateArr = Util.formatDate(loginresp.dateOfBirth,"dd-MM-yyyy").split("-")
-                                    year = dateArr[2].toInt()
-                                    month = dateArr[1].toInt() - 1
-                                    day = dateArr[0].toInt()
-                                    //val viewDate: String = day + "" + month + "" + year
-                                    date.text =
-                                        Editable.Factory.getInstance()
-                                            .newEditable(Util.formatDate(loginresp.dateOfBirth,"dd-MM-yyyy"))
-                                }
-                                if (!TextUtils.isEmpty(loginresp.pinCode)) pincode.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.pinCode)
-                                if (!TextUtils.isEmpty(loginresp.language)) language.text =
-                                    Editable.Factory.getInstance().newEditable(loginresp.language)
-                                if (!TextUtils.isEmpty(loginresp.country)) {
-                                    countrySP.setText(loginresp.country)
-                                    getStates(loginresp.country)
-                                }
-                                if (!TextUtils.isEmpty(loginresp.state)) {
-                                    stateSp.setText(loginresp.state)
-                                    getCities(loginresp.state)
-                                }
-                                if (!TextUtils.isEmpty(loginresp.city)) {
-                                    citySp.setText(loginresp.city)
-                                }
-                                if (!TextUtils.isEmpty(loginresp.gender)) {
-                                    when (loginresp.gender) {
-                                        "male" -> genderbtn = R.id.male
-                                        "female" -> genderbtn = R.id.female
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    myDetails = loginresp
+                                    if (!loginresp.picture.isNullOrEmpty()) {
+                                        imgStr = loginresp.picture
+                                        Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
+                                    } else
+                                    if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.firstName)
+                                    warriorStr = loginresp.isWarrior.toBoolean()
+                                    if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.lastName)
+                                    if (!TextUtils.isEmpty(loginresp.address)) address.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.address)
+                                    if (!TextUtils.isEmpty(loginresp.email)) email.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.email)
+                                    if (!TextUtils.isEmpty(loginresp.mobile)) {
+                                        mobile.text = Editable.Factory.getInstance().newEditable(loginresp.mobile)
+                                        mobileTxt = loginresp.mobile
                                     }
-                                    gender.check(genderbtn)
+                                    if (!TextUtils.isEmpty(loginresp.religion)) religion = loginresp.religion
+                                    if (!TextUtils.isEmpty(loginresp.churchName)) churchName = loginresp.churchName
+                                    loginresp.isWarrior.toBoolean()
+                                    if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
+                                        var dateArr = Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy").split("-")
+                                        year = dateArr[2].toInt()
+                                        month = dateArr[1].toInt() - 1
+                                        day = dateArr[0].toInt()
+                                        //val viewDate: String = day + "" + month + "" + year
+                                        date.text =
+                                            Editable.Factory.getInstance()
+                                                .newEditable(Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy"))
+                                    }
+                                    if (!TextUtils.isEmpty(loginresp.pinCode)) pincode.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.pinCode)
+                                    if (!TextUtils.isEmpty(loginresp.language)) language.text =
+                                        Editable.Factory.getInstance().newEditable(loginresp.language)
+                                    if (!TextUtils.isEmpty(loginresp.country)) {
+                                        countrySP.setText(loginresp.country)
+                                        countrystr = loginresp.country
+                                        getStates(loginresp.country)
+                                    }
+                                    if (!TextUtils.isEmpty(loginresp.state)) {
+                                        stateSp.setText(loginresp.state)
+                                        statestr = loginresp.state
+                                        getCities(loginresp.state)
+                                    }
+                                    if (!TextUtils.isEmpty(loginresp.city)) {
+                                        citySp.setText(loginresp.city)
+                                        citystr = loginresp.city
+                                    }
+                                    if (!TextUtils.isEmpty(loginresp.gender)) {
+                                        when (loginresp.gender) {
+                                            "male" -> genderbtn = R.id.male
+                                            "female" -> genderbtn = R.id.female
+                                        }
+                                        gender.check(genderbtn)
+                                    }
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
                                 }
                             }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
+                                Log.e("EditProfileActivity.getMyDetails", "fail")
                             }
-                            Log.e("EditProfileActivity.getMyDetails", "fail")
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@EditProfileActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@EditProfileActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.getMyDetails", e.toString())
         }
     }
 
     private fun updateProfilePic(context: Context, data: JsonObject) {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val retrofit = Util.getRetrofit()
-            userPreferences.authToken.asLiveData().observe(this) {
-                if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                        override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                            if (response.code() == 200) {
-                                val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
-                                startActivity(intent)
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
                             }
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            Log.e("EditProfileActivity.UpdateProfilepic ", "Fail")
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("EditProfileActivity.UpdateProfilepic ", "Fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@EditProfileActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
                         }
-                    })
-                } else {
-                    Toast.makeText(
-                        this@EditProfileActivity,
-                        "Somthing Went Wrong \nLogin again to continue",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    lifecycleScope.launch {
-                        userPreferences.deleteAuthToken()
-                        userPreferences.deleteUserId()
+                        val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                        startActivity(intent)
                     }
-                    val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
-                    startActivity(intent)
                 }
             }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.UpdateProfilepic", e.toString())
         }
     }
 
@@ -577,99 +611,113 @@ class EditProfileActivity : AppCompatActivity() {
 
         } else null
     }
+
     private val myDateListener =
         DatePickerDialog.OnDateSetListener { _, year, month, day ->
             date?.text = StringBuilder().append(day).append("-")
-                .append(month+1).append("-").append(year)
+                .append(month + 1).append("-").append(year)
         }
 
     private fun getCountries() {
-        if (Commons().isNetworkAvailable(this)) {
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-            val call = Util.getRetrofit().getCountries()
-            call!!.enqueue(object : Callback<JsonObject> {
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    Log.e("country",response.body().toString())
-                    val data = response.body()!!["results"] as JsonObject
-                    val array = data["countries"] as JsonArray
-                    country = ArrayList()
-                    for (i in 0 until array.size()) {
-                        val cityobj: City = Gson().fromJson(array[i], City::class.java)
-                        country.add(cityobj.name)
-                    }
-                    val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
-                    adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
-                    countrySP.setAdapter(adapter)
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                if (!dialog.isShowing) {
+                    dialog.show()
                 }
+                val call = Util.getRetrofit().getCountries()
+                call!!.enqueue(object : Callback<JsonObject> {
+                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                        Log.e("country", response.body().toString())
+                        val data = response.body()!!["results"] as JsonObject
+                        val array = data["countries"] as JsonArray
+                        country = ArrayList()
+                        for (i in 0 until array.size()) {
+                            val cityobj: City = Gson().fromJson(array[i], City::class.java)
+                            country.add(cityobj.name)
+                        }
+                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
+                        adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
+                        countrySP.setAdapter(adapter)
+                    }
 
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
+                    override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Log.e("EditProfileActivity.getCountries", "fail")
                     }
-                    Log.e("EditProfileActivity.getCountries", "fail")
-                }
-            })
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.getCountries", e.toString())
         }
     }
 
     private fun getStates(countryId: String) {
-        if (Commons().isNetworkAvailable(this)) {
-            val call = Util.getRetrofit().getState(countryId)
-            call!!.enqueue(object : Callback<JsonObject> {
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    val data = response.body()!!["results"] as JsonObject
-                    state = ArrayList()
-                    val array = data["states"] as JsonArray
-                    for (i in 0 until array.size()) {
-                        val stateobj: State = Gson().fromJson(array[i], State::class.java)
-                        state.add(stateobj.name)
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val call = Util.getRetrofit().getState(countryId)
+                call!!.enqueue(object : Callback<JsonObject> {
+                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                        val data = response.body()!!["results"] as JsonObject
+                        state = ArrayList()
+                        val array = data["states"] as JsonArray
+                        for (i in 0 until array.size()) {
+                            val stateobj: State = Gson().fromJson(array[i], State::class.java)
+                            state.add(stateobj.name)
+                        }
+                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        stateSp.setAdapter(adapter)
                     }
-                    val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    stateSp.setAdapter(adapter)
-                }
 
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
+                    override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Log.e("EditProfileActivity.getStates", "fail")
                     }
-                    Log.e("EditProfileActivity.getStates", "fail")
-                }
-            })
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.getStates", e.toString())
         }
     }
 
     private fun getCities(stateId: String) {
-        if (Commons().isNetworkAvailable(this)) {
-            val call = Util.getRetrofit().getCity(stateId)
-            call!!.enqueue(object : Callback<JsonObject> {
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    val data = response.body()!!["results"] as JsonObject
-                    val array = data["cities"] as JsonArray
-                    city = ArrayList()
-                    for (i in 0 until array.size()) {
-                        val cityObj: City = Gson().fromJson(array[i], City::class.java)
-                        city.add(cityObj.name)
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val call = Util.getRetrofit().getCity(stateId)
+                call!!.enqueue(object : Callback<JsonObject> {
+                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                        val data = response.body()!!["results"] as JsonObject
+                        val array = data["cities"] as JsonArray
+                        city = ArrayList()
+                        for (i in 0 until array.size()) {
+                            val cityObj: City = Gson().fromJson(array[i], City::class.java)
+                            city.add(cityObj.name)
+                        }
+                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        citySp.setAdapter(adapter)
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
                     }
-                    val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    citySp.setAdapter(adapter)
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
-                    }
-                }
 
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
+                    override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                        Log.e("EditProfileActivity.getCities", "fail")
                     }
-                    Log.e("EditProfileActivity.getCities", "fail")
-                }
-            })
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("EditProfileActivity.getCities", e.toString())
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

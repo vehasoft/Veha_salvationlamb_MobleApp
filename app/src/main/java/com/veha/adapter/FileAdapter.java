@@ -18,7 +18,6 @@ import com.veha.activity.R;
 import com.veha.util.FilesAndFolders;
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
-
     Context context;
     ArrayList<FilesAndFolders> filesAndFolders = new ArrayList<>();
 
@@ -27,26 +26,21 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         this.filesAndFolders = filesAndFolders;
     }
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(context).inflate(R.layout.child_folders, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(FileAdapter.ViewHolder holder, int position) {
-
         FilesAndFolders selectedFile = filesAndFolders.get(position);
         holder.textView.setText(selectedFile.getName());
-
         if (selectedFile.getType().equals("folder")) {
             holder.imageView.setImageResource(R.drawable.folder_icon);
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24);
         }
-
         holder.itemView.setOnClickListener(v -> {
             Log.e("type", selectedFile.getType());
             if (selectedFile.getType().equals("folder")) {
@@ -62,8 +56,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
                 context.startActivity(intent);
             }
         });
-
-
     }
 
     @Override
@@ -71,9 +63,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         return filesAndFolders.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         TextView textView;
         ImageView imageView;
 
