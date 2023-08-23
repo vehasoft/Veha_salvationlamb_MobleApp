@@ -89,7 +89,7 @@ class AboutActivity : AppCompatActivity() {
                                     gender.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                                     if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
                                     if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
-                                        Util.formatDate(loginResp.dateOfBirth, "dd MMMM yyyy")
+                                        Util.formatDate(loginResp.dateOfBirth, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                                     if (!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
                                     if (!TextUtils.isEmpty(loginResp.gender)) gender.text =
                                         loginResp.gender.capitalize()
@@ -101,7 +101,7 @@ class AboutActivity : AppCompatActivity() {
                                     address.text = add
                                     if (!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
                                     if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
-                                        Util.formatDate(loginResp.createdAt, "dd MMMM yyyy")
+                                        Util.formatDate(loginResp.createdAt, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
                                 }
                                 if (dialog.isShowing) {

@@ -304,7 +304,7 @@ class EditProfileActivity : AppCompatActivity() {
                             "gender",
                             findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
                         )
-                        data.addProperty("dateOfBirth", date.text.toString())
+                        data.addProperty("dateOfBirth", Util.formatDate(date.text.toString(), "MM-dd-yyyy","dd-MM-yyyy"))
                         data.addProperty("isWarrior", warriorStr)
                         data.addProperty("country", countrystr)
                         data.addProperty("state", statestr)
@@ -348,7 +348,7 @@ class EditProfileActivity : AppCompatActivity() {
             return true
         } else if (!address.text!!.contentEquals(myDetails.address, false)) {
             return true
-        } else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth, "dd-MM-yyyy"), false)) {
+        } else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"), false)) {
             return true
         } else if (!pincode.text!!.contentEquals(myDetails.pinCode, false)) {
             return true
@@ -397,6 +397,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun edit(data: JsonObject) {
+        Log.e("############",data.toString())
         try {
             if (Commons().isNetworkAvailable(this)) {
                 if (!dialog.isShowing) {
@@ -463,6 +464,7 @@ class EditProfileActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    Log.e("########",loginresp.toString())
                                     myDetails = loginresp
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
@@ -485,14 +487,14 @@ class EditProfileActivity : AppCompatActivity() {
                                     if (!TextUtils.isEmpty(loginresp.churchName)) churchName = loginresp.churchName
                                     loginresp.isWarrior.toBoolean()
                                     if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
-                                        var dateArr = Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy").split("-")
+                                        var dateArr = Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").split("-")
                                         year = dateArr[2].toInt()
                                         month = dateArr[1].toInt() - 1
                                         day = dateArr[0].toInt()
                                         //val viewDate: String = day + "" + month + "" + year
                                         date.text =
                                             Editable.Factory.getInstance()
-                                                .newEditable(Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy"))
+                                                .newEditable(Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
                                     }
                                     if (!TextUtils.isEmpty(loginresp.pinCode)) pincode.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.pinCode)

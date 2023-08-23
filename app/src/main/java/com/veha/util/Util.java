@@ -87,18 +87,18 @@ public class Util {
         return retrofitAPI;
     }
 
-    public static String formatDate(String date, String pattern) throws ParseException {
-        if (date.isEmpty()) {
+    public static String formatDate(String date, String toPattern, String fromPattern) throws ParseException {
+        if (date == null || date.isEmpty()) {
             return null;
         }
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat format = new SimpleDateFormat(fromPattern);
         Date past = format.parse(date);
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        SimpleDateFormat formatter = new SimpleDateFormat(toPattern);
         return formatter.format(past);
     }
 
     public static String getTimeAgo(String date) {
-        if (date.isEmpty()) {
+        if (date == null || date.isEmpty()) {
             return null;
         }
         String timeAgo = "";

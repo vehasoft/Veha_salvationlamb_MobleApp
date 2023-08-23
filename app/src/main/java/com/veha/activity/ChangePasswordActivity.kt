@@ -48,14 +48,19 @@ class ChangePasswordActivity : AppCompatActivity() {
             passwordTxt = new_pwd.text.toString()
             cnfmPasswordTxt = cnfm_pwd.text.toString()
             oldPasswordTxt = old_pwd.text.toString()
-            Log.e("password", passwordTxt)
             if (!Util.isValidPassword(passwordTxt)) {
+                Toast.makeText(this@ChangePasswordActivity, "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8", Toast.LENGTH_LONG).show()
                 new_pwd.error =
                     "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
             } else if (TextUtils.isEmpty(passwordTxt.trim())) {
+                Toast.makeText(this@ChangePasswordActivity, "Enter Password", Toast.LENGTH_LONG).show()
                 new_pwd.error = "Enter Password"
             } else if (!passwordTxt.equals(cnfmPasswordTxt, false)) {
-                cnfm_pwd.error = "Password is not same"
+                Toast.makeText(this@ChangePasswordActivity, "New Password and confirm password are not same", Toast.LENGTH_LONG).show()
+                cnfm_pwd.error = "New Password and confirm password are not same"
+            } else if (oldPasswordTxt.equals(cnfmPasswordTxt, false)) {
+                Toast.makeText(this@ChangePasswordActivity, "new password is same as old password", Toast.LENGTH_LONG).show()
+                new_pwd.error = "new password is same as old password"
             } else {
                 if (TextUtils.isEmpty(email?.trim())) {
                     val data = JsonObject()
