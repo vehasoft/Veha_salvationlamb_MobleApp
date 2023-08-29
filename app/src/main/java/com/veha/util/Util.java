@@ -26,7 +26,7 @@ public class Util {
     public static final String USER = "User";
     public static String isNight = DAY;
     private static ArrayList<String> religion;
-    public static Boolean isWarrior;
+    public static Boolean isWarrior = false;
     public static UserRslt user;
     private static RetrofitAPI retrofitAPI;
     public static MediaPlayer player = null;

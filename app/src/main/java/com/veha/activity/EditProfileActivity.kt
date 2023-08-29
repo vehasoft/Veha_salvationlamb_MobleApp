@@ -397,7 +397,6 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun edit(data: JsonObject) {
-        Log.e("############",data.toString())
         try {
             if (Commons().isNetworkAvailable(this)) {
                 if (!dialog.isShowing) {
@@ -464,7 +463,6 @@ class EditProfileActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                    Log.e("########",loginresp.toString())
                                     myDetails = loginresp
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture

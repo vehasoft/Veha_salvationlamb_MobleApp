@@ -344,9 +344,9 @@ class HomeAdapter(
                         likePost(post, myContext.getString(R.string.react14), holder)
                     }
 
-                    R.id.react15 -> {
+                    /*R.id.react15 -> {
                         likePost(post, myContext.getString(R.string.react15), holder)
-                    }
+                    }*/
 
                 }
                 true
@@ -362,6 +362,7 @@ class HomeAdapter(
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/"}                    
                     """.trimIndent()
+                Log.e("######", shareMessage)
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
             } catch (e: Exception) {

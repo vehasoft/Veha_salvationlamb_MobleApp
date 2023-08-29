@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -75,6 +76,7 @@ class SplashhScreenActivity : AppCompatActivity() {
                 }
 
                 Thread.sleep(2000)
+                Log.e("isnight", it)
                 getMyDetails(it)
             }
         }
@@ -85,6 +87,7 @@ class SplashhScreenActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
+                Log.e("isnight", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
@@ -113,6 +116,14 @@ class SplashhScreenActivity : AppCompatActivity() {
                             }
                         } else {
                             Log.e("responseee", "fail")
+                            Toast.makeText(
+                                this@SplashhScreenActivity,
+                                "Somthing Went Wrong \nLogin again to continue",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
                     }
 

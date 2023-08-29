@@ -293,7 +293,7 @@ class MainActivity : AppCompatActivity() {
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
-                                Log.e("MainActivity.getDetails", "fail")
+                                Log.e("MainActivity.getDetails", "fail$t")
                             }
                         })
                     } else {
