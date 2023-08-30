@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.veha.activity"
         minSdk 23
-        targetSdk 30
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
