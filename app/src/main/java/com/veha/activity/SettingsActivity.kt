@@ -169,9 +169,8 @@ class SettingsActivity : AppCompatActivity() {
                         val call: Call<JsonObject?>? = retrofit.deleteUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                                Log.e("#########",response.toString())
                                 if (response.code() == 200) {
-                                    finish()
+                                    finishAffinity()
                                     lifecycleScope.launch {
                                         userPreferences.deleteAuthToken()
                                         userPreferences.deleteUserId()
@@ -179,8 +178,6 @@ class SettingsActivity : AppCompatActivity() {
                                     val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                     startActivity(intent)
-                                } else {
-                                    Log.e("#########",response.toString())
                                 }
                             }
 
