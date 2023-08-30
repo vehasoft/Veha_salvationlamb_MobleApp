@@ -168,4 +168,10 @@ interface RetrofitAPI {
         @Header(value = "Authorization") head: String,
         @Path(value = "postId") postId: String
     ): Call<JsonObject?>?
+
+    @DELETE("api/v1/users/{userId}")
+    fun deleteUser(
+        @Header(value = "Authorization") head: String,
+        @Path(value = "userId") userId: String
+    ): Call<JsonObject?>?
 }
