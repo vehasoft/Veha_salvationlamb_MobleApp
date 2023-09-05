@@ -73,7 +73,7 @@ class RegisterActivity : AppCompatActivity() {
                 data.addProperty("mobile", mobileTxt)
                 data.addProperty("gender", findViewById<RadioButton>(genderId).text.toString().toLowerCase())
                 data.addProperty("password", passwordTxt)
-                data.addProperty("dateOfBirth", dobTxt)
+                data.addProperty("dateOfBirth", Util.formatDate(dobTxt, "MM-dd-yyyy","dd-MM-yyyy"))
                 data.addProperty("isWarrior", false)
                 data.addProperty("isFreshUser", true)
                 register(data)
