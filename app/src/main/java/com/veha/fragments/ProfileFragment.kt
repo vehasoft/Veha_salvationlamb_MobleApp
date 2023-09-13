@@ -45,6 +45,7 @@ class ProfileFragment : Fragment() {
     var followerCount = 0
     var followingCount = 0
     var postCount = 0
+    var updated: Boolean = false
 
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: AlertDialog
@@ -88,6 +89,7 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        updated = false
         contexts = container!!.context
         userId = arguments?.get("userId").toString()
         who = arguments?.get("who").toString()
@@ -97,6 +99,9 @@ class ProfileFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         getallLikes(viewLifecycleOwner)
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
@@ -179,13 +184,17 @@ class ProfileFragment : Fragment() {
                                     } else {
                                         list.visibility = View.VISIBLE
                                         nodata.visibility = View.GONE
-                                        adapter.addItem(postlist)
+                                        if (!updated) {
+                                            adapter.addItem(postlist)
+                                            updated = true
+                                        }
                                         list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
                                                         getallPosts(context, owner)
+                                                        updated = false
                                                     }
                                                 }
                                             }

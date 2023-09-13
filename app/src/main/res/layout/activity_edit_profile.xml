@@ -244,39 +244,60 @@
                         android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/country_layout"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:background="@color/home_bg"
+                    android:backgroundTint="@color/home_bg"
+                    android:hint="Country">
             <AutoCompleteTextView
                     android:id="@+id/country"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
-                    android:hint="Country"
-                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
-                    android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/state_layout"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:background="@color/home_bg"
+                    android:hint="State">
             <AutoCompleteTextView
                     android:id="@+id/state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
-                    android:hint="State"
-                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
-                    android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/city_layout"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:background="@color/home_bg"
+                    android:hint="City">
             <AutoCompleteTextView
                     android:id="@+id/city"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="start"
-                    android:hint="City"
-                    android:textColorHint="@color/black"
                     android:backgroundTint="@color/home_bg"
-                    android:background="@android:drawable/btn_dropdown"
                     android:spinnerMode="dropdown"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/language_layout"

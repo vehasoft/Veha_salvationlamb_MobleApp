@@ -199,10 +199,13 @@ class EditProfileActivity : AppCompatActivity() {
             builder.setTitle("Do you want to change your profile picture?")
             builder.setCancelable(false)
             builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->*/
-            val result = ContextCompat.checkSelfPermission(
+            val result = (ContextCompat.checkSelfPermission(
                 applicationContext,
                 Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PackageManager.PERMISSION_GRANTED)
             if (result) {
                 val items = arrayOf<CharSequence>(
                     "Take Photo", "Choose from Gallery",
@@ -568,6 +571,7 @@ class EditProfileActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
                                     startActivity(intent)
+                                    finish()
                                 }
                                 if (dialog.isShowing) {
                                     dialog.dismiss()

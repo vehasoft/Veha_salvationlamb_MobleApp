@@ -49,7 +49,7 @@
         />
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:text="Hello Everyone, Welcome Back"
+                  android:text="Hi, Welcome Back"
                   android:textColor="@color/black"
                   android:textStyle="bold"
                   android:textSize="20dp"

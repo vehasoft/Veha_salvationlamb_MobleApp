@@ -65,6 +65,9 @@ class FilesFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
 
         listIcon = view.findViewById(R.id.view_icon)
         if (Util.listview) {

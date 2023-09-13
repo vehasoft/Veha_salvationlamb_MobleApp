@@ -1,5 +1,6 @@
 package com.veha.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import com.veha.activity.FileListActivity;
 import com.veha.activity.PdfActivity2;
 import com.veha.activity.R;
 import com.veha.util.FilesAndFolders;
+import com.veha.util.Util;
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     Context context;
@@ -29,7 +32,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.child_folders, parent, false);
-        return new ViewHolder(view);
+        ViewHolder views =  new ViewHolder(view);
+        if (!Util.listview){
+            views.fileLinear.setOrientation(LinearLayout.VERTICAL);
+        } else {
+            views.fileLinear.setOrientation(LinearLayout.HORIZONTAL);
+        }
+        return views;
     }
 
     @Override
@@ -38,8 +47,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.textView.setText(selectedFile.getName());
         if (selectedFile.getType().equals("folder")) {
             holder.imageView.setImageResource(R.drawable.folder_icon);
+            holder.textView.setTextColor(context.getResources().getColor(R.color.black));
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24);
+            holder.textView.setTextColor(context.getResources().getColor(R.color.black));
         }
         holder.itemView.setOnClickListener(v -> {
             Log.e("type", selectedFile.getType());
@@ -66,11 +77,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         ImageView imageView;
+        LinearLayout fileLinear;
 
         public ViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.file_name_text_view);
             imageView = itemView.findViewById(R.id.icon_view);
+            fileLinear = itemView.findViewById(R.id.file_linear);
         }
     }
 }

@@ -38,11 +38,12 @@ class AdminAudioFragment : Fragment() {
     lateinit var nodata: LinearLayout
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
+    var updated: Boolean = false
 
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var myFollowMap: HashMap<String, String>
     private lateinit var myFavMap: HashMap<String, String>
-    private var page: Int = 1
+    private var page: Int = 0
 
     private lateinit var myLikesMap: HashMap<String, String>
     private var myLikes: String = ""
@@ -56,7 +57,6 @@ class AdminAudioFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -64,6 +64,7 @@ class AdminAudioFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        updated = false
         myFollowMap = HashMap()
         myFavMap = HashMap()
         myLikesMap = HashMap()
@@ -74,6 +75,9 @@ class AdminAudioFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         getMyDetails(viewLifecycleOwner)
@@ -109,20 +113,24 @@ class AdminAudioFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
-                                    if (postlist.size <= 0 && page == 1) {
+                                    if (postlist.size <= 0 && page == 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
                                     } else {
                                         list.visibility = View.VISIBLE
                                         nodata.visibility = View.GONE
                                         //list.adapter = HomeAdapter(postlist, contexts,"home",myLikesMap,myFollowMap,myFavMap,this@HomeFragment)
-                                        adapter.addItem(postlist)
+                                        if (!updated) {
+                                            adapter.addItem(postlist)
+                                            updated = true
+                                        }
                                         list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
                                                         getallPosts(context, owner)
+                                                        updated = false
                                                     }
                                                 }
                                             }

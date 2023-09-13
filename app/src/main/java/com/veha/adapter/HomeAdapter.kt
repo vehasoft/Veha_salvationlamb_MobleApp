@@ -54,6 +54,7 @@ class HomeAdapter(
         val time: TextView = view.findViewById(R.id.post_time)
         val fullTime: TextView = view.findViewById(R.id.post_full_time)
         val tags: TextView = view.findViewById(R.id.tags)
+        val saveTxt: TextView = view.findViewById(R.id.save_txt)
         val title: TextView = view.findViewById(R.id.title)
         val content: ExpandableView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
@@ -93,14 +94,17 @@ class HomeAdapter(
             viewHolder.followBtn.visibility = View.VISIBLE
             viewHolder.deleteBtn.visibility = View.GONE
             viewHolder.fav.visibility = View.VISIBLE
+            viewHolder.saveTxt.visibility = View.VISIBLE
         } else if (page.contentEquals("profile")) {
             viewHolder.followBtn.visibility = View.GONE
             viewHolder.deleteBtn.visibility = View.VISIBLE
             viewHolder.fav.visibility = View.GONE
+            viewHolder.saveTxt.visibility = View.GONE
         } else if (page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) {
             viewHolder.followBtn.visibility = View.GONE
             viewHolder.deleteBtn.visibility = View.GONE
             viewHolder.fav.visibility = View.GONE
+            viewHolder.saveTxt.visibility = View.GONE
         }
         return viewHolder
     }
@@ -258,8 +262,10 @@ class HomeAdapter(
             View.GONE else holder.followBtn.visibility = View.VISIBLE
         if (!myFavList.containsKey(post.id)) {
             holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_border_24)
+            holder.saveTxt.text = "Save"
         } else {
             holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_24)
+            holder.saveTxt.text = "Saved"
         }
         if (!myFollowList.containsKey(post.user.id)) {
             holder.followBtn.text = "follow"
@@ -362,7 +368,6 @@ class HomeAdapter(
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/"}                    
                     """.trimIndent()
-                Log.e("######", shareMessage)
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
             } catch (e: Exception) {
@@ -574,7 +579,6 @@ class HomeAdapter(
                 followData.addProperty("postId", postId)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    Log.e("token################", it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -588,9 +592,11 @@ class HomeAdapter(
                                     if (msg.equals("fav")) {
                                         myFavList.put(postId, userId)
                                         holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_24)
+                                        holder.saveTxt.text = "Saved"
                                     } else if (msg.equals("unfav")) {
                                         myFavList.remove(postId)
                                         holder.fav.setBackgroundResource(R.drawable.ic_baseline_bookmark_border_24)
+                                        holder.saveTxt.text = "Save"
                                     }
                                     notifyDataSetChanged()
                                 } else {
@@ -631,7 +637,6 @@ class HomeAdapter(
                 }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    Log.e("token################", it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {

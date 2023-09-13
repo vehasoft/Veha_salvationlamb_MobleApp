@@ -2,11 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 xmlns:tools="http://schemas.android.com/tools"
-                android:orientation="horizontal"
                 android:padding="10dp"
                 android:layout_height="wrap_content">
+<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:id="@+id/file_linear"
 
-
+        >
     <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
@@ -17,16 +22,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/file_name_text_view"
-            android:layout_toEndOf="@id/icon_view"
             android:padding="10dp"
             android:textColor="@color/black"
             tools:text="Documents"/>
+</LinearLayout>
+
+
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="2dp"
             android:background="@color/cardview_shadow_start_color"
-            android:layout_below="@id/file_name_text_view"/>
+            android:layout_below="@id/file_linear"/>
 
 </RelativeLayout>

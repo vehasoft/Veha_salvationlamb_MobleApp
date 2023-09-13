@@ -11,7 +11,7 @@
     <item  android:id="@+id/settings"
            android:title="Settings"/>
     <item  android:id="@+id/warrior"
-           android:title="Become a Warrior"/>
+           android:title="Make me a warrior"/>
     <item  android:id="@+id/logout"
            android:title="Logout"
            />

@@ -1,5 +1,6 @@
 package com.veha.activity
 
+import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.DialogInterface
 import android.content.Intent
@@ -185,10 +186,13 @@ class AddPostActivity : AppCompatActivity() {
     }
 
     private fun addImg() {
-        val result = ContextCompat.checkSelfPermission(
+        val result = (ContextCompat.checkSelfPermission(
             applicationContext,
-            READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.READ_MEDIA_IMAGES
+        ) == PackageManager.PERMISSION_GRANTED)
         if (result) {
             val items = arrayOf<CharSequence>(
                 "Take Photo", "Choose from Gallery",

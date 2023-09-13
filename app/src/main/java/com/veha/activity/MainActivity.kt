@@ -1,16 +1,26 @@
 package com.veha.activity
 
+import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.ContextThemeWrapper
+import android.view.View
+import android.view.Window
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -23,10 +33,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.veha.adapter.TabAdapter
-import com.veha.fragments.AdminVideoFragment
-import com.veha.util.*
+import com.veha.util.Commons
+import com.veha.util.UserPreferences
+import com.veha.util.UserRslt
+import com.veha.util.Util
 import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
@@ -41,15 +52,39 @@ class MainActivity : AppCompatActivity() {
     lateinit var search: ImageView
     lateinit var logo: ImageView
     lateinit var viewPager: ViewPager
-    lateinit var addPost: FloatingActionButton
     var userType: String = ""
+
+    var storage_permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        READ_EXTERNAL_STORAGE, CAMERA_SERVICE
+    )
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    var storage_permissions_33 = arrayOf(
+        Manifest.permission.READ_MEDIA_IMAGES,
+        Manifest.permission.READ_MEDIA_AUDIO,
+        Manifest.permission.READ_MEDIA_VIDEO,
+        Manifest.permission.CAMERA,
+    )
+
+    fun permissions(): Array<String>? {
+        val p: Array<String>
+        p = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            storage_permissions_33
+        } else {
+            storage_permissions
+        }
+        return p
+    }
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(READ_EXTERNAL_STORAGE, CAMERA_SERVICE, NOTIFICATION_SERVICE),
-            255
-        )
+        permissions()?.let {
+            ActivityCompat.requestPermissions(
+                this,
+                it,
+                255
+            )
+        }
         dialog.dismiss()
     }
 
@@ -65,6 +100,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = if (android.provider.Settings.System.getInt(
+                contentResolver,
+                Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR
+
+        } else{
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         userPreferences = UserPreferences(this@MainActivity)
@@ -98,13 +141,8 @@ class MainActivity : AppCompatActivity() {
                 firstTime()
             }*/
         }
-        if (Util.isWarrior) {
+        if (Util.isWarrior || Util.user.isReviewState.toBoolean()) {
             banner.visibility = View.GONE
-        }
-        addPost = findViewById(R.id.add_post)
-        addPost.setOnClickListener {
-            val intent = Intent(this@MainActivity, AddPostActivity::class.java)
-            startActivity(intent)
         }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
@@ -275,12 +313,6 @@ class MainActivity : AppCompatActivity() {
                                     Util.user = loginresp
                                     Util.isFirst = loginresp.isFreshUser.toBoolean()
                                     val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
-                                    if (isWarrior) {
-                                        banner.visibility = View.GONE
-                                        addPost.visibility = View.VISIBLE
-                                    } else {
-                                        addPost.visibility = View.GONE
-                                    }
                                     Util.isWarrior = isWarrior
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     if (dialog.isShowing) {

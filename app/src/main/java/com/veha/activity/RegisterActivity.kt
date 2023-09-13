@@ -117,7 +117,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun doValidation(): String {
         if (TextUtils.isEmpty(fNameTxt.trim())) {
             fname.error = "Enter name"
-            return "Enter name"
+            return "Enter first name"
         } else if (!Util.isValidName(fNameTxt)) {
             fname.error = "Enter valid name"
             return "Enter valid name"

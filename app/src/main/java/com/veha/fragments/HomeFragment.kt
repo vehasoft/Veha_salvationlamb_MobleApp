@@ -31,6 +31,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -48,12 +49,14 @@ class HomeFragment : Fragment() {
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
     lateinit var refresh: SwipeRefreshLayout
+    var updated: Boolean = false
 
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var myFollowMap: HashMap<String, String>
     private lateinit var myFavMap: HashMap<String, String>
-    private var page: Int = 1
+    private var page: Int = 0
     private var showCreatePost: Boolean = false
+    lateinit var addPost: FloatingActionButton
 
     private var myLikes: String = ""
     private lateinit var myLikesMap: HashMap<String, String>
@@ -76,6 +79,8 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        updated = false
         contexts = container!!.context
         type = arguments?.get("type").toString()
         myFollowMap = HashMap()
@@ -89,9 +94,22 @@ class HomeFragment : Fragment() {
         //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         refresh = view.findViewById(R.id.refresh)
+        addPost = view.findViewById(R.id.add_post)
+        if (Util.isWarrior) {
+            addPost.visibility = View.VISIBLE
+        } else {
+            addPost.visibility = View.GONE
+        }
+        addPost.setOnClickListener {
+            val intent = Intent(contexts, AddPostActivity::class.java)
+            contexts.startActivity(intent)
+        }
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         page = 1
@@ -104,6 +122,7 @@ class HomeFragment : Fragment() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                 if (!recyclerView.canScrollVertically(-1)) {
                     refresh.isEnabled = true
+                    updated=false
                     refresh.setOnRefreshListener {
                         refresh.isRefreshing = false
                         requireFragmentManager().beginTransaction().detach(this@HomeFragment).attach(this@HomeFragment)
@@ -218,19 +237,23 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
-                                    if (postlist.size <= 0 && page == 1) {
+                                    if (postlist.size <= 0 && page == 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
                                     } else {
                                         list.visibility = View.VISIBLE
                                         nodata.visibility = View.GONE
-                                        adapter.addItem(postlist)
+                                        if (!updated) {
+                                            adapter.addItem(postlist)
+                                            updated = true
+                                        }
                                         list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                                             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
                                                         getallPosts(context, owner)
+                                                        updated = false
                                                     }
                                                 }
                                             }

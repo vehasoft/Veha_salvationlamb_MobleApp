@@ -54,7 +54,7 @@ class SettingsActivity : AppCompatActivity() {
         delete.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this@SettingsActivity)
             builder.setMessage("Do you want to delete your account permanently?")
-            builder.setTitle("Delete")
+            builder.setTitle("Delete Account")
             builder.setCancelable(false)
             builder.setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
                 deleteAccount()
@@ -72,7 +72,7 @@ class SettingsActivity : AppCompatActivity() {
                 "large"
             )
             val builder1 = AlertDialog.Builder(this@SettingsActivity)
-            builder1.setTitle("Change Font")
+            builder1.setTitle("Change Font Size")
             builder1.setItems(items) { dialog, item ->
                 //com.sun.org.apache.bcel.internal.classfile.Utility.checkPermission(this@EditProfileActivity)
                 lifecycleScope.launch {
@@ -108,16 +108,10 @@ class SettingsActivity : AppCompatActivity() {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         Util.isNight = Util.DAY
                         userPreferences.saveIsNightModeEnabled(Util.DAY)
-                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-                        finish()
-                        startActivity(intent)
                     } else if (items[item] == Util.NIGHT) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         Util.isNight = Util.NIGHT
                         userPreferences.saveIsNightModeEnabled(Util.NIGHT)
-                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-                        finish()
-                        startActivity(intent)
                     }
                     else if (items[item] == Util.DEFAULT) {
                         userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
@@ -178,6 +172,7 @@ class SettingsActivity : AppCompatActivity() {
                                     val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                     startActivity(intent)
+                                } else {
                                 }
                             }
 

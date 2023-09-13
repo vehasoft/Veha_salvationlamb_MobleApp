@@ -120,7 +120,7 @@ public class Util {
                 if (days == 1) {
                     timeAgo = "yesterday";
                 } else {
-                    timeAgo = new SimpleDateFormat("dd MMM yyyy, HH:mm a").format(past);
+                    timeAgo = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(past);
                 }
             }
         } catch (Exception j) {
