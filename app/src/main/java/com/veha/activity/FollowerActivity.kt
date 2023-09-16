@@ -244,7 +244,10 @@ class FollowerActivity : AppCompatActivity() {
         super.onPause()
         dialog.dismiss()
     }
-
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

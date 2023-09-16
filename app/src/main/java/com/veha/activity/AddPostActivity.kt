@@ -62,6 +62,7 @@ class AddPostActivity : AppCompatActivity() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        dialog.dismiss()
 
         userPreferences = UserPreferences(this@AddPostActivity)
 
@@ -175,6 +176,9 @@ class AddPostActivity : AppCompatActivity() {
                     }
                 }
             }
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
         } catch (e: Exception) {
             Log.e("AddPostActivity.postData", e.toString())
         }
@@ -275,5 +279,14 @@ class AddPostActivity : AppCompatActivity() {
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val b = baos.toByteArray()
         return Base64.encodeToString(b, Base64.DEFAULT)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
     }
 }

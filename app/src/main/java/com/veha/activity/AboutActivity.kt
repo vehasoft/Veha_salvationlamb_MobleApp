@@ -137,6 +137,14 @@ class AboutActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

@@ -99,9 +99,7 @@ class ProfileFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         getallLikes(viewLifecycleOwner)
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
@@ -457,12 +455,14 @@ class ProfileFragment : Fragment() {
             Log.e("ProfileFragment.getMyDetails", e.toString())
         }
     }
-
     override fun onPause() {
         super.onPause()
         dialog.dismiss()
     }
-
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

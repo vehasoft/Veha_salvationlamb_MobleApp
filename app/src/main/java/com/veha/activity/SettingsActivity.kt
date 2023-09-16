@@ -105,18 +105,15 @@ class SettingsActivity : AppCompatActivity() {
             builder1.setItems(items) { dialog, item ->
                 lifecycleScope.launch {
                     if (items[item] == Util.DAY) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         Util.isNight = Util.DAY
                         userPreferences.saveIsNightModeEnabled(Util.DAY)
                     } else if (items[item] == Util.NIGHT) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         Util.isNight = Util.NIGHT
                         userPreferences.saveIsNightModeEnabled(Util.NIGHT)
                     }
                     else if (items[item] == Util.DEFAULT) {
                         userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
                         Util.isNight = Util.DEFAULT
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                         /*val nightModeFlags: Int = this@SettingsActivity.resources.configuration.uiMode and
                                 Configuration.UI_MODE_NIGHT_MASK
                         Log.e("night",Configuration.UI_MODE_NIGHT_MASK.toString())
@@ -141,8 +138,8 @@ class SettingsActivity : AppCompatActivity() {
 
                     }
                     val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-                    finish()
                     startActivity(intent)
+                    finish()
                 }
             }
             builder1.show()
@@ -159,10 +156,12 @@ class SettingsActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
+                    Log.e("tokennnn",it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.deleteUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                Log.e("tokennnn",response.toString())
                                 if (response.code() == 200) {
                                     finishAffinity()
                                     lifecycleScope.launch {
@@ -186,5 +185,10 @@ class SettingsActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("MainActivity.getMyDetails", e.toString())
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        delegate.applyDayNight()
     }
 }

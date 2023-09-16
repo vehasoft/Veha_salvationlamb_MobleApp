@@ -94,9 +94,7 @@ class HomeFragment : Fragment() {
         //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         refresh = view.findViewById(R.id.refresh)
@@ -514,7 +512,6 @@ class HomeFragment : Fragment() {
             Util.player = null
         }
     }
-
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()
@@ -524,5 +521,9 @@ class HomeFragment : Fragment() {
             Util.player.release()
             Util.player = null
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
     }
 }

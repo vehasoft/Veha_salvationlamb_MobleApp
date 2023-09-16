@@ -22,7 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Commons {
-    fun makeWarrior(context: Context, owner: LifecycleOwner) {
+    fun makeWarrior(context: Context, owner: LifecycleOwner): String {
+        var status = ""
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         val data = JsonObject()
         builder.setTitle("BECOME A WARRIOR")
@@ -118,18 +119,17 @@ class Commons {
                 }
                 if (wantToCloseDialog) {
                     alertDialog.dismiss()
-                    makeMeWarior(data, context, owner)
+                    status = makeMeWarior(data, context, owner)
                 }
-
-
             }
         }
         val alertDialog: AlertDialog = builder1.create()
         alertDialog.show()
-
+        return status
     }
 
-    private fun makeMeWarior(data: JsonObject, context: Context, owner: LifecycleOwner) {
+    private fun makeMeWarior(data: JsonObject, context: Context, owner: LifecycleOwner): String {
+        var status: String = ""
         try {
             if (isNetworkAvailable(context)) {
                 val userPreferences = UserPreferences(context)
@@ -141,12 +141,17 @@ class Commons {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
+                                    status = "success"
+                                }
+                                else{
+                                    status = "fail"
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 Log.e("<Make me warrior>", "fail")
+                                status = "fail"
                             }
                         })
                     }
@@ -155,6 +160,7 @@ class Commons {
         } catch (e: Exception) {
             Log.e("<Make me warrior>", e.toString())
         }
+        return status
     }
 
     fun getDate(date: String): String {

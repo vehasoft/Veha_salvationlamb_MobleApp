@@ -15,16 +15,13 @@
     <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
-            tools:src="@drawable/ic_baseline_folder_24"
             android:id="@+id/icon_view"/>
 
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/file_name_text_view"
-            android:padding="10dp"
-            android:textColor="@color/black"
-            tools:text="Documents"/>
+            android:padding="10dp"/>
 </LinearLayout>
 
 

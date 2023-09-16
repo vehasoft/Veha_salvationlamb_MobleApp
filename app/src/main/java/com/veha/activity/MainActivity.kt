@@ -8,8 +8,10 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
@@ -29,7 +31,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -99,14 +100,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        requestedOrientation = if (android.provider.Settings.System.getInt(
-                contentResolver,
-                Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
-            ActivityInfo.SCREEN_ORIENTATION_SENSOR
+    private val rotationObserver = object : ContentObserver(Handler()) {
+        override fun onChange(selfChange: Boolean) {
+            if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 
-        } else{
-            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            } else {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+         if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+        contentResolver.registerContentObserver(Settings.System.getUriFor
+            (Settings.System.ACCELEROMETER_ROTATION),
+            true,rotationObserver)
+        when (Util.isNight) {
+            Util.DAY -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            Util.NIGHT -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            Util.DEFAULT -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -116,9 +139,7 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         dialog.dismiss()
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         checkPermission()
         getMyDetails()
         if (Util.isFirst != null && Util.isFirst) {
@@ -141,8 +162,15 @@ class MainActivity : AppCompatActivity() {
                 firstTime()
             }*/
         }
-        if (Util.isWarrior || Util.user.isReviewState.toBoolean()) {
+        if (Util.isWarrior) {
             banner.visibility = View.GONE
+        } else if (Util.user.isReviewState.toBoolean()){
+            makewarrior.text = "Your warrior request is \nwaiting for admin approval"
+            makewarrior_gif.visibility = View.GONE
+        } else{
+            banner.visibility = View.VISIBLE
+            makewarrior.text = "Make Me Warrior"
+            makewarrior_gif.visibility = View.VISIBLE
         }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
@@ -153,19 +181,16 @@ class MainActivity : AppCompatActivity() {
             banner.visibility = View.GONE
         }
         banner.setOnClickListener {
-            Commons().makeWarrior(this@MainActivity, this)
-        }
-        when (Util.isNight) {
-            Util.DAY -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-
-            Util.NIGHT -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-
-            Util.DEFAULT -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            if(!Util.user.isReviewState.toBoolean()) {
+                if (Commons().makeWarrior(this@MainActivity, this).contentEquals("success")) {
+                    makewarrior.text = "Your warrior request is \nwaiting for admin approval"
+                    makewarrior_gif.visibility = View.GONE
+                } else {
+                    makewarrior.text = "Make Me Warrior"
+                    makewarrior_gif.visibility = View.VISIBLE
+                }
+                makewarrior.text = "Your warrior request is \nwaiting for admin approval"
+                makewarrior_gif.visibility = View.GONE
             }
         }
         val userPreferences = UserPreferences(this)
@@ -272,21 +297,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (tab != null) {
                     viewPager.currentItem = tab.position
-                    /* if (tab.position != 2){
-                         Log.e("position",tab.position.toString())
-                         //this@MainActivity.supportFragmentManager.beginTransaction().detach(AdminVideoFragment()).commit()
-                         //AdminVideoFragment().fragmentManager?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
-                         //val af : AdminVideoFragment = supportFragmentManager.findFragmentByTag("video") as AdminVideoFragment
-                         //af.refreshAdapter()
-                         AdminVideoFragment().getFragmentManager()?.beginTransaction()?.detach(AdminVideoFragment())?.commit();
-                         AdminVideoFragment().getFragmentManager()?.beginTransaction()?.attach(AdminVideoFragment())?.commit();
-                     }
-                     if (AdminVideoFragment().isDetached){
-                         Log.e("position","tab.position.toString()detacheddddd")
-                     }*/
                 }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
 
@@ -320,7 +332,6 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
@@ -394,13 +405,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        dialog.dismiss()
-    }
-
     override fun onPause() {
         super.onPause()
+        dialog.dismiss()
+    }
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
         dialog.dismiss()
     }
 

@@ -62,17 +62,20 @@
                   android:layout_height="wrap_content"
                   android:text="Files"
                   android:padding="5dp"
+                  android:textColor="@color/black"
                   android:layout_weight="1"
                   android:layout_gravity="left"
                   android:textStyle="bold"
                   android:textSize="20dp"
         />
-        <ImageView android:layout_width="30dp"
-                   android:layout_height="30dp"
+        <ImageView android:layout_width="40dp"
+                   android:layout_height="40dp"
                    android:layout_gravity="center"
+                   android:paddingEnd="10dp"
+                   android:padding="10dp"
                    android:id="@+id/view_icon"
-                   android:src="@drawable/ic_baseline_list_24"
-        />
+                   android:src="@drawable/ic_baseline_grid_on_24"
+                />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

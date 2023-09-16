@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +36,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         ViewHolder views =  new ViewHolder(view);
         if (!Util.listview){
             views.fileLinear.setOrientation(LinearLayout.VERTICAL);
+            views.fileLinear.setGravity(Gravity.CENTER);
+            views.textView.setTextColor(context.getColor(R.color.black));
         } else {
             views.fileLinear.setOrientation(LinearLayout.HORIZONTAL);
+            views.textView.setTextColor(context.getColor(R.color.black));
         }
         return views;
     }
@@ -47,10 +51,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.textView.setText(selectedFile.getName());
         if (selectedFile.getType().equals("folder")) {
             holder.imageView.setImageResource(R.drawable.folder_icon);
-            holder.textView.setTextColor(context.getResources().getColor(R.color.black));
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24);
-            holder.textView.setTextColor(context.getResources().getColor(R.color.black));
         }
         holder.itemView.setOnClickListener(v -> {
             Log.e("type", selectedFile.getType());

@@ -65,9 +65,7 @@ class FilesFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
 
         listIcon = view.findViewById(R.id.view_icon)
         if (Util.listview) {
@@ -151,5 +149,17 @@ class FilesFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("FilesFragment.getFilesAndFolder", e.toString())
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

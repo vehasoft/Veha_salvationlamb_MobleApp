@@ -75,9 +75,7 @@ class AdminAudioFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         getMyDetails(viewLifecycleOwner)
@@ -377,7 +375,10 @@ class AdminAudioFragment : Fragment() {
             Log.e("AdminAudioFragment.getMyDetails", e.toString())
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
     override fun onPause() {
         super.onPause()
         dialog.dismiss()

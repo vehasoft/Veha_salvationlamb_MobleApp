@@ -70,9 +70,7 @@ class AdminVideoFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
+        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         getMyDetails(viewLifecycleOwner)
@@ -376,7 +374,10 @@ class AdminVideoFragment : Fragment() {
         super.onPause()
         dialog.dismiss()
     }
-
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

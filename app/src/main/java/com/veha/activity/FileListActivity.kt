@@ -45,6 +45,7 @@ class FileListActivity : AppCompatActivity() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+        dialog.dismiss()
         recyclerView = findViewById(R.id.recycler_view)
         noFilesText = findViewById(R.id.no_data)
         logo = findViewById(R.id.prod_logo)
@@ -56,7 +57,7 @@ class FileListActivity : AppCompatActivity() {
         if (Util.listview) {
             listIcon.setImageResource(R.drawable.ic_baseline_list_24)
         } else {
-            listIcon.setImageResource(R.drawable.ic_baseline_grid_view_24)
+            listIcon.setImageResource(R.drawable.ic_baseline_grid_on_24)
         }
         listIcon.setOnClickListener {
             Util.listview = !Util.listview
@@ -134,5 +135,20 @@ class FileListActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("FileListActivity.getFilesAndFolder", e.toString())
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dialog.dismiss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog.dismiss()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog.dismiss()
     }
 }

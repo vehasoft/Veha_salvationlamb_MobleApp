@@ -33,7 +33,6 @@ class SplashhScreenActivity : AppCompatActivity() {
             content.viewTreeObserver.addOnDrawListener { false }
         }
         userPreferences.isNightModeEnabled.asLiveData().observe(this) {
-            Log.e("isnight", it.toString())
             when (it) {
                 Util.NIGHT -> {
                     Util.isNight = Util.NIGHT
@@ -49,13 +48,11 @@ class SplashhScreenActivity : AppCompatActivity() {
 
                 else -> {
                     lifecycleScope.launch {
-                        userPreferences.saveIsNightModeEnabled(Util.DAY)
-                        Util.isNight = Util.DAY
+                        userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
+                        Util.isNight = Util.DEFAULT
                     }
                 }
             }
-
-            Log.e("isnight", Util.isNight)
         }
         userPreferences.authToken.asLiveData().observe(this) { it ->
             if (TextUtils.isEmpty(it) || it.equals("null") || it.isNullOrEmpty()) {
@@ -76,7 +73,6 @@ class SplashhScreenActivity : AppCompatActivity() {
                 }
 
                 Thread.sleep(2000)
-                Log.e("isnight", it)
                 getMyDetails(it)
             }
         }
@@ -87,13 +83,11 @@ class SplashhScreenActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
-                Log.e("isnight", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
                             val resp = response.body()
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                            Log.e("response", loginresp.toString())
                             Util.user = loginresp
                             val isWarrior: Boolean =
                                 loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
