@@ -2,6 +2,7 @@ package com.veha.util
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -16,14 +17,14 @@ import androidx.lifecycle.asLiveData
 import com.veha.activity.R
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.veha.activity.MainActivity
 import retrofit2.Call
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
 class Commons {
-    fun makeWarrior(context: Context, owner: LifecycleOwner): String {
-        var status = ""
+    fun makeWarrior(context: Context, owner: LifecycleOwner) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         val data = JsonObject()
         builder.setTitle("BECOME A WARRIOR")
@@ -119,17 +120,15 @@ class Commons {
                 }
                 if (wantToCloseDialog) {
                     alertDialog.dismiss()
-                    status = makeMeWarior(data, context, owner)
+                    makeMeWarior(data, context, owner)
                 }
             }
         }
         val alertDialog: AlertDialog = builder1.create()
         alertDialog.show()
-        return status
     }
 
-    private fun makeMeWarior(data: JsonObject, context: Context, owner: LifecycleOwner): String {
-        var status: String = ""
+    private fun makeMeWarior(data: JsonObject, context: Context, owner: LifecycleOwner) {
         try {
             if (isNetworkAvailable(context)) {
                 val userPreferences = UserPreferences(context)
@@ -141,17 +140,14 @@ class Commons {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
-                                    status = "success"
-                                }
-                                else{
-                                    status = "fail"
+                                    val intent = Intent(context,MainActivity::class.java)
+                                    context.startActivity(intent)
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 Log.e("<Make me warrior>", "fail")
-                                status = "fail"
                             }
                         })
                     }
@@ -160,7 +156,6 @@ class Commons {
         } catch (e: Exception) {
             Log.e("<Make me warrior>", e.toString())
         }
-        return status
     }
 
     fun getDate(date: String): String {

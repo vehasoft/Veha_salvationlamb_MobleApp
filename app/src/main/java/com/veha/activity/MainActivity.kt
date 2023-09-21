@@ -162,16 +162,6 @@ class MainActivity : AppCompatActivity() {
                 firstTime()
             }*/
         }
-        if (Util.isWarrior) {
-            banner.visibility = View.GONE
-        } else if (Util.user.isReviewState.toBoolean()){
-            makewarrior.text = "Your warrior request is \nwaiting for admin approval"
-            makewarrior_gif.visibility = View.GONE
-        } else{
-            banner.visibility = View.VISIBLE
-            makewarrior.text = "Make Me Warrior"
-            makewarrior_gif.visibility = View.VISIBLE
-        }
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -181,16 +171,9 @@ class MainActivity : AppCompatActivity() {
             banner.visibility = View.GONE
         }
         banner.setOnClickListener {
-            if(!Util.user.isReviewState.toBoolean()) {
-                if (Commons().makeWarrior(this@MainActivity, this).contentEquals("success")) {
-                    makewarrior.text = "Your warrior request is \nwaiting for admin approval"
-                    makewarrior_gif.visibility = View.GONE
-                } else {
-                    makewarrior.text = "Make Me Warrior"
-                    makewarrior_gif.visibility = View.VISIBLE
-                }
-                makewarrior.text = "Your warrior request is \nwaiting for admin approval"
-                makewarrior_gif.visibility = View.GONE
+            if(!Util.isWarrior && !Util.user.isReviewState.toBoolean()) {
+                Commons().makeWarrior(this@MainActivity, this)
+                banner.visibility = View.GONE
             }
         }
         val userPreferences = UserPreferences(this)
@@ -327,6 +310,17 @@ class MainActivity : AppCompatActivity() {
                                     val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
                                     Util.isWarrior = isWarrior
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
+                                    if (loginresp.isWarrior.toBoolean()) {
+                                        banner.visibility = View.GONE
+                                    } else if (loginresp.isReviewState.toBoolean()){
+                                        banner.visibility = View.VISIBLE
+                                        makewarrior.text = "Your warrior request is \nwaiting for admin approval"
+                                        makewarrior_gif.visibility = View.GONE
+                                    } else {
+                                        banner.visibility = View.VISIBLE
+                                        makewarrior.text = "Make Me Warrior"
+                                        makewarrior_gif.visibility = View.VISIBLE
+                                    }
                                     if (dialog.isShowing) {
                                         dialog.dismiss()
                                     }

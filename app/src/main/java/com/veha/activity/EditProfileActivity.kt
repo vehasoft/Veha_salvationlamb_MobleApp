@@ -27,13 +27,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
-import com.veha.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import com.veha.util.*
 import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_edit_profile.email
@@ -48,6 +48,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.*
 
 
@@ -96,13 +97,17 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun cameraIntent() {
-        val intent = Intent()
-        intent.action = MediaStore.ACTION_IMAGE_CAPTURE //
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val outputFileUri = Uri.fromFile(File(this@EditProfileActivity.externalCacheDir!!.path, "pickImageResult.jpeg"))
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri)
         startActivityForResult(intent, 150)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         Log.e(requestCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE.toString())
         Log.e(resultCode.toString(), RESULT_OK.toString())
         Log.e(resultCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE.toString())
@@ -113,13 +118,20 @@ class EditProfileActivity : AppCompatActivity() {
             }
         } else if (requestCode == 150) {
             if (data != null) {
+                Log.e("###########",data.extras!![MediaStore.EXTRA_OUTPUT].toString())
+                Log.e("###########",data.data.toString())
                 if (data.extras!!["data"] != null) {
-                    CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap)).start(this@EditProfileActivity)
+                    CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap))
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setFixAspectRatio(true).setMultiTouchEnabled(true).start(this@EditProfileActivity)
                 }
             }
         } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === RESULT_OK) {
+                if (!dialog.isShowing) {
+                    dialog.show()
+                }
                 val resultUri = result.uri
                 val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
                 profilestr = encodeTobase64(bitmap)
@@ -127,10 +139,17 @@ class EditProfileActivity : AppCompatActivity() {
                 data.addProperty("base64Image", profilestr)
                 data.addProperty("name", Util.user.name + " picture")
                 updateProfilePic(this, data)
+                if (dialog.isShowing) {
+                    dialog.dismiss()
+                }
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
                 Log.e("errorrr", error.toString())
+                Toast.makeText(this@EditProfileActivity,error.toString(),Toast.LENGTH_LONG).show()
             }
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
@@ -569,7 +588,7 @@ class EditProfileActivity : AppCompatActivity() {
 
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
-                                    val intent = Intent(this@EditProfileActivity, EditProfileActivity::class.java)
+                                    val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 }

@@ -235,7 +235,11 @@ class HomeAdapter(
                         holder.postVideo.visibility = View.VISIBLE
                         holder.postVideo.loadUrl(Util.getVideo(post.url))*/
                         holder.postVideo.visibility = View.VISIBLE
-                        (context as MainActivity).lifecycle.addObserver(holder.postVideo)
+                        try {
+                            (context as MainActivity).lifecycle.addObserver(holder.postVideo)
+                        }catch (e: Exception){
+                            (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
+                        }
                         val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
                                 youTubePlayer.cueVideo(post.url, 0f)
@@ -268,9 +272,9 @@ class HomeAdapter(
             holder.saveTxt.text = "Saved"
         }
         if (!myFollowList.containsKey(post.user.id)) {
-            holder.followBtn.text = "follow"
+            holder.followBtn.text = "Follow"
         } else {
-            holder.followBtn.text = "unfollow"
+            holder.followBtn.text = "Unfollow"
         }
         if (myList.contains(post.id)) {
             holder.likeBtn.text = myList[post.id]
@@ -534,7 +538,7 @@ class HomeAdapter(
                                         holder.followBtn.text = "Follow"
                                         myFollowList.put(followerId, userId)
                                     } else if (msg == "follow") {
-                                        holder.followBtn.text = "unfollow"
+                                        holder.followBtn.text = "Unfollow"
                                         myFollowList.remove(followerId)
                                     }
                                     notifyDataSetChanged()

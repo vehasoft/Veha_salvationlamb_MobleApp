@@ -99,7 +99,10 @@ class ProfileFragment : Fragment() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
+        getmyDetails(contexts, viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
@@ -200,14 +203,14 @@ class ProfileFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("ProfileFragment.getAllPosts", "fail")
                             }
@@ -226,6 +229,9 @@ class ProfileFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllPosts", e.toString())
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
@@ -255,14 +261,14 @@ class ProfileFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("ProfileFragment.getAllLikes", "fail")
                             }
@@ -281,6 +287,9 @@ class ProfileFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllLikes", e.toString())
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
@@ -310,14 +319,14 @@ class ProfileFragment : Fragment() {
                                     profileFollowers.text = followerCount.toString()
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFollowing(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("ProfileFragment.getAllFollowers", "fail")
                             }
@@ -336,6 +345,9 @@ class ProfileFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllFollowers", e.toString())
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
@@ -367,14 +379,14 @@ class ProfileFragment : Fragment() {
                                     Log.e("following", "fails - " + response.code())
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getmyDetails(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("ProfileFragment.getAllFollowing", "fail")
                             }
@@ -393,6 +405,9 @@ class ProfileFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllFollowing", e.toString())
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
@@ -428,13 +443,13 @@ class ProfileFragment : Fragment() {
                                     profileName.text = loginresp.name + role
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("ProfileFragment.getMyDetails", "fail")
                             }
@@ -454,17 +469,26 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getMyDetails", e.toString())
         }
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
 }

@@ -77,7 +77,7 @@
             <Button android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:id="@+id/follow_post_btn"
-                    android:text="follow"
+                    android:text="Follow"
                     android:inputType="textCapWords"
                     android:layout_gravity="center"
                     android:textSize="10dp"

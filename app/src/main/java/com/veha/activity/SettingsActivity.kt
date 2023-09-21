@@ -172,6 +172,7 @@ class SettingsActivity : AppCompatActivity() {
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                     startActivity(intent)
                                 } else {
+                                    Toast.makeText(this@SettingsActivity,response.message().toString(),Toast.LENGTH_LONG).show()
                                 }
                             }
 

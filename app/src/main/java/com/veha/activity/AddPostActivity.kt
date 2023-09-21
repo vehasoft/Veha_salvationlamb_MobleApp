@@ -90,9 +90,6 @@ class AddPostActivity : AppCompatActivity() {
                 postTypeStr = "video"
             }
         }
-        /*postPic.setOnClickListener {
-
-        }*/
 
         postBtn.isEnabled = true
         postBtn.setOnClickListener {
@@ -125,7 +122,6 @@ class AddPostActivity : AppCompatActivity() {
                 if (!dialog.isShowing) {
                     dialog.show()
                 }
-                Log.e("data", data.toString())
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -246,6 +242,9 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (!dialog.isShowing) {
+            dialog.show()
+        }
         if (requestCode == 100) {
             if (data?.data != null) {
                 val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, data.data)
@@ -271,6 +270,9 @@ class AddPostActivity : AppCompatActivity() {
                 postPic.visibility = View.VISIBLE
                 video.visibility = View.GONE
             }
+        }
+        if (dialog.isShowing) {
+            dialog.dismiss()
         }
     }
 
