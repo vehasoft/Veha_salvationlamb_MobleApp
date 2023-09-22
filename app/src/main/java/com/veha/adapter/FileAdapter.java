@@ -37,10 +37,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         if (!Util.listview){
             views.fileLinear.setOrientation(LinearLayout.VERTICAL);
             views.fileLinear.setGravity(Gravity.CENTER);
-            views.textView.setTextColor(context.getColor(R.color.black));
+            views.textView.setTextColor(context.getColor(R.color.red));
         } else {
             views.fileLinear.setOrientation(LinearLayout.HORIZONTAL);
-            views.textView.setTextColor(context.getColor(R.color.black));
+            views.textView.setTextColor(context.getColor(R.color.red));
         }
         return views;
     }

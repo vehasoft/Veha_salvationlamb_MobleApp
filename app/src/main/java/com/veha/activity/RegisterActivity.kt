@@ -197,6 +197,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }

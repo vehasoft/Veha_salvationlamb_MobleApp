@@ -94,6 +94,10 @@ class LoginActivity : AppCompatActivity() {
                                 finish()*/
                             }
 
+                        } else if (response.code() == 401) {
+                            Toast.makeText(this@LoginActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            val intent = Intent(this@LoginActivity, LoginActivity::class.java)
+                            startActivity(intent)
                         } else {
                             val resp = response.errorBody()
                             val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
@@ -136,6 +140,11 @@ class LoginActivity : AppCompatActivity() {
                             val resp = response.body()
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
+                            if (loginresp.blocked.toBoolean()){
+                                Toast.makeText(this@LoginActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                val intent = Intent(this@LoginActivity, LoginActivity::class.java)
+                                startActivity(intent)
+                            }
                             val isWarrior: Boolean =
                                 loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
@@ -155,7 +164,11 @@ class LoginActivity : AppCompatActivity() {
                                 intent.putExtra("email", loginresp.email)
                                 startActivity(intent)
                             }
-                        } else {
+                        }  else if (response.code() == 401) {
+                            Toast.makeText(this@LoginActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            val intent = Intent(this@LoginActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                        }else {
                             Log.e("responseee", "fail")
                         }
                     }
@@ -172,7 +185,8 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }
 

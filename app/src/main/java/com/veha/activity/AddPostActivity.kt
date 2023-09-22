@@ -172,9 +172,6 @@ class AddPostActivity : AppCompatActivity() {
                     }
                 }
             }
-            if (dialog.isShowing) {
-                dialog.dismiss()
-            }
         } catch (e: Exception) {
             Log.e("AddPostActivity.postData", e.toString())
         }
@@ -182,7 +179,8 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 
     private fun addImg() {
@@ -285,10 +283,12 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }

@@ -195,6 +195,21 @@ class ViewLikesActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
+    }
+
+    override fun onResume() {
+        super.onResume()
+            dialog.dismiss()
+        
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
 }

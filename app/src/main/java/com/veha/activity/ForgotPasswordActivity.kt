@@ -207,7 +207,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 
     override fun onBackPressed() {

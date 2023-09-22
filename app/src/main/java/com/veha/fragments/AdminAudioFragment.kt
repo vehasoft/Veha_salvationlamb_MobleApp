@@ -225,7 +225,6 @@ class AdminAudioFragment : Fragment() {
             Log.e("AdminAudioFragment.getAllLikes", e.toString())
         }
     }
-
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
@@ -377,11 +376,14 @@ class AdminAudioFragment : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         if (Util.player != null) {
             Util.player.stop()
         }
@@ -389,7 +391,9 @@ class AdminAudioFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         if (Util.player != null) {
             Util.player.stop()
         }

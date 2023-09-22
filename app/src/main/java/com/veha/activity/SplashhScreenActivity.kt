@@ -89,6 +89,11 @@ class SplashhScreenActivity : AppCompatActivity() {
                             val resp = response.body()
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
+                            if (loginresp.blocked.toBoolean()){
+                                Toast.makeText(this@SplashhScreenActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                                startActivity(intent)
+                            }
                             val isWarrior: Boolean =
                                 loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
@@ -108,7 +113,11 @@ class SplashhScreenActivity : AppCompatActivity() {
                                 intent.putExtra("email", loginresp.email)
                                 startActivity(intent)
                             }
-                        } else {
+                        }  else if (response.code() == 401) {
+                            Toast.makeText(this@SplashhScreenActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                        }else {
                             Log.e("responseee", "fail")
                             Toast.makeText(
                                 this@SplashhScreenActivity,

@@ -468,10 +468,19 @@ class HomeFragment : Fragment() {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
+                                    if (loginresp.blocked.toBoolean()){
+                                        Toast.makeText(contexts,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(contexts, LoginActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                     val isWarrior: Boolean =
                                         loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     showCreatePost = (userType == Util.WARRIOR) && (type != "fav")
+                                } else if (response.code() == 401) {
+                                    Toast.makeText(contexts,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    val intent = Intent(contexts, LoginActivity::class.java)
+                                    startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
                                     dialog.hide()
@@ -504,7 +513,9 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -514,7 +525,9 @@ class HomeFragment : Fragment() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+        if (dialog.isShowing) {
+            dialog.dismiss()
+        }
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -524,6 +537,7 @@ class HomeFragment : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }

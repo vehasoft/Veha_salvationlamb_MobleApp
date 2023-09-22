@@ -34,6 +34,7 @@ public class Util {
     public static ArrayList getReligion() {
         religion = new ArrayList<>();
         religion.add("Select");
+        religion.add("SARC");
         religion.add("Adventist");
         religion.add("Anglican / Episcopal");
         religion.add("Apostolic");

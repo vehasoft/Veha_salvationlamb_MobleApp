@@ -418,6 +418,9 @@ class HomeAdapter(
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                dialog.show()
+            }
                 val data = JsonObject()
                 data.addProperty("userId", Util.userId)
                 data.addProperty("postId", post.id)
@@ -474,9 +477,10 @@ class HomeAdapter(
     private fun deletePost(post: Posts) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                Log.e("deleted post : postid  ==== ", post.id)/*if (!dialog.isShowing) {
+                Log.e("deleted post : postid  ==== ", post.id)
+                if (!dialog.isShowing) {
                     dialog.show()
-                }*/
+                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -518,9 +522,10 @@ class HomeAdapter(
 
     private fun follow(userId: String, followerId: String, holder: ViewHolder) {
         try {
-            if (Commons().isNetworkAvailable(context)) {/*if (!dialog.isShowing) {
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
                     dialog.show()
-                }*/
+                }
                 val followData = JsonObject()
                 followData.addProperty("userId", userId)
                 followData.addProperty("followerId", followerId)
@@ -575,9 +580,10 @@ class HomeAdapter(
 
     fun favPost(userId: String, postId: String, holder: ViewHolder) {
         try {
-            if (Commons().isNetworkAvailable(context)) {/*if (!dialog.isShowing) {
-                    dialog.show()
-                }*/
+            if (Commons().isNetworkAvailable(context)) {
+                if (!dialog.isShowing) {
+                dialog.show()
+            }
                 val followData = JsonObject()
                 followData.addProperty("userId", userId)
                 followData.addProperty("postId", postId)

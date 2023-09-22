@@ -86,6 +86,11 @@ class AboutActivity : AppCompatActivity() {
                                     val resp = response.body()
                                     val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     var add = ""
+                                    if (loginResp.blocked.toBoolean()){
+                                        Toast.makeText(this@AboutActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(this@AboutActivity, LoginActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                     gender.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                                     if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
                                     if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
@@ -103,6 +108,10 @@ class AboutActivity : AppCompatActivity() {
                                     if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
                                         Util.formatDate(loginResp.createdAt, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
+                                } else if (response.code() == 401) {
+                                        Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(this@AboutActivity, LoginActivity::class.java)
+                                        startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
@@ -139,14 +148,17 @@ class AboutActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }

@@ -486,6 +486,11 @@ class EditProfileActivity : AppCompatActivity() {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     myDetails = loginresp
+                                    if (loginresp.blocked.toBoolean()){
+                                        Toast.makeText(this@EditProfileActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
                                         Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
@@ -541,6 +546,10 @@ class EditProfileActivity : AppCompatActivity() {
                                         }
                                         gender.check(genderbtn)
                                     }
+                                } else if (response.code() == 401) {
+                                    Toast.makeText(this@EditProfileActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                                    startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
@@ -745,14 +754,17 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 }

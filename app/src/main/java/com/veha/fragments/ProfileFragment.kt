@@ -158,12 +158,12 @@ class ProfileFragment : Fragment() {
     private fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!dialog.isShowing) {
+                        dialog.show()
+                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getMyPosts("Bearer $it", userId, page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -230,19 +230,16 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllPosts", e.toString())
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 
     fun getallLikes(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!dialog.isShowing) {
+                        dialog.show()
+                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -288,19 +285,16 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllLikes", e.toString())
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!dialog.isShowing) {
+                        dialog.show()
+                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -346,19 +340,16 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllFollowers", e.toString())
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 
     private fun getallFollowing(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!dialog.isShowing) {
+                        dialog.show()
+                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -406,19 +397,16 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getAllFollowing", e.toString())
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 
     private fun getmyDetails(context: Context, owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!dialog.isShowing) {
+                        dialog.show()
+                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -427,6 +415,11 @@ class ProfileFragment : Fragment() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    if (loginresp.blocked.toBoolean()){
+                                        Toast.makeText(contexts,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(contexts, LoginActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         picture = loginresp.picture
                                         Picasso.with(context).load(loginresp.picture).into(profilePic)
@@ -441,6 +434,10 @@ class ProfileFragment : Fragment() {
                                         ""
                                     }
                                     profileName.text = loginresp.name + role
+                                } else if (response.code() == 401) {
+                                    Toast.makeText(contexts,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    val intent = Intent(contexts, LoginActivity::class.java)
+                                    startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
@@ -469,26 +466,20 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ProfileFragment.getMyDetails", e.toString())
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
     override fun onPause() {
         super.onPause()
-        if (dialog.isShowing) {
             dialog.dismiss()
-        }
+        
     }
     override fun onResume() {
         super.onResume()
-        if (dialog.isShowing) {
             dialog.dismiss()
-        }
+        
     }
     override fun onDestroy() {
         super.onDestroy()
-        if (dialog.isShowing) {
             dialog.dismiss()
-        }
+        
     }
 }

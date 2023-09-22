@@ -306,6 +306,11 @@ class MainActivity : AppCompatActivity() {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
+                                    if (loginresp.blocked.toBoolean()){
+                                        Toast.makeText(this@MainActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                     Util.isFirst = loginresp.isFreshUser.toBoolean()
                                     val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
                                     Util.isWarrior = isWarrior
@@ -324,6 +329,13 @@ class MainActivity : AppCompatActivity() {
                                     if (dialog.isShowing) {
                                         dialog.dismiss()
                                     }
+                                } else if (response.code() == 401) {
+                                    Toast.makeText(this@MainActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
                                 }
                             }
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -401,15 +413,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
+            dialog.dismiss()
+        
     }
 
     override fun onBackPressed() {
