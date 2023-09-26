@@ -7,6 +7,7 @@ import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -110,8 +111,8 @@ class RegisterActivity : AppCompatActivity() {
 
     private val myDateListener =
         OnDateSetListener { _, year, month, day ->
-            date?.text = StringBuilder().append(day).append("-")
-                .append(month + 1).append("-").append(year)
+            date?.text = Editable.Factory.getInstance().newEditable(StringBuilder().append(day).append("-")
+                .append(month + 1).append("-").append(year))
         }
 
     private fun doValidation(): String {

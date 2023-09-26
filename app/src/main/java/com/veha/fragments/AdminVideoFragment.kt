@@ -86,13 +86,13 @@ class AdminVideoFragment : Fragment() {
     fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getVideoPost("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -137,13 +137,13 @@ class AdminVideoFragment : Fragment() {
                                     nodata.visibility = View.VISIBLE
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminVideoFragment.getAllPosts", "fail")
                             }
@@ -168,12 +168,12 @@ class AdminVideoFragment : Fragment() {
     fun getallLikes(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -191,14 +191,14 @@ class AdminVideoFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminVideoFragment.getAllLikes", "fail")
                             }
@@ -223,12 +223,12 @@ class AdminVideoFragment : Fragment() {
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -243,14 +243,14 @@ class AdminVideoFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminVideoFragment.getAllFollowers", "fail")
                             }
@@ -275,12 +275,12 @@ class AdminVideoFragment : Fragment() {
     fun getallFav(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -295,14 +295,14 @@ class AdminVideoFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminVideoFragment.getAllFav", "fail")
                             }
@@ -327,12 +327,12 @@ class AdminVideoFragment : Fragment() {
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -342,13 +342,13 @@ class AdminVideoFragment : Fragment() {
                                     Util.user = loginresp
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminVideoFragment.getMyDetails", "fail")
                             }
@@ -372,17 +372,17 @@ class AdminVideoFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
 

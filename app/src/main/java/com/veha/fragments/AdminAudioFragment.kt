@@ -143,13 +143,13 @@ class AdminAudioFragment : Fragment() {
                                     nodata.visibility = View.VISIBLE
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminAudioFragment.getAllPosts", "fail")
                             }
@@ -197,14 +197,14 @@ class AdminAudioFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminAudioFragment.getAllLikes", "fail")
                             }
@@ -248,14 +248,14 @@ class AdminAudioFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminAudioFragment.getAllFollowers", "fail")
                             }
@@ -300,14 +300,14 @@ class AdminAudioFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminAudioFragment.getAllFav", "fail")
                             }
@@ -332,12 +332,12 @@ class AdminAudioFragment : Fragment() {
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -347,13 +347,13 @@ class AdminAudioFragment : Fragment() {
                                     Util.user = loginresp
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("AdminAudioFragment.getMyDetails", "fail")
                             }

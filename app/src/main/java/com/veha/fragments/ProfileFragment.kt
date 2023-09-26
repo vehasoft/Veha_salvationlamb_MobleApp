@@ -161,10 +161,10 @@ class ProfileFragment : Fragment() {
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    if (!dialog.isShowing) {
-                        dialog.show()
-                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getMyPosts("Bearer $it", userId, page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -237,13 +237,12 @@ class ProfileFragment : Fragment() {
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    if (!dialog.isShowing) {
-                        dialog.show()
-                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
@@ -292,10 +291,10 @@ class ProfileFragment : Fragment() {
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    if (!dialog.isShowing) {
-                        dialog.show()
-                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -347,13 +346,12 @@ class ProfileFragment : Fragment() {
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    if (!dialog.isShowing) {
-                        dialog.show()
-                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
@@ -404,13 +402,12 @@ class ProfileFragment : Fragment() {
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
-                    if (!dialog.isShowing) {
-                        dialog.show()
-                    }
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
@@ -469,17 +466,17 @@ class ProfileFragment : Fragment() {
     }
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
+        dialog.dismiss()
         
     }
 }

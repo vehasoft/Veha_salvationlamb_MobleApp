@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
                 255
             )
         }
-        dialog.dismiss()
     }
 
     private fun checkPermission() {
@@ -96,7 +95,6 @@ class MainActivity : AppCompatActivity() {
         val result2 = ContextCompat.checkSelfPermission(applicationContext, NOTIFICATION_SERVICE)
         if (!(result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED)) {
             requestPermission()
-            dialog.dismiss()
         }
     }
 
@@ -104,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         override fun onChange(selfChange: Boolean) {
             if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-
             } else {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
@@ -113,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
          if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-
         } else {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
@@ -139,7 +135,6 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         dialog.dismiss()
-        dialog.dismiss()
         checkPermission()
         getMyDetails()
         if (Util.isFirst != null && Util.isFirst) {
@@ -155,7 +150,6 @@ class MainActivity : AppCompatActivity() {
                     firstTime()
                     nagDialog.dismiss()
                 }
-
                 nagDialog.show()
             } /*else{
                 Commons().makeWarrior(this,this)
@@ -206,7 +200,6 @@ class MainActivity : AppCompatActivity() {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
                     }
-
                     R.id.logout -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
                         builder.setMessage("Do you want to Logout?")
@@ -226,17 +219,14 @@ class MainActivity : AppCompatActivity() {
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
                     }
-
                     R.id.edit_profile -> {
                         val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
-
                     R.id.fav -> {
                         val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
-
                     R.id.settings -> {
                         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -274,7 +264,6 @@ class MainActivity : AppCompatActivity() {
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                dialog.dismiss()
                 if (Util.player != null) {
                     Util.player.stop()
                 }
@@ -293,12 +282,12 @@ class MainActivity : AppCompatActivity() {
     private fun getMyDetails() {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -413,21 +402,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
 
     override fun onBackPressed() {
+        dialog.dismiss()
         if (viewPager.currentItem == 0) {
             exitProcess(-1)
         } else {

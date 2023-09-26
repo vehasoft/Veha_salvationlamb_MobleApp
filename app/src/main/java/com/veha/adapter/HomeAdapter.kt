@@ -418,9 +418,6 @@ class HomeAdapter(
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                dialog.show()
-            }
                 val data = JsonObject()
                 data.addProperty("userId", Util.userId)
                 data.addProperty("postId", post.id)
@@ -428,6 +425,9 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -478,12 +478,12 @@ class HomeAdapter(
         try {
             if (Commons().isNetworkAvailable(context)) {
                 Log.e("deleted post : postid  ==== ", post.id)
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -500,14 +500,14 @@ class HomeAdapter(
                                     Log.e("result", errorMessage)
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeAdapter.deletePost", "fail")
                             }
@@ -523,15 +523,15 @@ class HomeAdapter(
     private fun follow(userId: String, followerId: String, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val followData = JsonObject()
                 followData.addProperty("userId", userId)
                 followData.addProperty("followerId", followerId)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -565,7 +565,7 @@ class HomeAdapter(
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeAdapter.follow", "fail")
                             }
@@ -581,15 +581,15 @@ class HomeAdapter(
     fun favPost(userId: String, postId: String, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                dialog.show()
-            }
                 val followData = JsonObject()
                 followData.addProperty("userId", userId)
                 followData.addProperty("postId", postId)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -619,14 +619,14 @@ class HomeAdapter(
                                     Log.e("errorMessage", errorMessage)
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeAdapter.favPost", "fail")
                             }
@@ -642,12 +642,12 @@ class HomeAdapter(
     fun getPost(postId: String) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -663,14 +663,14 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeAdapter.getPost", "fail")
                             }

@@ -90,12 +90,12 @@ class FilesFragment : Fragment() {
     private fun getFilesAndFolder(folderID: String, context: Context) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {

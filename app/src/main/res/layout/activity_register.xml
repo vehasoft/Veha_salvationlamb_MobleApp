@@ -164,7 +164,30 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dob_op"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/black"
+                android:background="@color/home_bg"
+                android:onClick="setDate"
+                android:hint="Date of birth">
+
+            <!--this is the actual edit text which takes the input-->
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/date"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:editable="false"
+                    android:onClick="setDate"
+                    android:inputType="none"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--<TextView android:layout_width="match_parent"
                   android:layout_height="50dp"
                   android:gravity="center_vertical"
                   android:id="@+id/date"
@@ -174,7 +197,7 @@
                   android:textSize="20dp"
                   android:onClick="setDate"
                   android:layout_marginTop="10dp"
-        />
+        />-->
         <RadioGroup android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:orientation="horizontal"

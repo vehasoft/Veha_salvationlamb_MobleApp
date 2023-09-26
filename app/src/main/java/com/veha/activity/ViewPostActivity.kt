@@ -84,6 +84,9 @@ class ViewPostActivity : AppCompatActivity() {
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                if (dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
                                 Log.e("ViewPost", "fail")
                             }
                         })

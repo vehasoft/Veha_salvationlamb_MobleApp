@@ -72,12 +72,12 @@ class FileListActivity : AppCompatActivity() {
     private fun getFilesAndFolder(folderID: String, context: Context) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -139,19 +139,16 @@ class FileListActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
 
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
+        dialog.dismiss()
     }
 }

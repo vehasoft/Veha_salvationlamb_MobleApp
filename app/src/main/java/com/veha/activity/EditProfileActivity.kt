@@ -140,7 +140,7 @@ class EditProfileActivity : AppCompatActivity() {
                 data.addProperty("name", Util.user.name + " picture")
                 updateProfilePic(this, data)
                 if (dialog.isShowing) {
-                    dialog.dismiss()
+                dialog.dismiss()
                 }
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
@@ -149,7 +149,7 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
         if (dialog.isShowing) {
-            dialog.dismiss()
+        dialog.dismiss()
         }
     }
 
@@ -421,14 +421,13 @@ class EditProfileActivity : AppCompatActivity() {
     private fun edit(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 userPreferences = UserPreferences(this@EditProfileActivity)
                 val retrofit = Util.getRetrofit()
-
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -473,12 +472,12 @@ class EditProfileActivity : AppCompatActivity() {
     private fun getMyDetails(context: Context) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -586,12 +585,12 @@ class EditProfileActivity : AppCompatActivity() {
     private fun updateProfilePic(context: Context, data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -648,8 +647,8 @@ class EditProfileActivity : AppCompatActivity() {
 
     private val myDateListener =
         DatePickerDialog.OnDateSetListener { _, year, month, day ->
-            date?.text = StringBuilder().append(day).append("-")
-                .append(month + 1).append("-").append(year)
+            date?.text = Editable.Factory.getInstance().newEditable(StringBuilder().append(day).append("-")
+                .append(month + 1).append("-").append(year))
         }
 
     private fun getCountries() {

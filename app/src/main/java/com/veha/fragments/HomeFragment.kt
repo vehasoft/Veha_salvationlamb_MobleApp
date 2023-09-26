@@ -138,12 +138,12 @@ class HomeFragment : Fragment() {
     fun getfavPosts(context: Context, owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getMyFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -184,13 +184,13 @@ class HomeFragment : Fragment() {
                                     nodata.visibility = View.VISIBLE
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getFavPosts", "fail")
                             }
@@ -215,13 +215,13 @@ class HomeFragment : Fragment() {
     fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -266,13 +266,13 @@ class HomeFragment : Fragment() {
                                     nodata.visibility = View.VISIBLE
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getAllPosts", "fail")
                             }
@@ -297,12 +297,12 @@ class HomeFragment : Fragment() {
     fun getallLikes(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -320,14 +320,14 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getAllLikes", "fail")
                             }
@@ -352,12 +352,12 @@ class HomeFragment : Fragment() {
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -371,14 +371,14 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 if (type == "fav") getfavPosts(contexts, owner) else getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getAllFollowers", "fail")
                             }
@@ -403,12 +403,12 @@ class HomeFragment : Fragment() {
     fun getallFav(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -423,14 +423,14 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getAllFav", "fail")
                             }
@@ -455,12 +455,12 @@ class HomeFragment : Fragment() {
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        if (!dialog.isShowing) {
+                            dialog.show()
+                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -483,13 +483,13 @@ class HomeFragment : Fragment() {
                                     startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
-                                    dialog.hide()
+                                    dialog.dismiss()
                                 }
                                 Log.e("HomeFragment.getMyDetails", "fail")
                             }
@@ -513,9 +513,8 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (dialog.isShowing) {
             dialog.dismiss()
-        }
+
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -525,9 +524,7 @@ class HomeFragment : Fragment() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        if (dialog.isShowing) {
             dialog.dismiss()
-        }
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
