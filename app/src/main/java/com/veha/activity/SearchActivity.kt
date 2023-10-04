@@ -50,7 +50,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        Log.e("current tab", currentTab.toString())
         userPreferences = UserPreferences(this)
         dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")

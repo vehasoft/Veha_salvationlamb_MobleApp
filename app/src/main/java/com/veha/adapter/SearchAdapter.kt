@@ -20,10 +20,10 @@ internal class SearchAdapter(val context: Context,
     override fun getItem(position: Int): Fragment {
         return when (position) {
             1 -> {
-                SearchProfileFragment(context,profilelist)
+                SearchProfileFragment.getFragment(profilelist)
             }
             0 -> {
-                SearchPostFragment(context,postlist)
+                SearchPostFragment.getFragment(postlist)
             }
             else -> null as Fragment
         }

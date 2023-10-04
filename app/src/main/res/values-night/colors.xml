@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_blue">#3B5999</color>
+    <color name="primary_blue">#157DEC</color>
     <color name="secondary_blue">#8BA9E9</color>
     <color name="home_bg">#18243E</color>
     <color name="hintcolor">#CCCCCC</color>

@@ -488,9 +488,9 @@ class HomeAdapter(
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
-                                    Toast.makeText(
+                                    /*Toast.makeText(
                                         context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
-                                    ).show()
+                                    ).show()*/
                                 } else {
                                     val resp = response.errorBody()
                                     val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
