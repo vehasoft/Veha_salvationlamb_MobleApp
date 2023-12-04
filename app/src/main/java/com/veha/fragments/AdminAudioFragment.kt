@@ -111,7 +111,7 @@ class AdminAudioFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
-                                    if (postlist.size <= 0 && page == 0) {
+                                    if (postlist.size <= 0 && page == 1) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
                                     } else {

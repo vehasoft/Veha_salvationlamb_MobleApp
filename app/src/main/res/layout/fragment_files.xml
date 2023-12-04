@@ -12,24 +12,6 @@
 
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:id="@+id/no_data"
-                      android:visibility="gone"
-                      android:gravity="center"
-                      android:orientation="vertical">
-            <ImageView android:layout_width="150dp"
-                           android:layout_height="150dp"
-                           android:src="@drawable/ic_no_record"/>
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="No Data found"
-                      android:textSize="20dp"
-                      android:textColor="@color/black"
-                      android:gravity="center"
-                      android:padding="5dp"/>
-
-        </LinearLayout>
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
                       android:id="@+id/file_head_layout"
                       android:orientation="horizontal"
         >
@@ -53,6 +35,24 @@
                        android:id="@+id/view_icon"
                        android:src="@drawable/ic_baseline_grid_on_24"
             />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:id="@+id/no_data"
+                      android:visibility="gone"
+                      android:gravity="center"
+                      android:orientation="vertical">
+            <ImageView android:layout_width="150dp"
+                       android:layout_height="150dp"
+                       android:src="@drawable/ic_no_record"/>
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="No Data found"
+                      android:textSize="20dp"
+                      android:textColor="@color/black"
+                      android:gravity="center"
+                      android:padding="5dp"/>
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

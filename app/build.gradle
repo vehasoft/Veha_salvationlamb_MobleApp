@@ -11,8 +11,8 @@ android {
         applicationId "com.veha.activity"
         minSdk 23
         targetSdk 33
-        versionCode 7
-        versionName "1.2"
+        versionCode 9
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

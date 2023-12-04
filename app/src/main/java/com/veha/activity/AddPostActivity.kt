@@ -81,9 +81,14 @@ class AddPostActivity : AppCompatActivity() {
         }
 
         postType.setOnCheckedChangeListener { group, checkedId ->
-            if (checkedId == R.id.image_btn) {
+            if (checkedId == R.id.text_btn) {
+                video.visibility = View.GONE
+                postPic.visibility = View.GONE
+                postTypeStr = "text"
+            }else if (checkedId == R.id.image_btn) {
+                video.visibility = View.GONE
                 postTypeStr = "image"
-
+                addImg()
             } else if (checkedId == R.id.video_btn) {
                 video.visibility = View.VISIBLE
                 postPic.visibility = View.GONE
