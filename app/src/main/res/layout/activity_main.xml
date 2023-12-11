@@ -15,7 +15,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_main"
                 android:layout_width="match_parent"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="5dp"
@@ -28,6 +27,38 @@
                        app:layout_constraintLeft_toLeftOf="parent"
                        app:layout_constraintTop_toTopOf="parent"
                        app:layout_constraintBottom_toBottomOf="parent"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:id="@+id/notification_layout"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/search">
+                <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:id="@+id/notification"
+                        android:src="@drawable/ic_baseline_notifications_24"
+                        android:padding="10dp"
+                        app:tint="@color/always_white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+                <!--<TextView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:background="@drawable/rounded_border_login_register"
+                        android:backgroundTint="@color/red"
+                        android:layout_MarginTop="10dp"
+                        android:textSize="10dp"
+                        android:padding="5dp"
+                        android:textColor="@color/always_white"
+                        android:text="99"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        />-->
+            </androidx.constraintlayout.widget.ConstraintLayout>
             <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
@@ -89,7 +120,7 @@
                 android:layout_weight="10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-    <com.google.android.material.tabs.TabLayout
+        <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             app:tabTextColor="@color/always_white"
             app:tabSelectedTextColor="@color/home_bg"

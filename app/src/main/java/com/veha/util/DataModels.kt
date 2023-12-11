@@ -167,3 +167,8 @@ data class FavPost (
     val updatedAt: String,
     val posts: Posts,
 )
+data class NotificationList(
+    val id: String,
+    val name: String,
+    val content: String,
+)

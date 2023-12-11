@@ -49,7 +49,8 @@
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_forgot_password.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_image_detail.xml" value="0.2890625" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_login.xml" value="0.29010416666666666" />
-        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_main.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_notification_view.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_pdf.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_pdf2.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/activity_register.xml" value="0.29010416666666666" />
@@ -64,6 +65,7 @@
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_folders.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_follow.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_likes_list.xml" value="0.29010416666666666" />
+        <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_notification_list.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_post.xml" value="0.264" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_users.xml" value="0.29010416666666666" />
         <entry key="..\:/intellij/Veha_salvationlamb_MobleApp/app/src/main/res/layout/child_warrior.xml" value="0.2890625" />

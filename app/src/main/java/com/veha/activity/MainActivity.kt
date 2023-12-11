@@ -161,6 +161,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        notification.setOnClickListener {
+            val intent = Intent(this, NotificationViewActivity::class.java)
+            startActivity(intent)
+        }
         banner_close.setOnClickListener {
             banner.visibility = View.GONE
         }
