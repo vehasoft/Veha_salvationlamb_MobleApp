@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
-import com.veha.activity.R;
 
 public class ExpandableView extends TextView implements View.OnClickListener {
     String text;

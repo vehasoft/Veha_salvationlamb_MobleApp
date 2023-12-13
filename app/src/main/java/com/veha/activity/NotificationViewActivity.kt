@@ -5,9 +5,7 @@ import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.adapter.NotificationListAdapter
-import com.veha.adapter.ViewLikesAdapter
 import com.veha.util.NotificationList
-import kotlinx.android.synthetic.main.activity_notification_view.*
 
 class NotificationViewActivity : AppCompatActivity() {
 
@@ -19,15 +17,17 @@ class NotificationViewActivity : AppCompatActivity() {
 
         notificationRecyclerView=findViewById(R.id.notification_recycler)
 
-        val n1 = NotificationList("1","test","liked your post")
-        val n2 = NotificationList("1","test1","is following you")
-        val n3 = NotificationList("1","test","liked your post")
-        val n4 = NotificationList("1","test","is following you")
-        val n5 = NotificationList("1","test","liked your post")
-        val n6 = NotificationList("1","test","is following you")
-        val n7 = NotificationList("1","test","liked your post")
-        val n8 = NotificationList("1","admin","deleted your post")
-        val n9 = NotificationList("1","test","is following you")
+        val n1 = NotificationList("1","test","liked your post","1 min ago")
+        val n2 = NotificationList("1","test1","is following you","1 min ago")
+        val n3 = NotificationList("1","test","liked your post","1 min ago")
+        val n4 = NotificationList("1","test","is following you","1 min ago")
+        val n5 = NotificationList("1","test","liked your post","1 min ago")
+        val n6 = NotificationList("1","test","is following you","1 min ago")
+        val n7 = NotificationList("1","test","liked your post","1 min ago")
+        val n8 = NotificationList("1","admin","deleted your post","1 min ago")
+        val n9 = NotificationList("1","test","is following you","1 min ago")
+        val n10 = NotificationList("1","test","is following you","1 min ago")
+        val n11 = NotificationList("1","test","is following you","1 min ago")
 
         val notificationList :ArrayList<NotificationList> = ArrayList()
         notificationList.add(n1)
@@ -39,6 +39,8 @@ class NotificationViewActivity : AppCompatActivity() {
         notificationList.add(n7)
         notificationList.add(n8)
         notificationList.add(n9)
+        notificationList.add(n10)
+        notificationList.add(n11)
         notificationRecyclerView.layoutManager = LinearLayoutManager(this@NotificationViewActivity)
         notificationRecyclerView.adapter = NotificationListAdapter(notificationList, this)
 

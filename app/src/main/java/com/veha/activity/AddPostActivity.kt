@@ -76,6 +76,7 @@ class AddPostActivity : AppCompatActivity() {
         postType = findViewById(R.id.post_type)
         postImage = findViewById(R.id.image_btn)
         postVideo = findViewById(R.id.video_btn)
+
         postImage.setOnClickListener {
             addImg()
         }

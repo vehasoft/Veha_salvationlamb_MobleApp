@@ -8,14 +8,16 @@ import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
-import com.veha.activity.R
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.veha.util.Commons
 import com.veha.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_forgot_password.*
 import retrofit2.Call
 import retrofit2.Response
 
@@ -23,6 +25,15 @@ class ForgotPasswordActivity : AppCompatActivity() {
     lateinit var dialog: AlertDialog
     lateinit var page: String
     lateinit var emailID: String
+
+    private lateinit var forgotPasswordHead: TextView
+    private lateinit var forgotPasswordContent: TextView
+    private lateinit var email: TextInputEditText
+    private lateinit var otp: TextInputEditText
+    private lateinit var otpOp: TextInputLayout
+    private lateinit var emailOp: TextInputLayout
+    private lateinit var cancelButton: Button
+    private lateinit var forgotButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
@@ -31,17 +42,26 @@ class ForgotPasswordActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
 
+        forgotPasswordHead = findViewById(R.id.forgot_pwd_head)
+        forgotPasswordContent = findViewById(R.id.forgot_pwd_content)
+        email = findViewById(R.id.email)
+        otp = findViewById(R.id.otp)
+        otpOp = findViewById(R.id.otp_op)
+        emailOp = findViewById(R.id.email_op)
+        cancelButton = findViewById(R.id.cancel_btn)
+        forgotButton = findViewById(R.id.forgot_btn)
+
         page = intent.getStringExtra("page").toString()
         if (page.contentEquals("verify")) {
             emailID = intent.getStringExtra("email").toString()
-            forgot_pwd_head.text = "OTP Verification"
-            forgot_pwd_content.text = "Welcome to SalvationLamb. Please enter otp to verify your registered email id"
+            forgotPasswordHead.text = "OTP Verification"
+            forgotPasswordContent.text = "Welcome to SalvationLamb. Please enter otp to verify your registered email id"
             email.text = Editable.Factory.getInstance().newEditable(emailID)
-            otp_op.visibility = View.VISIBLE
-            cancel_btn.visibility = View.VISIBLE
-            email_op.visibility = View.GONE
+            otpOp.visibility = View.VISIBLE
+            cancelButton.visibility = View.VISIBLE
+            emailOp.visibility = View.GONE
             checkValid(emailID)
-            forgot_btn.setOnClickListener {
+            forgotButton.setOnClickListener {
                 if (TextUtils.isEmpty(otp.text!!.trim())) {
                     otp.error = "Enter OTP"
                     Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG).show()
@@ -50,16 +70,16 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     checkOtp(emailID, otp.text.toString())
                 }
             }
-            cancel_btn.setOnClickListener {
+            cancelButton.setOnClickListener {
                 val intent = Intent(this@ForgotPasswordActivity, LoginActivity::class.java)
                 finish()
                 startActivity(intent)
             }
 
         } else {
-            forgot_pwd_head.text = "Forgot Password"
-            forgot_pwd_content.text = "Welcome to SalvationLamb. Please enter your email-id."
-            forgot_btn.setOnClickListener {
+            forgotPasswordHead.text = "Forgot Password"
+            forgotPasswordContent.text = "Welcome to SalvationLamb. Please enter your email-id."
+            forgotButton.setOnClickListener {
                 if (TextUtils.isEmpty(email.text!!.trim())) {
                     email.error = "Enter Email"
                     Toast.makeText(this@ForgotPasswordActivity, "Enter Email", Toast.LENGTH_LONG).show()
@@ -67,7 +87,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     checkValid(email.text.toString())
                 }
             }
-            cancel_btn.setOnClickListener {
+            cancelButton.setOnClickListener {
                 finish()
             }
         }
@@ -97,10 +117,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             )
                                 .show()
-                            otp_op.visibility = View.VISIBLE
-                            forgot_btn.text = "confirm"
-                            if (forgot_btn.text != "verify") {
-                                forgot_btn.setOnClickListener {
+                            otpOp.visibility = View.VISIBLE
+                            forgotButton.text = "confirm"
+                            if (forgotButton.text != "verify") {
+                                forgotButton.setOnClickListener {
                                     if (TextUtils.isEmpty(otp.text!!.trim())) {
                                         otp.error = "Enter OTP"
                                         Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG)

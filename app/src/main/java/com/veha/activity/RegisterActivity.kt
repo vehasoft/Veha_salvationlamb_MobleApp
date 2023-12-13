@@ -11,24 +11,19 @@ import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.veha.activity.R
+import com.google.android.material.textfield.TextInputEditText
 import com.veha.util.Commons
 import com.veha.util.UserRslt
 import com.veha.util.Util
 import com.veha.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.activity_edit_profile.*
-import kotlinx.android.synthetic.main.activity_register.*
-import kotlinx.android.synthetic.main.activity_register.date
-import kotlinx.android.synthetic.main.activity_register.email
-import kotlinx.android.synthetic.main.activity_register.gender
-import kotlinx.android.synthetic.main.activity_register.mobile
-import kotlinx.android.synthetic.main.activity_register.fname
-import kotlinx.android.synthetic.main.activity_register.lname
 import retrofit2.Call
 import retrofit2.Response
 
@@ -48,6 +43,17 @@ class RegisterActivity : AppCompatActivity() {
     private val year = 1960
     private var month: Int = 0
     private var day: Int = 1
+
+    private lateinit var firstName: TextInputEditText
+    private lateinit var lastName: TextInputEditText
+    private lateinit var email: TextInputEditText
+    private lateinit var mobile: TextInputEditText
+    private lateinit var date: TextInputEditText
+    private lateinit var password: TextInputEditText
+    private lateinit var registerButton: Button
+    private lateinit var signInButton: Button
+    private lateinit var gender: RadioGroup
+    private lateinit var termsAndConditions: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -56,9 +62,20 @@ class RegisterActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
 
-        register_btn.setOnClickListener {
-            fNameTxt = fname.text.toString()
-            lNameTxt = lname.text.toString()
+        firstName = findViewById(R.id.fname)
+        lastName = findViewById(R.id.lname)
+        email = findViewById(R.id.email)
+        mobile = findViewById(R.id.mobile)
+        date = findViewById(R.id.date)
+        password = findViewById(R.id.password)
+        registerButton = findViewById(R.id.register_btn)
+        signInButton = findViewById(R.id.signin_btn)
+        termsAndConditions = findViewById(R.id.terms_conditions)
+        gender = findViewById(R.id.gender)
+
+        registerButton.setOnClickListener {
+            fNameTxt = firstName.text.toString()
+            lNameTxt = lastName.text.toString()
             emailTxt = email.text.toString()
             mobileTxt = mobile.text.toString()
             passwordTxt = password.text.toString()
@@ -82,12 +99,11 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, doValidation(), Toast.LENGTH_LONG).show()
             }
         }
-        signin_btn.setOnClickListener {
+        signInButton.setOnClickListener {
             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
             startActivity(intent)
         }
-        terms_conditions.setOnClickListener {
-
+        termsAndConditions.setOnClickListener {
             val intent = Intent(this@RegisterActivity, WebViewActivity::class.java)
             intent.putExtra("WebPageName", "terms")
             startActivity(intent)
@@ -117,10 +133,10 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun doValidation(): String {
         if (TextUtils.isEmpty(fNameTxt.trim())) {
-            fname.error = "Enter name"
+            firstName.error = "Enter name"
             return "Enter first name"
         } else if (!Util.isValidName(fNameTxt)) {
-            fname.error = "Enter valid name"
+            firstName.error = "Enter valid name"
             return "Enter valid name"
         } else if (TextUtils.isEmpty(emailTxt.trim())) {
             email.error = "Enter email"

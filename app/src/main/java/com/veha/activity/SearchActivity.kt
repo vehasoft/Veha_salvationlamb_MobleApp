@@ -1,7 +1,6 @@
 package com.veha.activity
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -35,7 +34,7 @@ class SearchActivity : AppCompatActivity() {
     lateinit var postlist: ArrayList<Posts>
     lateinit var dialog: AlertDialog
     var currentTab: Int = 0
-    fun setEditTextFocus(searchEditText: EditText, isFocused: Boolean) {
+    private fun setEditTextFocus(searchEditText: EditText, isFocused: Boolean) {
         searchEditText.isCursorVisible = isFocused
         searchEditText.isFocusable = isFocused
         searchEditText.isFocusableInTouchMode = isFocused
@@ -58,9 +57,6 @@ class SearchActivity : AppCompatActivity() {
         tabLayout = findViewById(R.id.tabLayout)
         search = findViewById(R.id.search)
         setEditTextFocus(search, true)
-        //val imm: InputMethodManager =
-        //  getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        //imm.showSoftInput(search, InputMethodManager.SHOW_FORCED)
         val home = tabLayout.newTab()
         val profile = tabLayout.newTab()
         home.tag = "Posts"

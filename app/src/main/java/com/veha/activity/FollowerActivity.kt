@@ -16,14 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.adapter.FollowAdapter
-import com.veha.activity.R
 import com.veha.util.PostUser
 import com.veha.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -36,6 +34,7 @@ class FollowerActivity : AppCompatActivity() {
     lateinit var nodata: LinearLayout
     private lateinit var userId: String
     lateinit var logo: ImageView
+    private lateinit var menu: ImageButton
     private var myFollowerMap: HashMap<String, String> = HashMap()
     private var followingMap: HashMap<String, String> = HashMap()
 
@@ -60,6 +59,7 @@ class FollowerActivity : AppCompatActivity() {
         lists = findViewById(R.id.my_follow_list)
         nodata = findViewById(R.id.no_data)
 
+        menu = findViewById(R.id.menu)
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@FollowerActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)

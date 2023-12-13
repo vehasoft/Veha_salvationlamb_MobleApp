@@ -49,6 +49,7 @@ class AboutActivity : AppCompatActivity() {
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
+
         name = findViewById(R.id.about_name)
         dob = findViewById(R.id.about_dob)
         phone = findViewById(R.id.about_phone)
@@ -58,6 +59,7 @@ class AboutActivity : AppCompatActivity() {
         join = findViewById(R.id.about_join)
         edit = findViewById(R.id.edit)
         changePass = findViewById(R.id.change_pwd_btn)
+
         getmyDetails()
         edit.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)

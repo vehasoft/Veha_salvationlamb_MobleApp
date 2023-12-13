@@ -8,7 +8,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.*
 import androidx.lifecycle.asLiveData
-import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.Posts
 import com.veha.util.UserPreferences

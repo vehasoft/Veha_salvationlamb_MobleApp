@@ -1,6 +1,8 @@
 package com.veha.adapter
 
 import android.content.Context
+import android.os.Build
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +41,13 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification : NotificationList = notifications[position]
 
-        holder.notificationContent.text = notification.name + " " + notification.content
+        val html = "<b>" + notification.name + "</b>" +  " " + "<p>" + notification.content + "<br>" + notification.createdAt + "</p>"
+
+        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            Html.fromHtml(html)
+        }).also { holder.notificationContent.text = it }
         /*holder.name.text = notification.user.name
         if (!notification.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(notification.user.picture).into(holder.profilePic)

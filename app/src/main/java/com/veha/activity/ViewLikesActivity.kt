@@ -25,7 +25,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -37,6 +36,7 @@ class ViewLikesActivity : AppCompatActivity() {
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var logo: ImageView
+    lateinit var menu: ImageView
 
     lateinit var likeslist: ArrayList<PostLikes>
 
@@ -50,6 +50,7 @@ class ViewLikesActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         list = findViewById(R.id.likesListRecycler)
         nodata = findViewById(R.id.no_data)
+        menu = findViewById(R.id.menu)
         userPreferences = UserPreferences(this@ViewLikesActivity)
         val indent = intent
         postId = indent.getStringExtra("postId").toString()

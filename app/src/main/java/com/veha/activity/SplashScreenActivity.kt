@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
@@ -21,7 +20,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
-class SplashhScreenActivity : AppCompatActivity() {
+class SplashScreenActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,8 +89,8 @@ class SplashhScreenActivity : AppCompatActivity() {
                             val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
                             if (loginresp.blocked.toBoolean()){
-                                Toast.makeText(this@SplashhScreenActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
-                                val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                                Toast.makeText(this@SplashScreenActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
                                 startActivity(intent)
                             }
                             val isWarrior: Boolean =
@@ -104,27 +103,27 @@ class SplashhScreenActivity : AppCompatActivity() {
                             }
                             Thread.sleep(2000)
                             if (loginresp.isVerified.toBoolean()) {
-                                val intent = Intent(this@SplashhScreenActivity, MainActivity::class.java)
+                                val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
                                 startActivity(intent)
                                 finish()
                             } else {
-                                val intent = Intent(this@SplashhScreenActivity, ForgotPasswordActivity::class.java)
+                                val intent = Intent(this@SplashScreenActivity, ForgotPasswordActivity::class.java)
                                 intent.putExtra("page", "verify")
                                 intent.putExtra("email", loginresp.email)
                                 startActivity(intent)
                             }
                         }  else if (response.code() == 401) {
-                            Toast.makeText(this@SplashhScreenActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                            val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                            Toast.makeText(this@SplashScreenActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
                             startActivity(intent)
                         }else {
                             Log.e("responseee", "fail")
                             Toast.makeText(
-                                this@SplashhScreenActivity,
+                                this@SplashScreenActivity,
                                 "Somthing Went Wrong \nLogin again to continue",
                                 Toast.LENGTH_LONG
                             ).show()
-                            val intent = Intent(this@SplashhScreenActivity, LoginActivity::class.java)
+                            val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
                             startActivity(intent)
                             finish()
                         }

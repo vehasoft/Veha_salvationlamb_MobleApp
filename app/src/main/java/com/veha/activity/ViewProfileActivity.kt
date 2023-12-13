@@ -9,18 +9,17 @@ import android.view.ContextThemeWrapper
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
 import com.veha.fragments.ProfileFragment
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 
 class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
+    private lateinit var menu: ImageView
     lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +39,7 @@ class ViewProfileActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        menu = findViewById(R.id.menu)
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@ViewProfileActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)

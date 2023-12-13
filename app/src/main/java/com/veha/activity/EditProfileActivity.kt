@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -35,14 +36,6 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import com.veha.util.*
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_edit_profile.*
-import kotlinx.android.synthetic.main.activity_edit_profile.email
-import kotlinx.android.synthetic.main.activity_edit_profile.fname
-import kotlinx.android.synthetic.main.activity_edit_profile.gender
-import kotlinx.android.synthetic.main.activity_edit_profile.lname
-import kotlinx.android.synthetic.main.activity_edit_profile.mobile
-import kotlinx.android.synthetic.main.activity_register.*
-import kotlinx.android.synthetic.main.activity_register.date
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -81,6 +74,18 @@ class EditProfileActivity : AppCompatActivity() {
     private var country: ArrayList<String> = ArrayList()
 
     private lateinit var myDetails: UserRslt
+
+    private lateinit var profilePic: ImageView
+    private lateinit var menu: ImageButton
+    private lateinit var firstName: TextInputEditText
+    private lateinit var lastName: TextInputEditText
+    private lateinit var email: TextInputEditText
+    private lateinit var mobile: TextInputEditText
+    private lateinit var address: TextInputEditText
+    private lateinit var date: TextInputEditText
+    private lateinit var language: TextInputEditText
+    private lateinit var pincode: TextInputEditText
+    private lateinit var gender: RadioGroup
 
     private fun galleryIntent() {
         val intent = Intent()
@@ -138,7 +143,7 @@ class EditProfileActivity : AppCompatActivity() {
                 val data = JsonObject()
                 data.addProperty("base64Image", profilestr)
                 data.addProperty("name", Util.user.name + " picture")
-                updateProfilePic(this, data)
+                updateProfilePic(data)
                 if (dialog.isShowing) {
                 dialog.dismiss()
                 }
@@ -169,9 +174,22 @@ class EditProfileActivity : AppCompatActivity() {
         dialog = SpotsDialog.Builder().setContext(this).build()
         dialog.setMessage("Please Wait")
         dialog.setCancelable(false)
+
+        profilePic = findViewById(R.id.profile_pic_edit)
         saveBtn = findViewById(R.id.save_btn)
         cancelBtn = findViewById(R.id.cancel_btn)
         warrior = findViewById(R.id.warrior)
+        menu = findViewById(R.id.menu)
+        firstName = findViewById(R.id.fname)
+        lastName = findViewById(R.id.lname)
+        email = findViewById(R.id.email)
+        mobile = findViewById(R.id.mobile)
+        address = findViewById(R.id.address)
+        date = findViewById(R.id.date)
+        language = findViewById(R.id.language)
+        pincode = findViewById(R.id.pincode)
+        gender = findViewById(R.id.gender)
+
         getCountries()
         getMyDetails(this)
 
@@ -212,7 +230,7 @@ class EditProfileActivity : AppCompatActivity() {
                 citystr = citySp.text.toString()
             }
         }
-        profile_pic_edit.setOnClickListener {
+        profilePic.setOnClickListener {
             /*val builder: AlertDialog.Builder = AlertDialog.Builder(this@EditProfileActivity)
             builder.setMessage("Modified profile picture can be updated only after the admin's approval.")
             builder.setTitle("Do you want to change your profile picture?")
@@ -316,9 +334,9 @@ class EditProfileActivity : AppCompatActivity() {
                 builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
                     if (doValidation().contentEquals("success", true)) {
                         val data = JsonObject()
-                        data.addProperty("firstName", fname.text.toString())
-                        data.addProperty("lastName", lname.text.toString())
-                        data.addProperty("name", fname.text.toString() + " " + lname.text.toString())
+                        data.addProperty("firstName", firstName.text.toString())
+                        data.addProperty("lastName", lastName.text.toString())
+                        data.addProperty("name", firstName.text.toString() + " " + lastName.text.toString())
                         data.addProperty("email", email.text.toString())
                         data.addProperty("mobile", mobile.text.toString())
                         data.addProperty("address", address.text.toString())
@@ -362,9 +380,9 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun isDataChanged(): Boolean {
-        if (!fname.text!!.contentEquals(myDetails.firstName, false)) {
+        if (!firstName.text!!.contentEquals(myDetails.firstName, false)) {
             return true
-        } else if (!lname.text!!.contentEquals(myDetails.lastName, false)) {
+        } else if (!lastName.text!!.contentEquals(myDetails.lastName, false)) {
             return true
         } else if (!mobile.text!!.contentEquals(myDetails.mobile, false)) {
             return true
@@ -391,11 +409,11 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun doValidation(): String {
-        if (TextUtils.isEmpty(fname.text.toString().trim())) {
-            fname.error = "Enter name"
+        if (TextUtils.isEmpty(firstName.text.toString().trim())) {
+            firstName.error = "Enter name"
             return "Enter name"
-        } else if (!Util.isValidName(fname.text.toString())) {
-            fname.error = "Enter valid name"
+        } else if (!Util.isValidName(firstName.text.toString())) {
+            firstName.error = "Enter valid name"
             return "Enter valid name"
         } else if (TextUtils.isEmpty(email.text.toString().trim())) {
             email.error = "Enter email"
@@ -429,7 +447,7 @@ class EditProfileActivity : AppCompatActivity() {
                             dialog.show()
                         }
                         val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
-                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        call!!.enqueue(object : Callback<JsonObject?> {
 
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
@@ -479,7 +497,7 @@ class EditProfileActivity : AppCompatActivity() {
                             dialog.show()
                         }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
-                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        call!!.enqueue(object : Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
@@ -492,12 +510,12 @@ class EditProfileActivity : AppCompatActivity() {
                                     }
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
-                                        Picasso.with(context).load(loginresp.picture).into(profile_pic_edit)
+                                        Picasso.with(context).load(loginresp.picture).into(profilePic)
                                     }
-                                    if (!TextUtils.isEmpty(loginresp.firstName)) fname.text =
+                                    if (!TextUtils.isEmpty(loginresp.firstName)) firstName.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.firstName)
                                     warriorStr = loginresp.isWarrior.toBoolean()
-                                    if (!TextUtils.isEmpty(loginresp.lastName)) lname.text =
+                                    if (!TextUtils.isEmpty(loginresp.lastName)) lastName.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.lastName)
                                     if (!TextUtils.isEmpty(loginresp.address)) address.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.address)
@@ -582,7 +600,7 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateProfilePic(context: Context, data: JsonObject) {
+    private fun updateProfilePic(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
@@ -592,7 +610,7 @@ class EditProfileActivity : AppCompatActivity() {
                             dialog.show()
                         }
                         val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
-                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                        call!!.enqueue(object : Callback<JsonObject?> {
 
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {

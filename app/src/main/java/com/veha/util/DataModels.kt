@@ -171,4 +171,5 @@ data class NotificationList(
     val id: String,
     val name: String,
     val content: String,
+    val createdAt: String,
 )

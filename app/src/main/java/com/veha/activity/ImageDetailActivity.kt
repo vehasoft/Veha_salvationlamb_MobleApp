@@ -6,7 +6,6 @@ import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.veha.activity.R
 import com.squareup.picasso.Picasso
 
 

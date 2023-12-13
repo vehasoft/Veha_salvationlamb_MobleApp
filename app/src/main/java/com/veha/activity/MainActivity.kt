@@ -21,11 +21,13 @@ import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
@@ -40,8 +42,8 @@ import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
+import pl.droidsonroids.gif.GifImageView
 import retrofit2.Call
 import retrofit2.Response
 import kotlin.system.exitProcess
@@ -55,31 +57,37 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewPager: ViewPager
     var userType: String = ""
 
-    var storage_permissions = arrayOf(
+    private lateinit var notification: ImageView
+    private lateinit var menu: ImageView
+    private lateinit var bannerClose: Button
+    private lateinit var banner: ConstraintLayout
+    private lateinit var makeWarrior: TextView
+    private lateinit var makeWarriorGif: GifImageView
+
+    var storagePermissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         READ_EXTERNAL_STORAGE, CAMERA_SERVICE
     )
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    var storage_permissions_33 = arrayOf(
+    var storagePermissions33 = arrayOf(
         Manifest.permission.READ_MEDIA_IMAGES,
         Manifest.permission.READ_MEDIA_AUDIO,
         Manifest.permission.READ_MEDIA_VIDEO,
         Manifest.permission.CAMERA,
     )
 
-    fun permissions(): Array<String>? {
-        val p: Array<String>
-        p = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            storage_permissions_33
+    private fun permissions(): Array<String> {
+        val p: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            storagePermissions33
         } else {
-            storage_permissions
+            storagePermissions
         }
         return p
     }
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
-        permissions()?.let {
+        permissions().let {
             ActivityCompat.requestPermissions(
                 this,
                 it,
@@ -100,19 +108,21 @@ class MainActivity : AppCompatActivity() {
 
     private val rotationObserver = object : ContentObserver(Handler()) {
         override fun onChange(selfChange: Boolean) {
-            if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-            } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+            requestedOrientation =
+                if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+                    ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-         if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-        } else {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
+        requestedOrientation =
+            if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            } else {
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
         contentResolver.registerContentObserver(Settings.System.getUriFor
             (Settings.System.ACCELEROMETER_ROTATION),
             true,rotationObserver)
@@ -135,6 +145,14 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         dialog.dismiss()
+
+        notification = findViewById(R.id.notification)
+        menu = findViewById(R.id.menu)
+        bannerClose = findViewById(R.id.banner_close)
+        banner = findViewById(R.id.banner)
+        makeWarrior = findViewById(R.id.makewarrior)
+        makeWarriorGif = findViewById(R.id.makewarrior_gif)
+
         checkPermission()
         getMyDetails()
         if (Util.isFirst != null && Util.isFirst) {
@@ -165,7 +183,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, NotificationViewActivity::class.java)
             startActivity(intent)
         }
-        banner_close.setOnClickListener {
+        bannerClose.setOnClickListener {
             banner.visibility = View.GONE
         }
         banner.setOnClickListener {
@@ -312,12 +330,12 @@ class MainActivity : AppCompatActivity() {
                                         banner.visibility = View.GONE
                                     } else if (loginresp.isReviewState.toBoolean()){
                                         banner.visibility = View.VISIBLE
-                                        makewarrior.text = "Your warrior request is \nwaiting for admin approval"
-                                        makewarrior_gif.visibility = View.GONE
+                                        makeWarrior.text = "Your warrior request is \nwaiting for admin approval"
+                                        makeWarriorGif.visibility = View.GONE
                                     } else {
                                         banner.visibility = View.VISIBLE
-                                        makewarrior.text = "Make Me Warrior"
-                                        makewarrior_gif.visibility = View.VISIBLE
+                                        makeWarrior.text = "Make Me Warrior"
+                                        makeWarriorGif.visibility = View.VISIBLE
                                     }
                                     if (dialog.isShowing) {
                                         dialog.dismiss()

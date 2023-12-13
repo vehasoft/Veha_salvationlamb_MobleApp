@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.adapter.FileAdapter
-import com.veha.activity.R
 import com.veha.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonArray

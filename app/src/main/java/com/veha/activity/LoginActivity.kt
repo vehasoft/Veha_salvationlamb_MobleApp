@@ -4,16 +4,15 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
 import com.veha.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login.email
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -21,6 +20,14 @@ import retrofit2.Response
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var dialog: AlertDialog
+
+    private lateinit var signupButton: Button
+    private lateinit var loginButton: Button
+    private lateinit var forgotPassword: TextView
+    private lateinit var termsAndConditions: TextView
+    private lateinit var privacyPolicy: TextView
+    private lateinit var email: TextView
+    private lateinit var password: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
@@ -29,25 +36,34 @@ class LoginActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.setInverseBackgroundForced(false)
         setContentView(R.layout.activity_login)
-        signup_btn.setOnClickListener {
+
+        signupButton = findViewById(R.id.signup_btn)
+        loginButton = findViewById(R.id.login_btn)
+        forgotPassword = findViewById(R.id.forgot_pwd)
+        termsAndConditions = findViewById(R.id.terms)
+        privacyPolicy = findViewById(R.id.privacy)
+        email = findViewById(R.id.email)
+        password = findViewById(R.id.password)
+
+        signupButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
-        forgot_pwd.setOnClickListener {
+        forgotPassword.setOnClickListener {
             val intent = Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
             startActivity(intent)
         }
-        terms.setOnClickListener {
+        termsAndConditions.setOnClickListener {
             val intent = Intent(this@LoginActivity, WebViewActivity::class.java)
             intent.putExtra("WebPageName", "terms")
             startActivity(intent)
         }
-        privacy.setOnClickListener {
+        privacyPolicy.setOnClickListener {
             val intent = Intent(this@LoginActivity, WebViewActivity::class.java)
             intent.putExtra("WebPageName", "privacy")
             startActivity(intent)
         }
-        login_btn.setOnClickListener {
+        loginButton.setOnClickListener {
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()
             val data = JsonObject()

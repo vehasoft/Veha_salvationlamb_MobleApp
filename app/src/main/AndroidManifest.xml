@@ -70,7 +70,7 @@
                 android:name=".ViewLikesActivity"
                 android:exported="false"/>
         <activity
-                android:name=".SplashhScreenActivity"
+                android:name=".SplashScreenActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

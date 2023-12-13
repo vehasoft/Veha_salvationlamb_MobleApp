@@ -31,7 +31,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response

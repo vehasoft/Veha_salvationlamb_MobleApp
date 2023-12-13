@@ -2,14 +2,15 @@ package com.veha.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.veha.activity.R
-import kotlinx.android.synthetic.main.activity_web_view.*
 
 class WebViewActivity : AppCompatActivity() {
+    private lateinit var webView: WebView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
+        webView = findViewById(R.id.webView)
         val page: String = intent.getStringExtra("WebPageName").toString()
         val url: String = if (page.contentEquals("terms")){
             "https://salvationlamb.com/terms"

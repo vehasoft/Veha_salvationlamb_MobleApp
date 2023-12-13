@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -14,15 +13,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
-import com.veha.util.UserRslt
 import com.veha.util.Util
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response

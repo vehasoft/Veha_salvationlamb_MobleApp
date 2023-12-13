@@ -9,13 +9,11 @@ import android.view.ContextThemeWrapper
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
 import com.veha.fragments.HomeFragment
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import dmax.dialog.SpotsDialog
-import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.coroutines.launch
 
 class FavoritesActivity : AppCompatActivity() {
@@ -23,6 +21,8 @@ class FavoritesActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
     private lateinit var dialog: android.app.AlertDialog
+
+    private lateinit var menu: ImageButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
@@ -33,6 +33,7 @@ class FavoritesActivity : AppCompatActivity() {
         dialog.setInverseBackgroundForced(false)
         userPreferences = UserPreferences(this)
         logo = findViewById(R.id.prod_logo)
+        menu = findViewById(R.id.menu)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
