@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         }
         return p
     }
+
     private fun requestPermission() {
         //on below line we are requesting the read external storage permissions.
         permissions().let {
@@ -109,30 +110,45 @@ class MainActivity : AppCompatActivity() {
     private val rotationObserver = object : ContentObserver(Handler()) {
         override fun onChange(selfChange: Boolean) {
             requestedOrientation =
-                if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+                if (android.provider.Settings.System.getInt(
+                        contentResolver,
+                        Settings.System.ACCELEROMETER_ROTATION,
+                        0
+                    ) == 1
+                ) {
                     ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 } else {
                     ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation =
-            if (android.provider.Settings.System.getInt(contentResolver,Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+            if (android.provider.Settings.System.getInt(
+                    contentResolver,
+                    Settings.System.ACCELEROMETER_ROTATION,
+                    0
+                ) == 1
+            ) {
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-        contentResolver.registerContentObserver(Settings.System.getUriFor
-            (Settings.System.ACCELEROMETER_ROTATION),
-            true,rotationObserver)
+        contentResolver.registerContentObserver(
+            Settings.System.getUriFor
+                (Settings.System.ACCELEROMETER_ROTATION),
+            true, rotationObserver
+        )
         when (Util.isNight) {
             Util.DAY -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+
             Util.NIGHT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
+
             Util.DEFAULT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
@@ -187,7 +203,7 @@ class MainActivity : AppCompatActivity() {
             banner.visibility = View.GONE
         }
         banner.setOnClickListener {
-            if(!Util.isWarrior && !Util.user.isReviewState.toBoolean()) {
+            if (!Util.isWarrior && !Util.user.isReviewState.toBoolean()) {
                 Commons().makeWarrior(this@MainActivity, this)
                 banner.visibility = View.GONE
             }
@@ -222,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
                     }
+
                     R.id.logout -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
                         builder.setMessage("Do you want to Logout?")
@@ -241,14 +258,17 @@ class MainActivity : AppCompatActivity() {
                         val alertDialog: AlertDialog = builder.create()
                         alertDialog.show()
                     }
+
                     R.id.edit_profile -> {
                         val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.fav -> {
                         val intent = Intent(this@MainActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.settings -> {
                         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -264,23 +284,31 @@ class MainActivity : AppCompatActivity() {
         val pdf = tabLayout.newTab()
         val adminVideo = tabLayout.newTab()
         val adminAudio = tabLayout.newTab()
+        val bibleBook = tabLayout.newTab()
         home.icon = getDrawable(R.drawable.ic_baseline_home_24)
         profile.icon = getDrawable(R.drawable.profile)
         pdf.icon = getDrawable(R.drawable.ic_baseline_folder_24)
         adminVideo.icon = getDrawable(R.drawable.ic_baseline_video_library_24)
         adminAudio.icon = getDrawable(R.drawable.ic_baseline_audio_file_24)
+        bibleBook.icon = getDrawable(R.drawable.bible_book)
         home.tag = "Home"
         profile.tag = "Profile"
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
+        bibleBook.tag = "Bible"
         tabLayout.addTab(home, 0)
         tabLayout.addTab(pdf, 1)
-        tabLayout.addTab(adminVideo, 2)
-        tabLayout.addTab(adminAudio, 3)
-        tabLayout.addTab(profile, 4)
+        tabLayout.addTab(bibleBook, 2)
+        tabLayout.addTab(adminVideo, 3)
+        tabLayout.addTab(adminAudio, 4)
+        tabLayout.addTab(profile, 5)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
-        val adapter = TabAdapter(this@MainActivity, this@MainActivity.supportFragmentManager, tabLayout.tabCount)
+        val adapter = TabAdapter(
+            this@MainActivity,
+            this@MainActivity.supportFragmentManager,
+            tabLayout.tabCount
+        )
         viewPager = findViewById(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
@@ -293,6 +321,7 @@ class MainActivity : AppCompatActivity() {
                     viewPager.currentItem = tab.position
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
 
@@ -312,14 +341,23 @@ class MainActivity : AppCompatActivity() {
                         }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    val loginresp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
-                                    if (loginresp.blocked.toBoolean()){
-                                        Toast.makeText(this@MainActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
-                                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                    if (loginresp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        val intent =
+                                            Intent(this@MainActivity, LoginActivity::class.java)
                                         startActivity(intent)
                                     }
                                     Util.isFirst = loginresp.isFreshUser.toBoolean()
@@ -328,9 +366,10 @@ class MainActivity : AppCompatActivity() {
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     if (loginresp.isWarrior.toBoolean()) {
                                         banner.visibility = View.GONE
-                                    } else if (loginresp.isReviewState.toBoolean()){
+                                    } else if (loginresp.isReviewState.toBoolean()) {
                                         banner.visibility = View.VISIBLE
-                                        makeWarrior.text = "Your warrior request is \nwaiting for admin approval"
+                                        makeWarrior.text =
+                                            "Your warrior request is \nwaiting for admin approval"
                                         makeWarriorGif.visibility = View.GONE
                                     } else {
                                         banner.visibility = View.VISIBLE
@@ -341,14 +380,20 @@ class MainActivity : AppCompatActivity() {
                                         dialog.dismiss()
                                     }
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(this@MainActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent =
+                                        Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
                             }
+
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
@@ -385,9 +430,13 @@ class MainActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.putFreshUser("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.putFreshUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 Log.e("firstttime", response.code().toString())
                                 Util.isFirst = false
                                 if (dialog.isShowing) {
@@ -426,10 +475,12 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         dialog.dismiss()
     }
+
     override fun onResume() {
         super.onResume()
         dialog.dismiss()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         dialog.dismiss()

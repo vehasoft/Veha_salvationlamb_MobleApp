@@ -145,6 +145,11 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
         />
+        <jp.wasabeef.richeditor.RichEditor
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/richtext_editor"
+            />
     </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

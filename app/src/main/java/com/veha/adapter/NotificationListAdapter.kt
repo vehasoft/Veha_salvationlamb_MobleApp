@@ -14,7 +14,7 @@ import com.veha.util.NotificationList
 
 class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.ViewHolder>() {
     private lateinit var notifications: ArrayList<NotificationList>
-    private  lateinit var context: Context
+    private lateinit var context: Context
 
     constructor(notifications: ArrayList<NotificationList>, context: Context) : this() {
         this.notifications = notifications
@@ -24,30 +24,34 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         //val name : TextView = view.findViewById(R.id.name_fol)
         //val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
-        val notificationContent : TextView = view.findViewById(R.id.notification_content)
-        val notificationListLinear : LinearLayout = view.findViewById(R.id.notification_list_linear)
+        val notificationContent: TextView = view.findViewById(R.id.notification_content)
+        val notificationtime: TextView = view.findViewById(R.id.time_ago)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationListAdapter.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): NotificationListAdapter.ViewHolder {
         var layoutInflater: LayoutInflater = LayoutInflater.from(context)
         var items: View = layoutInflater.inflate(R.layout.child_notification_list, parent, false)
         return ViewHolder(items)
     }
 
     override fun getItemCount(): Int {
-        return  notifications.size
+        return notifications.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val notification : NotificationList = notifications[position]
+        val notification: NotificationList = notifications[position]
 
-        val html = "<b>" + notification.name + "</b>" +  " " + "<p>" + notification.content + "<br>" + notification.createdAt + "</p>"
+        val html = "<b>" + notification.name + "</b>" + "  " + notification.content
 
         (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT)
         } else {
             Html.fromHtml(html)
         }).also { holder.notificationContent.text = it }
+        holder.notificationtime.text = notification.createdAt
         /*holder.name.text = notification.user.name
         if (!notification.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(notification.user.picture).into(holder.profilePic)
