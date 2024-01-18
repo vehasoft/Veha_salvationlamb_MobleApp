@@ -15,6 +15,8 @@ class NotificationViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_view)
 
+        //VehaLoader_1(this).show()
+
         notificationRecyclerView=findViewById(R.id.notification_recycler)
 
         val n1 = NotificationList("1","test","liked your post","1 min ago")

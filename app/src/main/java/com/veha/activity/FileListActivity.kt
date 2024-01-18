@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
@@ -28,10 +29,12 @@ import retrofit2.Response
 
 class FileListActivity : AppCompatActivity() {
     var path: String = ""
+    var name: String = ""
     lateinit var recyclerView: RecyclerView
     lateinit var noFilesText: LinearLayout
     lateinit var logo: ImageView
     lateinit var listIcon: ImageView
+    private lateinit var fileHead: TextView
     var filesAndFolders: ArrayList<FilesAndFolders> = ArrayList()
 
     lateinit var userPreferences: UserPreferences
@@ -48,6 +51,7 @@ class FileListActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recycler_view)
         noFilesText = findViewById(R.id.no_data)
         logo = findViewById(R.id.prod_logo)
+        fileHead = findViewById(R.id.file_head)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -64,6 +68,8 @@ class FileListActivity : AppCompatActivity() {
             finish()
         }
         path = intent.getStringExtra("folderId").toString()
+        name = intent.getStringExtra("folderName").toString()
+        fileHead.text = name
         getFilesAndFolder(path, this)
 
     }

@@ -32,6 +32,7 @@
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="Files"
+                  android:id="@+id/file_head"
                   android:padding="5dp"
                   android:textColor="@color/black"
                   android:layout_weight="1"

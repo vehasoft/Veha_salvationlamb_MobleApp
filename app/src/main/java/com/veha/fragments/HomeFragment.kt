@@ -1,6 +1,5 @@
 package com.veha.fragments
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -30,7 +29,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -40,7 +38,8 @@ class HomeFragment : Fragment() {
     lateinit var userPreferences: UserPreferences
 
     //lateinit var dialog: ProgressDialog
-    lateinit var dialog: AlertDialog
+    //lateinit var dialog: AlertDialog
+    lateinit var dialog: VehaLoader
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var userType: String
@@ -87,12 +86,13 @@ class HomeFragment : Fragment() {
         myLikesMap = HashMap()
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
+        dialog = VehaLoader(requireActivity())//SpotsDialog.Builder().setContext(contexts).build()
+        dialog.setCancelable(false)
         //dialog = ProgressDialog(contexts)
-        dialog.setMessage("Please Wait")
+        /*dialog.setMessage("Please Wait")
         //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
         dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
+        dialog.setInverseBackgroundForced(false)*/
         dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
@@ -119,7 +119,7 @@ class HomeFragment : Fragment() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                 if (!recyclerView.canScrollVertically(-1)) {
                     refresh.isEnabled = true
-                    updated=false
+                    updated = false
                     refresh.setOnRefreshListener {
                         refresh.isRefreshing = false
                         requireFragmentManager().beginTransaction().detach(this@HomeFragment).attach(this@HomeFragment)
@@ -188,9 +188,9 @@ class HomeFragment : Fragment() {
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                // if (dialog.isShowing) {
+                                dialog.dismiss()
+                                //}
                                 Log.e("HomeFragment.getFavPosts", "fail")
                             }
                         })
@@ -318,10 +318,10 @@ class HomeFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
+                                getallFav(owner)
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
-                                getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -369,10 +369,10 @@ class HomeFragment : Fragment() {
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
                                 }
+                                if (type == "fav") getfavPosts(contexts, owner) else getallPosts(contexts, owner)
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
-                                if (type == "fav") getfavPosts(contexts, owner) else getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -421,10 +421,10 @@ class HomeFragment : Fragment() {
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
                                 }
+                                getallFollowers(owner)
                                 if (dialog.isShowing) {
                                     dialog.dismiss()
                                 }
-                                getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -467,8 +467,12 @@ class HomeFragment : Fragment() {
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
-                                    if (loginresp.blocked.toBoolean()){
-                                        Toast.makeText(contexts,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                    if (loginresp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            contexts,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         val intent = Intent(contexts, LoginActivity::class.java)
                                         startActivity(intent)
                                     }
@@ -477,7 +481,11 @@ class HomeFragment : Fragment() {
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     showCreatePost = (userType == Util.WARRIOR) && (type != "fav")
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(contexts,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        contexts,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
@@ -512,7 +520,7 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
+        dialog.dismiss()
 
         if (Util.player != null) {
             Util.player.stop()
@@ -521,9 +529,10 @@ class HomeFragment : Fragment() {
             Util.player = null
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
+        dialog.dismiss()
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -531,9 +540,10 @@ class HomeFragment : Fragment() {
             Util.player = null
         }
     }
+
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
+        dialog.dismiss()
+
     }
 }

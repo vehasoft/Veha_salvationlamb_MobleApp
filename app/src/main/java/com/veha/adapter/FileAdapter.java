@@ -59,6 +59,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             if (selectedFile.getType().equals("folder")) {
                 Intent intent = new Intent(context, FileListActivity.class);
                 intent.putExtra("folderId", selectedFile.getId());
+                intent.putExtra("folderName", selectedFile.getName());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             } else {

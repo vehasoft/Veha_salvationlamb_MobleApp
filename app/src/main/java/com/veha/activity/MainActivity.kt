@@ -264,21 +264,25 @@ class MainActivity : AppCompatActivity() {
         val pdf = tabLayout.newTab()
         val adminVideo = tabLayout.newTab()
         val adminAudio = tabLayout.newTab()
+        val bibleBook = tabLayout.newTab()
         home.icon = getDrawable(R.drawable.ic_baseline_home_24)
         profile.icon = getDrawable(R.drawable.profile)
         pdf.icon = getDrawable(R.drawable.ic_baseline_folder_24)
         adminVideo.icon = getDrawable(R.drawable.ic_baseline_video_library_24)
         adminAudio.icon = getDrawable(R.drawable.ic_baseline_audio_file_24)
+        bibleBook.icon = getDrawable(R.drawable.bible_book)
         home.tag = "Home"
         profile.tag = "Profile"
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
+        bibleBook.tag = "Bible"
         tabLayout.addTab(home, 0)
         tabLayout.addTab(pdf, 1)
-        tabLayout.addTab(adminVideo, 2)
-        tabLayout.addTab(adminAudio, 3)
-        tabLayout.addTab(profile, 4)
+        tabLayout.addTab(bibleBook, 2)
+        tabLayout.addTab(adminVideo, 3)
+        tabLayout.addTab(adminAudio, 4)
+        tabLayout.addTab(profile, 5)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(this@MainActivity, this@MainActivity.supportFragmentManager, tabLayout.tabCount)
         viewPager = findViewById(R.id.viewPager)
