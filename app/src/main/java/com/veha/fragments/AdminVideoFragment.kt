@@ -17,6 +17,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.LoginActivity
 import com.veha.activity.R
@@ -33,7 +34,6 @@ import retrofit2.Response
 class AdminVideoFragment : Fragment() {
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var contexts: Context
@@ -47,6 +47,8 @@ class AdminVideoFragment : Fragment() {
 
     private lateinit var myLikesMap: HashMap<String, String>
     private var myLikes: String = ""
+
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,36 +68,46 @@ class AdminVideoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_admin_video, container, false)
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
+
+        shimmerFrameLayout = view.findViewById(R.id.video_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         page = 1
-        adapter = HomeAdapter(ArrayList(), contexts, "home", myLikesMap, myFollowMap, myFavMap, this@AdminVideoFragment)
+        adapter = HomeAdapter(
+            ArrayList(),
+            contexts,
+            "home",
+            myLikesMap,
+            myFollowMap,
+            myFavMap,
+            this@AdminVideoFragment
+        )
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
         return view
     }
 
-    fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
+    fun getallPosts(
+        context: Context,
+        owner: LifecycleOwner,
+        postlist: ArrayList<Posts> = ArrayList()
+    ) {
         try {
             if (Commons().isNetworkAvailable(context)) {
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getVideoPost("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -106,6 +118,8 @@ class AdminVideoFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0 && page == 1) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -116,8 +130,12 @@ class AdminVideoFragment : Fragment() {
                                             adapter.addItem(postlist)
                                             updated = true
                                         }
-                                        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                                            override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
+                                        list.addOnScrollListener(object :
+                                            RecyclerView.OnScrollListener() {
+                                            override fun onScrollStateChanged(
+                                                recyclerView: RecyclerView,
+                                                dx: Int
+                                            ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
@@ -136,20 +154,18 @@ class AdminVideoFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminVideoFragment.getAllPosts", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -171,12 +187,13 @@ class AdminVideoFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
-                        val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getUserLikes("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     likeslist = ArrayList()
                                     val resp = response.body()
@@ -190,21 +207,19 @@ class AdminVideoFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminVideoFragment.getAllLikes", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -226,12 +241,13 @@ class AdminVideoFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
-                        val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getFollowing("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -242,21 +258,19 @@ class AdminVideoFragment : Fragment() {
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminVideoFragment.getAllFollowers", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -278,13 +292,13 @@ class AdminVideoFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -294,21 +308,19 @@ class AdminVideoFragment : Fragment() {
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminVideoFragment.getAllFav", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -330,31 +342,30 @@ class AdminVideoFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    val loginresp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
-                                }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminVideoFragment.getMyDetails", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -372,24 +383,24 @@ class AdminVideoFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
-        
+
     }
+
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
-        
+
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
-        
+
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (!isVisibleToUser) {
-            fragmentManager?.beginTransaction()?.detach(this@AdminVideoFragment)?.attach(this@AdminVideoFragment)
+            fragmentManager?.beginTransaction()?.detach(this@AdminVideoFragment)
+                ?.attach(this@AdminVideoFragment)
                 ?.commit()
         }
     }

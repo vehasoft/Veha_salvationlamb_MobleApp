@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.AddPostActivity
 import com.veha.activity.LoginActivity
@@ -39,8 +40,6 @@ import retrofit2.Response
 class HomeFragment : Fragment() {
     lateinit var userPreferences: UserPreferences
 
-    //lateinit var dialog: ProgressDialog
-    lateinit var dialog: AlertDialog
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var userType: String
@@ -59,6 +58,8 @@ class HomeFragment : Fragment() {
 
     private var myLikes: String = ""
     private lateinit var myLikesMap: HashMap<String, String>
+
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     companion object {
         fun getInstance(type: String): HomeFragment {
@@ -87,17 +88,14 @@ class HomeFragment : Fragment() {
         myLikesMap = HashMap()
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        //dialog = ProgressDialog(contexts)
-        dialog.setMessage("Please Wait")
-        //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         refresh = view.findViewById(R.id.refresh)
         addPost = view.findViewById(R.id.add_post)
+
+        shimmerFrameLayout = view.findViewById(R.id.shimmerLayout)
+        shimmerFrameLayout.startShimmer()
+
         if (Util.isWarrior) {
             addPost.visibility = View.VISIBLE
         } else {
@@ -110,7 +108,15 @@ class HomeFragment : Fragment() {
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         page = 1
-        adapter = HomeAdapter(ArrayList(), contexts, "home", myLikesMap, myFollowMap, myFavMap, this@HomeFragment)
+        adapter = HomeAdapter(
+            ArrayList(),
+            contexts,
+            "home",
+            myLikesMap,
+            myFollowMap,
+            myFavMap,
+            this@HomeFragment
+        )
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
@@ -119,10 +125,11 @@ class HomeFragment : Fragment() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
                 if (!recyclerView.canScrollVertically(-1)) {
                     refresh.isEnabled = true
-                    updated=false
+                    updated = false
                     refresh.setOnRefreshListener {
                         refresh.isRefreshing = false
-                        requireFragmentManager().beginTransaction().detach(this@HomeFragment).attach(this@HomeFragment)
+                        requireFragmentManager().beginTransaction().detach(this@HomeFragment)
+                            .attach(this@HomeFragment)
                             .commit()
                     }
                 } else {
@@ -140,12 +147,12 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getMyFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -156,6 +163,8 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(post, FavPost::class.java)
                                         postlist.add(pos.posts)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -182,20 +191,18 @@ class HomeFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getFavPosts", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -211,19 +218,23 @@ class HomeFragment : Fragment() {
         }
     }
 
-    fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
+    fun getallPosts(
+        context: Context,
+        owner: LifecycleOwner,
+        postlist: ArrayList<Posts> = ArrayList()
+    ) {
         try {
             if (Commons().isNetworkAvailable(context)) {
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -244,8 +255,12 @@ class HomeFragment : Fragment() {
                                             adapter.addItem(postlist)
                                             updated = true
                                         }
-                                        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                                            override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
+                                        list.addOnScrollListener(object :
+                                            RecyclerView.OnScrollListener() {
+                                            override fun onScrollStateChanged(
+                                                recyclerView: RecyclerView,
+                                                dx: Int
+                                            ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
@@ -264,20 +279,18 @@ class HomeFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllPosts", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -299,12 +312,13 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
-                        val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getUserLikes("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     likeslist = ArrayList()
                                     val resp = response.body()
@@ -318,21 +332,19 @@ class HomeFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllLikes", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -354,12 +366,13 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
-                        val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getFollowing("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -369,21 +382,22 @@ class HomeFragment : Fragment() {
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
-                                if (type == "fav") getfavPosts(contexts, owner) else getallPosts(contexts, owner)
+                                if (type == "fav") getfavPosts(contexts, owner) else getallPosts(
+                                    contexts,
+                                    owner
+                                )
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllFollowers", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -405,13 +419,13 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -421,21 +435,19 @@ class HomeFragment : Fragment() {
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllFav", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -457,18 +469,23 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    val loginresp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
-                                    if (loginresp.blocked.toBoolean()){
-                                        Toast.makeText(contexts,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                    if (loginresp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            contexts,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         val intent = Intent(contexts, LoginActivity::class.java)
                                         startActivity(intent)
                                     }
@@ -477,24 +494,26 @@ class HomeFragment : Fragment() {
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     showCreatePost = (userType == Util.WARRIOR) && (type != "fav")
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(contexts,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        contexts,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
-                                }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getMyDetails", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -512,8 +531,6 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -521,9 +538,9 @@ class HomeFragment : Fragment() {
             Util.player = null
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -531,9 +548,8 @@ class HomeFragment : Fragment() {
             Util.player = null
         }
     }
+
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
 }

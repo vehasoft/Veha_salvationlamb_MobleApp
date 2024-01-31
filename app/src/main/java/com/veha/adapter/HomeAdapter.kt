@@ -45,7 +45,6 @@ class HomeAdapter(
     private var owner: LifecycleOwner,
 ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
     private var likesCount = 0
     private var currentHolder: ViewHolder? = null
 
@@ -76,10 +75,6 @@ class HomeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
-        dialog = SpotsDialog.Builder().setContext(context).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         var layoutInflater: LayoutInflater = LayoutInflater.from(context)
         var items: View = layoutInflater.inflate(R.layout.child_post, parent, false)
         var viewHolder = ViewHolder(items)
@@ -154,12 +149,6 @@ class HomeAdapter(
                     val myHandler = Handler()
                     if (!post.url.isNullOrEmpty()) {
                         holder.audioLayout.visibility = View.VISIBLE
-                        //mediaPlayer.setDataSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3")
-                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/168735710115316871075951701686907491197+%281%29.mp3")
-                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/16871075951701686907491197.mp3")
-                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/ff-16b-1c-44100hz.aac")
-                        //mediaPlayer.setDataSource("https://salvationlamb-images.s3.ap-south-1.amazonaws.com/post/1687282774781ff-16b-1c-44100hz.aac")
-
                         val updateSongTime: Runnable = object : Runnable {
                             override fun run() {
                                 if (Util.player.isPlaying) {
@@ -228,12 +217,7 @@ class HomeAdapter(
                 "video" -> {
                     holder.audioLayout.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
-                    if (!post.url.isNullOrEmpty()) {/*holder.postVideo.settings.javaScriptEnabled = true
-                        holder.postVideo.settings.domStorageEnabled = true
-                        holder.postVideo.webChromeClient = WebChromeClient()
-                        holder.postVideo.webViewClient = WebViewClient()
-                        holder.postVideo.visibility = View.VISIBLE
-                        holder.postVideo.loadUrl(Util.getVideo(post.url))*/
+                    if (!post.url.isNullOrEmpty()) {
                         holder.postVideo.visibility = View.VISIBLE
                         try {
                             (context as MainActivity).lifecycle.addObserver(holder.postVideo)
@@ -403,7 +387,7 @@ class HomeAdapter(
             builder.setTitle("Alert !")
             builder.setCancelable(false)
             builder.setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
-                deletePost(post)
+                deletePost(post,holder)
                 posts.removeAt(position)
                 notifyItemRemoved(position)
             }
@@ -425,9 +409,7 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
+                        holder.likeBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -453,16 +435,12 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
+                                holder.likeBtn.isEnabled = true
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.likeBtn.isEnabled = true
                                 Log.e("HomeAdapter.likePost", "fail")
                             }
                         })
@@ -474,16 +452,14 @@ class HomeAdapter(
         }
     }
 
-    private fun deletePost(post: Posts) {
+    private fun deletePost(post: Posts, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
                 Log.e("deleted post : postid  ==== ", post.id)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
+                        holder.deleteBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -499,16 +475,12 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
+                                holder.deleteBtn.isEnabled = true
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.deleteBtn.isEnabled = true
                                 Log.e("HomeAdapter.deletePost", "fail")
                             }
                         })
@@ -529,9 +501,7 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
+                        holder.followBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -557,16 +527,12 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.followBtn.isEnabled = true
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.followBtn.isEnabled = true
                                 Log.e("HomeAdapter.follow", "fail")
                             }
                         })
@@ -587,9 +553,7 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
+                        holder.fav.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -618,16 +582,12 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("errorMessage", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.fav.isEnabled = true
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.fav.isEnabled = true
                                 Log.e("HomeAdapter.favPost", "fail")
                             }
                         })
@@ -645,9 +605,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -662,16 +619,10 @@ class HomeAdapter(
                                     val errorMessage = loginresp.get("errorMessage").toString()
                                     Log.e("Status", status)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeAdapter.getPost", "fail")
                             }
                         })

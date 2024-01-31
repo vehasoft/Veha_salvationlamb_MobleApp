@@ -16,6 +16,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.*
 import com.veha.util.*
@@ -40,6 +41,7 @@ class ProfileFragment : Fragment() {
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var followersList: ArrayList<AllFollowerList>
     private lateinit var followingList: ArrayList<AllFollowerList>
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     private lateinit var adapter: HomeAdapter
     var followerCount = 0
@@ -48,7 +50,6 @@ class ProfileFragment : Fragment() {
     var updated: Boolean = false
 
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
     private lateinit var list: RecyclerView
     private lateinit var profilePic: ImageView
     private lateinit var profileName: TextView
@@ -59,6 +60,7 @@ class ProfileFragment : Fragment() {
     private lateinit var editProfile: Button
     private lateinit var followerLinear: LinearLayout
     private lateinit var followingLinear: LinearLayout
+    private lateinit var profileLinear: LinearLayout
     private lateinit var nodata: LinearLayout
 
     private var page: Int = 0
@@ -95,15 +97,6 @@ class ProfileFragment : Fragment() {
         who = arguments?.get("who").toString()
 
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
-        getmyDetails(contexts, viewLifecycleOwner)
-        getallLikes(viewLifecycleOwner)
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
         profilePic = view.findViewById(R.id.profile_pic_main)
@@ -116,6 +109,12 @@ class ProfileFragment : Fragment() {
         followingLinear = view.findViewById(R.id.following_linear)
         list = view.findViewById(R.id.my_post_list)
         nodata = view.findViewById(R.id.no_data)
+        profileLinear = view.findViewById(R.id.profile_linear)
+        shimmerFrameLayout = view.findViewById(R.id.profile_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
+
+        getmyDetails(contexts, viewLifecycleOwner)
+        getallLikes(viewLifecycleOwner)
 
         if (who != "me") {
             editProfile.visibility = View.GONE
@@ -150,24 +149,37 @@ class ProfileFragment : Fragment() {
 
         list.layoutManager = LinearLayoutManager(activity)
         val whoPage = if (who == "me") "profile" else "OtherProfile"
-        adapter = HomeAdapter(ArrayList(), contexts, whoPage, HashMap(), HashMap(), myLikesMap, this@ProfileFragment)
+        adapter = HomeAdapter(
+            ArrayList(),
+            contexts,
+            whoPage,
+            HashMap(),
+            HashMap(),
+            myLikesMap,
+            this@ProfileFragment
+        )
         list.adapter = adapter
         return view
     }
 
-    private fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
+    private fun getallPosts(
+        context: Context,
+        owner: LifecycleOwner,
+        postlist: ArrayList<Posts> = ArrayList()
+    ) {
         try {
             if (Commons().isNetworkAvailable(context)) {
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
-                        val call: Call<JsonObject?>? = retrofit.getMyPosts("Bearer $it", userId, page, 10)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getMyPosts("Bearer $it", userId, page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -179,6 +191,8 @@ class ProfileFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -189,8 +203,12 @@ class ProfileFragment : Fragment() {
                                             adapter.addItem(postlist)
                                             updated = true
                                         }
-                                        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                                            override fun onScrollStateChanged(recyclerView: RecyclerView, dx: Int) {
+                                        list.addOnScrollListener(object :
+                                            RecyclerView.OnScrollListener() {
+                                            override fun onScrollStateChanged(
+                                                recyclerView: RecyclerView,
+                                                dx: Int
+                                            ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if (count > page) {
                                                         page++
@@ -202,21 +220,19 @@ class ProfileFragment : Fragment() {
                                         })
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllPosts", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -238,12 +254,12 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -256,21 +272,19 @@ class ProfileFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllLikes", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -292,40 +306,39 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
                                         Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                                     followersList = ArrayList()
                                     for (likes in loginresp) {
-                                        val pos = Gson().fromJson(likes, AllFollowerList::class.java)
+                                        val pos =
+                                            Gson().fromJson(likes, AllFollowerList::class.java)
                                         followersList.add(pos)
                                     }
                                     followerCount = followersList.size
                                     profileFollowers.text = followerCount.toString()
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowing(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllFollowers", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -347,19 +360,20 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
                                         Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                                     followingList = ArrayList()
                                     for (likes in loginresp) {
-                                        val pos = Gson().fromJson(likes, AllFollowerList::class.java)
+                                        val pos =
+                                            Gson().fromJson(likes, AllFollowerList::class.java)
                                         followingList.add(pos)
                                     }
                                     followingCount = followingList.size
@@ -367,21 +381,19 @@ class ProfileFragment : Fragment() {
                                 } else {
                                     Log.e("following", "fails - " + response.code())
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getmyDetails(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllFollowing", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -403,23 +415,31 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
-                                    if (loginresp.blocked.toBoolean()){
-                                        Toast.makeText(contexts,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                                    val loginresp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    if (loginresp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            contexts,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         val intent = Intent(contexts, LoginActivity::class.java)
                                         startActivity(intent)
                                     }
+                                    profileLinear.visibility = View.VISIBLE
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         picture = loginresp.picture
-                                        Picasso.with(context).load(loginresp.picture).into(profilePic)
+                                        Picasso.with(context).load(loginresp.picture)
+                                            .into(profilePic)
                                     } else {
                                         picture = ""
                                     }
@@ -432,24 +452,26 @@ class ProfileFragment : Fragment() {
                                     }
                                     profileName.text = loginresp.name + role
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(contexts,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        contexts,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
-                                }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getMyDetails", "fail")
                             }
                         })
                     } else {
-                        Toast.makeText(contexts, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -464,20 +486,20 @@ class ProfileFragment : Fragment() {
             Log.e("ProfileFragment.getMyDetails", e.toString())
         }
     }
+
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
-        
+
     }
+
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
-        
+
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
-        
+
     }
 
 }
