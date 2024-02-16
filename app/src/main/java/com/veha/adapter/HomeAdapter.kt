@@ -5,7 +5,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Handler
+import android.text.Html
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -56,6 +58,7 @@ class HomeAdapter(
         val tags: TextView = view.findViewById(R.id.tags)
         val saveTxt: TextView = view.findViewById(R.id.save_txt)
         val title: TextView = view.findViewById(R.id.title)
+        val contentUrl: TextView = view.findViewById(R.id.content_url)
         val content: ExpandableView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
@@ -260,7 +263,15 @@ class HomeAdapter(
                 }
             }
         }
-
+        if (post.contentURL.isNullOrEmpty()){
+            holder.contentUrl.visibility = View.GONE
+        } else {
+            holder.contentUrl.visibility = View.VISIBLE
+            val url = "<a href=\"" + post.contentURL + "\">" + post.contentURL + "</a>"
+            holder.contentUrl.movementMethod = LinkMovementMethod.getInstance()
+            holder.contentUrl.text = Html.fromHtml(url)
+            holder.contentUrl.isClickable = true
+        }
         likesCount = post.likesCount.toInt()
         if (post.userId == Util.userId || page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) holder.followBtn.visibility =
             View.GONE else holder.followBtn.visibility = View.VISIBLE
