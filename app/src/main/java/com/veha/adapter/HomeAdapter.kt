@@ -267,7 +267,11 @@ class HomeAdapter(
             holder.contentUrl.visibility = View.GONE
         } else {
             holder.contentUrl.visibility = View.VISIBLE
-            val url = "<a href=\"" + post.contentURL + "\">" + post.contentURL + "</a>"
+            val urlList = post.contentURL.split(",")
+            var url = ""
+            for (urls in urlList) {
+                url += "<a href=\"" + urls + "\">" + urls + "</a><br>"
+            }
             holder.contentUrl.movementMethod = LinkMovementMethod.getInstance()
             holder.contentUrl.text = Html.fromHtml(url)
             holder.contentUrl.isClickable = true
