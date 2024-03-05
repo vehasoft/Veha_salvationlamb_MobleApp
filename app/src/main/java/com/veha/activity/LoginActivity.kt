@@ -19,7 +19,6 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
 
     private lateinit var signupButton: Button
     private lateinit var loginButton: Button
@@ -31,10 +30,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         setContentView(R.layout.activity_login)
 
         signupButton = findViewById(R.id.signup_btn)
@@ -74,8 +69,10 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
                 Toast.makeText(this, "Invalid Password", Toast.LENGTH_LONG).show()
-            else
+            else {
+                loginButton.isEnabled = false
                 login(data)
+            }
         }
 
     }
@@ -83,9 +80,6 @@ class LoginActivity : AppCompatActivity() {
     private fun login(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("login", data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -127,21 +121,18 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.makeText(this@LoginActivity, "INVALID USER", Toast.LENGTH_LONG).show()
                             }
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("LoginActivity.login()", "fail")
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
                 })
             }
         } catch (e: Exception) {
             Log.e("LoginActivity.login", e.toString())
+        }
+        finally {
+            loginButton.isEnabled = true
         }
     }
 
@@ -201,8 +192,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }
 

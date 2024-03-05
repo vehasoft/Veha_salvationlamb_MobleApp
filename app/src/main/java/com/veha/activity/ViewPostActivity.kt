@@ -40,10 +40,6 @@ class ViewPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
         userPreferences = UserPreferences(this)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -55,17 +51,20 @@ class ViewPostActivity : AppCompatActivity() {
     fun getPost(postId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
+                                    val post: Posts = Gson().fromJson(
+                                        response.body()?.get("result"),
+                                        Posts::class.java
+                                    )
                                     tags.text = post.tags
                                     time.text = Util.getTimeAgo(post.createdAt)
                                     content.text = post.content
@@ -77,15 +76,9 @@ class ViewPostActivity : AppCompatActivity() {
                                     val status = loginresp.get("status").toString()
                                     val errorMessage = loginresp.get("errorMessage").toString()*/
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ViewPost", "fail")
                             }
                         })
@@ -95,11 +88,5 @@ class ViewPostActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("ViewPost", e.toString())
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-            dialog.dismiss()
-        
     }
 }

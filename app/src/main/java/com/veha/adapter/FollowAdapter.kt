@@ -29,7 +29,6 @@ class FollowAdapter(
     private var owner: LifecycleOwner
 ) : RecyclerView.Adapter<FollowAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name_fol)
@@ -42,10 +41,6 @@ class FollowAdapter(
         var layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
         var items: View = layoutInflater.inflate(R.layout.child_follow, parent, false)
         var viewHolder = ViewHolder(items)
-        dialog = SpotsDialog.Builder().setContext(context).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         return viewHolder
     }
 
@@ -94,9 +89,6 @@ class FollowAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -115,16 +107,10 @@ class FollowAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("FollowAdapter.follow", "fail")
                             }
                         })

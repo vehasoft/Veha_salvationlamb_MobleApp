@@ -1,6 +1,5 @@
 package com.veha.activity
 
-import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,7 +16,6 @@ import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -35,7 +33,6 @@ class ChangePasswordActivity : AppCompatActivity() {
     private lateinit var cnfmPasswordTextView: TextView
 
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,10 +47,6 @@ class ChangePasswordActivity : AppCompatActivity() {
         oldPasswordTextView = findViewById(R.id.old_pwd)
         cancelButton = findViewById(R.id.cancel_btn)
 
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         val email = intent.getStringExtra("email")
         val otp = intent.getStringExtra("otp")
         if (TextUtils.isEmpty(email?.trim())) oldPasswordOp.visibility = View.VISIBLE else oldPasswordOp.visibility =
@@ -77,6 +70,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                 Toast.makeText(this@ChangePasswordActivity, "new password is same as old password", Toast.LENGTH_LONG).show()
                 newPasswordTextView.error = "new password is same as old password"
             } else {
+                changePasswordButton.isEnabled = false
                 if (TextUtils.isEmpty(email?.trim())) {
                     val data = JsonObject()
                     data.addProperty("userId", Util.userId)
@@ -101,15 +95,9 @@ class ChangePasswordActivity : AppCompatActivity() {
     private fun changePassword(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postChangePassword("Bearer $it", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -129,16 +117,10 @@ class ChangePasswordActivity : AppCompatActivity() {
                                     Log.e("ok", response.body().toString())*/
 
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ChangePasswordActivity.changePassword", "fail")
                             }
                         })
@@ -160,14 +142,14 @@ class ChangePasswordActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("ChangePasswordActivity.changePassword", e.toString())
         }
+        finally {
+            changePasswordButton.isEnabled = true
+        }
     }
 
     private fun forgotPassword(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -187,16 +169,10 @@ class ChangePasswordActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)*/
                             Toast.makeText(this@ChangePasswordActivity, "Something went wrong", Toast.LENGTH_LONG).show()
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         call.cancel()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("ChangePasswordActivity.forgotPassword", "fail")
                     }
                 })
@@ -204,21 +180,18 @@ class ChangePasswordActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("ChangePasswordActivity.forgotPassword", e.toString())
         }
+        finally {
+            changePasswordButton.isEnabled = true
+        }
     }
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }

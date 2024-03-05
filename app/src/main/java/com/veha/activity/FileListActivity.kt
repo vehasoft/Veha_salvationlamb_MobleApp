@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.FileAdapter
 import com.veha.util.*
 import com.google.gson.Gson
@@ -36,18 +37,16 @@ class FileListActivity : AppCompatActivity() {
     lateinit var listIcon: ImageView
     private lateinit var fileHead: TextView
     var filesAndFolders: ArrayList<FilesAndFolders> = ArrayList()
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
         userPreferences = UserPreferences(this@FileListActivity)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
+        shimmerFrameLayout = findViewById(R.id.file_shimmer_layout)
+
+        shimmerFrameLayout.startShimmer()
         recyclerView = findViewById(R.id.recycler_view)
         noFilesText = findViewById(R.id.no_data)
         logo = findViewById(R.id.prod_logo)
@@ -80,9 +79,6 @@ class FileListActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -95,6 +91,8 @@ class FileListActivity : AppCompatActivity() {
                                         val pos = Gson().fromJson(files, FilesAndFolders::class.java)
                                         filesAndFolders.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (filesAndFolders.size <= 0) {
                                         noFilesText.visibility = View.VISIBLE
                                         recyclerView.visibility = View.GONE
@@ -110,15 +108,9 @@ class FileListActivity : AppCompatActivity() {
                                         recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("FileListActivity.getFilesAndFolder", "fail")
                             }
                         })
@@ -144,16 +136,13 @@ class FileListActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
     }
 
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
     }
 }

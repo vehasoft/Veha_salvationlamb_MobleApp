@@ -51,7 +51,6 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
     lateinit var search: ImageView
     lateinit var logo: ImageView
     lateinit var viewPager: ViewPager
@@ -156,11 +155,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         userPreferences = UserPreferences(this@MainActivity)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
 
         notification = findViewById(R.id.notification)
         menu = findViewById(R.id.menu)
@@ -336,9 +330,6 @@ class MainActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
@@ -376,9 +367,6 @@ class MainActivity : AppCompatActivity() {
                                         makeWarrior.text = "Make Me Warrior"
                                         makeWarriorGif.visibility = View.VISIBLE
                                     }
-                                    if (dialog.isShowing) {
-                                        dialog.dismiss()
-                                    }
                                 } else if (response.code() == 401) {
                                     Toast.makeText(
                                         this@MainActivity,
@@ -389,15 +377,9 @@ class MainActivity : AppCompatActivity() {
                                         Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("MainActivity.getDetails", "fail$t")
                             }
                         })
@@ -424,9 +406,6 @@ class MainActivity : AppCompatActivity() {
     private fun firstTime() {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -439,15 +418,9 @@ class MainActivity : AppCompatActivity() {
                             ) {
                                 Log.e("firstttime", response.code().toString())
                                 Util.isFirst = false
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("MainActivity.firstTime", "fail")
                             }
                         })
@@ -473,21 +446,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
     }
 
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
     }
 
     override fun onBackPressed() {
-        dialog.dismiss()
         if (viewPager.currentItem == 0) {
             exitProcess(-1)
         } else {

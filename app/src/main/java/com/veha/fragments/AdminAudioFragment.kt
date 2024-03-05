@@ -17,6 +17,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.LoginActivity
 import com.veha.activity.R
@@ -33,12 +34,12 @@ import retrofit2.Response
 class AdminAudioFragment : Fragment() {
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var contexts: Context
     lateinit var adapter: HomeAdapter
     var updated: Boolean = false
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     private lateinit var likeslist: ArrayList<PostLikes>
     private lateinit var myFollowMap: HashMap<String, String>
@@ -68,16 +69,13 @@ class AdminAudioFragment : Fragment() {
         myFollowMap = HashMap()
         myFavMap = HashMap()
         myLikesMap = HashMap()
-        val view = inflater.inflate(R.layout.fragment_admin_video, container, false)
+        val view = inflater.inflate(R.layout.fragment_admin_audio, container, false)
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
+        shimmerFrameLayout = view.findViewById(R.id.audio_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)
         page = 1
@@ -91,9 +89,6 @@ class AdminAudioFragment : Fragment() {
     fun getallPosts(context: Context, owner: LifecycleOwner, postlist: ArrayList<Posts> = ArrayList()) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -111,6 +106,8 @@ class AdminAudioFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0 && page == 1) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -142,15 +139,9 @@ class AdminAudioFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminAudioFragment.getAllPosts", "fail")
                             }
                         })
@@ -174,9 +165,6 @@ class AdminAudioFragment : Fragment() {
     fun getallLikes(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -196,16 +184,10 @@ class AdminAudioFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFav(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminAudioFragment.getAllLikes", "fail")
                             }
                         })
@@ -228,9 +210,6 @@ class AdminAudioFragment : Fragment() {
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -247,16 +226,10 @@ class AdminAudioFragment : Fragment() {
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminAudioFragment.getAllFollowers", "fail")
                             }
                         })
@@ -280,9 +253,6 @@ class AdminAudioFragment : Fragment() {
     fun getallFav(owner: LifecycleOwner) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
@@ -299,16 +269,10 @@ class AdminAudioFragment : Fragment() {
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminAudioFragment.getAllFav", "fail")
                             }
                         })
@@ -335,9 +299,6 @@ class AdminAudioFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -346,15 +307,9 @@ class AdminAudioFragment : Fragment() {
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AdminAudioFragment.getMyDetails", "fail")
                             }
                         })
@@ -376,14 +331,10 @@ class AdminAudioFragment : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
         
     }
     override fun onPause() {
         super.onPause()
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
         if (Util.player != null) {
             Util.player.stop()
         }
@@ -391,9 +342,6 @@ class AdminAudioFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
         if (Util.player != null) {
             Util.player.stop()
         }

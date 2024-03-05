@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.AddPostActivity
 import com.veha.activity.LoginActivity
@@ -39,7 +40,7 @@ class HomeFragment : Fragment() {
 
     //lateinit var dialog: ProgressDialog
     //lateinit var dialog: AlertDialog
-    lateinit var dialog: VehaLoader
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var userType: String
@@ -86,18 +87,12 @@ class HomeFragment : Fragment() {
         myLikesMap = HashMap()
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         userPreferences = UserPreferences(contexts)
-        dialog = VehaLoader(requireActivity())//SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setCancelable(false)
-        //dialog = ProgressDialog(contexts)
-        /*dialog.setMessage("Please Wait")
-        //dialog.setProgressDrawable(resources.getDrawable(R.drawable.ic_sl_logo_01_svg))
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)*/
-        dialog.dismiss()
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
         refresh = view.findViewById(R.id.refresh)
         addPost = view.findViewById(R.id.add_post)
+        shimmerFrameLayout = view.findViewById(R.id.shimmerLayout)
+        shimmerFrameLayout.startShimmer()
         if (Util.isWarrior) {
             addPost.visibility = View.VISIBLE
         } else {
@@ -140,9 +135,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getMyFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -156,6 +148,8 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(post, FavPost::class.java)
                                         postlist.add(pos.posts)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -182,15 +176,9 @@ class HomeFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                // if (dialog.isShowing) {
-                                dialog.dismiss()
-                                //}
                                 Log.e("HomeFragment.getFavPosts", "fail")
                             }
                         })
@@ -218,9 +206,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -234,6 +219,8 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (postlist.size <= 0 && page == 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -264,15 +251,9 @@ class HomeFragment : Fragment() {
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllPosts", "fail")
                             }
                         })
@@ -299,9 +280,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -319,15 +297,9 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 getallFav(owner)
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllLikes", "fail")
                             }
                         })
@@ -354,9 +326,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -370,15 +339,9 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 if (type == "fav") getfavPosts(contexts, owner) else getallPosts(contexts, owner)
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllFollowers", "fail")
                             }
                         })
@@ -405,9 +368,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFav("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -422,15 +382,9 @@ class HomeFragment : Fragment() {
                                     }
                                 }
                                 getallFollowers(owner)
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getAllFav", "fail")
                             }
                         })
@@ -457,9 +411,6 @@ class HomeFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -489,15 +440,9 @@ class HomeFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeFragment.getMyDetails", "fail")
                             }
                         })
@@ -520,7 +465,6 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
 
         if (Util.player != null) {
             Util.player.stop()
@@ -532,7 +476,6 @@ class HomeFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
         if (Util.player != null) {
             Util.player.stop()
             Util.player.reset()
@@ -543,7 +486,6 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
 
     }
 }

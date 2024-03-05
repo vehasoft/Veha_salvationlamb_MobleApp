@@ -16,6 +16,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.HomeAdapter
 import com.veha.activity.*
 import com.veha.util.*
@@ -48,7 +49,7 @@ class ProfileFragment : Fragment() {
     var updated: Boolean = false
 
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
     private lateinit var list: RecyclerView
     private lateinit var profilePic: ImageView
     private lateinit var profileName: TextView
@@ -59,6 +60,7 @@ class ProfileFragment : Fragment() {
     private lateinit var editProfile: Button
     private lateinit var followerLinear: LinearLayout
     private lateinit var followingLinear: LinearLayout
+    private lateinit var profileLinear: LinearLayout
     private lateinit var nodata: LinearLayout
 
     private var page: Int = 0
@@ -95,15 +97,7 @@ class ProfileFragment : Fragment() {
         who = arguments?.get("who").toString()
 
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
         getmyDetails(contexts, viewLifecycleOwner)
-        getallLikes(viewLifecycleOwner)
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
         profilePic = view.findViewById(R.id.profile_pic_main)
@@ -114,8 +108,11 @@ class ProfileFragment : Fragment() {
         editProfile = view.findViewById(R.id.edit_profile)
         followerLinear = view.findViewById(R.id.followers_linear)
         followingLinear = view.findViewById(R.id.following_linear)
+        profileLinear = view.findViewById(R.id.profile_linear)
         list = view.findViewById(R.id.my_post_list)
         nodata = view.findViewById(R.id.no_data)
+        shimmerFrameLayout = view.findViewById(R.id.profile_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
 
         if (who != "me") {
             editProfile.visibility = View.GONE
@@ -147,7 +144,7 @@ class ProfileFragment : Fragment() {
             intent.putExtra("userId", userId)
             startActivity(intent)
         }
-
+        getallLikes(viewLifecycleOwner)
         list.layoutManager = LinearLayoutManager(activity)
         val whoPage = if (who == "me") "profile" else "OtherProfile"
         adapter = HomeAdapter(ArrayList(), contexts, whoPage, HashMap(), HashMap(), myLikesMap, this@ProfileFragment)
@@ -162,9 +159,6 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getMyPosts("Bearer $it", userId, page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -179,6 +173,9 @@ class ProfileFragment : Fragment() {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
+                                    profileLinear.visibility = View.VISIBLE
                                     if (postlist.size <= 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -202,16 +199,10 @@ class ProfileFragment : Fragment() {
                                         })
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowers(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllPosts", "fail")
                             }
                         })
@@ -238,9 +229,6 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUserLikes("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -256,16 +244,10 @@ class ProfileFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallPosts(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllLikes", "fail")
                             }
                         })
@@ -292,9 +274,6 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -311,16 +290,10 @@ class ProfileFragment : Fragment() {
                                     followerCount = followersList.size
                                     profileFollowers.text = followerCount.toString()
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getallFollowing(owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllFollowers", "fail")
                             }
                         })
@@ -347,9 +320,6 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -367,16 +337,10 @@ class ProfileFragment : Fragment() {
                                 } else {
                                     Log.e("following", "fails - " + response.code())
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 getmyDetails(contexts, owner)
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getAllFollowing", "fail")
                             }
                         })
@@ -403,9 +367,6 @@ class ProfileFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -436,15 +397,9 @@ class ProfileFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ProfileFragment.getMyDetails", "fail")
                             }
                         })
@@ -466,18 +421,12 @@ class ProfileFragment : Fragment() {
     }
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
-        
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
-        
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
-        
     }
 
 }

@@ -20,14 +20,9 @@ class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
     private lateinit var menu: ImageView
-    lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_profile)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         userPreferences = UserPreferences(this)
         val userId = intent.getStringExtra("userId")
         val viewProfile = ProfileFragment.getInstance(userId!!,"other")
@@ -100,22 +95,5 @@ class ViewProfileActivity : AppCompatActivity() {
             })
             popup.show()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-            dialog.dismiss()
-        
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-            dialog.dismiss()
-        
-    }
-
-    override fun onResume() {
-        super.onResume()
-            dialog.dismiss()
-        
     }
 }

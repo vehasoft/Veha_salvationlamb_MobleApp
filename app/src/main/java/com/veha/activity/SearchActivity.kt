@@ -32,7 +32,6 @@ class SearchActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var profilelist: ArrayList<PostUser>
     lateinit var postlist: ArrayList<Posts>
-    lateinit var dialog: AlertDialog
     var currentTab: Int = 0
     private fun setEditTextFocus(searchEditText: EditText, isFocused: Boolean) {
         searchEditText.isCursorVisible = isFocused
@@ -50,10 +49,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
         userPreferences = UserPreferences(this)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         tabLayout = findViewById(R.id.tabLayout)
         search = findViewById(R.id.search)
         setEditTextFocus(search, true)
@@ -137,15 +132,9 @@ class SearchActivity : AppCompatActivity() {
                                     Log.e("current tab", currentTab.toString())
                                     viewPager.currentItem = currentTab
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("SearchActivity.getContent", "fail")
                             }
                         })
@@ -167,19 +156,13 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
     }
 
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
 }

@@ -1,7 +1,6 @@
 package com.veha.activity
 
 import android.Manifest
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,9 +28,7 @@ import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
-import com.google.gson.Gson
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -53,16 +50,9 @@ class AddPostActivity : AppCompatActivity() {
     var postTypeStr = "text"
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
-
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
 
         userPreferences = UserPreferences(this@AddPostActivity)
 
@@ -128,9 +118,6 @@ class AddPostActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
                         call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -150,16 +137,10 @@ class AddPostActivity : AppCompatActivity() {
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)*/
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call1.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AddPostActivity.postData", "fail")
                             }
                         })
@@ -185,8 +166,6 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 
     private fun addImg() {
@@ -246,9 +225,6 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
         if (requestCode == 100) {
             if (data?.data != null) {
                 val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, data.data)
@@ -275,9 +251,6 @@ class AddPostActivity : AppCompatActivity() {
                 video.visibility = View.GONE
             }
         }
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 
     fun encodeTobase64(image: Bitmap): String? {
@@ -289,12 +262,8 @@ class AddPostActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
 }

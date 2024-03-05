@@ -47,7 +47,6 @@ class HomeAdapter(
     private var owner: LifecycleOwner,
 ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
     private var likesCount = 0
     private var currentHolder: ViewHolder? = null
 
@@ -79,10 +78,6 @@ class HomeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
-        dialog = SpotsDialog.Builder().setContext(context).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         var layoutInflater: LayoutInflater = LayoutInflater.from(context)
         var items: View = layoutInflater.inflate(R.layout.child_post, parent, false)
         var viewHolder = ViewHolder(items)
@@ -315,58 +310,72 @@ class HomeAdapter(
                 when (item.itemId) {
                     R.id.react1 -> {
                         likePost(post, myContext.getString(R.string.react1), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react1)
                     }
 
                     R.id.react2 -> {
                         likePost(post, myContext.getString(R.string.react2), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react2)
                     }
 
                     R.id.react3 -> {
                         likePost(post, myContext.getString(R.string.react3), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react3)
                     }
 
                     R.id.react4 -> {
                         likePost(post, myContext.getString(R.string.react4), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react4)
                     }
 
                     R.id.react5 -> {
                         likePost(post, myContext.getString(R.string.react5), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react5)
                     }
 
                     R.id.react6 -> {
                         likePost(post, myContext.getString(R.string.react6), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react6)
                     }
 
                     R.id.react7 -> {
                         likePost(post, myContext.getString(R.string.react7), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react7)
                     }
 
                     R.id.react8 -> {
                         likePost(post, myContext.getString(R.string.react8), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react8)
                     }
 
                     R.id.react9 -> {
                         likePost(post, myContext.getString(R.string.react9), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react9)
                     }
 
                     R.id.react10 -> {
                         likePost(post, myContext.getString(R.string.react10), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react10)
                     }
 
                     R.id.react11 -> {
                         likePost(post, myContext.getString(R.string.react11), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react11)
                     }
 
                     R.id.react12 -> {
                         likePost(post, myContext.getString(R.string.react12), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react12)
                     }
 
                     R.id.react13 -> {
                         likePost(post, myContext.getString(R.string.react13), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react13)
                     }
 
                     R.id.react14 -> {
                         likePost(post, myContext.getString(R.string.react14), holder)
+                        holder.likeBtn.text = myContext.getString(R.string.react14)
                     }
 
                     /*R.id.react15 -> {
@@ -440,9 +449,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -461,6 +467,7 @@ class HomeAdapter(
                                         holder.reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
+                                    holder.likeBtn.text = "React"
                                     val resp = response.errorBody()
                                     val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                                     val status = loginresp.get("status").toString()
@@ -468,16 +475,11 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
+                                holder.likeBtn.text = "React"
                                 Log.e("HomeAdapter.likePost", "fail")
                             }
                         })
@@ -496,9 +498,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -514,16 +513,10 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeAdapter.deletePost", "fail")
                             }
                         })
@@ -544,9 +537,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -572,16 +562,10 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("result", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeAdapter.follow", "fail")
                             }
                         })
@@ -602,9 +586,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -633,16 +614,10 @@ class HomeAdapter(
                                     Log.e("Status", status)
                                     Log.e("errorMessage", errorMessage)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeAdapter.favPost", "fail")
                             }
                         })
@@ -660,9 +635,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -677,16 +649,10 @@ class HomeAdapter(
                                     val errorMessage = loginresp.get("errorMessage").toString()
                                     Log.e("Status", status)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("HomeAdapter.getPost", "fail")
                             }
                         })

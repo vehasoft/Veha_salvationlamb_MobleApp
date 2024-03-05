@@ -15,6 +15,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.ViewLikesAdapter
 import com.veha.activity.R
 import com.veha.util.Commons
@@ -32,22 +33,18 @@ import retrofit2.Response
 class ViewLikesActivity : AppCompatActivity() {
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var logo: ImageView
     lateinit var menu: ImageView
 
     lateinit var likeslist: ArrayList<PostLikes>
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     private var postId: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_likes)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         list = findViewById(R.id.likesListRecycler)
         nodata = findViewById(R.id.no_data)
         menu = findViewById(R.id.menu)
@@ -55,6 +52,8 @@ class ViewLikesActivity : AppCompatActivity() {
         val indent = intent
         postId = indent.getStringExtra("postId").toString()
         logo = findViewById(R.id.prod_logo)
+        shimmerFrameLayout = findViewById(R.id.likes_shimmerLayout)
+        shimmerFrameLayout.startShimmer()
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -137,9 +136,6 @@ class ViewLikesActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getPostLike("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -152,6 +148,8 @@ class ViewLikesActivity : AppCompatActivity() {
                                         val pos = Gson().fromJson(post, PostLikes::class.java)
                                         likeslist.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (likeslist.size <= 0) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -162,15 +160,9 @@ class ViewLikesActivity : AppCompatActivity() {
                                         list.adapter = ViewLikesAdapter(likeslist, context)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("ViewLikesActivity.getAllLikes", "fail")
                             }
                         })
@@ -196,21 +188,13 @@ class ViewLikesActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
 
     override fun onPause() {
         super.onPause()
-
-        if (dialog.isShowing) {
-            dialog.dismiss()
-        }
     }
 }

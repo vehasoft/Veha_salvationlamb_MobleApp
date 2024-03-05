@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.FileAdapter
 import com.veha.activity.LoginActivity
 import com.veha.activity.R
@@ -37,7 +38,7 @@ class FilesFragment : Fragment() {
 
 
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
     lateinit var recyclerView: RecyclerView
     lateinit var noFilesText: LinearLayout
 
@@ -61,11 +62,6 @@ class FilesFragment : Fragment() {
         contexts = container!!.context
         val view = inflater.inflate(R.layout.fragment_files, container, false)
         userPreferences = UserPreferences(contexts)
-        dialog = SpotsDialog.Builder().setContext(contexts).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-        dialog.dismiss()
 
         listIcon = view.findViewById(R.id.view_icon)
         if (Util.listview) {
@@ -83,6 +79,8 @@ class FilesFragment : Fragment() {
         header_main = view.findViewById(R.id.header_main)
         header_main.visibility = View.GONE*/
 
+        shimmerFrameLayout = view.findViewById(R.id.files_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
         getFilesAndFolder("", contexts)
         return view
     }
@@ -93,9 +91,6 @@ class FilesFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -108,6 +103,8 @@ class FilesFragment : Fragment() {
                                         val pos = Gson().fromJson(files, FilesAndFolders::class.java)
                                         filesAndFolders.add(pos)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (filesAndFolders.size <= 0) {
                                         noFilesText.visibility = View.VISIBLE
                                         recyclerView.visibility = View.GONE
@@ -122,15 +119,9 @@ class FilesFragment : Fragment() {
                                         recyclerView.adapter = FileAdapter(context, filesAndFolders)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("FilesFragment.getFilesAndFolder", "fail")
                             }
                         })
@@ -152,17 +143,14 @@ class FilesFragment : Fragment() {
     }
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
 
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
         
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
         
     }
 }

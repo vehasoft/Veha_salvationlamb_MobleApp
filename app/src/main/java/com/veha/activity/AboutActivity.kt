@@ -1,18 +1,20 @@
 package com.veha.activity
 
-import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
@@ -20,7 +22,6 @@ import com.veha.util.UserRslt
 import com.veha.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -38,17 +39,15 @@ class AboutActivity : AppCompatActivity() {
     private lateinit var changePass: Button
 
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
+
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
+    lateinit var aboutLayout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
         userPreferences = UserPreferences(this)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
 
         name = findViewById(R.id.about_name)
         dob = findViewById(R.id.about_dob)
@@ -59,6 +58,11 @@ class AboutActivity : AppCompatActivity() {
         join = findViewById(R.id.about_join)
         edit = findViewById(R.id.edit)
         changePass = findViewById(R.id.change_pwd_btn)
+        changePass = findViewById(R.id.change_pwd_btn)
+        shimmerFrameLayout = findViewById(R.id.about_shimmer_layout)
+        aboutLayout = findViewById(R.id.about_layout)
+
+        shimmerFrameLayout.startShimmer()
 
         getmyDetails()
         edit.setOnClickListener {
@@ -77,9 +81,6 @@ class AboutActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -87,6 +88,11 @@ class AboutActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
+                                    aboutLayout.visibility = View.VISIBLE
+
                                     var add = ""
                                     if (loginResp.blocked.toBoolean()){
                                         Toast.makeText(this@AboutActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
@@ -111,20 +117,14 @@ class AboutActivity : AppCompatActivity() {
                                         Util.formatDate(loginResp.createdAt, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
                                 } else if (response.code() == 401) {
-                                        Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                                        val intent = Intent(this@AboutActivity, LoginActivity::class.java)
-                                        startActivity(intent)
-                                }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
+                                    Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                                    val intent = Intent(this@AboutActivity, LoginActivity::class.java)
+                                    startActivity(intent)
                                 }
                                 call.cancel()
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("AboutActivity.getMyDetails", "fail")
                             }
                         })
@@ -150,17 +150,14 @@ class AboutActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
+
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
+
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
+
     }
 }
