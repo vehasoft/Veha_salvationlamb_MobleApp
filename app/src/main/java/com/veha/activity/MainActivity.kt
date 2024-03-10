@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     var userType: String = ""
 
     private lateinit var notification: ImageView
+    private lateinit var announcement: ImageView
     private lateinit var menu: ImageView
     private lateinit var bannerClose: Button
     private lateinit var banner: ConstraintLayout
@@ -157,6 +158,7 @@ class MainActivity : AppCompatActivity() {
         userPreferences = UserPreferences(this@MainActivity)
 
         notification = findViewById(R.id.notification)
+        announcement = findViewById(R.id.announcement)
         menu = findViewById(R.id.menu)
         bannerClose = findViewById(R.id.banner_close)
         banner = findViewById(R.id.banner)
@@ -190,6 +192,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         notification.setOnClickListener {
+            val intent = Intent(this, NotificationViewActivity::class.java)
+            startActivity(intent)
+        }
+        announcement.setOnClickListener {
             val intent = Intent(this, NotificationViewActivity::class.java)
             startActivity(intent)
         }

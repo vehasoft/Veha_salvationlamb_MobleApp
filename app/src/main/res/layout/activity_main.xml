@@ -28,22 +28,33 @@
                 android:layout_height="50dp"
                 android:src="@drawable/ic_sl_logo_01_svg"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/announcement"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/announcement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_announcement_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/notification_layout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/prod_logo"
+                app:tint="@color/always_white" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/notification_layout"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/search"
+                app:layout_constraintLeft_toRightOf="@id/announcement"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/notification"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/ic_baseline_notifications_24"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -67,24 +78,25 @@
 
             <ImageView
                 android:id="@+id/search"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/search"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/menu"
+                app:layout_constraintLeft_toRightOf="@id/notification_layout"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/always_white" />
 
             <ImageButton
                 android:id="@+id/menu"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_baseline_grid_view_24"
                 android:tint="@color/always_white"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/search"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -143,7 +155,7 @@
             android:background="@color/primary_blue"
             app:tabIndicatorHeight="5dp"
             app:tabSelectedTextColor="@color/home_bg"
-            app:tabTextColor="@color/always_white"></com.google.android.material.tabs.TabLayout>
+            app:tabTextColor="@color/always_white"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
