@@ -1,6 +1,7 @@
 package com.veha.activity
 
 import android.Manifest
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Dialog
 import android.content.Context
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     var storagePermissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        READ_EXTERNAL_STORAGE, CAMERA_SERVICE
+        READ_EXTERNAL_STORAGE, CAMERA_SERVICE, POST_NOTIFICATIONS, NOTIFICATION_SERVICE
     )
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -75,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.READ_MEDIA_AUDIO,
         Manifest.permission.READ_MEDIA_VIDEO,
         Manifest.permission.CAMERA,
+        POST_NOTIFICATIONS,
     )
 
     private fun permissions(): Array<String> {

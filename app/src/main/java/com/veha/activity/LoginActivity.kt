@@ -1,7 +1,9 @@
 package com.veha.activity
 
-import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -9,10 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.veha.util.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
+import com.veha.util.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -39,7 +41,27 @@ class LoginActivity : AppCompatActivity() {
         privacyPolicy = findViewById(R.id.privacy)
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
+        var token = ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                Util.CHANNEL_ID,
+                Util.CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.description = Util.CHANNEL_DESC
+            val mgr = getSystemService(NotificationManager::class.java)
+            mgr.createNotificationChannel(channel)
+        }
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if (it.isSuccessful){
+                token = it.result
+                Log.e("token###########",token)
+            } else {
+                Log.e("token error",it.exception.toString())
+            }
+        }
+        Log.e("token###########",token)
         signupButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -59,12 +81,14 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         loginButton.setOnClickListener {
+            Log.e("token###########",token)
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()
             val data = JsonObject()
             data.addProperty("email", emailstr)
             data.addProperty("password", passwordstr)
             data.addProperty("isMobile", true)
+            data.addProperty("token", token)
             if (!Util.isValidEmail(emailstr))
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'\
+    id 'kotlin-android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -78,5 +79,9 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
 // dependency for using facebook shimmer layout.
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation platform('com.google.firebase:firebase-bom:32.8.0')
+    implementation 'com.google.firebase:firebase-messaging:23.4.1'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
 }

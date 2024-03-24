@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "816404726645",
+    "project_id": "salvationlamb-a9717",
+    "storage_bucket": "salvationlamb-a9717.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816404726645:android:90334846b87322b7cf893c",
+        "android_client_info": {
+          "package_name": "com.veha.activity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuUveIEJ6ArQVE3lNou9LkVUm91FX4ycw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

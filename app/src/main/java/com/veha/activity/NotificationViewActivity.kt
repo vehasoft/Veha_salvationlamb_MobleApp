@@ -1,7 +1,9 @@
 package com.veha.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.adapter.NotificationListAdapter
@@ -10,15 +12,18 @@ import com.veha.util.NotificationList
 class NotificationViewActivity : AppCompatActivity() {
 
     private lateinit var notificationRecyclerView: RecyclerView
+    lateinit var logo: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_view)
 
-        //VehaLoader_1(this).show()
-
         notificationRecyclerView=findViewById(R.id.notification_recycler)
-
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         val n1 = NotificationList("1","test","liked your post","1 min ago")
         val n2 = NotificationList("1","test1","is following you","1 min ago")
         val n3 = NotificationList("1","test","liked your post","1 min ago")
