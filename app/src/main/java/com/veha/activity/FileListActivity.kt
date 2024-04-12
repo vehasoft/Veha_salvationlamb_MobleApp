@@ -99,7 +99,7 @@ class FileListActivity : AppCompatActivity() {
                                         } else {
                                             recyclerView.layoutManager = GridLayoutManager(context, 3)
                                         }
-                                        recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders)
+                                        recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders,this@FileListActivity)
                                     }
                                 }
                             }

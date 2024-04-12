@@ -116,7 +116,7 @@ class FilesFragment : Fragment() {
                                         } else {
                                             recyclerView.layoutManager = GridLayoutManager(context, 3)
                                         }
-                                        recyclerView.adapter = FileAdapter(context, filesAndFolders)
+                                        recyclerView.adapter = FileAdapter(context, filesAndFolders,this@FilesFragment)
                                     }
                                 }
                             }
