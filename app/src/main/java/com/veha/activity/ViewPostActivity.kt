@@ -71,7 +71,7 @@ class ViewPostActivity : AppCompatActivity() {
                                     content.text = post.content
                                     reacts.text = "${post.likesCount} people reacts"
                                 } else {
-                                    Log.e("fail fav", response.errorBody().toString())
+                                    Log.e("fail post", response.errorBody().toString())
                                     /*val resp = response.errorBody()
                                     val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                                     val status = loginresp.get("status").toString()

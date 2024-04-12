@@ -58,6 +58,7 @@ data class FilesAndFolders(
     val id: String,
     val parentId: String,
     val name: String,
+    val isProtected: String,
     val type: String,
     val size: String,
     val url: String,
@@ -169,7 +170,42 @@ data class FavPost (
 )
 data class NotificationList(
     val id: String,
-    val name: String,
-    val content: String,
+    val acterId: String,
+    val userId: String,
+    val title: String,
+    val message: String,
+    val type: String,
+    val data: String,
+    val isVisited: String,
     val createdAt: String,
+    val updatedAt: String,
+    val user: PostUser,
 )
+data class Announcement(
+    val id: String,
+    val title: String,
+    val message: String,
+    val type: String,
+    val url: String,
+    val createdAt: String,
+    val updatedAt: String,
+)
+public enum class NotificationType(s: String) {
+    POST("post"),
+    USER("user"),
+}
+public enum class FileType(s: String) {
+    FILE("file"),
+    FOLDER("folder"),
+}
+public enum class USERType(s: String) {
+    USER("user"),
+    WARRIOR("warrior"),
+    ADMIN("admin"),
+}
+public enum class PostType(s: String) {
+    IMAGE("image"),
+    AUDIO("audio"),
+    VIDEO("video"),
+    URL("url"),
+}

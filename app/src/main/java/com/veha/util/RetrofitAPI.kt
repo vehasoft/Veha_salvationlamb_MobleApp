@@ -53,6 +53,14 @@ interface RetrofitAPI {
         @Body dataModal: JsonObject?
     ): Call<JsonObject?>?
 
+//password protected files
+    @POST("api/v1/files/access/{fileId}")
+    fun postCheckPassword(
+        @Header(value = "Authorization") head: String,
+        @Path(value = "fileId") fileId: String,
+        @Body dataModal: JsonObject?
+    ): Call<JsonObject?>?
+
 
     @GET("api/v1/favorites/{userId}")
     fun getFav(

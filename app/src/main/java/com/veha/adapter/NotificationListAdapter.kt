@@ -1,16 +1,19 @@
 package com.veha.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.activity.R
+import com.veha.activity.ViewPostActivity
+import com.veha.activity.ViewProfileActivity
 import com.veha.util.NotificationList
+import com.veha.util.NotificationType
 
 class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.ViewHolder>() {
     private lateinit var notifications: ArrayList<NotificationList>
@@ -44,7 +47,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification: NotificationList = notifications[position]
 
-        val html = "<b>" + notification.name + "</b>" + "  " + notification.content
+        val html = "<b>" + notification.user.name + "</b>" + "  " + notification.message
 
         (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT)
@@ -52,6 +55,15 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             Html.fromHtml(html)
         }).also { holder.notificationContent.text = it }
         holder.notificationtime.text = notification.createdAt
+        if (NotificationType.POST.equals(notification.type)){
+            val intent = Intent(context, ViewPostActivity::class.java)
+            intent.putExtra("postId", notification.acterId)
+            context.startActivity(intent)
+        }else if (NotificationType.USER.equals(notification.type)){
+            val intent = Intent(context, ViewProfileActivity::class.java)
+            intent.putExtra("id", notification.acterId)
+            context.startActivity(intent)
+        }
         /*holder.name.text = notification.user.name
         if (!notification.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(notification.user.picture).into(holder.profilePic)

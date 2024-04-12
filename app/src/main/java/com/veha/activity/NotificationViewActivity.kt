@@ -2,47 +2,48 @@ package com.veha.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.veha.adapter.NotificationListAdapter
-import com.veha.util.NotificationList
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
+import com.veha.adapter.NotificationTabAdapter
 
 class NotificationViewActivity : AppCompatActivity() {
 
-    private lateinit var notificationRecyclerView: RecyclerView
-
+    lateinit var viewPager: ViewPager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_view)
 
-        notificationRecyclerView=findViewById(R.id.notification_recycler)
+        val tabLayout = findViewById<TabLayout>(R.id.notification_tab_layout)
+        val user = tabLayout.newTab()
+        user.tag = "User"
+        user.text = "User"
+        val admin = tabLayout.newTab()
+        admin.tag = "Admin"
+        admin.text = "Admin"
+        tabLayout.addTab(user, 0)
+        tabLayout.addTab(admin, 1)
+        tabLayout.tabGravity = TabLayout.GRAVITY_FILL
+        val adapter = NotificationTabAdapter(
+            this@NotificationViewActivity,
+            this@NotificationViewActivity.supportFragmentManager,
+            tabLayout.tabCount
+        )
 
-        val n1 = NotificationList("1","test","liked your post","1 min ago")
-        val n2 = NotificationList("1","test1","is following you","1 min ago")
-        val n3 = NotificationList("1","test","liked your post","1 min ago")
-        val n4 = NotificationList("1","test","is following you","1 min ago")
-        val n5 = NotificationList("1","test","liked your post","1 min ago")
-        val n6 = NotificationList("1","test","is following you","1 min ago")
-        val n7 = NotificationList("1","test","liked your post","1 min ago")
-        val n8 = NotificationList("1","admin","deleted your post","1 min ago")
-        val n9 = NotificationList("1","test","is following you","1 min ago")
-        val n10 = NotificationList("1","test","is following you","1 min ago")
-        val n11 = NotificationList("1","test","is following you","1 min ago")
+        viewPager = findViewById(R.id.notification_viewpager)
+        viewPager.adapter = adapter
+        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (tab != null) {
+                    viewPager.currentItem = tab.position
+                }
+            }
 
-        val notificationList :ArrayList<NotificationList> = ArrayList()
-        notificationList.add(n1)
-        notificationList.add(n2)
-        notificationList.add(n3)
-        notificationList.add(n4)
-        notificationList.add(n5)
-        notificationList.add(n6)
-        notificationList.add(n7)
-        notificationList.add(n8)
-        notificationList.add(n9)
-        notificationList.add(n10)
-        notificationList.add(n11)
-        notificationRecyclerView.layoutManager = LinearLayoutManager(this@NotificationViewActivity)
-        notificationRecyclerView.adapter = NotificationListAdapter(notificationList, this)
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
 
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 }
