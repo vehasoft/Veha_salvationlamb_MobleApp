@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'\
+    id 'kotlin-android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -10,8 +11,8 @@ android {
         applicationId "com.veha.activity"
         minSdk 23
         targetSdk 33
-        versionCode 9
-        versionName "1.0.0"
+        versionCode 12
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,9 +59,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'org.chromium.net:cronet-embedded:76.3809.111'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'jp.wasabeef:richeditor-android:2.0.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
@@ -79,6 +77,12 @@ dependencies {
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:12.0.0'
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+// dependency for using facebook shimmer layout.
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation platform('com.google.firebase:firebase-bom:32.8.0')
+    implementation 'com.google.firebase:firebase-messaging:23.4.1'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
 // dependency for using facebook shimmer layout.
 

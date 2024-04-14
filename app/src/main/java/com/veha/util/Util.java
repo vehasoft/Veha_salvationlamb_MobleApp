@@ -30,6 +30,9 @@ public class Util {
     public static UserRslt user;
     private static RetrofitAPI retrofitAPI;
     public static MediaPlayer player = null;
+    public static final String CHANNEL_ID = "VEHA";
+    public static final String CHANNEL_NAME = "VEHA";
+    public static final String CHANNEL_DESC = "veha notification";
 
     public static ArrayList getReligion() {
         religion = new ArrayList<>();

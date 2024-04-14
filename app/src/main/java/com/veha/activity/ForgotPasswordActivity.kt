@@ -22,7 +22,6 @@ import retrofit2.Call
 import retrofit2.Response
 
 class ForgotPasswordActivity : AppCompatActivity() {
-    lateinit var dialog: AlertDialog
     lateinit var page: String
     lateinit var emailID: String
 
@@ -37,10 +36,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
 
         forgotPasswordHead = findViewById(R.id.forgot_pwd_head)
         forgotPasswordContent = findViewById(R.id.forgot_pwd_content)
@@ -66,7 +61,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     otp.error = "Enter OTP"
                     Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG).show()
                 } else {
-                    Log.e("email", emailID)
+                    forgotButton.isEnabled = false
                     checkOtp(emailID, otp.text.toString())
                 }
             }
@@ -84,6 +79,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     email.error = "Enter Email"
                     Toast.makeText(this@ForgotPasswordActivity, "Enter Email", Toast.LENGTH_LONG).show()
                 } else {
+                    forgotButton.isEnabled = false
                     checkValid(email.text.toString())
                 }
             }
@@ -97,9 +93,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
     private fun checkValid(emailtxt: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val data = JsonObject()
                 data.addProperty("email", emailtxt)
                 if (page.contentEquals("verify")) {
@@ -138,15 +131,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             email.error = errorMessage
                             Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("ForgotPasswordActivity.checkValid", "fail")
                     }
                 })
@@ -154,14 +141,14 @@ class ForgotPasswordActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("ForgotPasswordActivity.checkValid", e.toString())
         }
+        finally {
+            forgotButton.isEnabled = true
+        }
     }
 
     private fun checkOtp(emailtxt: String, otpTxt: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val data = JsonObject()
                 data.addProperty("email", emailtxt)
                 data.addProperty("otp", otpTxt)
@@ -207,15 +194,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             otp.error = errorMessage
                             Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("ForgotPasswordActivity.checkOTP", "fail")
                     }
                 })
@@ -223,12 +204,13 @@ class ForgotPasswordActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("ForgotPasswordActivity.checkOTP", e.toString())
         }
+        finally {
+            forgotButton.isEnabled = true
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 
     override fun onBackPressed() {

@@ -29,17 +29,16 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
     PDFView pdfView = null;
     TextView tv_header = null;
     String pdfFileName;
-    String SAMPLE_FILE = "sample.pdf";
     int pageNumber = 0;
-    String url ;//="https://salvationlamb-images.s3.ap-south-1.amazonaws.com/files/1679558065527.pdf";
+    String url ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_pdf2);
-        pdfView = (PDFView)findViewById(R.id.pdfView1);
-        tv_header = (TextView) findViewById(R.id.pdf_header);
+        pdfView = findViewById(R.id.pdfView1);
+        tv_header = findViewById(R.id.pdf_header);
         tv_header.setOnClickListener(v -> {
 
         });

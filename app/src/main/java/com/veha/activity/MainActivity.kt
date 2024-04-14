@@ -1,6 +1,7 @@
 package com.veha.activity
 
 import android.Manifest
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Dialog
 import android.content.Context
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     var userType: String = ""
 
     private lateinit var notification: ImageView
+    private lateinit var announcement: ImageView
     private lateinit var menu: ImageView
     private lateinit var bannerClose: Button
     private lateinit var banner: ConstraintLayout
@@ -65,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     var storagePermissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        READ_EXTERNAL_STORAGE, CAMERA_SERVICE
+        READ_EXTERNAL_STORAGE, CAMERA_SERVICE, POST_NOTIFICATIONS, NOTIFICATION_SERVICE
     )
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -74,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.READ_MEDIA_AUDIO,
         Manifest.permission.READ_MEDIA_VIDEO,
         Manifest.permission.CAMERA,
+        POST_NOTIFICATIONS,
     )
 
     private fun permissions(): Array<String> {
@@ -157,6 +160,7 @@ class MainActivity : AppCompatActivity() {
         userPreferences = UserPreferences(this@MainActivity)
 
         notification = findViewById(R.id.notification)
+        announcement = findViewById(R.id.announcement)
         menu = findViewById(R.id.menu)
         bannerClose = findViewById(R.id.banner_close)
         banner = findViewById(R.id.banner)
@@ -190,6 +194,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         notification.setOnClickListener {
+            val intent = Intent(this, NotificationViewActivity::class.java)
+            startActivity(intent)
+        }
+        announcement.setOnClickListener {
             val intent = Intent(this, NotificationViewActivity::class.java)
             startActivity(intent)
         }

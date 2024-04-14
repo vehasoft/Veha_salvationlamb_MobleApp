@@ -20,17 +20,11 @@ class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
-    private lateinit var dialog: android.app.AlertDialog
 
     private lateinit var menu: ImageButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
-
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         userPreferences = UserPreferences(this)
         logo = findViewById(R.id.prod_logo)
         menu = findViewById(R.id.menu)
@@ -109,17 +103,11 @@ class FavoritesActivity : AppCompatActivity() {
     }
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }

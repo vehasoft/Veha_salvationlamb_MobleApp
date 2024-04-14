@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -35,7 +36,6 @@ import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import com.veha.util.*
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -59,6 +59,8 @@ class EditProfileActivity : AppCompatActivity() {
     var warriorStr: Boolean = false
     lateinit var warrior: CheckBox
     lateinit var cancelBtn: Button
+    lateinit var editLayout: ScrollView
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
     lateinit var countrySP: AutoCompleteTextView
     lateinit var stateSp: AutoCompleteTextView
     lateinit var citySp: AutoCompleteTextView
@@ -66,7 +68,6 @@ class EditProfileActivity : AppCompatActivity() {
     private var month: Int = 0
     private var day: Int = 1
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
     lateinit var logo: ImageView
 
     private var state: ArrayList<String> = ArrayList()
@@ -110,9 +111,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
         Log.e(requestCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE.toString())
         Log.e(resultCode.toString(), RESULT_OK.toString())
         Log.e(resultCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE.toString())
@@ -134,9 +132,6 @@ class EditProfileActivity : AppCompatActivity() {
         } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === RESULT_OK) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val resultUri = result.uri
                 val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
                 profilestr = encodeTobase64(bitmap)
@@ -144,17 +139,11 @@ class EditProfileActivity : AppCompatActivity() {
                 data.addProperty("base64Image", profilestr)
                 data.addProperty("name", Util.user.name + " picture")
                 updateProfilePic(data)
-                if (dialog.isShowing) {
-                dialog.dismiss()
-                }
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
                 Log.e("errorrr", error.toString())
                 Toast.makeText(this@EditProfileActivity,error.toString(),Toast.LENGTH_LONG).show()
             }
-        }
-        if (dialog.isShowing) {
-        dialog.dismiss()
         }
     }
 
@@ -171,9 +160,6 @@ class EditProfileActivity : AppCompatActivity() {
         StrictMode.setVmPolicy(builder.build())
         setContentView(R.layout.activity_edit_profile)
         userPreferences = UserPreferences(this)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
 
         profilePic = findViewById(R.id.profile_pic_edit)
         saveBtn = findViewById(R.id.save_btn)
@@ -189,6 +175,9 @@ class EditProfileActivity : AppCompatActivity() {
         language = findViewById(R.id.language)
         pincode = findViewById(R.id.pincode)
         gender = findViewById(R.id.gender)
+        editLayout = findViewById(R.id.edit_scroll)
+        shimmerFrameLayout = findViewById(R.id.edit_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
 
         getCountries()
         getMyDetails(this)
@@ -443,9 +432,6 @@ class EditProfileActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
                         call!!.enqueue(object : Callback<JsonObject?> {
 
@@ -467,15 +453,9 @@ class EditProfileActivity : AppCompatActivity() {
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("EditProfileActivity.edit", "fail")
                             }
                         })
@@ -493,13 +473,13 @@ class EditProfileActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
+                                    editLayout.visibility = View.VISIBLE
                                     val resp = response.body()
                                     val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     myDetails = loginresp
@@ -568,15 +548,9 @@ class EditProfileActivity : AppCompatActivity() {
                                     val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("EditProfileActivity.getMyDetails", "fail")
                             }
                         })
@@ -606,9 +580,6 @@ class EditProfileActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
                         call!!.enqueue(object : Callback<JsonObject?> {
 
@@ -617,9 +588,6 @@ class EditProfileActivity : AppCompatActivity() {
                                     val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
-                                }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
                                 }
                             }
 
@@ -672,9 +640,6 @@ class EditProfileActivity : AppCompatActivity() {
     private fun getCountries() {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val call = Util.getRetrofit().getCountries()
                 call!!.enqueue(object : Callback<JsonObject> {
                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -692,9 +657,6 @@ class EditProfileActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("EditProfileActivity.getCountries", "fail")
                     }
                 })
@@ -723,9 +685,6 @@ class EditProfileActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("EditProfileActivity.getStates", "fail")
                     }
                 })
@@ -751,15 +710,9 @@ class EditProfileActivity : AppCompatActivity() {
                         val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         citySp.setAdapter(adapter)
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("EditProfileActivity.getCities", "fail")
                     }
                 })
@@ -771,17 +724,11 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-            dialog.dismiss()
-        
     }
     override fun onResume() {
         super.onResume()
-            dialog.dismiss()
-        
     }
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }

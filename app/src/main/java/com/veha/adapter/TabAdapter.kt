@@ -8,8 +8,7 @@ import com.veha.fragments.*
 import com.veha.util.Util
 
 
-internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) :
-    FragmentPagerAdapter(fm!!) {
+internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : FragmentPagerAdapter(fm!!) {
     var context: Context
     var totalTabs: Int
 
@@ -19,32 +18,26 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) :
     }
 
     override fun getItem(position: Int): Fragment {
-        var b: Any? = null
+        var b : Any ? =null
         return when (position) {
             0 -> {
                 HomeFragment.getInstance("user")
             }
-
             1 -> {
                 FilesFragment()
             }
-
             2 -> {
                 FilesFragment()
             }
-
             3 -> {
                 AdminVideoFragment()
             }
-
             4 -> {
                 AdminAudioFragment()
             }
-
             5 -> {
-                ProfileFragment.getInstance(Util.userId, "me")
+                ProfileFragment.getInstance(Util.userId,"me")
             }
-
             else -> b as Fragment
         }
     }

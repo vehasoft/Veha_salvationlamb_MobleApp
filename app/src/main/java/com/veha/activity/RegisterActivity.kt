@@ -30,7 +30,6 @@ import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: ProgressDialog
     private val SUCCESS = "success"
     private lateinit var fNameTxt: String
     private lateinit var lNameTxt: String
@@ -57,11 +56,6 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        dialog = ProgressDialog(this)
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
-
         firstName = findViewById(R.id.fname)
         lastName = findViewById(R.id.lname)
         email = findViewById(R.id.email)
@@ -83,6 +77,7 @@ class RegisterActivity : AppCompatActivity() {
             dobTxt = date.text.toString()
 
             if (doValidation() == SUCCESS) {
+                registerButton.isEnabled = false
                 val data = JsonObject()
                 data.addProperty("firstName", fNameTxt)
                 data.addProperty("lastName", lNameTxt)
@@ -169,9 +164,6 @@ class RegisterActivity : AppCompatActivity() {
     private fun register(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 userPreferences = UserPreferences(this@RegisterActivity)
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("users", data)
@@ -194,27 +186,21 @@ class RegisterActivity : AppCompatActivity() {
                             Log.e("result", errorMessage)
                             Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                         Log.e("REGISTER", "fail")
                     }
                 })
             }
         } catch (e: Exception) {
             Log.e("REGISTER", e.toString())
+        } finally {
+            registerButton.isEnabled = true
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }

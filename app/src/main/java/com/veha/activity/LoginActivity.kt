@@ -1,7 +1,9 @@
 package com.veha.activity
 
-import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -9,17 +11,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.veha.util.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import dmax.dialog.SpotsDialog
+import com.veha.util.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
-    lateinit var dialog: AlertDialog
 
     private lateinit var signupButton: Button
     private lateinit var loginButton: Button
@@ -31,10 +32,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         setContentView(R.layout.activity_login)
 
         signupButton = findViewById(R.id.signup_btn)
@@ -44,7 +41,27 @@ class LoginActivity : AppCompatActivity() {
         privacyPolicy = findViewById(R.id.privacy)
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
+        var token = ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                Util.CHANNEL_ID,
+                Util.CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.description = Util.CHANNEL_DESC
+            val mgr = getSystemService(NotificationManager::class.java)
+            mgr.createNotificationChannel(channel)
+        }
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if (it.isSuccessful){
+                token = it.result
+                Log.e("token###########",token)
+            } else {
+                Log.e("token error",it.exception.toString())
+            }
+        }
+        Log.e("token###########",token)
         signupButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -64,18 +81,22 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         loginButton.setOnClickListener {
+            Log.e("token###########",token)
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()
             val data = JsonObject()
             data.addProperty("email", emailstr)
             data.addProperty("password", passwordstr)
             data.addProperty("isMobile", true)
+            data.addProperty("token", token)
             if (!Util.isValidEmail(emailstr))
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
                 Toast.makeText(this, "Invalid Password", Toast.LENGTH_LONG).show()
-            else
+            else {
+                loginButton.isEnabled = false
                 login(data)
+            }
         }
 
     }
@@ -83,9 +104,6 @@ class LoginActivity : AppCompatActivity() {
     private fun login(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
-                if (!dialog.isShowing) {
-                    dialog.show()
-                }
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("login", data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -127,21 +145,18 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.makeText(this@LoginActivity, "INVALID USER", Toast.LENGTH_LONG).show()
                             }
                         }
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                         Log.e("LoginActivity.login()", "fail")
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                        }
                     }
                 })
             }
         } catch (e: Exception) {
             Log.e("LoginActivity.login", e.toString())
+        }
+        finally {
+            loginButton.isEnabled = true
         }
     }
 
@@ -201,8 +216,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-            dialog.dismiss()
-        
     }
 }
 

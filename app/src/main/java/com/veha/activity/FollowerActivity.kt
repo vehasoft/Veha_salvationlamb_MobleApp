@@ -15,6 +15,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.veha.adapter.FollowAdapter
 import com.veha.util.PostUser
 import com.veha.util.*
@@ -28,7 +29,7 @@ import retrofit2.Response
 
 class FollowerActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
-    lateinit var dialog: android.app.AlertDialog
+    lateinit var shimmerFrameLayout: ShimmerFrameLayout
     private lateinit var followList: ArrayList<PostUser>
     lateinit var lists: RecyclerView
     lateinit var nodata: LinearLayout
@@ -42,10 +43,6 @@ class FollowerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follower)
         userPreferences = UserPreferences(this)
-        dialog = SpotsDialog.Builder().setContext(this).build()
-        dialog.setMessage("Please Wait")
-        dialog.setCancelable(false)
-        dialog.setInverseBackgroundForced(false)
         userId = intent.extras!!.get("userId").toString()
         if (intent.extras!!.get("page") == "follower")
             getAllFollowers(this)
@@ -59,6 +56,8 @@ class FollowerActivity : AppCompatActivity() {
         lists = findViewById(R.id.my_follow_list)
         nodata = findViewById(R.id.no_data)
 
+        shimmerFrameLayout = findViewById(R.id.follower_shimmerLayout)
+        shimmerFrameLayout.startShimmer()
         menu = findViewById(R.id.menu)
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@FollowerActivity, R.style.menuStyle)
@@ -136,9 +135,6 @@ class FollowerActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
@@ -153,6 +149,8 @@ class FollowerActivity : AppCompatActivity() {
                                         followList.add(pos)
                                         myFollowerMap.put(Util.userId, pos.id)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (followList.size <= 0) {
                                         lists.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -165,15 +163,9 @@ class FollowerActivity : AppCompatActivity() {
                                     }
 
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Log.e("FollowerActivity.getAllFollowers", "fail")
                             }
                         })
@@ -191,9 +183,6 @@ class FollowerActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        if (!dialog.isShowing) {
-                            dialog.show()
-                        }
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -207,6 +196,8 @@ class FollowerActivity : AppCompatActivity() {
                                         followList.add(pos)
                                         followingMap.put(pos.id, Util.userId)
                                     }
+                                    shimmerFrameLayout.stopShimmer()
+                                    shimmerFrameLayout.visibility = View.GONE
                                     if (followList.size <= 0) {
                                         lists.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
@@ -218,15 +209,9 @@ class FollowerActivity : AppCompatActivity() {
                                             FollowAdapter(followList, context, followingMap, this@FollowerActivity)
                                     }
                                 }
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                if (dialog.isShowing) {
-                                    dialog.dismiss()
-                                }
                                 Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
                                 Log.e("FollowerActivity.getAllFollowing", "fail")
                             }
@@ -241,15 +226,12 @@ class FollowerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
     }
     override fun onResume() {
         super.onResume()
-        dialog.dismiss()
     }
     override fun onDestroy() {
         super.onDestroy()
-        dialog.dismiss()
     }
 
 }
