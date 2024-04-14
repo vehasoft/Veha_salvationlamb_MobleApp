@@ -133,6 +133,12 @@ interface RetrofitAPI {
         @Path(value = "userId") userId: String
     ): Call<JsonObject?>?
 
+    @GET("api/v1/notifications/{userId}")
+    fun getNotifications(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "userId") userId: String
+    ): Call<JsonObject?>?
+
     @GET("api/v1/search")
     fun getSearch(@Header(value = "Authorization") head: String, @Query("query") query: String?): Call<JsonObject?>?
 

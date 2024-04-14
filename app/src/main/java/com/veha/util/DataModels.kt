@@ -149,6 +149,8 @@ data class Posts(
     val contentURL: String,
     val likesCount: String,
     val shareCount: String,
+    val role: String,
+    val isDeleted: String,
     val createdAt: String,
     val updatedAt: String,
     var user: PostUser
@@ -191,7 +193,7 @@ data class Announcement(
     val createdAt: String,
     val updatedAt: String,
 )
-public enum class NotificationType(s: String) {
+public enum class NotificationType( val value: String) {
     POST("post"),
     USER("user"),
 }

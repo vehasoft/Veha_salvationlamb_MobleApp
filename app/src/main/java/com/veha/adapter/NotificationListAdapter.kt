@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.veha.activity.R
@@ -29,6 +31,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         //val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
         val notificationContent: TextView = view.findViewById(R.id.notification_content)
         val notificationtime: TextView = view.findViewById(R.id.time_ago)
+        val notificationLayout: LinearLayout = view.findViewById(R.id.notification_list_linear)
     }
 
     override fun onCreateViewHolder(
@@ -55,15 +58,22 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             Html.fromHtml(html)
         }).also { holder.notificationContent.text = it }
         holder.notificationtime.text = notification.createdAt
-        if (NotificationType.POST.equals(notification.type)){
-            val intent = Intent(context, ViewPostActivity::class.java)
-            intent.putExtra("postId", notification.acterId)
-            context.startActivity(intent)
-        }else if (NotificationType.USER.equals(notification.type)){
-            val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("id", notification.acterId)
-            context.startActivity(intent)
+        holder.notificationLayout.setOnClickListener {
+            Log.e("taggggg",notification.type)
+            Log.e("taggggg",NotificationType.USER.value)
+            Log.e("taggggg",NotificationType.POST.value)
+            Log.e("taggggg", (notification.type == NotificationType.USER.name).toString())
+            if (NotificationType.POST.value == notification.type){
+                val intent = Intent(context, ViewPostActivity::class.java)
+                intent.putExtra("postId", notification.acterId)
+                context.startActivity(intent)
+            }else if (NotificationType.USER.value == notification.type){
+                val intent = Intent(context, ViewProfileActivity::class.java)
+                intent.putExtra("userId", notification.user.id)
+                context.startActivity(intent)
+            }
         }
+
         /*holder.name.text = notification.user.name
         if (!notification.user.picture.isNullOrEmpty()){
             Picasso.with(context).load(notification.user.picture).into(holder.profilePic)

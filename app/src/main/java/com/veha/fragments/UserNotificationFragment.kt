@@ -34,7 +34,7 @@ class UserNotificationFragment : Fragment() {
         nodata = view.findViewById(R.id.no_data)
 
 
-        val n1 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
+        val n1 = NotificationList("1","a3295600-fa10-11ee-a77a-7f0156e992fe","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.value,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
             PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
         )
         val n2 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
