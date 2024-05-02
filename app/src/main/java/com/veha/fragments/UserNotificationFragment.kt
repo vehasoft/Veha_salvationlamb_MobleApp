@@ -1,21 +1,39 @@
 package com.veha.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.veha.activity.LoginActivity
 import com.veha.activity.R
 import com.veha.adapter.NotificationListAdapter
+import com.veha.util.Commons
 import com.veha.util.NotificationList
 import com.veha.util.PostUser
 import com.veha.util.NotificationType
+import com.veha.util.UserPreferences
+import com.veha.util.Util
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 
 class UserNotificationFragment : Fragment() {
+    lateinit var userPreferences: UserPreferences
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var contexts: Context
@@ -30,9 +48,11 @@ class UserNotificationFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_user_notification, container, false)
         contexts = container!!.context
+        userPreferences = UserPreferences(contexts)
         list = view.findViewById(R.id.notification_user_recycler)
         nodata = view.findViewById(R.id.no_data)
 
+/*
 
         val n1 = NotificationList("1","a3295600-fa10-11ee-a77a-7f0156e992fe","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.value,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
             PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
@@ -81,8 +101,76 @@ class UserNotificationFragment : Fragment() {
         notificationList.add(n11)
         list.layoutManager = LinearLayoutManager(contexts)
         list.adapter = NotificationListAdapter(notificationList, contexts)
+*/
 
+        getNotifications(viewLifecycleOwner)
         return view
     }
+    private fun getNotifications(owner: LifecycleOwner, postlist: ArrayList<NotificationList> = ArrayList()){
 
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,0,50,"user")
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val loginresp: JsonArray =
+                                        Gson().fromJson(resp?.get("notification"), JsonArray::class.java)
+                                    for (notification in loginresp) {
+                                        val pos = Gson().fromJson(notification, NotificationList::class.java)
+                                        postlist.add(pos)
+                                    }
+                                    if (postlist.size <= 0) {
+                                        list.visibility = View.GONE
+                                        nodata.visibility = View.VISIBLE
+                                    } else {
+                                        list.visibility = View.VISIBLE
+                                        nodata.visibility = View.GONE
+
+                                        list.layoutManager = LinearLayoutManager(contexts)
+                                        list.adapter = NotificationListAdapter(postlist, contexts,owner)
+                                    }
+
+                                } else if (response.code() == 401) {
+                                    Toast.makeText(
+                                        contexts,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent = Intent(contexts, LoginActivity::class.java)
+                                    startActivity(intent)
+                                }
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("HomeFragment.getMyDetails", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            contexts,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(contexts, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("HomeFragment.getMyDetails", e.toString())
+        }
+    }
 }

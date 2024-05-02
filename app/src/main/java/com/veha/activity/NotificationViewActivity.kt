@@ -1,7 +1,9 @@
 package com.veha.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.veha.adapter.NotificationTabAdapter
@@ -9,10 +11,15 @@ import com.veha.adapter.NotificationTabAdapter
 class NotificationViewActivity : AppCompatActivity() {
 
     lateinit var viewPager: ViewPager
+    lateinit var logo: ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_view)
-
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         val tabLayout = findViewById<TabLayout>(R.id.notification_tab_layout)
         val user = tabLayout.newTab()
         user.tag = "User"

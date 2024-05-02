@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">SalvationLamb</string>
     <string name="Product_name">SalvationLamb</string>
     <string name="title_activity_favorites">FavoritesActivity</string>
@@ -65,6 +65,7 @@
         warrior.
 
     </string>
+    <string name="notification_channel_id" tools:ignore="ExtraTranslation">VEHA</string>
 
 
 </resources>

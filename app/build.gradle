@@ -87,5 +87,6 @@ dependencies {
 // dependency for using facebook shimmer layout.
 
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.4.1'
 
 }

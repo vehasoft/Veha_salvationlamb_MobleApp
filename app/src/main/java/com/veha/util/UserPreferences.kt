@@ -25,6 +25,21 @@ class UserPreferences (context: Context) {
             it.remove(AUTH_TOKEN)
         }
     }
+    val fcmToken: Flow<String>
+        get() = dataStorePref.data.map { preferences ->
+            preferences[FCM_TOKEN].toString()
+        }
+
+    suspend fun savefcmToken(token: String){
+        dataStorePref.edit { preferences ->
+            preferences[FCM_TOKEN] = token
+        }
+    }
+    suspend fun deletefcmToken(){
+        dataStorePref.edit {
+            it.remove(FCM_TOKEN)
+        }
+    }
     val userId: Flow<String>
         get() = dataStorePref.data.map { preferences ->
             preferences[USER_ID].toString()
@@ -98,6 +113,7 @@ class UserPreferences (context: Context) {
 
     companion object{
         private val AUTH_TOKEN = preferencesKey<String>("token")
+        private val FCM_TOKEN = preferencesKey<String>("fcmToken")
         private val USER_ID = preferencesKey<String>("userId")
         private val IS_NIGHT = preferencesKey<String>("isNight")
         private val IS_FIRST = preferencesKey<Boolean>("isFirst")

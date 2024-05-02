@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bannerClose: Button
     private lateinit var banner: ConstraintLayout
     private lateinit var makeWarrior: TextView
+    private lateinit var notificationCount: TextView
     private lateinit var makeWarriorGif: GifImageView
 
     var storagePermissions = arrayOf(
@@ -166,8 +167,10 @@ class MainActivity : AppCompatActivity() {
         banner = findViewById(R.id.banner)
         makeWarrior = findViewById(R.id.makewarrior)
         makeWarriorGif = findViewById(R.id.makewarrior_gif)
+        notificationCount = findViewById(R.id.notification_count)
 
         checkPermission()
+        getNotificationCount()
         getMyDetails()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
@@ -212,6 +215,12 @@ class MainActivity : AppCompatActivity() {
         }
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
+            if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        userPreferences.fcmToken.asLiveData().observe(this) {
             if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
@@ -298,13 +307,13 @@ class MainActivity : AppCompatActivity() {
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
-        bibleBook.tag = "Bible"
+        //bibleBook.tag = "Bible"
         tabLayout.addTab(home, 0)
         tabLayout.addTab(pdf, 1)
-        tabLayout.addTab(bibleBook, 2)
-        tabLayout.addTab(adminVideo, 3)
-        tabLayout.addTab(adminAudio, 4)
-        tabLayout.addTab(profile, 5)
+        //tabLayout.addTab(bibleBook, 2)
+        tabLayout.addTab(adminVideo, 2)
+        tabLayout.addTab(adminAudio, 3)
+        tabLayout.addTab(profile, 4)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(
             this@MainActivity,
@@ -427,6 +436,52 @@ class MainActivity : AppCompatActivity() {
                             ) {
                                 Log.e("firstttime", response.code().toString())
                                 Util.isFirst = false
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("MainActivity.firstTime", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity.firstTime", e.toString())
+        }
+    }
+    private fun getNotificationCount() {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? =
+                            retrofit.getNotificationCount("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+                                    val resp = response.body()
+                                    val count = Integer.parseInt(resp?.get("count").toString())
+                                    if (count > 0 ){
+                                        notificationCount.visibility = View.VISIBLE
+                                        notificationCount.text = count.toString()
+                                    }
+                                }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {

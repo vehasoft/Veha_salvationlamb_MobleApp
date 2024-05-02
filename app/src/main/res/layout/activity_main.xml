@@ -39,6 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/notification_layout"
                 app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
                 app:layout_constraintLeft_toRightOf="@id/prod_logo"
                 app:tint="@color/always_white" />
 
@@ -61,19 +62,20 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/always_white" />
-                <!--<TextView
+                <TextView
                         android:layout_width="15dp"
                         android:layout_height="15dp"
+                    android:id="@+id/notification_count"
+                    android:visibility="gone"
                         android:background="@drawable/rounded_border_login_register"
                         android:backgroundTint="@color/red"
-                        android:layout_MarginTop="10dp"
-                        android:textSize="10dp"
-                        android:padding="5dp"
+                        android:textSize="7dp"
+                        android:padding="3dp"
                         android:textColor="@color/always_white"
                         android:text="99"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        />-->
+                        />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView

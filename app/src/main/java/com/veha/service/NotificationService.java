@@ -12,6 +12,7 @@ public class NotificationService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         if (message.getNotification() != null){
+            Log.e("message", message.toString());
             String title = message.getNotification().getTitle();
             String text = message.getNotification().getBody();
             message.getData();

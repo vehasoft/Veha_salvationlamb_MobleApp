@@ -136,7 +136,15 @@ interface RetrofitAPI {
     @GET("api/v1/notifications/{userId}")
     fun getNotifications(
         @Header("Authorization") dataModal: String?,
-        @Path(value = "userId") userId: String
+        @Path(value = "userId") userId: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("type") type: String
+    ): Call<JsonObject?>?
+    @GET("api/v1/notifications/count/{userId}")
+    fun getNotificationCount(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "userId") userId: String,
     ): Call<JsonObject?>?
 
     @GET("api/v1/search")
@@ -174,6 +182,13 @@ interface RetrofitAPI {
     fun putFreshUser(
         @Header(value = "Authorization") head: String,
         @Path(value = "userId") userId: String
+    ): Call<JsonObject?>?
+
+    @PUT("api/v1/notifications/{id}")
+    fun putReadNotification(
+        @Header(value = "Authorization") head: String,
+        @Path(value = "id") userId: String,
+        @Body dataModal: JsonObject?
     ): Call<JsonObject?>?
 
 

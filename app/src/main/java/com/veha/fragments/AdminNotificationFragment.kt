@@ -117,7 +117,7 @@ class AdminNotificationFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,0,50,"admin")
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -139,7 +139,7 @@ class AdminNotificationFragment : Fragment() {
                                         nodata.visibility = View.GONE
 
                                         list.layoutManager = LinearLayoutManager(contexts)
-                                        list.adapter = NotificationListAdapter(postlist, contexts)
+                                        list.adapter = NotificationListAdapter(postlist, contexts,owner)
                                     }
 
                                 } else if (response.code() == 401) {

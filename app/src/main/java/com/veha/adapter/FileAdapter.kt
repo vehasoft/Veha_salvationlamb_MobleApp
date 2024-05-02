@@ -13,10 +13,12 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.JsonObject
 import com.veha.activity.FileListActivity
 import com.veha.activity.PdfActivity2
@@ -54,43 +56,48 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
         }
+        if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)){
+            holder.lockSymbol.visibility = View.VISIBLE
+        } else {
+            holder.lockSymbol.visibility = View.GONE
+        }
         holder.itemView.setOnClickListener { v: View? ->
             Log.e("type", filesAndFolder.type)
+            var result = true
             if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)) {
-                val builder = AlertDialog.Builder(
-                    context
-                )
-                val view = EditText(context)
+                result = false
+                val builder = AlertDialog.Builder(context)
                 builder.setTitle("Password")
+                val view = View.inflate(context,R.layout.password_layout,null)
+                val passwordView = view.findViewById<TextInputEditText>(R.id.password)
                 builder.setView(view)
                 builder.setMessage("Enter Password")
                 builder.setPositiveButton("Ok") { dialog: DialogInterface?, which: Int ->
-                    val password = view.text.toString()
+                    val password = passwordView.text.toString()
                     if (password.isNotEmpty()){
                         val passwordJson = JsonObject()
                         passwordJson.addProperty("password",password)
-                        val result = checkPassword(passwordJson,filesAndFolder.id)
-                        if (result){
-                            if (filesAndFolder.type == "folder") {
-                                val intent = Intent(context, FileListActivity::class.java)
-                                intent.putExtra("folderId", filesAndFolder.id)
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                context.startActivity(intent)
-                            } else {
-                                val intent = Intent(context, PdfActivity2::class.java)
-                                intent.putExtra("url", filesAndFolder.url)
-                                intent.putExtra("fileName", filesAndFolder.name)
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                context.startActivity(intent)
-                            }
-                        } else {
-                            view.error = "Invalid Password"
-                        }
+                        checkPassword(passwordJson,filesAndFolder.id,filesAndFolder)
                     } else {
-                        view.error = "Enter Password"
+                        Toast.makeText(context,"No password provided",Toast.LENGTH_LONG).show()
                     }
                 }
-                builder.setNegativeButton("") { dialog: DialogInterface, which: Int -> dialog.cancel() }
+                builder.setNegativeButton("cancel") { dialog: DialogInterface, which: Int -> dialog.cancel() }
+                val alertDialog: AlertDialog = builder.create()
+                alertDialog.show()
+            } else {
+                if (filesAndFolder.type == "folder") {
+                    val intent = Intent(context, FileListActivity::class.java)
+                    intent.putExtra("folderId", filesAndFolder.id)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, PdfActivity2::class.java)
+                    intent.putExtra("url", filesAndFolder.url)
+                    intent.putExtra("fileName", filesAndFolder.name)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }
             }
 
         }
@@ -103,17 +110,18 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textView: TextView
         var imageView: ImageView
+        var lockSymbol: ImageView
         var fileLinear: LinearLayout
 
         init {
             textView = itemView.findViewById(R.id.file_name_text_view)
             imageView = itemView.findViewById(R.id.icon_view)
+            lockSymbol = itemView.findViewById(R.id.lock_symbol)
             fileLinear = itemView.findViewById(R.id.file_linear)
         }
     }
 
-    fun checkPassword(password: JsonObject,fileId: String): Boolean {
-        var result: Boolean = false
+    fun checkPassword(password: JsonObject,fileId: String, filesAndFolder: FilesAndFolders) {
         if (Commons().isNetworkAvailable(context)) {
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(owner) {
@@ -125,7 +133,20 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
                             response: Response<JsonObject?>
                         ) {
                             if (response.code() == 200) {
-                                result = true
+                                if (filesAndFolder.type == "folder") {
+                                    val intent = Intent(context, FileListActivity::class.java)
+                                    intent.putExtra("folderId", filesAndFolder.id)
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    context.startActivity(intent)
+                                } else {
+                                    val intent = Intent(context, PdfActivity2::class.java)
+                                    intent.putExtra("url", filesAndFolder.url)
+                                    intent.putExtra("fileName", filesAndFolder.name)
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    context.startActivity(intent)
+                                }
+                            } else{
+                                Toast.makeText(context,"Invalid password",Toast.LENGTH_LONG).show()
                             }
                         }
                         override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
@@ -135,6 +156,5 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
                 }
             }
         }
-        return result
     }
 }

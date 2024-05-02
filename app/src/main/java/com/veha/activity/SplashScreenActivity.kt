@@ -16,6 +16,7 @@ import com.veha.util.UserRslt
 import com.veha.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.veha.util.NotificationType
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -103,9 +104,25 @@ class SplashScreenActivity : AppCompatActivity() {
                             }
                             Thread.sleep(2000)
                             if (loginresp.isVerified.toBoolean()) {
-                                val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
+                                if (intent.extras != null) {
+                                    val id = intent.extras!!.getString("id")
+                                    if (intent.extras!!.getString("type").equals(NotificationType.POST.value)){
+                                        val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
+                                        intent.putExtra("postId", id)
+                                        startActivity(intent)
+                                        finish()
+                                    } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
+                                        val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
+                                        intent.putExtra("userId", id)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                } else {
+                                    val intent =
+                                        Intent(this@SplashScreenActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
                             } else {
                                 val intent = Intent(this@SplashScreenActivity, ForgotPasswordActivity::class.java)
                                 intent.putExtra("page", "verify")

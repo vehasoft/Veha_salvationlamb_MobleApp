@@ -56,6 +56,9 @@ class LoginActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
             if (it.isSuccessful){
                 token = it.result
+                lifecycleScope.launch {
+                    userPreferences.savefcmToken(token)
+                }
                 Log.e("token###########",token)
             } else {
                 Log.e("token error",it.exception.toString())

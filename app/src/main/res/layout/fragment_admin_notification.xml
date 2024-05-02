@@ -23,7 +23,7 @@
             android:src="@drawable/ic_no_record"/>
         <TextView android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No Likes\nData found"
+            android:text="No Data found"
             android:textSize="30dp"
             android:textColor="@color/black"
             android:gravity="center"
