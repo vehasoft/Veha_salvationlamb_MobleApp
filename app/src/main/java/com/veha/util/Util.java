@@ -38,7 +38,7 @@ public class Util {
     public static final String CHANNEL_NAME = "VEHA";
     public static final String CHANNEL_DESC = "veha notification";
 
-    public static JSONObject bible = new JSONObject();
+    public static JSONObject bible = null;
 
     public static ArrayList getReligion() {
         religion = new ArrayList<>();

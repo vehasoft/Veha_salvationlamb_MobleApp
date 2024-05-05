@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var privacyPolicy: TextView
     private lateinit var email: TextView
     private lateinit var password: TextView
+    var token = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
@@ -41,7 +42,6 @@ class LoginActivity : AppCompatActivity() {
         privacyPolicy = findViewById(R.id.privacy)
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
-        var token = ""
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 Util.CHANNEL_ID,
@@ -56,15 +56,11 @@ class LoginActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
             if (it.isSuccessful){
                 token = it.result
-                lifecycleScope.launch {
-                    userPreferences.savefcmToken(token)
-                }
                 Log.e("token###########",token)
             } else {
                 Log.e("token error",it.exception.toString())
             }
         }
-        Log.e("token###########",token)
         signupButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -121,6 +117,7 @@ class LoginActivity : AppCompatActivity() {
                                 userPreferences.saveAuthToken(loginresp.token)
                                 userPreferences.saveUserId(loginresp.id)
                                 userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
+                                userPreferences.savefcmToken(token)
                                 userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
                                 Util.isFirst = loginresp.isFreshUser.toBoolean()
                                 Util.isWarrior = loginresp.isWarrior.toBoolean()

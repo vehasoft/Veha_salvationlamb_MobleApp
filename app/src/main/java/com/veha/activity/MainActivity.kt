@@ -349,9 +349,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun getBible(){
 
-        Log.e("bibles",Util.bible.length().toString())
-        Log.e("bibles",Util.bible.toString())
-        if (Util.bible.length() <= 0){
+        //Log.e("bibles",Util.bible.length().toString())
+        //Log.e("bibles",Util.bible.toString())
+        if (Util.bible == null){
             try {
                 var fileInputStream: FileInputStream = openFileInput("bible.json")
                 var inputStreamReader = InputStreamReader(fileInputStream)
@@ -364,11 +364,12 @@ class MainActivity : AppCompatActivity() {
                     } != null) {
                     stringBuilder.append(text)
                 }
-                Log.e("bible",stringBuilder.toString())
-                Util.bible = Gson().fromJson(stringBuilder.toString(), JSONObject::class.java)
+                Log.e("bibles",stringBuilder.toString())
+                Util.bible = JSONObject(stringBuilder.toString())
+                Log.e("bibles", Util.bible.toString())
             } catch (ex: FileNotFoundException){
                 Log.e("bible","File doesnot exists")
-                val data = "{\"test\":\"test\"}"
+                val data = "{\"test\": \"test\"}"
                 var fileInputStream: FileOutputStream = openFileOutput("bible.json",Context.MODE_PRIVATE)
                 fileInputStream.write(data.toByteArray())
             }
