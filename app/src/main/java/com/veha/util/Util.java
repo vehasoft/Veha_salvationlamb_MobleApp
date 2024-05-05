@@ -2,6 +2,10 @@ package com.veha.util;
 
 import android.media.MediaPlayer;
 import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -33,6 +37,8 @@ public class Util {
     public static final String CHANNEL_ID = "VEHA";
     public static final String CHANNEL_NAME = "VEHA";
     public static final String CHANNEL_DESC = "veha notification";
+
+    public static JSONObject bible = new JSONObject();
 
     public static ArrayList getReligion() {
         religion = new ArrayList<>();

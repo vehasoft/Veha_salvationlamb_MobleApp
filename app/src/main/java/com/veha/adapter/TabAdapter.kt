@@ -26,16 +26,16 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
             1 -> {
                 FilesFragment()
             }
-           /* 2 -> {
-                FilesFragment()
-            }*/
             2 -> {
-                AdminVideoFragment()
+                BibleFragment()
             }
             3 -> {
-                AdminAudioFragment()
+                AdminVideoFragment()
             }
             4 -> {
+                AdminAudioFragment()
+            }
+            5 -> {
                 ProfileFragment.getInstance(Util.userId,"me")
             }
             else -> b as Fragment
