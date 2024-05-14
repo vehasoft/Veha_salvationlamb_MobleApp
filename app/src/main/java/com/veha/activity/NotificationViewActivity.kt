@@ -27,8 +27,12 @@ class NotificationViewActivity : AppCompatActivity() {
         val admin = tabLayout.newTab()
         admin.tag = "Admin"
         admin.text = "Admin"
+        val warrior = tabLayout.newTab()
+        warrior.tag = "Warrior"
+        warrior.text = "Warrior"
         tabLayout.addTab(user, 0)
         tabLayout.addTab(admin, 1)
+        tabLayout.addTab(warrior, 2)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = NotificationTabAdapter(
             this@NotificationViewActivity,

@@ -18,12 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import com.veha.activity.ApproveRequestActivity
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.activity.ViewProfileActivity
 import com.veha.util.Commons
 import com.veha.util.NotificationList
 import com.veha.util.NotificationType
+import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import retrofit2.Call
@@ -89,11 +91,21 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             readNotification(holder,notification.id)
             if (NotificationType.POST.value == notification.type) {
                 val intent = Intent(context, ViewPostActivity::class.java)
+                intent.putExtra("type", NotificationType.POST.value)
                 intent.putExtra("postId", notification.data)
                 context.startActivity(intent)
             } else if (NotificationType.USER.value == notification.type) {
                 val intent = Intent(context, ViewProfileActivity::class.java)
                 intent.putExtra("userId", notification.data)
+                context.startActivity(intent)
+            } else if (NotificationType.WARRIOR.value == notification.type) {
+                val intent = Intent(context, ApproveRequestActivity::class.java)
+                intent.putExtra("userId", notification.data)
+                context.startActivity(intent)
+            }else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
+                val intent = Intent(context, ViewPostActivity::class.java)
+                intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
+                intent.putExtra("postId", notification.data)
                 context.startActivity(intent)
             }
         }
@@ -133,5 +145,8 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             Log.e("NotificationListAdapter.readNotification", e.toString())
         }
     }
-
+    fun addItem(post: ArrayList<NotificationList>) {
+        notifications.addAll(post)
+        notifyItemRangeInserted(notifications.size, post.size)
+    }
 }

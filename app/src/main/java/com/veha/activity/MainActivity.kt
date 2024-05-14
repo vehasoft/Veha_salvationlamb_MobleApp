@@ -201,8 +201,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         announcement.setOnClickListener {
-            val intent = Intent(this, NotificationViewActivity::class.java)
+            val intent = Intent(this, AnnouncementActivity::class.java)
             startActivity(intent)
+            /*val intent = Intent(this, ApproveRequestActivity::class.java)
+            intent.putExtra("userId","7c46ea10-fade-11ee-a77a-7f0156e992fe")
+            startActivity(intent)*/
         }
         bannerClose.setOnClickListener {
             banner.visibility = View.GONE
