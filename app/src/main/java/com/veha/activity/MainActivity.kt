@@ -170,8 +170,8 @@ class MainActivity : AppCompatActivity() {
         notificationCount = findViewById(R.id.notification_count)
 
         checkPermission()
-        getNotificationCount()
         getMyDetails()
+        getNotificationCount()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
                 val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
