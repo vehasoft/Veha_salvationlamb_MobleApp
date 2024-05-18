@@ -26,7 +26,8 @@ public class Util {
     public static final String NIGHT = "Night";
     public static final String DEFAULT = "Default";
     public static Float fontSize = 10.0F;
-    public static String url = "https://server.salvationlamb.com";
+   // public static String url = "https://server.salvationlamb.com";
+    public static String url = "http://209.182.232.231:4000";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static String userId;
     public static Boolean isFirst = true;
