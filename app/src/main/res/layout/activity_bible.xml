@@ -34,12 +34,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/txt_linear"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="right"
             >
             <Button
                 android:layout_width="wrap_content"
@@ -47,6 +49,7 @@
                 android:background="@drawable/rounded_border_login_register"
                 android:backgroundTint="@color/primary_blue"
                 android:text="copy"
+                android:layout_marginRight="10dp"
                 android:id="@+id/copy_txt"
                 />
             <Button
@@ -56,6 +59,7 @@
                 android:backgroundTint="@color/primary_blue"
                 android:text="post"
                 android:id="@+id/post_txt"
+                android:layout_marginRight="10dp"
                 />
         </LinearLayout>
 
