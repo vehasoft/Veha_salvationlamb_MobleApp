@@ -57,7 +57,7 @@ class BibleFragment : Fragment() {
             Log.e("newbible",Util.bible.get("New").toString())
             val intent = Intent(contexts, BibleActivity::class.java)
             intent.putExtra("type", "list")
-            intent.putExtra("content", Util.bible.get("new").toString())
+            intent.putExtra("content", Util.bible.get("New").toString())
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             contexts.startActivity(intent)
         }
