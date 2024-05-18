@@ -1,9 +1,13 @@
 package com.veha.activity
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -19,6 +23,7 @@ class BibleActivity : AppCompatActivity() {
     lateinit var recyclerView: RecyclerView
     lateinit var content: TextView
     lateinit var txtLinear: LinearLayout
+    lateinit var copy: Button
     lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +32,7 @@ class BibleActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recycler_view)
         logo = findViewById(R.id.prod_logo)
         content = findViewById(R.id.content)
+        copy = findViewById(R.id.copy_txt)
         txtLinear = findViewById(R.id.txt_linear)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -46,6 +52,11 @@ class BibleActivity : AppCompatActivity() {
             recyclerView.visibility = View.GONE
             txtLinear.visibility = View.VISIBLE
             content.text = intent.extras!!.get("content").toString()
+        }
+        copy.setOnClickListener {
+            val clipBoardManager: ClipboardManager = this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData: ClipData = ClipData.newPlainText("bible",content.text.toString())
+            clipBoardManager.setPrimaryClip(clipData)
         }
     }
 }
