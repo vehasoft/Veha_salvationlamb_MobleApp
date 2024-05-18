@@ -1,15 +1,20 @@
 package com.veha.util;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -160,7 +165,24 @@ public class Util {
         url = "https://salvationlamb.com/video/" + url;
         return url;
     }
+    public static void getBible(Context context){
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new InputStreamReader(
+                    context.getAssets().open("test.json")));
+            String line;
+            StringBuffer content = new StringBuffer();
+            char[] buffer = new char[1024];
+            int num;
+            while ((num = input.read(buffer)) > 0) {
+                content.append(buffer, 0, num);
+            }
+            bible = new JSONObject(content.toString());
 
+        }catch (IOException e) {} catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
 

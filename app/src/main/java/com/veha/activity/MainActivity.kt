@@ -9,6 +9,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.database.ContentObserver
 import android.os.Build
 import android.os.Bundle
@@ -51,6 +52,8 @@ import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 import kotlin.system.exitProcess
 
@@ -346,13 +349,32 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
+    /*fun loadJSONFromAsset(): String? {
+        var json: String? = null
+        json = try {
+            val `is`: InputStream = this.getAssets().open("test.json")
+            val size = `is`.available()
+            val buffer = ByteArray(size)
+            `is`.read(buffer)
+            `is`.close()
+            String(buffer, charset("UTF-8"))
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return null
+        }
+        Log.e("json",json.toString())
+        return json
+    }*/
     private fun getBible(){
-
+        Util.getBible(this@MainActivity)
+        Log.e("bibles",Util.bible.length().toString())
+        Log.e("bibles",Util.bible.toString())
+        //Util.bible = loadJSONFromAsset()?.let { JSONObject(it) }
         //Log.e("bibles",Util.bible.length().toString())
         //Log.e("bibles",Util.bible.toString())
-        if (Util.bible == null){
-            try {
+        /*if (Util.bible == null){
+            Util.bible = loadJSONFromAsset()?.let { JSONObject(it) }
+            *//*try {
                 var fileInputStream: FileInputStream = openFileInput("bible.json")
                 var inputStreamReader = InputStreamReader(fileInputStream)
                 val bufferedReader = BufferedReader(inputStreamReader)
@@ -369,13 +391,26 @@ class MainActivity : AppCompatActivity() {
                 Log.e("bibles", Util.bible.toString())
             } catch (ex: FileNotFoundException){
                 Log.e("bible","File doesnot exists")
-                val data = "{\"test\": \"test\"}"
+                val assetManager: AssetManager = this@MainActivity.assets
+                val inputStream: InputStream = assetManager.open("test.json")
+                var inputStreamReader = InputStreamReader(inputStream)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val stringBuilder: StringBuilder = StringBuilder()
+                var text: String? = null
+                while (run {
+                        text = bufferedReader.readLine()
+                        text
+                    } != null) {
+                    stringBuilder.append(text)
+                }
+                Log.e("biblesbuildr", stringBuilder.toString())
+                Util.bible = JSONObject(stringBuilder.toString())
                 var fileInputStream: FileOutputStream = openFileOutput("bible.json",Context.MODE_PRIVATE)
-                fileInputStream.write(data.toByteArray())
-            }
+                fileInputStream.write(stringBuilder.toString().toByteArray())
+            }*//*
         } else{
             Log.e("bibles",Util.bible.toString())
-        }
+        }*/
         /*
         try {
             if (Commons().isNetworkAvailable(this)) {

@@ -2,12 +2,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.veha.fragments.BibleFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.veha.fragments.FilesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_marginBottom="15dp"
+            android:id="@+id/oldd"
+            android:background="@drawable/rounded_border_login_register"
+            android:text="Bible"
+            android:paddingStart="10dp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_marginBottom="15dp"
+            android:id="@+id/neww"
+            android:background="@drawable/rounded_border_login_register"
+            android:text="Bible"
+            android:paddingStart="10dp"
+            android:textStyle="bold"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:background="@color/home_bg"
+            android:id="@+id/recycler_view"/>
+
+    </LinearLayout>
 
 </FrameLayout>

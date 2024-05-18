@@ -1,33 +1,32 @@
 package com.veha.fragments
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.veha.activity.BibleActivity
 import com.veha.activity.R
+import com.veha.adapter.BibleAdapter
+import com.veha.util.UserPreferences
+import com.veha.util.Util
+import org.chromium.base.Log
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [BibleFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class BibleFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
+    lateinit var userPreferences: UserPreferences
+    lateinit var recyclerView: RecyclerView
+    lateinit var oldd: TextView
+    lateinit var neww: TextView
+    lateinit var contexts: Context
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onCreateView(
@@ -35,26 +34,34 @@ class BibleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bible, container, false)
-    }
+        contexts = container!!.context
+        val view =  inflater.inflate(R.layout.fragment_bible, container, false)
+        userPreferences = UserPreferences(contexts)
+        recyclerView = view.findViewById(R.id.recycler_view)
+        oldd = view.findViewById(R.id.oldd)
+        neww = view.findViewById(R.id.neww)
+        recyclerView.visibility = View.GONE
+        recyclerView.layoutManager = LinearLayoutManager(contexts)
+        //recyclerView.adapter = BibleAdapter(context,)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BibleFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BibleFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        Log.e("util bible",Util.bible.toString())
+        oldd.setOnClickListener {
+            Log.e("oldbible",Util.bible.get("Old").toString())
+            val intent = Intent(contexts, BibleActivity::class.java)
+            intent.putExtra("type", "list")
+            intent.putExtra("content", Util.bible.get("Old").toString())
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            contexts.startActivity(intent)
+        }
+        neww.setOnClickListener {
+            Log.e("newbible",Util.bible.get("New").toString())
+            val intent = Intent(contexts, BibleActivity::class.java)
+            intent.putExtra("type", "list")
+            intent.putExtra("content", Util.bible.get("new").toString())
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            contexts.startActivity(intent)
+        }
+
+        return view
     }
 }
