@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -31,6 +32,7 @@ class AnnouncementActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
+    lateinit var logo: ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_announcement)
@@ -38,6 +40,11 @@ class AnnouncementActivity : AppCompatActivity() {
         userPreferences = UserPreferences(this)
         list = findViewById(R.id.announcement_recycler)
         nodata = findViewById(R.id.no_data)
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         getAnnouncenents()
 
     }
@@ -49,7 +56,7 @@ class AnnouncementActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this@AnnouncementActivity) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it",1,5)
+                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it")
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -59,7 +66,7 @@ class AnnouncementActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
-                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                        Gson().fromJson(resp?.get("announcement"), JsonArray::class.java)
                                     for (notification in loginresp) {
                                         val pos = Gson().fromJson(notification, Posts::class.java)
                                         postlist.add(pos)
