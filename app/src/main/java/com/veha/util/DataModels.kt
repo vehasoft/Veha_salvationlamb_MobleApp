@@ -233,8 +233,9 @@ public enum class USERType(s: String) {
     WARRIOR("warrior"),
     ADMIN("admin"),
 }
-public enum class PostType(s: String) {
+public enum class PostType(val type: String) {
     IMAGE("image"),
+    TEXT("text"),
     AUDIO("audio"),
     VIDEO("video"),
     URL("url"),

@@ -160,6 +160,8 @@ interface RetrofitAPI {
     @GET("api/v1/announcements")
     fun getAnnouncements(
         @Header("Authorization") dataModal: String?,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
     ): Call<JsonObject?>?
     @GET("api/v1/announcements/{postId}")
     fun getAnnouncements(

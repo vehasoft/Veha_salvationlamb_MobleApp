@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
+import com.veha.util.NotificationList
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 
@@ -63,5 +64,9 @@ class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Cont
             //intent.putExtra("post", announcement)
             context.startActivity(intent)
         }
+    }
+    fun addItem(post: ArrayList<Posts>) {
+        announcements.addAll(post)
+        notifyItemRangeInserted(announcements.size, post.size)
     }
 }

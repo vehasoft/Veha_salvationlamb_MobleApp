@@ -383,7 +383,7 @@ class ViewPostActivity : AppCompatActivity() {
                             ) {
                                 if (response.code() == 200) {
                                     val post: Posts = Gson().fromJson(
-                                        response.body()?.get("result"),
+                                        response.body()?.get("announcement"),
                                         Posts::class.java
                                     )
                                     Log.e("postttttttt",post.toString())

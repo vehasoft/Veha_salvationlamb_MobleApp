@@ -33,6 +33,9 @@ class AnnouncementActivity : AppCompatActivity() {
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var logo: ImageView
+    var updated: Boolean = false
+    private var page: Int = 1
+    lateinit var adapter: AnnouncementAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_announcement)
@@ -45,6 +48,10 @@ class AnnouncementActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        adapter = AnnouncementAdapter(ArrayList(),this@AnnouncementActivity,this@AnnouncementActivity)
+        val layoutManager = LinearLayoutManager(this)
+        list.layoutManager = layoutManager
+        list.adapter = adapter
         getAnnouncenents()
 
     }
@@ -53,10 +60,11 @@ class AnnouncementActivity : AppCompatActivity() {
 
         try {
             if (Commons().isNetworkAvailable(this@AnnouncementActivity)) {
+                var count: Int
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this@AnnouncementActivity) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it")
+                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it",page,10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -66,7 +74,9 @@ class AnnouncementActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
-                                        Gson().fromJson(resp?.get("announcement"), JsonArray::class.java)
+                                        Gson().fromJson(resp?.get("results"), JsonArray::class.java)
+                                    count = Integer.parseInt(resp?.get("count").toString())
+                                    count /= 10
                                     for (notification in loginresp) {
                                         val pos = Gson().fromJson(notification, Posts::class.java)
                                         postlist.add(pos)
@@ -77,9 +87,25 @@ class AnnouncementActivity : AppCompatActivity() {
                                     } else {
                                         list.visibility = View.VISIBLE
                                         nodata.visibility = View.GONE
-
-                                        list.layoutManager = LinearLayoutManager(this@AnnouncementActivity)
-                                        list.adapter = AnnouncementAdapter(postlist, this@AnnouncementActivity,this@AnnouncementActivity)
+                                        if (!updated) {
+                                            adapter.addItem(postlist)
+                                            page++
+                                            updated = true
+                                        }
+                                        list.addOnScrollListener(object :
+                                            RecyclerView.OnScrollListener() {
+                                            override fun onScrollStateChanged(
+                                                recyclerView: RecyclerView,
+                                                dx: Int
+                                            ) {
+                                                if (!recyclerView.canScrollVertically(1)) {
+                                                    if ((count+2) > page) {
+                                                        getAnnouncenents()
+                                                        updated = false
+                                                    }
+                                                }
+                                            }
+                                        })
                                     }
 
                                 } else if (response.code() == 401) {

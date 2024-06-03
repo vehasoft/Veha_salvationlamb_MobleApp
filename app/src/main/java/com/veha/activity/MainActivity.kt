@@ -42,7 +42,6 @@ import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
-import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import pl.droidsonroids.gif.GifImageView
 import retrofit2.Call

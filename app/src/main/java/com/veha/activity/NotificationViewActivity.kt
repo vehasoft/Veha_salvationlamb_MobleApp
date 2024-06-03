@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.veha.adapter.NotificationTabAdapter
+import com.veha.util.Util
 
 class NotificationViewActivity : AppCompatActivity() {
 
@@ -32,7 +33,9 @@ class NotificationViewActivity : AppCompatActivity() {
         warrior.text = "Warrior"
         tabLayout.addTab(user, 0)
         tabLayout.addTab(admin, 1)
-        tabLayout.addTab(warrior, 2)
+        if (Util.user.role == "admin") {
+            tabLayout.addTab(warrior, 2)
+        }
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = NotificationTabAdapter(
             this@NotificationViewActivity,
