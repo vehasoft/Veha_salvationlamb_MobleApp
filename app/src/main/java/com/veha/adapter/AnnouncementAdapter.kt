@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.util.NotificationList
+import com.veha.util.NotificationType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 
@@ -61,7 +62,8 @@ class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Cont
         }).also { holder.notificationContent.text = it }
         holder.notificationLayout.setOnClickListener {
             val intent = Intent(context, ViewPostActivity::class.java)
-            //intent.putExtra("post", announcement)
+            intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
+            intent.putExtra("postId", announcement.id)
             context.startActivity(intent)
         }
     }

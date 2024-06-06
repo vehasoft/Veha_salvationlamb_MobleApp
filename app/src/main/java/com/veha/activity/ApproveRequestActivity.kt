@@ -149,40 +149,93 @@ class ApproveRequestActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val result: JsonObject = Gson().fromJson(resp?.get("results"), JsonObject::class.java)
-                                    val exObj: ProfileChange = Gson().fromJson(result.get("user"), ProfileChange::class.java)
-                                    val newObj: ProfileChange = Gson().fromJson(result.get("updateRequest"), ProfileChange::class.java)
-
-                                    Log.e("ex",exObj.toString())
-                                    Log.e("new",newObj.toString())
-
-                                    setValue(exName,newName,exObj.name,newObj.name)
-                                    setValue(exFname,newFname,exObj.firstName,newObj.firstName)
-                                    setValue(exLname,newLname,exObj.lastName,newObj.lastName)
-                                    setValue(exGender,newGender,exObj.gender,newObj.gender)
-                                    setValue(exEmail,newEmail,exObj.email,newObj.email)
-                                    setValue(exMobile,newMobile,exObj.mobile,newObj.mobile)
-                                    setValue(exDOB,newDOB,
-                                        Util.formatDate(exObj.dateOfBirth, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
-                                        Util.formatDate(newObj.dateOfBirth, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
-                                    setValue(exCity,newCity,exObj.city,newObj.city)
-                                    setValue(exState,newState,exObj.state,newObj.state)
-                                    setValue(exCountry,newCountry,exObj.country,newObj.country)
-                                    setValue(exPincode,newPincode,exObj.pinCode,newObj.pinCode)
-                                    setValue(exLang,newLang,exObj.language,newObj.language)
-                                    setValue(exReligion,newReligion,exObj.religion,newObj.religion)
-                                    setValue(exChurch,newChurch,exObj.churchName,newObj.churchName)
-                                    setValue(exIsWarrior,newIsWarrior,exObj.isWarrior,newObj.isWarrior)
-                                    setValue(exAddress,newAddress,exObj.address,newObj.address)
-                                    setValue(exGift,newGift,exObj.gift,newObj.gift)
-                                    if (!exObj.picture.isNullOrEmpty()) {
-                                        Picasso.with(context).load(exObj.picture).into(expic)
-                                    } else {
-                                        expic.setImageResource(R.drawable.ic_profile)
-                                    }
-                                    if (!newObj.picture.isNullOrEmpty()) {
-                                        Picasso.with(context).load(newObj.picture).into(newpic)
-                                    } else {
-                                        newpic.setImageResource(R.drawable.ic_profile)
+                                    var exObj: ProfileChange
+                                    var newObj: ProfileChange
+                                    if (!result.get("user").isJsonNull && !result.get("updateRequest").isJsonNull) {
+                                        exObj = Gson().fromJson(
+                                            result.get("user"),
+                                            ProfileChange::class.java
+                                        )
+                                        newObj = Gson().fromJson(
+                                            result.get("updateRequest"),
+                                            ProfileChange::class.java
+                                        )
+                                        setValue(exName, newName, exObj.name, newObj.name)
+                                        setValue(
+                                            exFname,
+                                            newFname,
+                                            exObj.firstName,
+                                            newObj.firstName
+                                        )
+                                        setValue(exLname, newLname, exObj.lastName, newObj.lastName)
+                                        setValue(exGender, newGender, exObj.gender, newObj.gender)
+                                        setValue(exEmail, newEmail, exObj.email, newObj.email)
+                                        setValue(exMobile, newMobile, exObj.mobile, newObj.mobile)
+                                        setValue(
+                                            exDOB, newDOB,
+                                            Util.formatDate(
+                                                exObj.dateOfBirth,
+                                                "dd MMMM yyyy",
+                                                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                            ),
+                                            Util.formatDate(
+                                                newObj.dateOfBirth,
+                                                "dd MMMM yyyy",
+                                                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                            )
+                                        )
+                                        setValue(exCity, newCity, exObj.city, newObj.city)
+                                        setValue(exState, newState, exObj.state, newObj.state)
+                                        setValue(
+                                            exCountry,
+                                            newCountry,
+                                            exObj.country,
+                                            newObj.country
+                                        )
+                                        setValue(
+                                            exPincode,
+                                            newPincode,
+                                            exObj.pinCode,
+                                            newObj.pinCode
+                                        )
+                                        setValue(exLang, newLang, exObj.language, newObj.language)
+                                        setValue(
+                                            exReligion,
+                                            newReligion,
+                                            exObj.religion,
+                                            newObj.religion
+                                        )
+                                        setValue(
+                                            exChurch,
+                                            newChurch,
+                                            exObj.churchName,
+                                            newObj.churchName
+                                        )
+                                        setValue(
+                                            exIsWarrior,
+                                            newIsWarrior,
+                                            exObj.isWarrior,
+                                            newObj.isWarrior
+                                        )
+                                        setValue(
+                                            exAddress,
+                                            newAddress,
+                                            exObj.address,
+                                            newObj.address
+                                        )
+                                        setValue(exGift, newGift, exObj.gift, newObj.gift)
+                                        if (!exObj.picture.isNullOrEmpty()) {
+                                            Picasso.with(context).load(exObj.picture).into(expic)
+                                        } else {
+                                            expic.setImageResource(R.drawable.ic_profile)
+                                        }
+                                        if (!newObj.picture.isNullOrEmpty()) {
+                                            Picasso.with(context).load(newObj.picture).into(newpic)
+                                        } else {
+                                            newpic.setImageResource(R.drawable.ic_profile)
+                                        }
+                                    } else{
+                                        finish()
                                     }
 
                                 } else if (response.code() == 401) {

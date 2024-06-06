@@ -59,6 +59,7 @@ class ViewPostActivity : AppCompatActivity() {
     lateinit var overallLayout: ScrollView
     lateinit var logo: ImageView
     lateinit var postId: String
+    lateinit var type: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -86,10 +87,11 @@ class ViewPostActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        if (intent.extras!!.get("type").toString() == NotificationType.POST.value) {
+        type = intent.extras!!.get("type").toString()
+        if (type == NotificationType.POST.value) {
             postId = intent.extras!!.get("postId").toString()
             getPost(postId)
-        }else if (intent.extras!!.get("type").toString() == NotificationType.ANNOUNCEMENT.value) {
+        }else if (type == NotificationType.ANNOUNCEMENT.value) {
             postId = intent.extras!!.get("postId").toString()
             getAnnouncement(postId)
         }
@@ -191,28 +193,38 @@ class ViewPostActivity : AppCompatActivity() {
     }
 
     fun setPostContent(post: Posts) {
-        content.setText(post.content)
+        if (type == NotificationType.ANNOUNCEMENT.value){
+            if (!post.message.isNullOrEmpty()){content.setText(post.message)}
+        } else if (type == NotificationType.POST.value){
+            if (!post.content.isNullOrEmpty()){content.setText(post.content)}
+        }
         content.setOnClickListener { content.expand() }
-        name.text = post.user.name
-        tags.text = getTags(post.tags)
-        title.text = post.title
+        if (post.user != null){
+            name.text = post.user.name
+            if (!post.user.picture.isNullOrEmpty()) {
+                Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
+            } else {
+                profilePic.setImageResource(R.drawable.ic_profile)
+            }
+        }
+        if (!post.tags.isNullOrEmpty()){tags.text = getTags(post.tags)}
+        if (!post.title.isNullOrEmpty()){title.text = post.title}
         time.text = Util.getTimeAgo(post.createdAt)
         fullTime.text = post.createdAt
-        reacts.text = post.likesCount + "people reacts"
-        if (!post.user.picture.isNullOrEmpty()) {
-            Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
-        } else {
-            profilePic.setImageResource(R.drawable.ic_profile)
-        }
+        if (!post.likesCount.isNullOrEmpty()){reacts.text = post.likesCount + "people reacts"}
         if (!post.type.isNullOrEmpty()) {
             when (post.type) {
                 "image" -> {
                     audioLayout.visibility = View.GONE
                     postVideo.visibility = View.GONE
-                    if (!post.picture.isNullOrEmpty()) {
+                    if (type == NotificationType.ANNOUNCEMENT.value && post.picture != null) {
                         postPic.visibility = View.VISIBLE
                         Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside().into(postPic)
-                    } else {
+                    } else if(type == NotificationType.ANNOUNCEMENT.value && post.url != null){
+                        postPic.visibility = View.VISIBLE
+                        Picasso.with(this@ViewPostActivity).load(post.url).fit().centerInside().into(postPic)
+                    }
+                    else {
                         postPic.visibility = View.GONE
                     }
                     postPic.setOnClickListener {
@@ -471,6 +483,12 @@ class ViewPostActivity : AppCompatActivity() {
         return opTags
     }
     override fun onBackPressed() {
+        if (Util.player != null) {
+            Util.player.stop()
+            Util.player.reset()
+            Util.player.release()
+            Util.player = null
+        }
         if (isTaskRoot) {
             val intent =
                 Intent(this@ViewPostActivity, MainActivity::class.java)
@@ -478,5 +496,15 @@ class ViewPostActivity : AppCompatActivity() {
             finish()
         }
         super.onBackPressed()
+    }
+
+    override fun onDestroy() { if (
+        Util.player != null) {
+        Util.player.stop()
+        Util.player.reset()
+        Util.player.release()
+        Util.player = null
+    }
+        super.onDestroy()
     }
 }

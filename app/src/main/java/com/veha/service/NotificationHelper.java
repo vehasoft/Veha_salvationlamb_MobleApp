@@ -1,5 +1,6 @@
 package com.veha.service;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.veha.activity.ApproveRequestActivity;
 import com.veha.activity.R;
 import com.veha.activity.ViewPostActivity;
 import com.veha.activity.ViewProfileActivity;
@@ -30,10 +32,22 @@ public class NotificationHelper {
         if (Objects.equals(data.get("type"), NotificationType.POST.getValue())) {
             Intent intent = new Intent(context, ViewPostActivity.class);
             intent.putExtra("postId",data.get("id").toString());
+            intent.putExtra("type", NotificationType.POST.getValue());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         } else if (Objects.equals(data.get("type"), NotificationType.USER.getValue())){
             Intent intent = new Intent(context, ViewProfileActivity.class);
+            intent.putExtra("userId",data.get("id").toString());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        } else if (Objects.equals(data.get("type"),NotificationType.ANNOUNCEMENT.getValue())) {
+            Intent intent = new Intent(context, ViewPostActivity.class);
+            intent.putExtra("type", NotificationType.ANNOUNCEMENT.getValue());
+            intent.putExtra("postId",data.get("id").toString());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        } else if (Objects.equals(data.get("type"),NotificationType.WARRIOR.getValue())) {
+            Intent intent = new Intent(context, ApproveRequestActivity.class);
             intent.putExtra("userId",data.get("id").toString());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
@@ -44,10 +58,12 @@ public class NotificationHelper {
         builder.setContentText(body);
         builder.setContentIntent(pendingIntent);
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        Notification notification = builder.build();
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManagerCompat.notify(1, builder.build());
+            notificationManagerCompat.notify(1, notification);
         }
     }
 }

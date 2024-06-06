@@ -72,7 +72,6 @@ class SplashScreenActivity : AppCompatActivity() {
                     Util.fontSize = it
                 }
 
-                Thread.sleep(2000)
                 getMyDetails(it)
             }
         }

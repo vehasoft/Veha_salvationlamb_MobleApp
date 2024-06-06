@@ -344,6 +344,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getMyDetails() {
+        if (Util.userId == null) {
+            userPreferences.userId.asLiveData().observe(this){
+                Util.userId = it
+            }
+        }
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()

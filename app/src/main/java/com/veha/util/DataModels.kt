@@ -166,6 +166,7 @@ data class Posts(
     val id: String,
     val title: String,
     val content: String,
+    val message: String,
     val tags: String,
     val userId: String,
     val picture: String,
