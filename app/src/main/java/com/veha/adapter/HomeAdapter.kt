@@ -367,6 +367,7 @@ class HomeAdapter(
 
         }
         holder.followBtn.setOnClickListener {
+            holder.followBtn.isEnabled = false
             follow(Util.userId, post.userId, holder)
         }
         holder.reacts.setOnClickListener {
@@ -401,6 +402,7 @@ class HomeAdapter(
 
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
         try {
+            holder.likeBtn.isEnabled = false
             if (Commons().isNetworkAvailable(context)) {
                 val data = JsonObject()
                 data.addProperty("userId", Util.userId)
@@ -449,6 +451,7 @@ class HomeAdapter(
             }
         } catch (e: Exception) {
             Log.e("HomeAdapter.likePost", e.toString())
+            holder.likeBtn.isEnabled = true
         }
     }
 
@@ -541,6 +544,7 @@ class HomeAdapter(
             }
         } catch (e: Exception) {
             Log.e("HomeAdapter.follow", e.toString())
+            holder.followBtn.isEnabled = true
         }
     }
 

@@ -108,11 +108,25 @@ class SplashScreenActivity : AppCompatActivity() {
                                     if (intent.extras!!.getString("type").equals(NotificationType.POST.value)){
                                         val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
                                         intent.putExtra("postId", id)
+                                        intent.putExtra("type", NotificationType.POST.value)
                                         startActivity(intent)
                                         finish()
                                     } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
                                         val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
                                         intent.putExtra("userId", id)
+                                        intent.putExtra("type", NotificationType.USER.value)
+                                        startActivity(intent)
+                                        finish()
+                                    }else if (intent.extras!!.getString("type").equals(NotificationType.WARRIOR.value)){
+                                        val intent = Intent(this@SplashScreenActivity, ApproveRequestActivity::class.java)
+                                        intent.putExtra("userId", id)
+                                        intent.putExtra("type", NotificationType.USER.value)
+                                        startActivity(intent)
+                                        finish()
+                                    }else if (intent.extras!!.getString("type").equals(NotificationType.ANNOUNCEMENT.value)){
+                                        val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
+                                        intent.putExtra("postId", id)
+                                        intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
                                         startActivity(intent)
                                         finish()
                                     }

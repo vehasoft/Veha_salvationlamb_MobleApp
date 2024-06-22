@@ -90,6 +90,7 @@ class ViewPostActivity : AppCompatActivity() {
         type = intent.extras!!.get("type").toString()
         if (type == NotificationType.POST.value) {
             postId = intent.extras!!.get("postId").toString()
+            Log.e("post",postId.toString())
             getPost(postId)
         }else if (type == NotificationType.ANNOUNCEMENT.value) {
             postId = intent.extras!!.get("postId").toString()
