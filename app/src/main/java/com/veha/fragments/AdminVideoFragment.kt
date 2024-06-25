@@ -147,10 +147,8 @@ class AdminVideoFragment : Fragment() {
                                         })
                                     }
                                 } else {
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("result", errorMessage)*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
@@ -206,6 +204,9 @@ class AdminVideoFragment : Fragment() {
                                         myLikes += pos.postId + " , "
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFav(owner)
                             }
@@ -257,6 +258,9 @@ class AdminVideoFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, PostUser::class.java)
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallPosts(contexts, owner)
                             }
@@ -307,6 +311,9 @@ class AdminVideoFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, AllFavList::class.java)
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -353,6 +360,9 @@ class AdminVideoFragment : Fragment() {
                                     val loginresp: UserRslt =
                                         Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

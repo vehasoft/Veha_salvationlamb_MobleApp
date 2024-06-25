@@ -124,12 +124,8 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                                 if (response.code() == 200) {
                                     holder.notificationLayout.setBackgroundColor(context.resources.getColor(R.color.white))
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

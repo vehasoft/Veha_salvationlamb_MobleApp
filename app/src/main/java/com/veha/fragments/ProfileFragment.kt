@@ -219,6 +219,9 @@ class ProfileFragment : Fragment() {
                                             }
                                         })
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -271,6 +274,9 @@ class ProfileFragment : Fragment() {
                                         myLikes += pos.postId + ","
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallPosts(contexts, owner)
                             }
@@ -325,6 +331,9 @@ class ProfileFragment : Fragment() {
                                     }
                                     followerCount = followersList.size
                                     profileFollowers.text = followerCount.toString()
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFollowing(owner)
                             }
@@ -379,7 +388,7 @@ class ProfileFragment : Fragment() {
                                     followingCount = followingList.size
                                     profileFollowing.text = followingCount.toString()
                                 } else {
-                                    Log.e("following", "fails - " + response.code())
+                                    Log.e("following", "fails - " + response.code() + response.errorBody().toString())
                                 }
                                 getmyDetails(contexts, owner)
                             }
@@ -459,6 +468,9 @@ class ProfileFragment : Fragment() {
                                     ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

@@ -122,6 +122,9 @@ class AboutActivity : AppCompatActivity() {
                                         Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
                                         val intent = Intent(this@AboutActivity, LoginActivity::class.java)
                                         startActivity(intent)
+                                } else {
+                                    Log.e("failAbout - Status", response.code().toString())
+                                    Log.e("failAbout", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

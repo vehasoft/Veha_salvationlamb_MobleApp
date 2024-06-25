@@ -116,6 +116,9 @@ class AnnouncementActivity : AppCompatActivity() {
                                     ).show()
                                     val intent = Intent(this@AnnouncementActivity, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("failAnnouncements - Status", response.code().toString())
+                                    Log.e("failAnnouncements", response.errorBody().toString())
                                 }
                             }
 

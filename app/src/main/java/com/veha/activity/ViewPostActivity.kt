@@ -5,7 +5,9 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import android.text.Html
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -60,6 +62,7 @@ class ViewPostActivity : AppCompatActivity() {
     lateinit var logo: ImageView
     lateinit var postId: String
     lateinit var type: String
+    lateinit var contentUrl: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -82,6 +85,7 @@ class ViewPostActivity : AppCompatActivity() {
         likeBtn = findViewById(R.id.like_btn)
         shareBtn = findViewById(R.id.share_btn)
         overallLayout = findViewById(R.id.child_post_layout)
+        contentUrl = findViewById(R.id.content_url)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -208,6 +212,19 @@ class ViewPostActivity : AppCompatActivity() {
                 profilePic.setImageResource(R.drawable.ic_profile)
             }
         }
+        if (post.contentURL.isNullOrEmpty()){
+            contentUrl.visibility = View.GONE
+        } else {
+            contentUrl.visibility = View.VISIBLE
+            val urlList = post.contentURL.split(",")
+            var url = ""
+            for (urls in urlList) {
+                url += "<a href=\"" + urls + "\">" + urls + "</a><br>"
+            }
+            contentUrl.movementMethod = LinkMovementMethod.getInstance()
+            contentUrl.text = Html.fromHtml(url)
+            contentUrl.isClickable = true
+        }
         if (!post.tags.isNullOrEmpty()){tags.text = getTags(post.tags)}
         if (!post.title.isNullOrEmpty()){title.text = post.title}
         time.text = Util.getTimeAgo(post.createdAt)
@@ -218,7 +235,7 @@ class ViewPostActivity : AppCompatActivity() {
                 "image" -> {
                     audioLayout.visibility = View.GONE
                     postVideo.visibility = View.GONE
-                    if (type == NotificationType.ANNOUNCEMENT.value && post.picture != null) {
+                    if (type == NotificationType.POST.value && post.picture != null) {
                         postPic.visibility = View.VISIBLE
                         Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside().into(postPic)
                     } else if(type == NotificationType.ANNOUNCEMENT.value && post.url != null){
@@ -363,11 +380,8 @@ class ViewPostActivity : AppCompatActivity() {
                                     Log.e("postttttttt",post.toString())
                                     setPostContent(post)
                                 } else {
-                                    Log.e("fail post", response.errorBody().toString())
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -402,11 +416,8 @@ class ViewPostActivity : AppCompatActivity() {
                                     Log.e("postttttttt",post.toString())
                                     setPostContent(post)
                                 } else {
-                                    Log.e("fail post", response.errorBody().toString())
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -449,12 +460,8 @@ class ViewPostActivity : AppCompatActivity() {
                                         reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 likeBtn.isEnabled = true

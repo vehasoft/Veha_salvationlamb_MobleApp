@@ -124,12 +124,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 }
                             }
                         } else {
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = loginresp.get("status").toString()
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            email.error = errorMessage
-                            Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
                     }
 
@@ -188,11 +184,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             }
 
                         } else {
-                            val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val errorMessage = loginresp.get("errorMessage").toString()
-                            otp.error = errorMessage
-                            Toast.makeText(this@ForgotPasswordActivity, errorMessage, Toast.LENGTH_LONG).show()
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
                     }
 

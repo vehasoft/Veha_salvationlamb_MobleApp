@@ -225,7 +225,11 @@ class HomeAdapter(
                         try {
                             (context as MainActivity).lifecycle.addObserver(holder.postVideo)
                         }catch (e: Exception){
-                            (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
+                            try {
+                                (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
+                            }catch (e: Exception){
+                                (context as ViewProfileActivity).lifecycle.addObserver(holder.postVideo)
+                            }
                         }
                         val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
@@ -446,12 +450,8 @@ class HomeAdapter(
                                         holder.reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.likeBtn.isEnabled = true
@@ -487,12 +487,8 @@ class HomeAdapter(
                                         context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
                                     ).show()*/
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.deleteBtn.isEnabled = true
@@ -520,7 +516,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        holder.followBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -529,22 +524,18 @@ class HomeAdapter(
                                         Gson().fromJson(response.body()!!.get("message"), String::class.java)
                                     Log.e("msg follow", msg)
                                     if (msg == "unfollow") {
+                                        holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"
                                         myFollowList.put(followerId, userId)
                                     } else if (msg == "follow") {
+                                        holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Unfollow"
                                         myFollowList.remove(followerId)
                                     }
                                     notifyDataSetChanged()
                                 } else {
+                                    Log.e("failFollow - Status", response.code().toString())
                                     Log.e("failFollow", response.errorBody().toString())
-                                    //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
                                 }
                                 holder.followBtn.isEnabled = true
                                 call.cancel()
@@ -594,13 +585,8 @@ class HomeAdapter(
                                     }
                                     notifyDataSetChanged()
                                 } else {
-                                    Log.e("fail fav", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("errorMessage", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 holder.fav.isEnabled = true
                                 call.cancel()
@@ -632,12 +618,8 @@ class HomeAdapter(
                                     val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
 
                                 } else {
-                                    Log.e("fail fav", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

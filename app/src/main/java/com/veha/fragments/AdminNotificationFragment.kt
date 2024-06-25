@@ -63,58 +63,6 @@ class AdminNotificationFragment : Fragment() {
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
-
-/*
-
-        val n1 = NotificationList("1","18e83160-db79-11ee-991e-9f64ae4c00f8","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.USER.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n2 = NotificationList("1","086b6270-b451-11ee-a013-91221e4f7ee9","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.USER.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n3 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n4 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n5 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n6 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n7 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n8 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n9 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n10 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val n11 = NotificationList("1","37b83040-64ff-11ee-b633-99dbe0476c63","086b6270-b451-11ee-a013-91221e4f7ee9","Followed Your Profile","Rajkumar Lakshmanan Followed your Profile",NotificationType.POST.name,"086b6270-b451-11ee-a013-91221e4f7ee9","false","2024-02-13T02:53:06.000Z","2024-02-13T02:53:06.000Z",
-            PostUser("086b6270-b451-11ee-a013-91221e4f7ee9","Rajkumar Lakshmanan","","true","l.raajkumar@gmail.com",)
-        )
-        val notificationList :ArrayList<NotificationList> = ArrayList()
-        notificationList.add(n1)
-        notificationList.add(n2)
-        notificationList.add(n3)
-        notificationList.add(n4)
-        notificationList.add(n5)
-        notificationList.add(n6)
-        notificationList.add(n7)
-        notificationList.add(n8)
-        notificationList.add(n9)
-        notificationList.add(n10)
-        notificationList.add(n11)
-        list.layoutManager = LinearLayoutManager(contexts)
-        list.adapter = NotificationListAdapter(notificationList, contexts)
-*/
-
         getNotifications(viewLifecycleOwner)
 
         return view
@@ -179,6 +127,9 @@ class AdminNotificationFragment : Fragment() {
                                     ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

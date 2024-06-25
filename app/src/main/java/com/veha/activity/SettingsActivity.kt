@@ -108,28 +108,6 @@ class SettingsActivity : AppCompatActivity() {
                     else if (items[item] == Util.DEFAULT) {
                         userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
                         Util.isNight = Util.DEFAULT
-                        /*val nightModeFlags: Int = this@SettingsActivity.resources.configuration.uiMode and
-                                Configuration.UI_MODE_NIGHT_MASK
-                        Log.e("night",Configuration.UI_MODE_NIGHT_MASK.toString())
-                        Log.e("night",nightModeFlags.toString())
-                        Log.e("night",this@SettingsActivity.resources.configuration.uiMode.toString())
-                        when (nightModeFlags) {
-                            Configuration.UI_MODE_NIGHT_YES -> {
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                                Util.isNight = true
-                            }
-
-                            Configuration.UI_MODE_NIGHT_NO -> {
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                                Util.isNight = false
-                            }
-
-                            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                                Util.isNight = false
-                            }
-                        }*/
-
                     }
                     val intent = Intent(this@SettingsActivity, MainActivity::class.java)
                     startActivity(intent)

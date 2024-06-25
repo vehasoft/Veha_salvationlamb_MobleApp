@@ -401,6 +401,9 @@ class MainActivity : AppCompatActivity() {
                                     val intent =
                                         Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -441,10 +444,14 @@ class MainActivity : AppCompatActivity() {
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
-                                Log.e("firstttime", response.code().toString())
-                                Util.isFirst = false
+                                if (response.code() == 200) {
+                                    Log.e("firstttime", response.code().toString())
+                                    Util.isFirst = false
+                                } else {
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
+                                }
                             }
-
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 Log.e("MainActivity.firstTime", "fail")
                             }
@@ -488,6 +495,9 @@ class MainActivity : AppCompatActivity() {
                                         notificationCount.visibility = View.VISIBLE
                                         notificationCount.text = count.toString()
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

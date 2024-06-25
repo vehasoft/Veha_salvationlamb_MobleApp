@@ -441,17 +441,8 @@ class EditProfileActivity : AppCompatActivity() {
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    /* val resp = response.errorBody()
-                                     val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                     val status = registerResp.get("status").toString()
-                                     val errorMessage = registerResp.get("errorMessage").toString()
-                                     Log.e("respppStatus", status)
-                                     Log.e("respppresult", errorMessage)*/
-                                    Toast.makeText(
-                                        this@EditProfileActivity,
-                                        "Something Went wrong \n please try after sometime",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -547,6 +538,9 @@ class EditProfileActivity : AppCompatActivity() {
                                     Toast.makeText(this@EditProfileActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
                                     val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -588,6 +582,9 @@ class EditProfileActivity : AppCompatActivity() {
                                     val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -643,17 +640,26 @@ class EditProfileActivity : AppCompatActivity() {
                 val call = Util.getRetrofit().getCountries()
                 call!!.enqueue(object : Callback<JsonObject> {
                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                        Log.e("country", response.body().toString())
-                        val data = response.body()!!["results"] as JsonObject
-                        val array = data["countries"] as JsonArray
-                        country = ArrayList()
-                        for (i in 0 until array.size()) {
-                            val cityobj: City = Gson().fromJson(array[i], City::class.java)
-                            country.add(cityobj.name)
+                        if (response.code() == 200) {
+                            Log.e("country", response.body().toString())
+                            val data = response.body()!!["results"] as JsonObject
+                            val array = data["countries"] as JsonArray
+                            country = ArrayList()
+                            for (i in 0 until array.size()) {
+                                val cityobj: City = Gson().fromJson(array[i], City::class.java)
+                                country.add(cityobj.name)
+                            }
+                            val adapter = ArrayAdapter(
+                                this@EditProfileActivity,
+                                R.layout.spinner_text,
+                                country
+                            )
+                            adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
+                            countrySP.setAdapter(adapter)
+                        } else {
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
-                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, country)
-                        adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
-                        countrySP.setAdapter(adapter)
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
@@ -672,16 +678,22 @@ class EditProfileActivity : AppCompatActivity() {
                 val call = Util.getRetrofit().getState(countryId)
                 call!!.enqueue(object : Callback<JsonObject> {
                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                        val data = response.body()!!["results"] as JsonObject
-                        state = ArrayList()
-                        val array = data["states"] as JsonArray
-                        for (i in 0 until array.size()) {
-                            val stateobj: State = Gson().fromJson(array[i], State::class.java)
-                            state.add(stateobj.name)
+                        if (response.code() == 200) {
+                            val data = response.body()!!["results"] as JsonObject
+                            state = ArrayList()
+                            val array = data["states"] as JsonArray
+                            for (i in 0 until array.size()) {
+                                val stateobj: State = Gson().fromJson(array[i], State::class.java)
+                                state.add(stateobj.name)
+                            }
+                            val adapter =
+                                ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            stateSp.setAdapter(adapter)
+                        } else {
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
-                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, state)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        stateSp.setAdapter(adapter)
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
@@ -700,16 +712,22 @@ class EditProfileActivity : AppCompatActivity() {
                 val call = Util.getRetrofit().getCity(stateId)
                 call!!.enqueue(object : Callback<JsonObject> {
                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                        val data = response.body()!!["results"] as JsonObject
-                        val array = data["cities"] as JsonArray
-                        city = ArrayList()
-                        for (i in 0 until array.size()) {
-                            val cityObj: City = Gson().fromJson(array[i], City::class.java)
-                            city.add(cityObj.name)
+                        if (response.code() == 200) {
+                            val data = response.body()!!["results"] as JsonObject
+                            val array = data["cities"] as JsonArray
+                            city = ArrayList()
+                            for (i in 0 until array.size()) {
+                                val cityObj: City = Gson().fromJson(array[i], City::class.java)
+                                city.add(cityObj.name)
+                            }
+                            val adapter =
+                                ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            citySp.setAdapter(adapter)
+                        } else {
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
-                        val adapter = ArrayAdapter(this@EditProfileActivity, R.layout.spinner_text, city)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        citySp.setAdapter(adapter)
                     }
 
                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {

@@ -131,12 +131,8 @@ class AddPostActivity : AppCompatActivity() {
                                     finish()
                                 } else {
                                     postBtn.isEnabled = true
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)*/
+                                    Log.e("failAddPost - Status", response.code().toString())
+                                    Log.e("failAddPost", response.errorBody().toString())
                                 }
                                 call1.cancel()
                             }

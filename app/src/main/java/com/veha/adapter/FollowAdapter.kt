@@ -99,13 +99,8 @@ class FollowAdapter(
                                         myFollowList.put(followerId, userId)
                                     }
                                 } else {
-                                    Log.e("failFollow", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
