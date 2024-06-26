@@ -1,5 +1,6 @@
 package com.veha.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebView
@@ -37,5 +38,11 @@ class WebViewActivity : AppCompatActivity() {
 
         // if you want to enable zoom feature
         //webView.settings.setSupportZoom(true)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this@WebViewActivity, MainActivity::class.java)
+        startActivity(intent)
     }
 }
