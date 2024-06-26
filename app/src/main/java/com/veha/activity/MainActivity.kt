@@ -341,9 +341,12 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+        if (intent.extras != null){
+            viewPager.currentItem = intent.extras!!.getInt("gotopage")
+        }
     }
 
-    private fun getMyDetails() {
+    public fun getMyDetails() {
         if (Util.userId == null) {
             userPreferences.userId.asLiveData().observe(this){
                 Util.userId = it

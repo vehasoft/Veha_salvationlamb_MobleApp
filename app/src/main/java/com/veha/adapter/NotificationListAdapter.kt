@@ -19,9 +19,11 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.veha.activity.ApproveRequestActivity
+import com.veha.activity.MainActivity
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.activity.ViewProfileActivity
+import com.veha.activity.WebViewActivity
 import com.veha.util.Commons
 import com.veha.util.NotificationList
 import com.veha.util.NotificationType
@@ -89,6 +91,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         holder.notificationtime.text = Util.getTimeAgo(notification.createdAt)
         holder.notificationLayout.setOnClickListener {
             readNotification(holder,notification.id)
+            Log.e("notification",notification.toString())
             if (NotificationType.POST.value == notification.type) {
                 val intent = Intent(context, ViewPostActivity::class.java)
                 intent.putExtra("type", NotificationType.POST.value)
@@ -106,6 +109,14 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                 val intent = Intent(context, ViewPostActivity::class.java)
                 intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
                 intent.putExtra("postId", notification.data)
+                context.startActivity(intent)
+            }else if (NotificationType.FILE.value == notification.type) {
+                val intent = Intent(context, MainActivity::class.java)
+                intent.putExtra("gotopage", 1)
+                context.startActivity(intent)
+            }else if (NotificationType.EVENT.value == notification.type) {
+                val intent = Intent(context, WebViewActivity::class.java)
+                intent.putExtra("pageUrl", notification.data)
                 context.startActivity(intent)
             }
         }

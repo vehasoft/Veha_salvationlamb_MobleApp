@@ -66,6 +66,11 @@ class UserNotificationFragment : Fragment() {
     private fun getNotifications(owner: LifecycleOwner, postlist: ArrayList<NotificationList> = ArrayList()){
 
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 var count: Int
                 val retrofit = Util.getRetrofit()

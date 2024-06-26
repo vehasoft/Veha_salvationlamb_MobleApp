@@ -181,6 +181,11 @@ class AdminVideoFragment : Fragment() {
 
     fun getallLikes(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -238,6 +243,11 @@ class AdminVideoFragment : Fragment() {
 
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -292,6 +302,11 @@ class AdminVideoFragment : Fragment() {
 
     fun getallFav(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -345,6 +360,11 @@ class AdminVideoFragment : Fragment() {
 
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {

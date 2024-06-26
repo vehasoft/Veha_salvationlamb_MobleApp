@@ -54,6 +54,11 @@ class FollowAdapter(
         if (!follow.picture.isNullOrEmpty()) {
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
+        if (Util.userId == null) {
+            userPreferences.userId.asLiveData().observe(owner){
+                Util.userId = it
+            }
+        }
         if (!myFollowList.containsKey(Util.userId)) {
             holder.followBtn.text = "follow"
         } else {

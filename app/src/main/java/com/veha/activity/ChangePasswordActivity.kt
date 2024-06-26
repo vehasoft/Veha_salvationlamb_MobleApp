@@ -72,6 +72,11 @@ class ChangePasswordActivity : AppCompatActivity() {
             } else {
                 changePasswordButton.isEnabled = false
                 if (TextUtils.isEmpty(email?.trim())) {
+                    if (Util.userId == null) {
+                        userPreferences.userId.asLiveData().observe(this){
+                            Util.userId = it
+                        }
+                    }
                     val data = JsonObject()
                     data.addProperty("userId", Util.userId)
                     data.addProperty("oldPassword", oldPasswordTxt)

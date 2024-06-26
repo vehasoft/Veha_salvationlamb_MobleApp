@@ -241,6 +241,7 @@ class ApproveRequestActivity : AppCompatActivity() {
                                             newpic.setImageResource(R.drawable.ic_profile)
                                         }
                                     } else{
+                                        Toast.makeText(this@ApproveRequestActivity,"This request is already handled",Toast.LENGTH_LONG).show()
                                         finish()
                                     }
 

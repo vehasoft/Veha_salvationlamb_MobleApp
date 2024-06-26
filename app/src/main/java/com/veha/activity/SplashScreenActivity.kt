@@ -139,6 +139,16 @@ class SplashScreenActivity : AppCompatActivity() {
                                         intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
                                         startActivity(intent)
                                         finish()
+                                    }else if (intent.extras!!.getString("type").equals(NotificationType.FILE.value)){
+                                        val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
+                                        intent.putExtra("gotopage", 1)
+                                        startActivity(intent)
+                                        finish()
+                                    } else if (intent.extras!!.getString("type").equals(NotificationType.EVENT.value)){
+                                        val intent = Intent(this@SplashScreenActivity, WebViewActivity::class.java)
+                                        intent.putExtra("pageUrl", id)
+                                        startActivity(intent)
+                                        finish()
                                     } else {
                                         val intent =
                                             Intent(this@SplashScreenActivity, MainActivity::class.java)

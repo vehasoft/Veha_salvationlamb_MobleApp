@@ -388,7 +388,6 @@ class HomeAdapter(
         }
         holder.followBtn.setOnClickListener {
             holder.followBtn.isEnabled = false
-            notifyDataSetChanged()
             follow(Util.userId, post.userId, holder)
         }
         holder.reacts.setOnClickListener {
@@ -527,11 +526,11 @@ class HomeAdapter(
                                     if (msg == "unfollow") {
                                         holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"
-                                        myFollowList.put(followerId, userId)
+                                        myFollowList.remove(followerId)
                                     } else if (msg == "follow") {
                                         holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Unfollow"
-                                        myFollowList.remove(followerId)
+                                        myFollowList.put(followerId, userId)
                                     }
                                     notifyDataSetChanged()
                                 } else {

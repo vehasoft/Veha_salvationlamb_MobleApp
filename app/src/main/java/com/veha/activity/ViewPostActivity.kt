@@ -416,6 +416,8 @@ class ViewPostActivity : AppCompatActivity() {
                                     )
                                     Log.e("postttttttt",post.toString())
                                     setPostContent(post)
+                                    likeBtn.visibility = View.GONE
+                                    shareBtn.visibility = View.GONE
                                 } else {
                                     Log.e("code",response.code().toString())
                                     Log.e("err",response.errorBody().toString())

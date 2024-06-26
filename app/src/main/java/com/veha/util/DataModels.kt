@@ -224,6 +224,8 @@ public enum class NotificationType( val value: String) {
     USER("user"),
     WARRIOR("warrior"),
     ANNOUNCEMENT("announcement"),
+    FILE("file"),
+    EVENT("event"),
 }
 public enum class FileType(s: String) {
     FILE("file"),
