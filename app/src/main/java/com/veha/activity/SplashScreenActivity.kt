@@ -10,13 +10,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.veha.adapter.NotificationListAdapter
 import com.veha.util.Commons
+import com.veha.util.NotificationType
 import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.veha.util.NotificationType
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -104,6 +105,15 @@ class SplashScreenActivity : AppCompatActivity() {
                             Thread.sleep(2000)
                             if (loginresp.isVerified.toBoolean()) {
                                 if (intent.extras != null) {
+                                    val bundle = intent.extras
+                                    if (bundle != null) {
+                                        for (key in bundle.keySet()) {
+                                            Log.e(
+                                                "intenttt",
+                                                key + " : " + if (bundle[key] != null) bundle[key] else "NULL"
+                                            )
+                                        }
+                                    }
                                     val id = intent.extras!!.getString("id")
                                     if (intent.extras!!.getString("type").equals(NotificationType.POST.value)){
                                         val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
@@ -129,6 +139,14 @@ class SplashScreenActivity : AppCompatActivity() {
                                         intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
                                         startActivity(intent)
                                         finish()
+                                    } else {
+                                        val intent =
+                                            Intent(this@SplashScreenActivity, MainActivity::class.java)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                    if (intent.extras!!.getString("notificationId") != null){
+                                        readNotification(intent.extras!!.getString("notificationId").toString())
                                     }
                                 } else {
                                     val intent =
@@ -166,6 +184,37 @@ class SplashScreenActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("Splashscreen", e.toString())
+        }
+    }
+    fun readNotification(id: String){
+        try {
+            val data = JsonObject()
+            data.addProperty("isVisited", true)
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this@SplashScreenActivity) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.putReadNotification("Bearer $it", id, data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
+                                }
+                                call.cancel()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("NotificationListAdapter.readNotification", "fail")
+                            }
+                        })
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("NotificationListAdapter.readNotification", e.toString())
         }
     }
 }

@@ -66,6 +66,7 @@ class ApproveRequestActivity : AppCompatActivity() {
     lateinit var expic: ImageView
     lateinit var approve: Button
     lateinit var reject: Button
+    lateinit var logo: ImageView
 
     private lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,6 +111,11 @@ class ApproveRequestActivity : AppCompatActivity() {
         newpic = findViewById(R.id.new_pic)
         approve = findViewById(R.id.approve)
         reject = findViewById(R.id.reject)
+        logo = findViewById(R.id.prod_logo)
+        logo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
         val userId: String = intent.extras!!.getString("userId").toString()
         getUpdateRequest(this@ApproveRequestActivity,userId)
         approve.setOnClickListener {

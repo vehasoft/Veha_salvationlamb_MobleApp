@@ -388,6 +388,7 @@ class HomeAdapter(
         }
         holder.followBtn.setOnClickListener {
             holder.followBtn.isEnabled = false
+            notifyDataSetChanged()
             follow(Util.userId, post.userId, holder)
         }
         holder.reacts.setOnClickListener {
