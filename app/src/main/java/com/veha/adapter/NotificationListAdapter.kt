@@ -20,6 +20,7 @@ import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.veha.activity.ApproveRequestActivity
 import com.veha.activity.MainActivity
+import com.veha.activity.NoPermissionActivity
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.activity.ViewProfileActivity
@@ -27,6 +28,8 @@ import com.veha.activity.WebViewActivity
 import com.veha.util.Commons
 import com.veha.util.NotificationList
 import com.veha.util.NotificationType
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
@@ -98,9 +101,14 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                 intent.putExtra("postId", notification.data)
                 context.startActivity(intent)
             } else if (NotificationType.USER.value == notification.type) {
-                val intent = Intent(context, ViewProfileActivity::class.java)
-                intent.putExtra("userId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewProfileActivity::class.java)
+                    intent.putExtra("userId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             } else if (NotificationType.WARRIOR.value == notification.type) {
                 val intent = Intent(context, ApproveRequestActivity::class.java)
                 intent.putExtra("userId", notification.data)

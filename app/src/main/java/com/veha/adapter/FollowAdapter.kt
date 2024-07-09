@@ -18,6 +18,7 @@ import com.veha.util.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import com.veha.activity.NoPermissionActivity
 import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
@@ -70,9 +71,14 @@ class FollowAdapter(
             holder.followBtn.text = "unfollow"
         }
         holder.followListLinear.setOnClickListener {
-            val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("userId", follow.id)
-            context.startActivity(intent)
+            if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                val intent = Intent(context, ViewProfileActivity::class.java)
+                intent.putExtra("userId", follow.id)
+                context.startActivity(intent)
+            } else {
+                val intent = Intent(context, NoPermissionActivity::class.java)
+                context.startActivity(intent)
+            }
         }
         holder.followBtn.setOnClickListener {
             if (holder.followBtn.text.equals("follow")) {

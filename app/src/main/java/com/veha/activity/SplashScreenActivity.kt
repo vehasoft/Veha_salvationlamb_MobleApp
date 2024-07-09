@@ -15,6 +15,8 @@ import com.google.gson.JsonObject
 import com.veha.adapter.NotificationListAdapter
 import com.veha.util.Commons
 import com.veha.util.NotificationType
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
@@ -122,11 +124,17 @@ class SplashScreenActivity : AppCompatActivity() {
                                         startActivity(intent)
                                         finish()
                                     } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
-                                        val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
-                                        intent.putExtra("userId", id)
-                                        intent.putExtra("type", NotificationType.USER.value)
-                                        startActivity(intent)
-                                        finish()
+                                        if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                                            val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
+                                            intent.putExtra("userId", id)
+                                            intent.putExtra("type", NotificationType.USER.value)
+                                            startActivity(intent)
+                                            finish()
+                                        } else {
+                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.WARRIOR.value)){
                                         val intent = Intent(this@SplashScreenActivity, ApproveRequestActivity::class.java)
                                         intent.putExtra("userId", id)

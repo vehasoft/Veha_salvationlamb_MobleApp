@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.veha.activity.ViewProfileActivity
 import com.veha.util.PostUser
 import com.squareup.picasso.Picasso
+import com.veha.activity.NoPermissionActivity
 import com.veha.activity.R
+import com.veha.util.Permission
+import com.veha.util.PermissionType
+import com.veha.util.Util
 
 class UsersAdapter(private  val follows:  ArrayList<PostUser>,
                     private val context: Context,
@@ -47,9 +51,14 @@ class UsersAdapter(private  val follows:  ArrayList<PostUser>,
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
         holder.listLinear.setOnClickListener {
-            val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("userId", follow.id)
-            context.startActivity(intent)
+            if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                val intent = Intent(context, ViewProfileActivity::class.java)
+                intent.putExtra("userId", follow.id)
+                context.startActivity(intent)
+            } else {
+                val intent = Intent(context, NoPermissionActivity::class.java)
+                context.startActivity(intent)
+            }
         }
     }
 }

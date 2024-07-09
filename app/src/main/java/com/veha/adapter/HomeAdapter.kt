@@ -403,9 +403,14 @@ class HomeAdapter(
         }
         holder.headLinear.setOnClickListener {
             if (page != "profile" && page != "OtherProfile") {
-                val intent = Intent(context, ViewProfileActivity::class.java)
-                intent.putExtra("userId", post.userId)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewProfileActivity::class.java)
+                    intent.putExtra("userId", post.userId)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }
         }
         holder.deleteBtn.setOnClickListener {
