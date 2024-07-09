@@ -20,6 +20,7 @@ public class Util {
    // public static String url = "https://server.salvationlamb.com";
     public static String url = "http://209.182.232.231:4000";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
+    public static Map<String,List<String>> permissionMap = new HashMap<>();
     public static String userId;
     public static Boolean isFirst = true;
     public static boolean listview = true;
@@ -154,6 +155,16 @@ public class Util {
     public static String getVideo(String url) {
         url = "https://salvationlamb.com/video/" + url;
         return url;
+    }
+    public static boolean hasPermission(String type,String permission) {
+        if (permissionMap.containsKey(type)){
+            List<String> permissionList = permissionMap.get(type);
+            if (permissionList.contains(permission)){
+                return true;
+            }
+        }
+        //return false;
+        return true;
     }
 
 }
