@@ -81,7 +81,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             holder.notificationLayout.setBackgroundColor(context.resources.getColor(R.color.white))
         }
 
-        val html = "<b>" + notification.user.name + "</b>" + "  " + notification.message
+        val html = "<b>" + notification.user.name + "</b>" + "  " + notification.message.replace(notification.user.name,"")
 
         (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT)
