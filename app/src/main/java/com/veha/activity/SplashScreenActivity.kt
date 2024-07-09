@@ -142,11 +142,23 @@ class SplashScreenActivity : AppCompatActivity() {
                                         startActivity(intent)
                                         finish()
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.ANNOUNCEMENT.value)){
-                                        val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
-                                        intent.putExtra("postId", id)
-                                        intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
-                                        startActivity(intent)
-                                        finish()
+                                        if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                ViewPostActivity::class.java
+                                            )
+                                            intent.putExtra("postId", id)
+                                            intent.putExtra(
+                                                "type",
+                                                NotificationType.ANNOUNCEMENT.value
+                                            )
+                                            startActivity(intent)
+                                            finish()
+                                        } else {
+                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.FILE.value)){
                                         val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
                                         intent.putExtra("gotopage", 1)

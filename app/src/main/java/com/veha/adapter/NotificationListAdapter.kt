@@ -114,10 +114,15 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                 intent.putExtra("userId", notification.data)
                 context.startActivity(intent)
             }else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
-                val intent = Intent(context, ViewPostActivity::class.java)
-                intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
-                intent.putExtra("postId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewPostActivity::class.java)
+                    intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
+                    intent.putExtra("postId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }else if (NotificationType.FILE.value == notification.type) {
                 val intent = Intent(context, MainActivity::class.java)
                 intent.putExtra("gotopage", 1)

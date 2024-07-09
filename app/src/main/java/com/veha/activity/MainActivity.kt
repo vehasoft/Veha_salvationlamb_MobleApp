@@ -202,8 +202,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         announcement.setOnClickListener {
-            val intent = Intent(this, AnnouncementActivity::class.java)
-            startActivity(intent)
+            if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                val intent = Intent(this, AnnouncementActivity::class.java)
+                startActivity(intent)
+            } else {
+                val intent = Intent(this@MainActivity, NoPermissionActivity::class.java)
+                startActivity(intent)
+            }
             /*val intent = Intent(this, ApproveRequestActivity::class.java)
             intent.putExtra("userId","7c46ea10-fade-11ee-a77a-7f0156e992fe")
             startActivity(intent)*/

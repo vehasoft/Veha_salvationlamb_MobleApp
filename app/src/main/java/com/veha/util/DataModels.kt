@@ -250,6 +250,7 @@ public enum class PermissionType( val value: String) {
     AUDIO("Audio"),
     VIDEO("Video"),
     WARRIOR("Warrior"),
+    ANNOUNCEMENT("Announcement"),
 }
 public enum class PostType(val type: String) {
     IMAGE("image"),
