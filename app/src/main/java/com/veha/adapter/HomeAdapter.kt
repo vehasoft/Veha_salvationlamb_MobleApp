@@ -29,6 +29,8 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import com.squareup.picasso.Picasso
 import com.veha.activity.*
 import com.veha.util.Commons
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
@@ -95,7 +97,11 @@ class HomeAdapter(
             viewHolder.saveTxt.visibility = View.VISIBLE
         } else if (page.contentEquals("profile")) {
             viewHolder.followBtn.visibility = View.GONE
-            viewHolder.deleteBtn.visibility = View.VISIBLE
+            if (Util.hasPermission(PermissionType.POST.value, Permission.DELETE.value)) {
+                viewHolder.deleteBtn.visibility = View.VISIBLE
+            } else {
+                viewHolder.deleteBtn.visibility = View.GONE
+            }
             viewHolder.fav.visibility = View.GONE
             viewHolder.saveTxt.visibility = View.GONE
         } else if (page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) {
