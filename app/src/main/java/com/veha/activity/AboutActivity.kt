@@ -23,6 +23,8 @@ import com.veha.util.UserRslt
 import com.veha.util.Util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -68,8 +70,13 @@ class AboutActivity : AppCompatActivity() {
 
         getmyDetails()
         edit.setOnClickListener {
-            val intent = Intent(this, EditProfileActivity::class.java)
-            startActivity(intent)
+            if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                val intent = Intent(this@AboutActivity, EditProfileActivity::class.java)
+                startActivity(intent)
+            } else {
+                val intent = Intent(this@AboutActivity, NoPermissionActivity::class.java)
+                startActivity(intent)
+            }
         }
         changePass.setOnClickListener {
             val intent = Intent(this, ChangePasswordActivity::class.java)
