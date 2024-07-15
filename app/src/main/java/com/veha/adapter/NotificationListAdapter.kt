@@ -95,10 +95,15 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             readNotification(holder,notification.id)
             Log.e("notification",notification.toString())
             if (NotificationType.POST.value == notification.type) {
-                val intent = Intent(context, ViewPostActivity::class.java)
-                intent.putExtra("type", NotificationType.POST.value)
-                intent.putExtra("postId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewPostActivity::class.java)
+                    intent.putExtra("type", NotificationType.POST.value)
+                    intent.putExtra("postId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             } else if (NotificationType.USER.value == notification.type) {
                 if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
                     val intent = Intent(context, ViewProfileActivity::class.java)

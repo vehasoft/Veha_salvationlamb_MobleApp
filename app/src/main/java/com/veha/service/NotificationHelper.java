@@ -32,11 +32,13 @@ public class NotificationHelper {
     public static void displayNotification(Context context, String title, String body, Map data) {
         PendingIntent pendingIntent = null;
         if (Objects.equals(data.get("type"), NotificationType.POST.getValue())) {
-            Intent intent = new Intent(context, ViewPostActivity.class);
-            intent.putExtra("postId",data.get("id").toString());
-            intent.putExtra("type", NotificationType.POST.getValue());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            if (Util.hasPermission(PermissionType.POST.getValue(), Permission.READ.getValue())) {
+                Intent intent = new Intent(context, ViewPostActivity.class);
+                intent.putExtra("postId", data.get("id").toString());
+                intent.putExtra("type", NotificationType.POST.getValue());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            }
         } else if (Objects.equals(data.get("type"), NotificationType.USER.getValue())){
             Intent intent = new Intent(context, ViewProfileActivity.class);
             intent.putExtra("userId",data.get("id").toString());

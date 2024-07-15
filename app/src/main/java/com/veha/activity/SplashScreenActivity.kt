@@ -118,11 +118,20 @@ class SplashScreenActivity : AppCompatActivity() {
                                     }
                                     val id = intent.extras!!.getString("id")
                                     if (intent.extras!!.getString("type").equals(NotificationType.POST.value)){
-                                        val intent = Intent(this@SplashScreenActivity, ViewPostActivity::class.java)
-                                        intent.putExtra("postId", id)
-                                        intent.putExtra("type", NotificationType.POST.value)
-                                        startActivity(intent)
-                                        finish()
+                                        if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                ViewPostActivity::class.java
+                                            )
+                                            intent.putExtra("postId", id)
+                                            intent.putExtra("type", NotificationType.POST.value)
+                                            startActivity(intent)
+                                            finish()
+                                        } else {
+                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
                                     } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
                                         if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
                                             val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
