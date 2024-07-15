@@ -166,7 +166,7 @@ public class Util {
         permissionMap.put("Announcement","Read,Edit,Delete,Create");
     }
     public static boolean hasPermission(String type,String permission) {
-        //setMap();
+        setMap();
         if (permissionMap != null || permissionMap.isEmpty()){
             return true;
         }
