@@ -20,7 +20,7 @@ public class Util {
    // public static String url = "https://server.salvationlamb.com";
     public static String url = "http://209.182.232.231:4000";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
-    public static Map<String,List<String>> permissionMap = new HashMap<>();
+    public static Map<String,String> permissionMap = new HashMap<>();
     public static String userId;
     public static Boolean isFirst = true;
     public static boolean listview = true;
@@ -156,15 +156,27 @@ public class Util {
         url = "https://salvationlamb.com/video/" + url;
         return url;
     }
+    private static void setMap(){
+        permissionMap.put("Post","Read,Edit,Delete,Create");
+        permissionMap.put("User","Read,Edit,Delete,Create");
+        permissionMap.put("Profile","Read,Edit,Delete,Create");
+        permissionMap.put("File","Read,Edit,Delete,Create");
+        permissionMap.put("Audio","Read,Edit,Delete,Create");
+        permissionMap.put("Video","Read,Edit,Delete,Create");
+        permissionMap.put("Announcement","Read,Edit,Delete,Create");
+    }
     public static boolean hasPermission(String type,String permission) {
+        //setMap();
+        if (permissionMap != null || permissionMap.isEmpty()){
+            return true;
+        }
         if (permissionMap.containsKey(type)){
-            List<String> permissionList = permissionMap.get(type);
+            List<String> permissionList = Arrays.asList(permissionMap.get(type).split(","));
             if (permissionList.contains(permission)){
                 return true;
             }
         }
-        //return false;
-        return true;
+        return false;
     }
 
 }
