@@ -209,9 +209,6 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this@MainActivity, NoPermissionActivity::class.java)
                 startActivity(intent)
             }
-            /*val intent = Intent(this, ApproveRequestActivity::class.java)
-            intent.putExtra("userId","7c46ea10-fade-11ee-a77a-7f0156e992fe")
-            startActivity(intent)*/
         }
         bannerClose.setOnClickListener {
             banner.visibility = View.GONE

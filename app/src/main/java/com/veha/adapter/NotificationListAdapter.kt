@@ -15,7 +15,6 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.veha.activity.ApproveRequestActivity
@@ -110,9 +109,14 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                     context.startActivity(intent)
                 }
             } else if (NotificationType.WARRIOR.value == notification.type) {
-                val intent = Intent(context, ApproveRequestActivity::class.java)
-                intent.putExtra("userId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.EDIT.value)) {
+                    val intent = Intent(context, ApproveRequestActivity::class.java)
+                    intent.putExtra("userId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
                 if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
                     val intent = Intent(context, ViewPostActivity::class.java)

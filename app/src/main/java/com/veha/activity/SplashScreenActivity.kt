@@ -136,11 +136,20 @@ class SplashScreenActivity : AppCompatActivity() {
                                             finish()
                                         }
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.WARRIOR.value)){
-                                        val intent = Intent(this@SplashScreenActivity, ApproveRequestActivity::class.java)
-                                        intent.putExtra("userId", id)
-                                        intent.putExtra("type", NotificationType.USER.value)
-                                        startActivity(intent)
-                                        finish()
+                                        if (Util.hasPermission(PermissionType.USER.value, Permission.EDIT.value)) {
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                ApproveRequestActivity::class.java
+                                            )
+                                            intent.putExtra("userId", id)
+                                            intent.putExtra("type", NotificationType.USER.value)
+                                            startActivity(intent)
+                                            finish()
+                                        } else {
+                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.ANNOUNCEMENT.value)){
                                         if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
                                             val intent = Intent(

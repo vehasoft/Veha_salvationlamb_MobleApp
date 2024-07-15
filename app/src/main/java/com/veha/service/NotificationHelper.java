@@ -51,10 +51,12 @@ public class NotificationHelper {
                 pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             }
         } else if (Objects.equals(data.get("type"),NotificationType.WARRIOR.getValue())) {
-            Intent intent = new Intent(context, ApproveRequestActivity.class);
-            intent.putExtra("userId",data.get("id").toString());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            if (Util.hasPermission(PermissionType.USER.getValue(), Permission.EDIT.getValue())) {
+                Intent intent = new Intent(context, ApproveRequestActivity.class);
+                intent.putExtra("userId", data.get("id").toString());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            }
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Util.CHANNEL_ID);
         builder.setSmallIcon(R.drawable.logo);
