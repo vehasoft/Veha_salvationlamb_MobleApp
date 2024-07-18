@@ -19,9 +19,13 @@ import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.Window
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -250,10 +254,68 @@ class MainActivity : AppCompatActivity() {
             if (Util.user.isReviewState.toBoolean()) {
                 popup.menu.findItem(R.id.warrior).isVisible = false
             }
+            popup.menu.findItem(R.id.feedback).isVisible = true
+            popup.menu.findItem(R.id.invite).isVisible = true
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
+                    }
+                    R.id.feedback -> {
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+                        builder.setTitle("FEEDBACK FORM")
+                        val view = View.inflate(this@MainActivity, R.layout.feedback_form, null)
+                        builder.setView(view)
+                        val feedbackType: Spinner = view.findViewById(R.id.feedback_type)
+                        val feedback: EditText = view.findViewById(R.id.feedback)
+                        val list = Util.getReligion()
+                        var feedbackTypeTxt = ""
+                        val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, list)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        feedbackType.adapter = adapter
+                        feedbackType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
+                                if (list[pos] != "Select") {
+                                    feedbackTypeTxt = list[pos].toString()
+                                }
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
+                        builder.setCancelable(false)
+                        builder.setPositiveButton("Send") { dialog: DialogInterface?, _: Int ->
+                            //apicall
+                            if (dialog != null) {
+                                dialog.cancel()
+                            }
+
+                        }
+                        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+                        builder.create().show()
+                    }
+                    R.id.invite -> {
+                        try {
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
+                        var shareMessage = " Hey friends! \n" +
+                                "\n" +
+                                "Exciting news! I've just joined Salvation Lamb, a vibrant new social media platform where we can connect, share, and discover together! \n" +
+                                "\n" +
+                                "Join me and let's stay connected like never before. Here's why you'll love it:\n" +
+                                "It's all about making connections and having fun! Click the link below to download Salvation Lamb and join me on this journey. Let's create something awesome together!\n" +
+                                "\n" +
+                                "[App Store/Google Play Store Link]\n" +
+                                "\n" +
+                                "Can't wait to see you there! "
+                        shareMessage = """
+                    $shareMessage                    
+                    """.trimIndent()
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+                        startActivity(Intent.createChooser(shareIntent, "choose one"))
+                    } catch (e: Exception) {
+                        Log.e("exception", e.toString())
+                    }
                     }
 
                     R.id.logout -> {
