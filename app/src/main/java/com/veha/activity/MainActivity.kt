@@ -178,8 +178,8 @@ class MainActivity : AppCompatActivity() {
         notificationCount = findViewById(R.id.notification_count)
 
         checkPermission()
-        getNotificationCount()
         getMyDetails()
+        getNotificationCount()
         getBible()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
@@ -210,8 +210,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         announcement.setOnClickListener {
-            val intent = Intent(this, NotificationViewActivity::class.java)
+            val intent = Intent(this, AnnouncementActivity::class.java)
             startActivity(intent)
+            /*val intent = Intent(this, ApproveRequestActivity::class.java)
+            intent.putExtra("userId","7c46ea10-fade-11ee-a77a-7f0156e992fe")
+            startActivity(intent)*/
         }
         bannerClose.setOnClickListener {
             banner.visibility = View.GONE
@@ -348,6 +351,9 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+        if (intent.extras != null){
+            viewPager.currentItem = intent.extras!!.getInt("gotopage")
+        }
     }
     /*fun loadJSONFromAsset(): String? {
         var json: String? = null
@@ -453,7 +459,12 @@ class MainActivity : AppCompatActivity() {
         }*/
     }
 
-    private fun getMyDetails() {
+    public fun getMyDetails() {
+        if (Util.userId == null) {
+            userPreferences.userId.asLiveData().observe(this){
+                Util.userId = it
+            }
+        }
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
@@ -506,6 +517,9 @@ class MainActivity : AppCompatActivity() {
                                     val intent =
                                         Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -546,10 +560,14 @@ class MainActivity : AppCompatActivity() {
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
-                                Log.e("firstttime", response.code().toString())
-                                Util.isFirst = false
+                                if (response.code() == 200) {
+                                    Log.e("firstttime", response.code().toString())
+                                    Util.isFirst = false
+                                } else {
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
+                                }
                             }
-
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 Log.e("MainActivity.firstTime", "fail")
                             }
@@ -593,6 +611,9 @@ class MainActivity : AppCompatActivity() {
                                         notificationCount.visibility = View.VISIBLE
                                         notificationCount.text = count.toString()
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

@@ -3,10 +3,12 @@ package com.veha.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.veha.adapter.NotificationTabAdapter
+import com.veha.util.Util
 
 class NotificationViewActivity : AppCompatActivity() {
 
@@ -27,8 +29,17 @@ class NotificationViewActivity : AppCompatActivity() {
         val admin = tabLayout.newTab()
         admin.tag = "Admin"
         admin.text = "Admin"
+        val warrior = tabLayout.newTab()
+        warrior.tag = "Warrior"
+        warrior.text = "Warrior"
         tabLayout.addTab(user, 0)
         tabLayout.addTab(admin, 1)
+        if (Util.user.role == null){
+            MainActivity().getMyDetails()
+        }
+        if (Util.user.role == "admin") {
+            tabLayout.addTab(warrior, 2)
+        }
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = NotificationTabAdapter(
             this@NotificationViewActivity,
@@ -52,5 +63,11 @@ class NotificationViewActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 }

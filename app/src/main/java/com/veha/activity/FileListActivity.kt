@@ -101,6 +101,9 @@ class FileListActivity : AppCompatActivity() {
                                         }
                                         recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders,this@FileListActivity)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

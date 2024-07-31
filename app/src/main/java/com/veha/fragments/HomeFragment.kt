@@ -143,6 +143,11 @@ class HomeFragment : Fragment() {
 
     fun getfavPosts(context: Context, owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -182,12 +187,8 @@ class HomeFragment : Fragment() {
                                         )
                                     }
                                 } else {
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
@@ -272,10 +273,8 @@ class HomeFragment : Fragment() {
                                         })
                                     }
                                 } else {
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("result", errorMessage)*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
@@ -331,6 +330,9 @@ class HomeFragment : Fragment() {
                                         myLikes += pos.postId + " , "
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFav(owner)
                             }
@@ -381,6 +383,9 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, PostUser::class.java)
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 if (type == "fav") getfavPosts(contexts, owner) else getallPosts(
                                     contexts,
@@ -415,6 +420,11 @@ class HomeFragment : Fragment() {
 
     fun getallFav(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -434,6 +444,9 @@ class HomeFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, AllFavList::class.java)
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -465,6 +478,11 @@ class HomeFragment : Fragment() {
 
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -501,6 +519,9 @@ class HomeFragment : Fragment() {
                                     ).show()
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

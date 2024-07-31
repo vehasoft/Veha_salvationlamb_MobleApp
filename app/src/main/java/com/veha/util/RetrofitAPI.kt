@@ -62,6 +62,16 @@ interface RetrofitAPI {
     ): Call<JsonObject?>?
 
 
+    @POST("api/v1/review/{status}/{userId}")
+    fun postUpdateRequest(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "userId") userId: String,
+        @Path(value = "status") status: String,
+    ): Call<JsonObject?>?
+
+
+
+
     @GET("api/v1/favorites/{userId}")
     fun getFav(
         @Header(value = "Authorization") head: String,
@@ -127,6 +137,12 @@ interface RetrofitAPI {
         @Path(value = "userId") userId: String
     ): Call<JsonObject?>?
 
+    @GET("api/v1/review/{userId}")
+    fun getUpdateRequest(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "userId") userId: String
+    ): Call<JsonObject?>?
+
     @GET("api/v1/follows/{userId}")
     fun getFollowing(
         @Header("Authorization") dataModal: String?,
@@ -140,6 +156,17 @@ interface RetrofitAPI {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("type") type: String
+    ): Call<JsonObject?>?
+    @GET("api/v1/announcements")
+    fun getAnnouncements(
+        @Header("Authorization") dataModal: String?,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Call<JsonObject?>?
+    @GET("api/v1/announcements/{postId}")
+    fun getAnnouncements(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "postId") postId: String,
     ): Call<JsonObject?>?
     @GET("api/v1/notifications/count/{userId}")
     fun getNotificationCount(
@@ -174,6 +201,11 @@ interface RetrofitAPI {
     fun putUser(
         @Header(value = "Authorization") head: String,
         @Path(value = "userId") userId: String,
+        @Body dataModal: JsonObject?
+    ): Call<JsonObject?>?
+    @PUT("/api/v1/users/token/update")
+    fun putToken(
+        @Header(value = "Authorization") head: String,
         @Body dataModal: JsonObject?
     ): Call<JsonObject?>?
 //same as register

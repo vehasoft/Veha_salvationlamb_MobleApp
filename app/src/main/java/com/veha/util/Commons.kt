@@ -142,6 +142,9 @@ class Commons {
                                     Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
                                     val intent = Intent(context,MainActivity::class.java)
                                     context.startActivity(intent)
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

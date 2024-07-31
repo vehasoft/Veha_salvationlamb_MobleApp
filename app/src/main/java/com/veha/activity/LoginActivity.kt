@@ -196,11 +196,16 @@ class LoginActivity : AppCompatActivity() {
                                 startActivity(intent)
                             }
                         }  else if (response.code() == 401) {
-                            Toast.makeText(this@LoginActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@LoginActivity,
+                                resources.getString(R.string.Deleted_account),
+                                Toast.LENGTH_LONG
+                            ).show()
                             val intent = Intent(this@LoginActivity, LoginActivity::class.java)
                             startActivity(intent)
-                        }else {
-                            Log.e("responseee", "fail")
+                        } else {
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
                     }
 

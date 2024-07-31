@@ -137,10 +137,36 @@ data class UserRslt(
     val isFreshUser: String,
     val blocked: String,
 )
+data class ProfileChange(
+    val id: String,
+    val userId: String,
+    val name: String,
+    val firstName: String,
+    val lastName: String,
+    val gender: String,
+    val email: String,
+    val mobile: String,
+    val picture: String,
+    val coverPicture: String,
+    val address: String,
+    val dateOfBirth: String,
+    val updatedAt: String,
+    val isWarrior: String,
+    val state: String,
+    val pinCode: String,
+    val country: String,
+    val churchName: String,
+    val religion: String,
+    val gift: String,
+    val city: String,
+    val language: String,
+    val createdAt: String,
+)
 data class Posts(
     val id: String,
     val title: String,
     val content: String,
+    val message: String,
     val tags: String,
     val userId: String,
     val picture: String,
@@ -196,6 +222,10 @@ data class Announcement(
 public enum class NotificationType( val value: String) {
     POST("post"),
     USER("user"),
+    WARRIOR("warrior"),
+    ANNOUNCEMENT("announcement"),
+    FILE("file"),
+    EVENT("event"),
 }
 public enum class FileType(s: String) {
     FILE("file"),
@@ -206,8 +236,9 @@ public enum class USERType(s: String) {
     WARRIOR("warrior"),
     ADMIN("admin"),
 }
-public enum class PostType(s: String) {
+public enum class PostType(val type: String) {
     IMAGE("image"),
+    TEXT("text"),
     AUDIO("audio"),
     VIDEO("video"),
     URL("url"),

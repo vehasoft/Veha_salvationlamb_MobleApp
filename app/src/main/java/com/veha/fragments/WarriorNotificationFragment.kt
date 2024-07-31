@@ -24,15 +24,13 @@ import com.veha.activity.R
 import com.veha.adapter.NotificationListAdapter
 import com.veha.util.Commons
 import com.veha.util.NotificationList
-import com.veha.util.PostUser
-import com.veha.util.NotificationType
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
-class UserNotificationFragment : Fragment() {
+class WarriorNotificationFragment : Fragment() {
     lateinit var userPreferences: UserPreferences
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
@@ -50,17 +48,18 @@ class UserNotificationFragment : Fragment() {
     ): View? {
         updated = false
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_user_notification, container, false)
+        val view =  inflater.inflate(R.layout.fragment_warrior_notification, container, false)
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
-        list = view.findViewById(R.id.notification_user_recycler)
+        list = view.findViewById(R.id.notification_admin_recycler)
         nodata = view.findViewById(R.id.no_data)
         page = 1
-        adapter = NotificationListAdapter(ArrayList(),contexts,this@UserNotificationFragment)
+        adapter = NotificationListAdapter(ArrayList(),contexts,this@WarriorNotificationFragment)
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
         getNotifications(viewLifecycleOwner)
+
         return view
     }
     private fun getNotifications(owner: LifecycleOwner, postlist: ArrayList<NotificationList> = ArrayList()){
@@ -76,7 +75,7 @@ class UserNotificationFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,page,10,"user")
+                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,page,50,"warrior")
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -111,6 +110,7 @@ class UserNotificationFragment : Fragment() {
                                             ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
                                                     if ((count+2) > page) {
+                                                        page++
                                                         getNotifications(owner)
                                                         updated = false
                                                     }
@@ -118,7 +118,6 @@ class UserNotificationFragment : Fragment() {
                                             }
                                         })
                                     }
-
                                 } else if (response.code() == 401) {
                                     Toast.makeText(
                                         contexts,

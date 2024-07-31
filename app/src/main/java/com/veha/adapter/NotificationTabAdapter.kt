@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.veha.fragments.AdminAudioFragment
 import com.veha.fragments.AdminNotificationFragment
 import com.veha.fragments.UserNotificationFragment
+import com.veha.fragments.WarriorNotificationFragment
 
 class NotificationTabAdapter (c: Context, fm: FragmentManager?, totalTabs: Int) :
     FragmentPagerAdapter(fm!!) {
@@ -27,6 +28,10 @@ class NotificationTabAdapter (c: Context, fm: FragmentManager?, totalTabs: Int) 
 
             1 -> {
                 AdminNotificationFragment()
+            }
+
+            2 -> {
+                WarriorNotificationFragment()
             }
             else -> b as Fragment
         }

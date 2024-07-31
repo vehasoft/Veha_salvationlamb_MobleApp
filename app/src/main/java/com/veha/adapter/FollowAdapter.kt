@@ -54,6 +54,11 @@ class FollowAdapter(
         if (!follow.picture.isNullOrEmpty()) {
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
+        if (Util.userId == null) {
+            userPreferences.userId.asLiveData().observe(owner){
+                Util.userId = it
+            }
+        }
         if (!myFollowList.containsKey(Util.userId)) {
             holder.followBtn.text = "follow"
         } else {
@@ -99,13 +104,8 @@ class FollowAdapter(
                                         myFollowList.put(followerId, userId)
                                     }
                                 } else {
-                                    Log.e("failFollow", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

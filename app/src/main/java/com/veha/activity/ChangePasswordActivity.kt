@@ -72,6 +72,11 @@ class ChangePasswordActivity : AppCompatActivity() {
             } else {
                 changePasswordButton.isEnabled = false
                 if (TextUtils.isEmpty(email?.trim())) {
+                    if (Util.userId == null) {
+                        userPreferences.userId.asLiveData().observe(this){
+                            Util.userId = it
+                        }
+                    }
                     val data = JsonObject()
                     data.addProperty("userId", Util.userId)
                     data.addProperty("oldPassword", oldPasswordTxt)
@@ -109,13 +114,8 @@ class ChangePasswordActivity : AppCompatActivity() {
                                     ).show()
                                     finish()
                                 } else {
-                                   /* val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val errorMessage = loginresp.get("errorMessage").toString()*/
-                                    Toast.makeText(this@ChangePasswordActivity, "Something went wrong", Toast.LENGTH_LONG).show()
-                                    /*Log.e("result", errorMessage)
-                                    Log.e("ok", response.body().toString())*/
-
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
@@ -155,19 +155,11 @@ class ChangePasswordActivity : AppCompatActivity() {
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                     override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                         if (response.code() == 200) {
-
                             Log.e("ok1", response.code().toString())
                             finish()
-                        } else {
-                            /*val resp = response.errorBody()
-                            Log.e("responseeeee", response.toString())
-                            Log.e("responseeeee", resp.toString())
-                            val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                            val status = registerResp.get("status").toString()
-                            val errorMessage = registerResp.get("errorMessage").toString()
-                            Log.e("Status", status)
-                            Log.e("result", errorMessage)*/
-                            Toast.makeText(this@ChangePasswordActivity, "Something went wrong", Toast.LENGTH_LONG).show()
+                        }  else {
+                            Log.e("code",response.code().toString())
+                            Log.e("err",response.errorBody().toString())
                         }
                         call.cancel()
                     }

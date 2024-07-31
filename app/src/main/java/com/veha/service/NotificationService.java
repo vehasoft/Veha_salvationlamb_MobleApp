@@ -6,6 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.JsonObject;
+import com.veha.util.UserPreferences;
+import com.veha.util.Util;
 
 public class NotificationService extends FirebaseMessagingService {
     @Override
@@ -24,6 +27,19 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
+        updateToken(token);
+    }
+    void updateToken(String token){
+        try {
+            UserPreferences userPreferences = new UserPreferences(this);
+            JsonObject data = new JsonObject();
+            data.addProperty("userID", Util.userId);
+            data.addProperty("token", token);
+            data.addProperty("oldToken", String.valueOf(userPreferences.getFcmToken()));
+            //userPreferences.savefcmToken(token);
 
+        }catch (Exception e){
+            Log.e("error while updating token",e.toString());
+        }
     }
 }

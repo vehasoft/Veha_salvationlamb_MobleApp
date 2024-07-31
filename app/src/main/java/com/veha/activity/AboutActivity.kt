@@ -79,6 +79,11 @@ class AboutActivity : AppCompatActivity() {
 
     private fun getmyDetails() {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
@@ -122,6 +127,9 @@ class AboutActivity : AppCompatActivity() {
                                         Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
                                         val intent = Intent(this@AboutActivity, LoginActivity::class.java)
                                         startActivity(intent)
+                                } else {
+                                    Log.e("failAbout - Status", response.code().toString())
+                                    Log.e("failAbout", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

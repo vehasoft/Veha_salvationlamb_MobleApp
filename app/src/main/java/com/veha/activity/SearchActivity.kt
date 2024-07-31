@@ -131,6 +131,9 @@ class SearchActivity : AppCompatActivity() {
                                     )
                                     Log.e("current tab", currentTab.toString())
                                     viewPager.currentItem = currentTab
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

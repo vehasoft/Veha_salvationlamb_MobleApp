@@ -110,19 +110,6 @@ class ViewLikesActivity : AppCompatActivity() {
                         val intent = Intent(this@ViewLikesActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
-                    /*R.id.nightmode ->{
-                        if (Util.isNight){
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }*/
                 }
                 true
             })
@@ -159,6 +146,9 @@ class ViewLikesActivity : AppCompatActivity() {
                                         list.layoutManager = LinearLayoutManager(context)
                                         list.adapter = ViewLikesAdapter(likeslist, context)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

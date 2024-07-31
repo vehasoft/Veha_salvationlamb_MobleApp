@@ -5,7 +5,9 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import android.text.Html
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -14,6 +16,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +30,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFram
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.squareup.picasso.Picasso
 import com.veha.util.Commons
+import com.veha.util.NotificationType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
@@ -54,9 +58,11 @@ class ViewPostActivity : AppCompatActivity() {
     lateinit var likeBtn: Button
     lateinit var shareBtn: Button
     lateinit var fav: ImageButton
-    lateinit var overallLayout: ConstraintLayout
+    lateinit var overallLayout: ScrollView
     lateinit var logo: ImageView
     lateinit var postId: String
+    lateinit var type: String
+    lateinit var contentUrl: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -79,13 +85,30 @@ class ViewPostActivity : AppCompatActivity() {
         likeBtn = findViewById(R.id.like_btn)
         shareBtn = findViewById(R.id.share_btn)
         overallLayout = findViewById(R.id.child_post_layout)
+        contentUrl = findViewById(R.id.content_url)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        postId = intent.extras!!.get("postId").toString()
-        getPost(postId)
+        type = intent.extras!!.get("type").toString()
+        if (type == NotificationType.POST.value) {
+            postId = intent.extras!!.get("postId").toString()
+            Log.e("post",postId.toString())
+            getPost(postId)
+        }else if (type == NotificationType.ANNOUNCEMENT.value) {
+            postId = intent.extras!!.get("postId").toString()
+            getAnnouncement(postId)
+        }
+        /*if (!intent.extras!!.get("postId").toString().isNullOrEmpty()) {
+            postId = intent.extras!!.get("postId").toString()
+            getPost(postId)
+        } else if (!intent.extras!!.get("post").toString().isNullOrEmpty()){
+            val postString: String = intent.extras!!.get("post").toString()
+            Log.e("postString",postString)
+            val post = Gson().fromJson(postString, Posts::class.java)
+            setPostContent(post)
+        }*/
         likeBtn.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@ViewPostActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, likeBtn)
@@ -174,6 +197,169 @@ class ViewPostActivity : AppCompatActivity() {
         }
     }
 
+    fun setPostContent(post: Posts) {
+        if (type == NotificationType.ANNOUNCEMENT.value){
+            if (!post.message.isNullOrEmpty()){content.setText(post.message)}
+        } else if (type == NotificationType.POST.value){
+            if (!post.content.isNullOrEmpty()){content.setText(post.content)}
+        }
+        content.setOnClickListener { content.expand() }
+        if (post.user != null){
+            name.text = post.user.name
+            if (!post.user.picture.isNullOrEmpty()) {
+                Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
+            } else {
+                profilePic.setImageResource(R.drawable.ic_profile)
+            }
+        }
+        if (post.contentURL.isNullOrEmpty()){
+            contentUrl.visibility = View.GONE
+        } else {
+            contentUrl.visibility = View.VISIBLE
+            val urlList = post.contentURL.split(",")
+            var url = ""
+            for (urls in urlList) {
+                url += "<a href=\"" + urls + "\">" + urls + "</a><br>"
+            }
+            contentUrl.movementMethod = LinkMovementMethod.getInstance()
+            contentUrl.text = Html.fromHtml(url)
+            contentUrl.isClickable = true
+        }
+        if (!post.tags.isNullOrEmpty()){tags.text = getTags(post.tags)}
+        if (!post.title.isNullOrEmpty()){title.text = post.title}
+        time.text = Util.getTimeAgo(post.createdAt)
+        fullTime.text = post.createdAt
+        if (!post.likesCount.isNullOrEmpty()){reacts.text = post.likesCount + "people reacts"}
+        if (!post.type.isNullOrEmpty()) {
+            when (post.type) {
+                "image" -> {
+                    audioLayout.visibility = View.GONE
+                    postVideo.visibility = View.GONE
+                    if (type == NotificationType.POST.value && post.picture != null) {
+                        postPic.visibility = View.VISIBLE
+                        Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside().into(postPic)
+                    } else if(type == NotificationType.ANNOUNCEMENT.value && post.url != null){
+                        postPic.visibility = View.VISIBLE
+                        Picasso.with(this@ViewPostActivity).load(post.url).fit().centerInside().into(postPic)
+                    }
+                    else {
+                        postPic.visibility = View.GONE
+                    }
+                    postPic.setOnClickListener {
+                        if (!post.picture.isNullOrEmpty()) {
+                            val intent = Intent(this@ViewPostActivity, ImageDetailActivity::class.java)
+                            intent.putExtra("profilePic", post.picture)
+                            startActivity(intent)
+                        }
+                    }
+                }
+
+                "audio" -> {
+                    postVideo.visibility = View.GONE
+                    postPic.visibility = View.GONE
+                    val myHandler = Handler()
+                    if (!post.url.isNullOrEmpty()) {
+                        audioLayout.visibility = View.VISIBLE
+                        val updateSongTime: Runnable = object : Runnable {
+                            override fun run() {
+                                if (Util.player.isPlaying) {
+                                    seekbar.progress = Util.player.currentPosition
+                                    myHandler.postDelayed(this, 100)
+                                } else {
+                                    myHandler.removeCallbacks(this)
+                                    pauseBtn.visibility = View.GONE
+                                    playBtn.visibility = View.VISIBLE
+
+                                }
+                            }
+                        }
+                        playBtn.setOnClickListener {
+
+                            /*if (currentHolder != null && Util.player != null && Util.player.isPlaying) {
+                                myHandler.removeCallbacks(updateSongTime)
+                                Util.player.pause()
+                                currentHolder!!.pauseBtn.visibility = View.GONE
+                                currentHolder!!.seekbar.progress = 0
+                                currentHolder!!.playBtn.visibility = View.VISIBLE
+                                Util.player.stop()
+                                Util.player.release()
+                                Util.player = null
+                            }*/
+                            Util.player = MediaPlayer()
+                            try {
+                                Util.player.setDataSource(post.url)
+                                Util.player.prepare()
+                                seekbar.max = Util.player.duration
+                                seekbar.isClickable = true
+                                Util.player.start()
+                                seekbar.progress = Util.player.currentPosition
+                                myHandler.postDelayed(updateSongTime, 100)
+                                playBtn.visibility = View.GONE
+                                pauseBtn.visibility = View.VISIBLE
+                                seekbar.setOnSeekBarChangeListener(object :
+                                    SeekBar.OnSeekBarChangeListener {
+                                    override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                                        if (fromUser) {
+                                            Util.player.seekTo(progress)
+                                        }
+                                    }
+                                })
+                            } catch (e: Exception) {
+                                //posts.removeAt(position)
+                                //Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
+                            }
+                            //currentHolder = holder
+                        }
+                        pauseBtn.setOnClickListener {
+                            if (Util.player.isPlaying) {
+                                myHandler.removeCallbacks(updateSongTime)
+                                Util.player.pause()
+                            }
+                            pauseBtn.visibility = View.GONE
+                            playBtn.visibility = View.VISIBLE
+                        }
+                    } else {
+                        audioLayout.visibility = View.GONE
+                    }
+
+                }
+
+                "video" -> {
+                    audioLayout.visibility = View.GONE
+                    postPic.visibility = View.GONE
+                    if (!post.url.isNullOrEmpty()) {
+                        postVideo.visibility = View.VISIBLE
+                        try {
+                            this@ViewPostActivity.lifecycle.addObserver(postVideo)
+                        }catch (e: Exception){
+                            this@ViewPostActivity.lifecycle.addObserver(postVideo)
+                        }
+                        val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
+                            override fun onReady(youTubePlayer: YouTubePlayer) {
+                                youTubePlayer.cueVideo(post.url, 0f)
+                            }
+                        }
+                        val iFramePlayerOptions = IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
+
+                        postVideo.enableAutomaticInitialization = false
+                        try {
+
+                            postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
+                        } catch (e: Exception) {
+                            Log.e("Exception", e.toString());
+                        }
+                    } else {
+                        postVideo.visibility = View.GONE
+                    }
+                }
+
+
+
+            }
+        }
+    }
     fun getPost(postId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
@@ -192,150 +378,49 @@ class ViewPostActivity : AppCompatActivity() {
                                         Posts::class.java
                                     )
                                     Log.e("postttttttt",post.toString())
-                                    content.setText(post.content)
-                                    content.setOnClickListener { content.expand() }
-                                    name.text = post.user.name
-                                    tags.text = getTags(post.tags)
-                                    title.text = post.title
-                                    time.text = Util.getTimeAgo(post.createdAt)
-                                    fullTime.text = post.createdAt
-                                    reacts.text = post.likesCount + "people reacts"
-                                    if (!post.user.picture.isNullOrEmpty()) {
-                                        Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
-                                    } else {
-                                        profilePic.setImageResource(R.drawable.ic_profile)
-                                    }
-                                    if (!post.type.isNullOrEmpty()) {
-                                        when (post.type) {
-                                            "image" -> {
-                                                audioLayout.visibility = View.GONE
-                                                postVideo.visibility = View.GONE
-                                                if (!post.picture.isNullOrEmpty()) {
-                                                    postPic.visibility = View.VISIBLE
-                                                    Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside().into(postPic)
-                                                } else {
-                                                    postPic.visibility = View.GONE
-                                                }
-                                                postPic.setOnClickListener {
-                                                    if (!post.picture.isNullOrEmpty()) {
-                                                        val intent = Intent(this@ViewPostActivity, ImageDetailActivity::class.java)
-                                                        intent.putExtra("profilePic", post.picture)
-                                                        startActivity(intent)
-                                                    }
-                                                }
-                                            }
-
-                                            "audio" -> {
-                                                postVideo.visibility = View.GONE
-                                                postPic.visibility = View.GONE
-                                                val myHandler = Handler()
-                                                if (!post.url.isNullOrEmpty()) {
-                                                    audioLayout.visibility = View.VISIBLE
-                                                    val updateSongTime: Runnable = object : Runnable {
-                                                        override fun run() {
-                                                            if (Util.player.isPlaying) {
-                                                                seekbar.progress = Util.player.currentPosition
-                                                                myHandler.postDelayed(this, 100)
-                                                            } else {
-                                                                myHandler.removeCallbacks(this)
-                                                                pauseBtn.visibility = View.GONE
-                                                                playBtn.visibility = View.VISIBLE
-
-                                                            }
-                                                        }
-                                                    }
-                                                    playBtn.setOnClickListener {
-
-                                                        /*if (currentHolder != null && Util.player != null && Util.player.isPlaying) {
-                                                            myHandler.removeCallbacks(updateSongTime)
-                                                            Util.player.pause()
-                                                            currentHolder!!.pauseBtn.visibility = View.GONE
-                                                            currentHolder!!.seekbar.progress = 0
-                                                            currentHolder!!.playBtn.visibility = View.VISIBLE
-                                                            Util.player.stop()
-                                                            Util.player.release()
-                                                            Util.player = null
-                                                        }*/
-                                                        Util.player = MediaPlayer()
-                                                        try {
-                                                            Util.player.setDataSource(post.url)
-                                                            Util.player.prepare()
-                                                            seekbar.max = Util.player.duration
-                                                            seekbar.isClickable = true
-                                                            Util.player.start()
-                                                            seekbar.progress = Util.player.currentPosition
-                                                            myHandler.postDelayed(updateSongTime, 100)
-                                                            playBtn.visibility = View.GONE
-                                                            pauseBtn.visibility = View.VISIBLE
-                                                            seekbar.setOnSeekBarChangeListener(object :
-                                                                SeekBar.OnSeekBarChangeListener {
-                                                                override fun onStopTrackingTouch(seekBar: SeekBar) {}
-                                                                override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                                                                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                                                                    if (fromUser) {
-                                                                        Util.player.seekTo(progress)
-                                                                    }
-                                                                }
-                                                            })
-                                                        } catch (e: Exception) {
-                                                            //posts.removeAt(position)
-                                                            //Handler().post { this@HomeAdapter.notifyItemRemoved(position) }
-                                                        }
-                                                        //currentHolder = holder
-                                                    }
-                                                    pauseBtn.setOnClickListener {
-                                                        if (Util.player.isPlaying) {
-                                                            myHandler.removeCallbacks(updateSongTime)
-                                                            Util.player.pause()
-                                                        }
-                                                        pauseBtn.visibility = View.GONE
-                                                        playBtn.visibility = View.VISIBLE
-                                                    }
-                                                } else {
-                                                    audioLayout.visibility = View.GONE
-                                                }
-
-                                            }
-
-                                            "video" -> {
-                                                audioLayout.visibility = View.GONE
-                                                postPic.visibility = View.GONE
-                                                if (!post.url.isNullOrEmpty()) {
-                                                    postVideo.visibility = View.VISIBLE
-                                                    try {
-                                                        this@ViewPostActivity.lifecycle.addObserver(postVideo)
-                                                    }catch (e: Exception){
-                                                        this@ViewPostActivity.lifecycle.addObserver(postVideo)
-                                                    }
-                                                    val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
-                                                        override fun onReady(youTubePlayer: YouTubePlayer) {
-                                                            youTubePlayer.cueVideo(post.url, 0f)
-                                                        }
-                                                    }
-                                                    val iFramePlayerOptions = IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
-
-                                                    postVideo.enableAutomaticInitialization = false
-                                                    try {
-
-                                                        postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
-                                                    } catch (e: Exception) {
-                                                        Log.e("Exception", e.toString());
-                                                    }
-                                                } else {
-                                                    postVideo.visibility = View.GONE
-                                                }
-                                            }
-
-
-
-                                        }
-                                    }
+                                    setPostContent(post)
                                 } else {
-                                    Log.e("fail post", response.errorBody().toString())
-                                    /*val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()*/
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
+                                }
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("ViewPost", "fail")
+                            }
+                        })
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ViewPost", e.toString())
+        }
+    }
+    fun getAnnouncement(postId: String) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it", postId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+                                    Log.e("announcement",response.body().toString())
+                                    val post: Posts = Gson().fromJson(
+                                        response.body()?.get("announcement"),
+                                        Posts::class.java
+                                    )
+                                    Log.e("postttttttt",post.toString())
+                                    setPostContent(post)
+                                    likeBtn.visibility = View.GONE
+                                    shareBtn.visibility = View.GONE
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
@@ -378,12 +463,8 @@ class ViewPostActivity : AppCompatActivity() {
                                         reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 likeBtn.isEnabled = true
@@ -413,6 +494,12 @@ class ViewPostActivity : AppCompatActivity() {
         return opTags
     }
     override fun onBackPressed() {
+        if (Util.player != null) {
+            Util.player.stop()
+            Util.player.reset()
+            Util.player.release()
+            Util.player = null
+        }
         if (isTaskRoot) {
             val intent =
                 Intent(this@ViewPostActivity, MainActivity::class.java)
@@ -420,5 +507,15 @@ class ViewPostActivity : AppCompatActivity() {
             finish()
         }
         super.onBackPressed()
+    }
+
+    override fun onDestroy() { if (
+        Util.player != null) {
+        Util.player.stop()
+        Util.player.reset()
+        Util.player.release()
+        Util.player = null
+    }
+        super.onDestroy()
     }
 }

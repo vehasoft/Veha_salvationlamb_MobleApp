@@ -152,7 +152,9 @@ class AdminAudioFragment : Fragment() {
                                             }
                                         })
                                     }
-                                } else {
+                                } else{
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                     /*val resp = response.errorBody()
                                     val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                                     val errorMessage = loginresp.get("errorMessage").toString()
@@ -189,6 +191,11 @@ class AdminAudioFragment : Fragment() {
 
     fun getallLikes(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -212,6 +219,9 @@ class AdminAudioFragment : Fragment() {
                                         myLikes += pos.postId + " , "
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFav(owner)
                             }
@@ -243,6 +253,11 @@ class AdminAudioFragment : Fragment() {
 
     private fun getallFollowers(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -263,6 +278,9 @@ class AdminAudioFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, PostUser::class.java)
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallPosts(contexts, owner)
                             }
@@ -294,6 +312,11 @@ class AdminAudioFragment : Fragment() {
 
     fun getallFav(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -313,6 +336,9 @@ class AdminAudioFragment : Fragment() {
                                         val pos = Gson().fromJson(likes, AllFavList::class.java)
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -344,6 +370,11 @@ class AdminAudioFragment : Fragment() {
 
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
+            if (Util.userId == null) {
+                userPreferences.userId.asLiveData().observe(this){
+                    Util.userId = it
+                }
+            }
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
@@ -359,6 +390,9 @@ class AdminAudioFragment : Fragment() {
                                     val loginresp: UserRslt =
                                         Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     Util.user = loginresp
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 

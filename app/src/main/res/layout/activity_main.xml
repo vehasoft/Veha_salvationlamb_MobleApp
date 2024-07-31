@@ -39,7 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/notification_layout"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintLeft_toRightOf="@id/prod_logo"
                 app:tint="@color/always_white" />
 

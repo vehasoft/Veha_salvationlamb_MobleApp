@@ -5,7 +5,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Handler
+import android.text.Html
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -55,6 +57,7 @@ class HomeAdapter(
         val tags: TextView = view.findViewById(R.id.tags)
         val saveTxt: TextView = view.findViewById(R.id.save_txt)
         val title: TextView = view.findViewById(R.id.title)
+        val contentUrl: TextView = view.findViewById(R.id.content_url)
         val content: ExpandableView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
@@ -222,7 +225,11 @@ class HomeAdapter(
                         try {
                             (context as MainActivity).lifecycle.addObserver(holder.postVideo)
                         }catch (e: Exception){
-                            (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
+                            try {
+                                (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
+                            }catch (e: Exception){
+                                (context as ViewProfileActivity).lifecycle.addObserver(holder.postVideo)
+                            }
                         }
                         val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
@@ -243,6 +250,19 @@ class HomeAdapter(
                     }
                 }
             }
+        }
+        if (post.contentURL.isNullOrEmpty()){
+            holder.contentUrl.visibility = View.GONE
+        } else {
+            holder.contentUrl.visibility = View.VISIBLE
+            val urlList = post.contentURL.split(",")
+            var url = ""
+            for (urls in urlList) {
+                url += "<a href=\"" + urls + "\">" + urls + "</a><br>"
+            }
+            holder.contentUrl.movementMethod = LinkMovementMethod.getInstance()
+            holder.contentUrl.text = Html.fromHtml(url)
+            holder.contentUrl.isClickable = true
         }
 
         likesCount = post.likesCount.toInt()
@@ -367,6 +387,7 @@ class HomeAdapter(
 
         }
         holder.followBtn.setOnClickListener {
+            holder.followBtn.isEnabled = false
             follow(Util.userId, post.userId, holder)
         }
         holder.reacts.setOnClickListener {
@@ -401,6 +422,7 @@ class HomeAdapter(
 
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
         try {
+            holder.likeBtn.isEnabled = false
             if (Commons().isNetworkAvailable(context)) {
                 val data = JsonObject()
                 data.addProperty("userId", Util.userId)
@@ -428,12 +450,8 @@ class HomeAdapter(
                                         holder.reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.likeBtn.isEnabled = true
@@ -449,6 +467,7 @@ class HomeAdapter(
             }
         } catch (e: Exception) {
             Log.e("HomeAdapter.likePost", e.toString())
+            holder.likeBtn.isEnabled = true
         }
     }
 
@@ -468,12 +487,8 @@ class HomeAdapter(
                                         context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
                                     ).show()*/
                                 } else {
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.deleteBtn.isEnabled = true
@@ -501,7 +516,6 @@ class HomeAdapter(
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        holder.followBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
@@ -510,22 +524,18 @@ class HomeAdapter(
                                         Gson().fromJson(response.body()!!.get("message"), String::class.java)
                                     Log.e("msg follow", msg)
                                     if (msg == "unfollow") {
+                                        holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"
-                                        myFollowList.put(followerId, userId)
-                                    } else if (msg == "follow") {
-                                        holder.followBtn.text = "Unfollow"
                                         myFollowList.remove(followerId)
+                                    } else if (msg == "follow") {
+                                        holder.followBtn.isEnabled = true
+                                        holder.followBtn.text = "Unfollow"
+                                        myFollowList.put(followerId, userId)
                                     }
                                     notifyDataSetChanged()
                                 } else {
+                                    Log.e("failFollow - Status", response.code().toString())
                                     Log.e("failFollow", response.errorBody().toString())
-                                    //Toast.makeText(context,"Followed Failed",Toast.LENGTH_LONG).show()
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
                                 }
                                 holder.followBtn.isEnabled = true
                                 call.cancel()
@@ -541,6 +551,7 @@ class HomeAdapter(
             }
         } catch (e: Exception) {
             Log.e("HomeAdapter.follow", e.toString())
+            holder.followBtn.isEnabled = true
         }
     }
 
@@ -574,13 +585,8 @@ class HomeAdapter(
                                     }
                                     notifyDataSetChanged()
                                 } else {
-                                    Log.e("fail fav", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("errorMessage", errorMessage)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 holder.fav.isEnabled = true
                                 call.cancel()
@@ -612,12 +618,8 @@ class HomeAdapter(
                                     val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
 
                                 } else {
-                                    Log.e("fail fav", response.errorBody().toString())
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

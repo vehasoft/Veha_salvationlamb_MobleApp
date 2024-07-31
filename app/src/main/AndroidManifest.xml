@@ -29,6 +29,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ApproveRequestActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".BibleActivity"
             android:exported="false" />
 

@@ -118,6 +118,9 @@ class FilesFragment : Fragment() {
                                         }
                                         recyclerView.adapter = FileAdapter(context, filesAndFolders,this@FilesFragment)
                                     }
+                                } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
                                 }
                             }
 
