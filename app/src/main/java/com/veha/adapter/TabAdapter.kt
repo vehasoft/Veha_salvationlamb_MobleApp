@@ -36,24 +36,24 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
                     NoPermissionFragment()
                 }
             }
-           /* 2 -> {
-                FilesFragment()
-            }*/
             2 -> {
+                BibleFragment()
+            }
+            3 -> {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value) && Util.hasPermission(PermissionType.VIDEO.value, Permission.READ.value)) {
                     AdminVideoFragment()
                 } else {
                     NoPermissionFragment()
                 }
             }
-            3 -> {
+            4 -> {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value) && Util.hasPermission(PermissionType.AUDIO.value, Permission.READ.value)) {
                     AdminAudioFragment()
                 } else {
                     NoPermissionFragment()
                 }
             }
-            4 -> {
+            5 -> {
                 if (Util.hasPermission(PermissionType.PROFILE.value, Permission.READ.value)) {
                     ProfileFragment.getInstance(Util.userId,"me")
                 } else {

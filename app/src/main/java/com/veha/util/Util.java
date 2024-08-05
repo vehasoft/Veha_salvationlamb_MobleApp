@@ -1,11 +1,24 @@
 package com.veha.util;
 
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.util.Log;
+
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.os.AsyncTask;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -18,7 +31,7 @@ public class Util {
     public static final String DEFAULT = "Default";
     public static Float fontSize = 10.0F;
    // public static String url = "https://server.salvationlamb.com";
-    public static String url = "http://209.182.232.231:4000";
+    public static String url = "https://dev-server.salvationlamb.com";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static Map<String,String> permissionMap = new HashMap<>();
     public static String userId;
@@ -35,6 +48,8 @@ public class Util {
     public static final String CHANNEL_ID = "VEHA";
     public static final String CHANNEL_NAME = "VEHA";
     public static final String CHANNEL_DESC = "veha notification";
+
+    public static JSONObject bible = null;
 
     public static ArrayList getReligion() {
         religion = new ArrayList<>();
@@ -178,8 +193,59 @@ public class Util {
         }
         return false;
     }
+    public static void getBible(Context context){
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new InputStreamReader(
+                    context.getAssets().open("test.json")));
+            String line;
+            StringBuffer content = new StringBuffer();
+            char[] buffer = new char[1024];
+            int num;
+            while ((num = input.read(buffer)) > 0) {
+                content.append(buffer, 0, num);
+            }
+            if (content.toString().isEmpty()){
+                new DownloadFileTask(context).execute();
+                //getBible(context);
+            }
+            bible = new JSONObject(content.toString());
 
+        } catch (Exception e) {
+
+            Log.e("bible parsing",e.toString());
+        }
+    }
+    private static class DownloadFileTask extends AsyncTask<Void,Void,Boolean> {
+        private Context context;
+
+        DownloadFileTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            URL website = null;
+            try {
+                website = new URL("https://files.salvationlamb.com/salvationlamb-images/bible.json");
+                try (InputStream in = website.openStream()) {
+                    File file = new File(context.getFilesDir(), "test.json");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Log.e("bible parsing", ex.toString());
+            }
+
+            return null;
+        }
+
+
+    }
 }
+
 
 
 

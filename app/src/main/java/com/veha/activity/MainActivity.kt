@@ -9,6 +9,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.database.ContentObserver
 import android.os.Build
 import android.os.Bundle
@@ -49,9 +50,17 @@ import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import pl.droidsonroids.gif.GifImageView
 import retrofit2.Call
 import retrofit2.Response
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 import kotlin.system.exitProcess
 
 
@@ -177,6 +186,7 @@ class MainActivity : AppCompatActivity() {
         checkPermission()
         getMyDetails()
         getNotificationCount()
+        getBible()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
                 val nagDialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar)
@@ -380,13 +390,13 @@ class MainActivity : AppCompatActivity() {
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
-        //bibleBook.tag = "Bible"
+        bibleBook.tag = "Bible"
         tabLayout.addTab(home, 0)
         tabLayout.addTab(pdf, 1)
-        //tabLayout.addTab(bibleBook, 2)
-        tabLayout.addTab(adminVideo, 2)
-        tabLayout.addTab(adminAudio, 3)
-        tabLayout.addTab(profile, 4)
+        tabLayout.addTab(bibleBook, 2)
+        tabLayout.addTab(adminVideo, 3)
+        tabLayout.addTab(adminAudio, 4)
+        tabLayout.addTab(profile, 5)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(
             this@MainActivity,
@@ -415,6 +425,109 @@ class MainActivity : AppCompatActivity() {
         if (intent.extras != null){
             viewPager.currentItem = intent.extras!!.getInt("gotopage")
         }
+    }
+    /*fun loadJSONFromAsset(): String? {
+        var json: String? = null
+        json = try {
+            val `is`: InputStream = this.getAssets().open("test.json")
+            val size = `is`.available()
+            val buffer = ByteArray(size)
+            `is`.read(buffer)
+            `is`.close()
+            String(buffer, charset("UTF-8"))
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return null
+        }
+        Log.e("json",json.toString())
+        return json
+    }*/
+    private fun getBible(){
+        Util.getBible(this@MainActivity)
+        //Log.e("bibles",Util.bible.length().toString())
+        //Log.e("bibles",Util.bible.toString())
+        //Util.bible = loadJSONFromAsset()?.let { JSONObject(it) }
+        //Log.e("bibles",Util.bible.length().toString())
+        //Log.e("bibles",Util.bible.toString())
+        /*if (Util.bible == null){
+            Util.bible = loadJSONFromAsset()?.let { JSONObject(it) }
+            *//*try {
+                var fileInputStream: FileInputStream = openFileInput("bible.json")
+                var inputStreamReader = InputStreamReader(fileInputStream)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val stringBuilder: StringBuilder = StringBuilder()
+                var text: String? = null
+                while (run {
+                        text = bufferedReader.readLine()
+                        text
+                    } != null) {
+                    stringBuilder.append(text)
+                }
+                Log.e("bibles",stringBuilder.toString())
+                Util.bible = JSONObject(stringBuilder.toString())
+                Log.e("bibles", Util.bible.toString())
+            } catch (ex: FileNotFoundException){
+                Log.e("bible","File doesnot exists")
+                val assetManager: AssetManager = this@MainActivity.assets
+                val inputStream: InputStream = assetManager.open("test.json")
+                var inputStreamReader = InputStreamReader(inputStream)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val stringBuilder: StringBuilder = StringBuilder()
+                var text: String? = null
+                while (run {
+                        text = bufferedReader.readLine()
+                        text
+                    } != null) {
+                    stringBuilder.append(text)
+                }
+                Log.e("biblesbuildr", stringBuilder.toString())
+                Util.bible = JSONObject(stringBuilder.toString())
+                var fileInputStream: FileOutputStream = openFileOutput("bible.json",Context.MODE_PRIVATE)
+                fileInputStream.write(stringBuilder.toString().toByteArray())
+            }*//*
+        } else{
+            Log.e("bibles",Util.bible.toString())
+        }*/
+        /*
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    Log.e("######################",it)
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+
+                                }
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("MainActivity.getDetails", "fail$t")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity.bible", e.toString())
+        }*/
     }
 
     public fun getMyDetails() {

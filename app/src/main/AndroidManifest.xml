@@ -35,6 +35,10 @@
             android:name=".ApproveRequestActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".BibleActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/logo" />
