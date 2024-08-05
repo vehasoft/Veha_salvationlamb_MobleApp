@@ -19,11 +19,16 @@
             android:textSize="20dp"
             android:layout_marginBottom="15dp"
             android:id="@+id/oldd"
-            android:background="@drawable/rounded_border_login_register"
-            android:text="Bible"
+            android:text="Old"
             android:paddingStart="10dp"
             android:textStyle="bold"
             />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/cardview_shadow_start_color"
+            android:layout_below="@id/file_linear"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -31,18 +36,17 @@
             android:textSize="20dp"
             android:layout_marginBottom="15dp"
             android:id="@+id/neww"
-            android:background="@drawable/rounded_border_login_register"
-            android:text="Bible"
+            android:text="New"
             android:paddingStart="10dp"
             android:textStyle="bold"
+            android:layout_marginTop="10dp"
             />
-
-        <androidx.recyclerview.widget.RecyclerView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:background="@color/home_bg"
-            android:id="@+id/recycler_view"/>
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/cardview_shadow_start_color"
+            android:layout_below="@id/file_linear"/>
 
     </LinearLayout>
 

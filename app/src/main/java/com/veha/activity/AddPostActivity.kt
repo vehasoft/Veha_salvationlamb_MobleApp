@@ -1,6 +1,7 @@
 package com.veha.activity
 
 import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,6 +23,7 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.veha.activity.R
@@ -105,7 +107,11 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("url", video.text.toString())
                 data.addProperty("type", postTypeStr)
                 data.addProperty("userId", Util.userId)
-                postData(data)
+                postData(data,this,this)
+                postBtn.isEnabled = true
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
         imgPostBtn.setOnClickListener {
@@ -113,11 +119,12 @@ class AddPostActivity : AppCompatActivity() {
         }
     }
 
-    private fun postData(data: JsonObject) {
+    public fun postData(data: JsonObject,context: Context,owner: LifecycleOwner) {
         try {
-            if (Commons().isNetworkAvailable(this)) {
+            if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
-                userPreferences.authToken.asLiveData().observe(this) {
+                val userPreferences = UserPreferences(context);
+                userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
                         call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -125,14 +132,13 @@ class AddPostActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     title.text.clear()
                                     content.text.clear()
-                                    postBtn.isEnabled = true
-                                    val intent = Intent(this@AddPostActivity, MainActivity::class.java)
+                                    val intent = Intent(context, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    postBtn.isEnabled = true
                                     Log.e("failAddPost - Status", response.code().toString())
                                     Log.e("failAddPost", response.errorBody().toString())
+                                    Log.e("failAddPost", response.toString())
                                 }
                                 call1.cancel()
                             }
@@ -143,7 +149,7 @@ class AddPostActivity : AppCompatActivity() {
                         })
                     } else {
                         Toast.makeText(
-                            this@AddPostActivity,
+                            context,
                             "Somthing Went Wrong \nLogin again to continue",
                             Toast.LENGTH_LONG
                         ).show()
@@ -151,7 +157,7 @@ class AddPostActivity : AppCompatActivity() {
                             userPreferences.deleteAuthToken()
                             userPreferences.deleteUserId()
                         }
-                        val intent = Intent(this@AddPostActivity, LoginActivity::class.java)
+                        val intent = Intent(context, LoginActivity::class.java)
                         startActivity(intent)
                     }
                 }

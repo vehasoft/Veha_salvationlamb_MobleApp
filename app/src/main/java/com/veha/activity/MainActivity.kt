@@ -373,8 +373,8 @@ class MainActivity : AppCompatActivity() {
     }*/
     private fun getBible(){
         Util.getBible(this@MainActivity)
-        Log.e("bibles",Util.bible.length().toString())
-        Log.e("bibles",Util.bible.toString())
+        //Log.e("bibles",Util.bible.length().toString())
+        //Log.e("bibles",Util.bible.toString())
         //Util.bible = loadJSONFromAsset()?.let { JSONObject(it) }
         //Log.e("bibles",Util.bible.length().toString())
         //Log.e("bibles",Util.bible.toString())

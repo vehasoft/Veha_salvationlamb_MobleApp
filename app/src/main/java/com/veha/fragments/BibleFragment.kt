@@ -20,7 +20,6 @@ import org.chromium.base.Log
 class BibleFragment : Fragment() {
 
     lateinit var userPreferences: UserPreferences
-    lateinit var recyclerView: RecyclerView
     lateinit var oldd: TextView
     lateinit var neww: TextView
     lateinit var contexts: Context
@@ -37,27 +36,17 @@ class BibleFragment : Fragment() {
         contexts = container!!.context
         val view =  inflater.inflate(R.layout.fragment_bible, container, false)
         userPreferences = UserPreferences(contexts)
-        recyclerView = view.findViewById(R.id.recycler_view)
         oldd = view.findViewById(R.id.oldd)
         neww = view.findViewById(R.id.neww)
-        recyclerView.visibility = View.GONE
-        recyclerView.layoutManager = LinearLayoutManager(contexts)
-        //recyclerView.adapter = BibleAdapter(context,)
-
-        Log.e("util bible",Util.bible.toString())
         oldd.setOnClickListener {
-            Log.e("oldbible",Util.bible.get("Old").toString())
             val intent = Intent(contexts, BibleActivity::class.java)
-            intent.putExtra("type", "list")
-            intent.putExtra("content", Util.bible.get("Old").toString())
+            intent.putExtra("type", "old")
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             contexts.startActivity(intent)
         }
         neww.setOnClickListener {
-            Log.e("newbible",Util.bible.get("New").toString())
             val intent = Intent(contexts, BibleActivity::class.java)
-            intent.putExtra("type", "list")
-            intent.putExtra("content", Util.bible.get("New").toString())
+            intent.putExtra("type", "new")
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             contexts.startActivity(intent)
         }

@@ -1,27 +1,35 @@
 package com.veha.adapter
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.JsonObject
+import com.veha.activity.AddPostActivity
 import com.veha.activity.BibleActivity
+import com.veha.activity.ExpandableView
+import com.veha.activity.MainActivity
 import com.veha.activity.R
 import com.veha.util.UserPreferences
+import com.veha.util.Util
 import org.json.JSONArray
 import org.json.JSONObject
 
-class BibleAdapter(val context: Context, val bibleContent: JSONArray) :
+class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner) :
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
-        val view = LayoutInflater.from(context).inflate(R.layout.child_folders, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.child_bible, parent, false)
         val views: ViewHolder = ViewHolder(view)
         /*if (!Util.listview) {
             views.fileLinear.orientation = LinearLayout.VERTICAL
@@ -37,62 +45,45 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val bible: JSONObject = bibleContent[position] as JSONObject
         val name: String = bible.names()?.get(0).toString()
-        holder.textView.text = name
-        var type: String
-        if (name != "V"){
-            type = "list"
+        var jsonType: String = "list"
+        if (type == "list") {
+            if (name == "C") {
+                holder.bibleTitle.text = bible.get("n").toString()
+                jsonType = "list"
+            } else if (name == "V") {
+                holder.bibleTitle.text = "Chapter "+ (position+1)
+                jsonType = "content"
+            }
         } else {
-            type = "content"
+            holder.bibleContent.text = bible.get("V").toString()
         }
-        holder.itemView.setOnClickListener { v: View? ->
+        holder.titleLayout.setOnClickListener { v: View? ->
             val intent = Intent(context, BibleActivity::class.java)
-            intent.putExtra("type", type)
+            intent.putExtra("type", jsonType)
             intent.putExtra("content", bible.get(name).toString())
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
-        }/*
-        holder.textView.text = bible.get(name).toString()
+        }
+        holder.postBtn.setOnClickListener {
+            holder.postBtn.isEnabled = false
+            val data = JsonObject()
+            data.addProperty("title", "bible content")
+            data.addProperty("content", holder.bibleContent.text.toString())
+            data.addProperty("tags", "")
+            data.addProperty("image", "")
+            data.addProperty("url", "")
+            data.addProperty("type", "text")
+            data.addProperty("userId", Util.userId)
+            AddPostActivity().postData(data,context,owner)
 
-        holder.itemView.setOnClickListener { v: View? ->
-            Log.e("type", filesAndFolder.type)
-            var result = true
-            if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)) {
-                result = false
-                val builder = AlertDialog.Builder(context)
-                builder.setTitle("Password")
-                val view = View.inflate(context, R.layout.password_layout, null)
-                val passwordView = view.findViewById<TextInputEditText>(R.id.password)
-                builder.setView(view)
-                builder.setMessage("Enter Password")
-                builder.setPositiveButton("Ok") { dialog: DialogInterface?, which: Int ->
-                    val password = passwordView.text.toString()
-                    if (password.isNotEmpty()) {
-                        val passwordJson = JsonObject()
-                        passwordJson.addProperty("password", password)
-                        checkPassword(passwordJson, filesAndFolder.id, filesAndFolder)
-                    } else {
-                        Toast.makeText(context, "No password provided", Toast.LENGTH_LONG).show()
-                    }
-                }
-                builder.setNegativeButton("cancel") { dialog: DialogInterface, which: Int -> dialog.cancel() }
-                val alertDialog: AlertDialog = builder.create()
-                alertDialog.show()
-            } else {
-                if (filesAndFolder.type == "folder") {
-                    val intent = Intent(context, FileListActivity::class.java)
-                    intent.putExtra("folderId", filesAndFolder.id)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                } else {
-                    val intent = Intent(context, PdfActivity2::class.java)
-                    intent.putExtra("url", filesAndFolder.url)
-                    intent.putExtra("fileName", filesAndFolder.name)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                }
-            }
-
-        }*/
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
+        }
+        holder.copyBtn.setOnClickListener {
+            val clipBoardManager: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData: ClipData = ClipData.newPlainText("bible",holder.bibleContent.text.toString())
+            clipBoardManager.setPrimaryClip(clipData)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -100,18 +91,30 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray) :
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textView: TextView
-        var imageView: ImageView
-        var lockSymbol: ImageView
-        var fileLinear: LinearLayout
+        var bibleContent: ExpandableView
+        var postBtn: Button
+        var shareBtn: Button
+        var copyBtn: ImageView
+        var titleLayout: LinearLayout
+        var bodyLayout: LinearLayout
+        var bibleTitle: TextView
 
         init {
-            textView = itemView.findViewById(R.id.file_name_text_view)
-            imageView = itemView.findViewById(R.id.icon_view)
-            lockSymbol = itemView.findViewById(R.id.lock_symbol)
-            fileLinear = itemView.findViewById(R.id.file_linear)
-            imageView.visibility = View.GONE
-            lockSymbol.visibility = View.GONE
+            bibleContent = itemView.findViewById(R.id.bible_content)
+            postBtn = itemView.findViewById(R.id.post_btn)
+            shareBtn = itemView.findViewById(R.id.share_btn)
+            copyBtn = itemView.findViewById(R.id.copy_btn)
+            titleLayout = itemView.findViewById(R.id.title_layout)
+            bodyLayout = itemView.findViewById(R.id.body_layout)
+            bibleTitle = itemView.findViewById(R.id.bible_title)
+            if (type == "list"){
+                bodyLayout.visibility = View.GONE
+                titleLayout.visibility = View.VISIBLE
+                copyBtn.visibility = View.GONE
+            } else {
+                bodyLayout.visibility = View.VISIBLE
+                titleLayout.visibility = View.GONE
+            }
         }
     }
 }
