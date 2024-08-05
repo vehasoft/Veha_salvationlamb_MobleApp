@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -83,6 +84,21 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             val clipBoardManager: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("bible",holder.bibleContent.text.toString())
             clipBoardManager.setPrimaryClip(clipData)
+        }
+        holder.shareBtn.setOnClickListener {
+            try {
+                val shareIntent = Intent(Intent.ACTION_SEND)
+                shareIntent.type = "text/plain"
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
+                var shareMessage = "${holder.bibleContent.text.toString()} \n\n\n\nLet me recommend you this application\n\n"
+                shareMessage = """
+                    ${shareMessage + "https://salvationlamb.com/"}                    
+                    """.trimIndent()
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+                context.startActivity(Intent.createChooser(shareIntent, "choose one"))
+            } catch (e: Exception) {
+                Log.e("exception", e.toString())
+            }
         }
     }
 
