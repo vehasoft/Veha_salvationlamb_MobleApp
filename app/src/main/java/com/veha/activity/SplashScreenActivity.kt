@@ -134,6 +134,8 @@ class SplashScreenActivity : AppCompatActivity() {
                                             finish()
                                         }
                                     } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
+                                        Log.e("extraaaa",intent.extras!!.getString("type").toString())
+                                        Log.e("extraaaa",intent.extras!!.getString("id").toString())
                                         if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
                                             val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
                                             intent.putExtra("userId", id)

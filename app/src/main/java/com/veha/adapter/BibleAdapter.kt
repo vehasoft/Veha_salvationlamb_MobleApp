@@ -92,7 +92,7 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
                 var shareMessage = "${holder.bibleContent.text.toString()} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
-                    ${shareMessage + "https://salvationlamb.com/"}                    
+                    ${shareMessage + "http://salvationlamb.com/redirect"}                    
                     """.trimIndent()
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
