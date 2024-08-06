@@ -380,7 +380,7 @@ class HomeAdapter(
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
                 var shareMessage = "${post.content} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
-                    ${shareMessage + "http://salvationlamb.com/redirect?id=" + post.id}                    
+                    ${shareMessage + "https://salvationlamb.com/redirect?id=" + post.id}                    
                     """.trimIndent()
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
