@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,18 +13,26 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.JsonObject
 import com.veha.activity.AddPostActivity
 import com.veha.activity.BibleActivity
 import com.veha.activity.ExpandableView
+import com.veha.activity.LoginActivity
 import com.veha.activity.MainActivity
 import com.veha.activity.R
+import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Response
 
 class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner) :
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
@@ -73,12 +82,12 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             data.addProperty("tags", "")
             data.addProperty("image", "")
             data.addProperty("url", "")
-            data.addProperty("type", "text")
+            data.addProperty("type", "image")
             data.addProperty("userId", Util.userId)
-            AddPostActivity().postData(data,context,owner)
-
+            postData(data)
+/*
             val intent = Intent(context, MainActivity::class.java)
-            context.startActivity(intent)
+            context.startActivity(intent)*/
         }
         holder.copyBtn.setOnClickListener {
             val clipBoardManager: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -131,6 +140,38 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
                 bodyLayout.visibility = View.VISIBLE
                 titleLayout.visibility = View.GONE
             }
+        }
+    }
+    private fun postData(data: JsonObject) {
+        try {
+            if (Commons().isNetworkAvailable(context)) {
+                val retrofit = Util.getRetrofit()
+                val userPreferences = UserPreferences(context);
+                userPreferences.authToken.asLiveData().observe(owner) {
+                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
+                        val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
+                        call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                                if (response.code() == 200) {
+                                    val intent = Intent(context, MainActivity::class.java)
+                                    context.startActivity(intent)
+                                } else {
+                                    Log.e("failAddPost - Status", response.code().toString())
+                                    Log.e("failAddPost", response.errorBody().toString())
+                                    Log.e("failAddPost", response.toString())
+                                }
+                                call1.cancel()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("Bible.postData", "fail")
+                            }
+                        })
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddPostActivity.postData", e.toString())
         }
     }
 }

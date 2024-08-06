@@ -104,7 +104,7 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("url", video.text.toString())
                 data.addProperty("type", postTypeStr)
                 data.addProperty("userId", Util.userId)
-                postData(data,this,this)
+                postData(data)
                 postBtn.isEnabled = true
                 Log.e("posttt",data.toString())
                 val intent = Intent(this, MainActivity::class.java)
@@ -117,12 +117,12 @@ class AddPostActivity : AppCompatActivity() {
         }
     }
 
-    public fun postData(data: JsonObject,context: Context,owner: LifecycleOwner) {
+    private fun postData(data: JsonObject) {
         try {
-            if (Commons().isNetworkAvailable(context)) {
+            if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
-                val userPreferences = UserPreferences(context);
-                userPreferences.authToken.asLiveData().observe(owner) {
+                val userPreferences = UserPreferences(this);
+                userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
                         call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -130,7 +130,7 @@ class AddPostActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     title.text.clear()
                                     content.text.clear()
-                                    val intent = Intent(context, MainActivity::class.java)
+                                    val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
@@ -147,7 +147,7 @@ class AddPostActivity : AppCompatActivity() {
                         })
                     } else {
                         Toast.makeText(
-                            context,
+                            this@AddPostActivity,
                             "Somthing Went Wrong \nLogin again to continue",
                             Toast.LENGTH_LONG
                         ).show()
@@ -155,7 +155,7 @@ class AddPostActivity : AppCompatActivity() {
                             userPreferences.deleteAuthToken()
                             userPreferences.deleteUserId()
                         }
-                        val intent = Intent(context, LoginActivity::class.java)
+                        val intent = Intent(this@AddPostActivity, LoginActivity::class.java)
                         startActivity(intent)
                     }
                 }
