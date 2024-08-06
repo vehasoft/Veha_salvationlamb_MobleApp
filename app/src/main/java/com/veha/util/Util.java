@@ -5,17 +5,24 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import android.os.AsyncTask;
+
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -107,6 +114,17 @@ public class Util {
         retrofitAPI = retrofit.create(RetrofitAPI.class);
         return retrofitAPI;
     }
+    public static RetrofitAPI getRetrofit(String urll) {
+        OkHttpClient.Builder okhttpClientBuilder = new OkHttpClient.Builder();
+        OkHttpClient okHttpClient = okhttpClientBuilder.build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(urll)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        return retrofitAPI;
+    }
 
     public static String formatDate(String date, String toPattern, String fromPattern) throws ParseException {
         if (date == null || date.isEmpty()) {
@@ -193,7 +211,64 @@ public class Util {
         }
         return false;
     }
-    public static void getBible(Context context){
+    public static void getBible(){
+
+        RetrofitAPI retrofitAPI1 = getRetrofit("https://files.salvationlamb.com/");
+        //retrofitAPI1.getContent();
+        Call<JsonObject> call = retrofitAPI1.getContent();
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                try {
+                    Log.e("bibleee",response.toString());
+                    bible = new JSONObject(response.body().toString());
+                } catch (Exception e) {
+                    Log.e("bibleee",e.toString());
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("bibleee",t.toString());
+            }
+        });
+/*
+        String urlString = "https://files.salvationlamb.com/salvationlamb-images/bible.json"; // Replace with your target URL
+        try {
+            // Create a URL object from the string
+            URL url = new URL(urlString);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set the request method to GET
+            connection.setRequestMethod("GET");
+
+            // Get the input stream from the connection
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // Read the content line by line and build a StringBuilder
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+            Log.e("biblee",content.toString());
+
+            // Close the reader
+            reader.close();
+            bible =new JSONObject(content.toString());
+
+            // Print the downloaded content
+            System.out.println(content.toString());
+
+        } catch (Exception e) {
+            Log.e("biblee",e.toString());
+            e.printStackTrace();
+        }*/
+        /*
+
         BufferedReader input = null;
         try {
             input = new BufferedReader(new InputStreamReader(
@@ -206,7 +281,7 @@ public class Util {
                 content.append(buffer, 0, num);
             }
             if (content.toString().isEmpty()){
-                new DownloadFileTask(context).execute();
+                //new DownloadFileTask(context).execute();
                 //getBible(context);
             }
             bible = new JSONObject(content.toString());
@@ -214,8 +289,8 @@ public class Util {
         } catch (Exception e) {
 
             Log.e("bible parsing",e.toString());
-        }
-    }
+        }*/
+    }/*
     private static class DownloadFileTask extends AsyncTask<Void,Void,Boolean> {
         private Context context;
 
@@ -243,7 +318,7 @@ public class Util {
         }
 
 
-    }
+    }*/
 }
 
 

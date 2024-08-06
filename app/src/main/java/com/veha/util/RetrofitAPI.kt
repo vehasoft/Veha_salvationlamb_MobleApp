@@ -196,6 +196,9 @@ interface RetrofitAPI {
     @GET("api/v1/city/{stateId}")
     fun getCity(@Path(value = "stateId") stateId: String): Call<JsonObject>?
 
+    @GET("salvationlamb-images/bible.json")
+    fun getContent(): Call<JsonObject>?
+
 
     @PUT("api/v1/users/{userId}")
     fun putUser(

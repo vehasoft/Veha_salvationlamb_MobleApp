@@ -52,12 +52,11 @@ class BibleActivity : AppCompatActivity() {
         }
         var type: String = intent.extras!!.getString("type").toString()
         var obj: JSONArray
-        Log.e("typeeeeeeeeeeee",type)
         if (type == "old"){
             obj = JSONArray(Util.bible.get("Old").toString())
             type = "list"
         } else if (type == "new"){
-            obj = JSONArray(Util.bible.get("New"))
+            obj = JSONArray(Util.bible.get("New").toString())
             type = "list"
         } else {
             obj = JSONArray(intent.extras!!.get("content").toString())

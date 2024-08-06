@@ -75,6 +75,7 @@ class SplashScreenActivity : AppCompatActivity() {
                     Util.fontSize = it
                 }
 
+                Util.getBible()
                 getMyDetails(it)
             }
         }
