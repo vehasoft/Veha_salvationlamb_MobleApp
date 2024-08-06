@@ -205,6 +205,7 @@ class SplashScreenActivity : AppCompatActivity() {
                                     startActivity(intent)
                                     finish()
                                 }
+                                getMyPermission(token)
                             } else {
                                 val intent = Intent(this@SplashScreenActivity, ForgotPasswordActivity::class.java)
                                 intent.putExtra("page", "verify")
@@ -236,6 +237,28 @@ class SplashScreenActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("Splashscreen", e.toString())
         }
+    }
+    private fun getMyPermission(token: String) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                val call: Call<JsonObject?>? = retrofit.getPermissions("Bearer $token", Util.userId)
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                        if (response.code() == 200) {
+                            val resp = response.body()
+                            Log.e("reslt",resp.toString())
+                            Util.permissionMap = Gson().fromJson(resp?.get("results"), Map::class.java) as MutableMap<String, String>?
+                        }
+                    }
+                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                            Log.e("Splashscreen", "fail")
+                        }
+                    })
+                }
+            } catch (e: Exception) {
+                Log.e("Splashscreen", e.toString())
+            }
     }
     fun readNotification(id: String){
         try {

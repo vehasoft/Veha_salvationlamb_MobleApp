@@ -189,7 +189,7 @@ public class Util {
         url = "https://salvationlamb.com/video/" + url;
         return url;
     }
-    private static void setMap(){
+   /* private static void setMap(){
         permissionMap.put("Post","Read,Edit,Delete,Create");
         permissionMap.put("User","Read,Edit,Delete,Create");
         permissionMap.put("Profile","Read,Edit,Delete,Create");
@@ -197,17 +197,19 @@ public class Util {
         permissionMap.put("Audio","Read,Edit,Delete,Create");
         permissionMap.put("Video","Read,Edit,Delete,Create");
         permissionMap.put("Announcement","Read,Edit,Delete,Create");
-    }
+    }*/
     public static boolean hasPermission(String type,String permission) {
-        setMap();
+        Log.e("mappppp",permissionMap.toString());
+        Log.e("mappppp", String.valueOf(permissionMap.size()));
+        //setMap();
         if (permissionMap != null || permissionMap.isEmpty()){
             return true;
         }
         if (permissionMap.containsKey(type)){
             List<String> permissionList = Arrays.asList(permissionMap.get(type).split(","));
-            if (permissionList.contains(permission)){
+            if (permissionList.contains("All")){
                 return true;
-            }
+            } else return permissionList.contains(permission);
         }
         return false;
     }
