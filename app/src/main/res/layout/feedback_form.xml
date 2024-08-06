@@ -28,6 +28,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/feedback"
             android:lines="5"
+            android:paddingStart="15dp"
             android:textColorHint="@color/black"
             android:textColor="@color/black"
             android:layout_width="match_parent"

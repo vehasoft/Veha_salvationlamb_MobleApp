@@ -61,6 +61,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.util.ArrayList
 import kotlin.system.exitProcess
 
 
@@ -277,7 +278,11 @@ class MainActivity : AppCompatActivity() {
                         builder.setView(view)
                         val feedbackType: Spinner = view.findViewById(R.id.feedback_type)
                         val feedback: EditText = view.findViewById(R.id.feedback)
-                        val list = Util.getReligion()
+                        val list = ArrayList<String>()
+                        list.add("Select")
+                        list.add("Suggestions")
+                        list.add("Customer Support")
+                        list.add("Performance")
                         var feedbackTypeTxt = ""
                         val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, list)
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -294,9 +299,13 @@ class MainActivity : AppCompatActivity() {
                         builder.setCancelable(false)
                         builder.setPositiveButton("Send") { dialog: DialogInterface?, _: Int ->
                             //apicall
-                            if (dialog != null) {
-                                dialog.cancel()
-                            }
+                            val data = JsonObject()
+                            data.addProperty("userName",Util.user.name)
+                            data.addProperty("email",Util.user.email)
+                            data.addProperty("type",feedbackTypeTxt)
+                            data.addProperty("feedback",feedback.text.toString())
+                            postFeedback(data)
+                            dialog?.cancel()
 
                         }
                         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
@@ -579,6 +588,51 @@ class MainActivity : AppCompatActivity() {
                                         notificationCount.text = count.toString()
                                     }
                                 } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
+                                }
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("MainActivity.firstTime", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity.firstTime", e.toString())
+        }
+    }
+    private fun postFeedback(data: JsonObject) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? =
+                            retrofit.postCallHead("Bearer $it", "feedback",data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(this@MainActivity,"Feedback submitted successfully",Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(this@MainActivity,"Feedback submission failed",Toast.LENGTH_LONG).show()
                                     Log.e("code",response.code().toString())
                                     Log.e("err",response.errorBody().toString())
                                 }
