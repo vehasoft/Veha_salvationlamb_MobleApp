@@ -51,6 +51,7 @@ class BibleActivity : AppCompatActivity() {
             startActivity(intent)
         }
         var type: String = intent.extras!!.getString("type").toString()
+        var details: String = intent.extras!!.getString("details").toString()
         var obj: JSONArray
         if (type == "old"){
             obj = JSONArray(Util.bible.get("Old").toString())
@@ -65,7 +66,7 @@ class BibleActivity : AppCompatActivity() {
             txtLinear.visibility = View.GONE
             recyclerView.layoutManager = LinearLayoutManager(this)
             //Log.e("biblejsonarray",obj.toString())
-            recyclerView.adapter = BibleAdapter(this,obj,type,this)
+            recyclerView.adapter = BibleAdapter(this,obj,type,this,details)
         copy.setOnClickListener {
             val clipBoardManager: ClipboardManager = this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("bible",content.text.toString())

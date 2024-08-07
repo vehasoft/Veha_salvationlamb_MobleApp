@@ -34,7 +34,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 
-class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner) :
+class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner, var details: String) :
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,11 +56,23 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
         val bible: JSONObject = bibleContent[position] as JSONObject
         val name: String = bible.names()?.get(0).toString()
         var jsonType: String = "list"
+        holder.bibleDef.text = details
+        var namee: String = ""
+        namee = if (details.contains("Old")){
+            "Old Edition"
+        } else {
+            "new Edition"
+        }
+        holder.bibleName.text = namee
         if (type == "list") {
             if (name == "C") {
                 holder.bibleTitle.text = bible.get("n").toString()
+                val json: JSONArray = bible.get(name) as JSONArray
+                holder.count.text = "Total Chapters : " + json.length().toString()
                 jsonType = "list"
             } else if (name == "V") {
+                val json: JSONArray = bible.get(name) as JSONArray
+                holder.count.text = "Total Verses : " + json.length().toString()
                 holder.bibleTitle.text = "Chapter "+ (position+1)
                 jsonType = "content"
             }
@@ -71,6 +83,12 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             val intent = Intent(context, BibleActivity::class.java)
             intent.putExtra("type", jsonType)
             intent.putExtra("content", bible.get(name).toString())
+            if (name == "V") {
+                intent.putExtra("details", details + "/" + "Chapter " + (position + 1))
+            }
+            if (name == "C") {
+                intent.putExtra("details",details + "/" + bible.get("n").toString())
+            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         }
@@ -123,6 +141,9 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
         var titleLayout: LinearLayout
         var bodyLayout: LinearLayout
         var bibleTitle: TextView
+        var count: TextView
+        var bibleDef: TextView
+        var bibleName: TextView
 
         init {
             bibleContent = itemView.findViewById(R.id.bible_content)
@@ -132,6 +153,9 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             titleLayout = itemView.findViewById(R.id.title_layout)
             bodyLayout = itemView.findViewById(R.id.body_layout)
             bibleTitle = itemView.findViewById(R.id.bible_title)
+            count = itemView.findViewById(R.id.count)
+            bibleName = itemView.findViewById(R.id.bible_name)
+            bibleDef = itemView.findViewById(R.id.bible_definition)
             if (type == "list"){
                 bodyLayout.visibility = View.GONE
                 titleLayout.visibility = View.VISIBLE
