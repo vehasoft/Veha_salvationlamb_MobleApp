@@ -92,6 +92,8 @@ class LoginActivity : AppCompatActivity() {
             data.addProperty("password", passwordstr)
             data.addProperty("isMobile", true)
             data.addProperty("token", token)
+            data.addProperty("deviceInfo", getSystemDetails().toString())
+            Log.e("deviceeee",getSystemDetails().toString())
             if (!Util.isValidEmail(emailstr))
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
@@ -295,39 +297,6 @@ class LoginActivity : AppCompatActivity() {
                  "Version Code: ${Build.VERSION.RELEASE}"*/
         return devicedetails
     }
-
-    private fun postDeviceDetails(token: String) {
-        try {
-            val data: JsonObject = getSystemDetails()
-            data.addProperty("userId",Util.userId)
-            if (Commons().isNetworkAvailable(this)) {
-                val retrofit = Util.getRetrofit()
-                    val call: Call<JsonObject?>? =
-                        retrofit.postCallHead("Bearer $token", "device", data)
-                    call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                        override fun onResponse(
-                            call: Call<JsonObject?>,
-                            response: Response<JsonObject?>
-                        ) {
-                            if (response.code() == 200) {
-                                //Toast.makeText(this@LoginActivity,"Feedback submitted successfully",Toast.LENGTH_LONG).show()
-                            } else {
-                                //Toast.makeText(this@LoginActivity,"Feedback submission failed",Toast.LENGTH_LONG).show()
-                                Log.e("code", response.code().toString())
-                                Log.e("err", response.errorBody().toString())
-                            }
-                        }
-
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            Log.e("LoginActivity.firstTime", "fail")
-                        }
-                    })
-            }
-        } catch (e: Exception) {
-            Log.e("LoginActivity.firstTime", e.toString())
-        }
-    }
-
 
 }
 
