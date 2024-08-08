@@ -62,7 +62,6 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
             holder.lockSymbol.visibility = View.GONE
         }
         holder.itemView.setOnClickListener { v: View? ->
-            Log.e("type", filesAndFolder.type)
             var result = true
             if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)) {
                 result = false

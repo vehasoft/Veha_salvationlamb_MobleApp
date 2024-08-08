@@ -485,7 +485,6 @@ class HomeAdapter(
     private fun deletePost(post: Posts, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                Log.e("deleted post : postid  ==== ", post.id)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -533,7 +532,6 @@ class HomeAdapter(
                                 if (response.code() == 200) {
                                     val msg: String =
                                         Gson().fromJson(response.body()!!.get("message"), String::class.java)
-                                    Log.e("msg follow", msg)
                                     if (msg == "unfollow") {
                                         holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"

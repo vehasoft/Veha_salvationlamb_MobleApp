@@ -93,7 +93,6 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         holder.notificationtime.text = Util.getTimeAgo(notification.createdAt)
         holder.notificationLayout.setOnClickListener {
             readNotification(holder,notification.id)
-            Log.e("notification",notification.toString())
             if (NotificationType.POST.value == notification.type) {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
                     val intent = Intent(context, ViewPostActivity::class.java)

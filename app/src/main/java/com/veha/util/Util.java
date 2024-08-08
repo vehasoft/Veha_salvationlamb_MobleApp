@@ -199,8 +199,6 @@ public class Util {
         permissionMap.put("Announcement","Read,Edit,Delete,Create");
     }*/
     public static boolean hasPermission(String type,String permission) {
-        Log.e("mappppp",permissionMap.toString());
-        Log.e("mappppp", String.valueOf(permissionMap.size()));
         //setMap();
         if (permissionMap != null || permissionMap.isEmpty()){
             return true;
@@ -222,17 +220,16 @@ public class Util {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 try {
-                    Log.e("bibleee",response.toString());
                     bible = new JSONObject(response.body().toString());
                 } catch (Exception e) {
-                    Log.e("bibleee",e.toString());
+                    Log.e("bible.error",e.toString());
                     throw new RuntimeException(e);
                 }
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("bibleee",t.toString());
+                Log.e("bible.fail",t.toString());
             }
         });
 /*

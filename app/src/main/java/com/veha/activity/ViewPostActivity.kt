@@ -377,7 +377,6 @@ class ViewPostActivity : AppCompatActivity() {
                                         response.body()?.get("result"),
                                         Posts::class.java
                                     )
-                                    Log.e("postttttttt",post.toString())
                                     setPostContent(post)
                                 } else {
                                     Log.e("code",response.code().toString())

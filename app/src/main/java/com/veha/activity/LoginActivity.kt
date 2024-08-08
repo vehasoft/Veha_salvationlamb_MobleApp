@@ -60,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
             if (it.isSuccessful) {
                 token = it.result
-                Log.e("token###########", token)
             } else {
                 Log.e("token error", it.exception.toString())
             }
@@ -84,7 +83,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         loginButton.setOnClickListener {
-            Log.e("token###########", token)
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()
             val data = JsonObject()
