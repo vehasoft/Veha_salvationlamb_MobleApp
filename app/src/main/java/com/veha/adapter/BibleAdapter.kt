@@ -95,9 +95,10 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
         holder.postBtn.setOnClickListener {
             holder.postBtn.isEnabled = false
             val data = JsonObject()
-            data.addProperty("title", "bible content")
+            val tags = details.split("/");
+            data.addProperty("title", "Bible Post - " + tags[0] + " Edition")
             data.addProperty("content", holder.bibleContent.text.toString())
-            data.addProperty("tags", "")
+            data.addProperty("tags", tags[1] + "," + tags[2])
             data.addProperty("image", "")
             data.addProperty("url", "")
             data.addProperty("type", "image")
