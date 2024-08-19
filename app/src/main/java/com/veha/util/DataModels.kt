@@ -205,6 +205,7 @@ data class NotificationList(
     val message: String,
     val type: String,
     val data: String,
+    val fileUrl: String,
     val isVisited: String,
     val createdAt: String,
     val updatedAt: String,

@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
@@ -14,6 +15,7 @@ class NotificationViewActivity : AppCompatActivity() {
 
     lateinit var viewPager: ViewPager
     lateinit var logo: ImageView
+    lateinit var close: ImageButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_view)
@@ -21,6 +23,11 @@ class NotificationViewActivity : AppCompatActivity() {
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+        }
+
+        close = findViewById(R.id.close)
+        close.setOnClickListener {
+            finish()
         }
         val tabLayout = findViewById<TabLayout>(R.id.notification_tab_layout)
         val user = tabLayout.newTab()
