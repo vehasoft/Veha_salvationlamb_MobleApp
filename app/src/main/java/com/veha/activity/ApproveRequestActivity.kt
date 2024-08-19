@@ -9,6 +9,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -32,6 +33,7 @@ class ApproveRequestActivity : AppCompatActivity() {
     lateinit var newName: TextView
     lateinit var exFname: TextView
     lateinit var newFname: TextView
+    lateinit var close: ImageButton
     lateinit var exLname: TextView
     lateinit var newLname: TextView
     lateinit var exGender: TextView
@@ -64,6 +66,7 @@ class ApproveRequestActivity : AppCompatActivity() {
     lateinit var exIsWarrior: TextView
     lateinit var newpic: ImageView
     lateinit var expic: ImageView
+    lateinit var profile: ImageView
     lateinit var approve: Button
     lateinit var reject: Button
     lateinit var logo: ImageView
@@ -74,6 +77,7 @@ class ApproveRequestActivity : AppCompatActivity() {
         setContentView(R.layout.activity_approve_request)
         userPreferences = UserPreferences(this)
         exName = findViewById(R.id.ex_name)
+        close = findViewById(R.id.close)
         newName = findViewById(R.id.new_name)
         exFname = findViewById(R.id.ex_fname)
         newFname = findViewById(R.id.new_fname)
@@ -108,6 +112,7 @@ class ApproveRequestActivity : AppCompatActivity() {
         exIsWarrior = findViewById(R.id.ex_warrior)
         newIsWarrior = findViewById(R.id.new_warrior)
         expic = findViewById(R.id.ex_pic)
+        profile = findViewById(R.id.profile_pic)
         newpic = findViewById(R.id.new_pic)
         approve = findViewById(R.id.approve)
         reject = findViewById(R.id.reject)
@@ -115,6 +120,9 @@ class ApproveRequestActivity : AppCompatActivity() {
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+        }
+        close.setOnClickListener {
+            finish()
         }
         val userId: String = intent.extras!!.getString("userId").toString()
         getUpdateRequest(this@ApproveRequestActivity,userId)
@@ -231,7 +239,7 @@ class ApproveRequestActivity : AppCompatActivity() {
                                         )
                                         setValue(exGift, newGift, exObj.gift, newObj.gift)
                                         if (!exObj.picture.isNullOrEmpty()) {
-                                            Picasso.with(context).load(exObj.picture).into(expic)
+                                            Picasso.with(context).load(exObj.picture).into(profile)
                                         } else {
                                             expic.setImageResource(R.drawable.ic_profile)
                                         }

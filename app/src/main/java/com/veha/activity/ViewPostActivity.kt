@@ -58,10 +58,12 @@ class ViewPostActivity : AppCompatActivity() {
     lateinit var likeBtn: Button
     lateinit var shareBtn: Button
     lateinit var fav: ImageButton
+    lateinit var close: ImageButton
     lateinit var overallLayout: ScrollView
     lateinit var logo: ImageView
     lateinit var postId: String
     lateinit var type: String
+    lateinit var reacted: LinearLayout
     lateinit var contentUrl: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +76,7 @@ class ViewPostActivity : AppCompatActivity() {
         title = findViewById(R.id.title)
         content = findViewById(R.id.post_content)
         reacts = findViewById(R.id.no_of_reacts)
+        close = findViewById(R.id.close)
         profilePic = findViewById(R.id.profile_pic)
         postPic = findViewById(R.id.post_pic)
         postVideo = findViewById(R.id.post_video)
@@ -86,6 +89,7 @@ class ViewPostActivity : AppCompatActivity() {
         shareBtn = findViewById(R.id.share_btn)
         overallLayout = findViewById(R.id.child_post_layout)
         contentUrl = findViewById(R.id.content_url)
+        reacted = findViewById(R.id.react_btn)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -100,6 +104,9 @@ class ViewPostActivity : AppCompatActivity() {
             postId = intent.extras!!.get("postId").toString()
             getAnnouncement(postId)
         }
+        close.setOnClickListener {
+            finish()
+        }
         /*if (!intent.extras!!.get("postId").toString().isNullOrEmpty()) {
             postId = intent.extras!!.get("postId").toString()
             getPost(postId)
@@ -109,6 +116,11 @@ class ViewPostActivity : AppCompatActivity() {
             val post = Gson().fromJson(postString, Posts::class.java)
             setPostContent(post)
         }*/
+        reacts.setOnClickListener {
+            val intent = Intent(this@ViewPostActivity, ViewLikesActivity::class.java)
+            intent.putExtra("postId", postId)
+            startActivity(intent)
+        }
         likeBtn.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@ViewPostActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, likeBtn)

@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
     private lateinit var logo: ImageView
-    private lateinit var menu: ImageView
+    private lateinit var close: ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_profile)
@@ -34,8 +34,11 @@ class ViewProfileActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        menu = findViewById(R.id.menu)
-        menu.setOnClickListener {
+        close = findViewById(R.id.close)
+        close.setOnClickListener {
+            finish()
+        }
+        /*menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@ViewProfileActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
@@ -77,7 +80,7 @@ class ViewProfileActivity : AppCompatActivity() {
                         val intent = Intent(this@ViewProfileActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
-                    /*R.id.nightmode ->{
+                    *//*R.id.nightmode ->{
                         if (Util.isNight){
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                             Util.isNight = false
@@ -89,11 +92,11 @@ class ViewProfileActivity : AppCompatActivity() {
                             night.title = "Night Mode"
                             lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
                         }
-                    }*/
+                    }*//*
                 }
                 true
             })
             popup.show()
-        }
+        }*/
     }
 }

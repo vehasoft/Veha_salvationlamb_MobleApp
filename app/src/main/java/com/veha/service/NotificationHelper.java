@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -52,8 +54,10 @@ public class NotificationHelper {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         }
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),R.drawable.logo);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Util.CHANNEL_ID);
         builder.setSmallIcon(R.drawable.logo);
+        builder.setLargeIcon(icon);
         builder.setContentTitle(title);
         builder.setContentText(body);
         builder.setContentIntent(pendingIntent);

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -33,6 +34,7 @@ class AnnouncementActivity : AppCompatActivity() {
     lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var logo: ImageView
+    lateinit var close: ImageButton
     var updated: Boolean = false
     private var page: Int = 1
     lateinit var adapter: AnnouncementAdapter
@@ -47,6 +49,10 @@ class AnnouncementActivity : AppCompatActivity() {
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+        }
+        close = findViewById(R.id.close)
+        close.setOnClickListener {
+            finish()
         }
         adapter = AnnouncementAdapter(ArrayList(),this@AnnouncementActivity,this@AnnouncementActivity)
         val layoutManager = LinearLayoutManager(this)
