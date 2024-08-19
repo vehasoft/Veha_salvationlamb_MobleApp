@@ -20,6 +20,7 @@ import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.veha.activity.ApproveRequestActivity
 import com.veha.activity.MainActivity
+import com.veha.activity.PdfActivity2
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.activity.ViewProfileActivity
@@ -111,8 +112,9 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                 intent.putExtra("postId", notification.data)
                 context.startActivity(intent)
             }else if (NotificationType.FILE.value == notification.type) {
-                val intent = Intent(context, MainActivity::class.java)
-                intent.putExtra("gotopage", 1)
+                val intent = Intent(context, PdfActivity2::class.java)
+                intent.putExtra("fileName", notification.data)
+                intent.putExtra("url", notification.fileUrl)
                 context.startActivity(intent)
             }else if (NotificationType.EVENT.value == notification.type) {
                 val intent = Intent(context, WebViewActivity::class.java)

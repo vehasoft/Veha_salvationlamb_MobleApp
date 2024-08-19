@@ -140,13 +140,15 @@ class SplashScreenActivity : AppCompatActivity() {
                                         startActivity(intent)
                                         finish()
                                     }else if (intent.extras!!.getString("type").equals(NotificationType.FILE.value)){
-                                        val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
-                                        intent.putExtra("gotopage", 1)
+                                        val url = intent.extras!!.getString("fileUrl")
+                                        val intent = Intent(this@SplashScreenActivity, PdfActivity2::class.java)
+                                        intent.putExtra("fileName", id)
+                                        intent.putExtra("url", url)
                                         startActivity(intent)
                                         finish()
                                     } else if (intent.extras!!.getString("type").equals(NotificationType.EVENT.value)){
                                         val intent = Intent(this@SplashScreenActivity, WebViewActivity::class.java)
-                                        intent.putExtra("pageUrl", id)
+                                        intent.putExtra("url", id)
                                         startActivity(intent)
                                         finish()
                                     } else {
