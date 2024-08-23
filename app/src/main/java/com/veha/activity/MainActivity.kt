@@ -355,6 +355,9 @@ class MainActivity : AppCompatActivity() {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
+                userPreferences.fcmToken.asLiveData().observe(this) {
+                    Log.e("tokennnnnnn",it)
+                }
                 userPreferences.authToken.asLiveData().observe(this) {
                     Log.e("######################",it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {

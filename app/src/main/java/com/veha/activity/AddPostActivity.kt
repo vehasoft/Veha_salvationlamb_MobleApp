@@ -48,7 +48,7 @@ class AddPostActivity : AppCompatActivity() {
     lateinit var postImage: RadioButton
     lateinit var postVideo: RadioButton
     var postPicStr = ""
-    var postTypeStr = "text"
+    var postTypeStr = "image"
 
     lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,9 +91,9 @@ class AddPostActivity : AppCompatActivity() {
         postBtn.isEnabled = true
         postBtn.setOnClickListener {
             if (postPicStr.isNullOrEmpty() && postTypeStr.contentEquals("image")) {
-                postTypeStr = "text"
+                postTypeStr = "image"
             }
-            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("text")) {
+            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("image")) {
                 content.error = "Content must not be empty"
             } else {
                 postBtn.isEnabled = false
