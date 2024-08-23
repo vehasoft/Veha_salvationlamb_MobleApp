@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.veha.activity"
         minSdk 23
-        targetSdk 33
+        targetSdk 34
         versionCode 13
         versionName "1.1.0"
 
