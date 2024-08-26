@@ -174,6 +174,12 @@ interface RetrofitAPI {
         @Path(value = "userId") userId: String,
     ): Call<JsonObject?>?
 
+    @GET("/api/v1/permission/users/{userId}")
+    fun getPermissions(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "userId") userId: String,
+    ): Call<JsonObject?>?
+
     @GET("api/v1/search")
     fun getSearch(@Header(value = "Authorization") head: String, @Query("query") query: String?): Call<JsonObject?>?
 
@@ -195,6 +201,9 @@ interface RetrofitAPI {
 
     @GET("api/v1/city/{stateId}")
     fun getCity(@Path(value = "stateId") stateId: String): Call<JsonObject>?
+
+    @GET("salvationlamb-images/bible.json")
+    fun getContent(): Call<JsonObject>?
 
 
     @PUT("api/v1/users/{userId}")

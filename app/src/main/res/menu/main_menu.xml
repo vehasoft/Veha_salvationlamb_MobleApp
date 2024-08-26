@@ -12,6 +12,12 @@
            android:title="Settings"/>
     <item  android:id="@+id/warrior"
            android:title="Make me a warrior"/>
+    <item  android:id="@+id/feedback"
+        android:visible="false"
+           android:title="Feedback"/>
+    <item  android:id="@+id/invite"
+        android:visible="false"
+           android:title="Invite a friend"/>
     <item  android:id="@+id/logout"
            android:title="Logout"
            />

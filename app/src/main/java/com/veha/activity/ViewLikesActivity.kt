@@ -25,6 +25,8 @@ import com.veha.util.UserPreferences
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -97,8 +99,13 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
+                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                            val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(this@ViewLikesActivity, NoPermissionActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
 
                     R.id.fav -> {

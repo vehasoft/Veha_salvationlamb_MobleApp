@@ -9,6 +9,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.database.ContentObserver
 import android.os.Build
 import android.os.Bundle
@@ -19,9 +20,13 @@ import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.Window
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -39,13 +44,24 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.veha.adapter.TabAdapter
 import com.veha.util.Commons
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import pl.droidsonroids.gif.GifImageView
 import retrofit2.Call
 import retrofit2.Response
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.util.ArrayList
 import kotlin.system.exitProcess
 
 
@@ -200,11 +216,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         announcement.setOnClickListener {
-            val intent = Intent(this, AnnouncementActivity::class.java)
-            startActivity(intent)
-            /*val intent = Intent(this, ApproveRequestActivity::class.java)
-            intent.putExtra("userId","7c46ea10-fade-11ee-a77a-7f0156e992fe")
-            startActivity(intent)*/
+            if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                val intent = Intent(this, AnnouncementActivity::class.java)
+                startActivity(intent)
+            } else {
+                val intent = Intent(this@MainActivity, NoPermissionActivity::class.java)
+                startActivity(intent)
+            }
         }
         bannerClose.setOnClickListener {
             banner.visibility = View.GONE
@@ -246,10 +264,76 @@ class MainActivity : AppCompatActivity() {
             if (Util.user.isReviewState.toBoolean()) {
                 popup.menu.findItem(R.id.warrior).isVisible = false
             }
+            popup.menu.findItem(R.id.feedback).isVisible = true
+            popup.menu.findItem(R.id.invite).isVisible = true
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
+                    }
+                    R.id.feedback -> {
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+                        builder.setTitle("FEEDBACK FORM")
+                        val view = View.inflate(this@MainActivity, R.layout.feedback_form, null)
+                        builder.setView(view)
+                        val feedbackType: Spinner = view.findViewById(R.id.feedback_type)
+                        val feedback: EditText = view.findViewById(R.id.feedback)
+                        val list = ArrayList<String>()
+                        list.add("Select")
+                        list.add("Suggestions")
+                        list.add("Customer Support")
+                        list.add("Performance")
+                        var feedbackTypeTxt = ""
+                        val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, list)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        feedbackType.adapter = adapter
+                        feedbackType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
+                                if (list[pos] != "Select") {
+                                    feedbackTypeTxt = list[pos].toString()
+                                }
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
+                        builder.setCancelable(false)
+                        builder.setPositiveButton("Send") { dialog: DialogInterface?, _: Int ->
+                            //apicall
+                            val data = JsonObject()
+                            data.addProperty("userName",Util.user.name)
+                            data.addProperty("email",Util.user.email)
+                            data.addProperty("type",feedbackTypeTxt)
+                            data.addProperty("feedback",feedback.text.toString())
+                            postFeedback(data)
+                            dialog?.cancel()
+
+                        }
+                        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
+                        builder.create().show()
+                    }
+                    R.id.invite -> {
+                        try {
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
+                        var shareMessage = " Hey friends! \n" +
+                                "\n" +
+                                "Exciting news! I've just joined Salvation Lamb, a vibrant new social media platform where we can connect, share, and discover together! \n" +
+                                "\n" +
+                                "Join me and let's stay connected like never before. Here's why you'll love it:\n" +
+                                "It's all about making connections and having fun! Click the link below to download Salvation Lamb and join me on this journey. Let's create something awesome together!\n" +
+                                "\n" +
+                                "[App Store/Google Play Store Link]\n" +
+                                "\n" +
+                                "Can't wait to see you there! "
+                        shareMessage = """
+                    $shareMessage                    
+                    """.trimIndent()
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+                        startActivity(Intent.createChooser(shareIntent, "choose one"))
+                    } catch (e: Exception) {
+                        Log.e("exception", e.toString())
+                    }
                     }
 
                     R.id.logout -> {
@@ -273,8 +357,13 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
+                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                            val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(this@MainActivity, NoPermissionActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
 
                     R.id.fav -> {
@@ -309,13 +398,13 @@ class MainActivity : AppCompatActivity() {
         adminVideo.tag = "video"
         adminAudio.tag = "audio"
         pdf.tag = "Files"
-        //bibleBook.tag = "Bible"
+        bibleBook.tag = "Bible"
         tabLayout.addTab(home, 0)
         tabLayout.addTab(pdf, 1)
-        //tabLayout.addTab(bibleBook, 2)
-        tabLayout.addTab(adminVideo, 2)
-        tabLayout.addTab(adminAudio, 3)
-        tabLayout.addTab(profile, 4)
+        tabLayout.addTab(bibleBook, 2)
+        tabLayout.addTab(adminVideo, 3)
+        tabLayout.addTab(adminAudio, 4)
+        tabLayout.addTab(profile, 5)
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = TabAdapter(
             this@MainActivity,
@@ -366,7 +455,6 @@ class MainActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
-                    Log.e("######################",it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
@@ -509,6 +597,51 @@ class MainActivity : AppCompatActivity() {
                                         notificationCount.text = count.toString()
                                     }
                                 } else {
+                                    Log.e("code",response.code().toString())
+                                    Log.e("err",response.errorBody().toString())
+                                }
+                            }
+
+                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                                Log.e("MainActivity.firstTime", "fail")
+                            }
+                        })
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        lifecycleScope.launch {
+                            userPreferences.deleteAuthToken()
+                            userPreferences.deleteUserId()
+                        }
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity.firstTime", e.toString())
+        }
+    }
+    private fun postFeedback(data: JsonObject) {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                userPreferences.authToken.asLiveData().observe(this) {
+                    if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
+                        val call: Call<JsonObject?>? =
+                            retrofit.postCallHead("Bearer $it", "feedback",data)
+                        call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(this@MainActivity,"Feedback submitted successfully",Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(this@MainActivity,"Feedback submission failed",Toast.LENGTH_LONG).show()
                                     Log.e("code",response.code().toString())
                                     Log.e("err",response.errorBody().toString())
                                 }

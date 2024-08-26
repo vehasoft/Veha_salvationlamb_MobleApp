@@ -30,9 +30,9 @@ class UserPreferences (context: Context) {
             preferences[FCM_TOKEN].toString()
         }
 
-    suspend fun savefcmToken(token: String){
+    suspend fun savefcmToken(fcmToken: String){
         dataStorePref.edit { preferences ->
-            preferences[FCM_TOKEN] = token
+            preferences[FCM_TOKEN] = fcmToken
         }
     }
     suspend fun deletefcmToken(){

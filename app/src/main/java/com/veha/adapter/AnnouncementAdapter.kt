@@ -13,12 +13,16 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.veha.activity.NoPermissionActivity
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
 import com.veha.util.NotificationList
 import com.veha.util.NotificationType
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
+import com.veha.util.Util
 
 class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Context,owner: LifecycleOwner) :
     RecyclerView.Adapter<NotificationListAdapter.ViewHolder>() {
@@ -61,10 +65,15 @@ class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Cont
             Html.fromHtml(html)
         }).also { holder.notificationContent.text = it }
         holder.notificationLayout.setOnClickListener {
-            val intent = Intent(context, ViewPostActivity::class.java)
-            intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
-            intent.putExtra("postId", announcement.id)
-            context.startActivity(intent)
+            if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                val intent = Intent(context, ViewPostActivity::class.java)
+                intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
+                intent.putExtra("postId", announcement.id)
+                context.startActivity(intent)
+            } else {
+                val intent = Intent(context, NoPermissionActivity::class.java)
+                context.startActivity(intent)
+            }
         }
     }
     fun addItem(post: ArrayList<Posts>) {

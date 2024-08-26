@@ -96,8 +96,13 @@ class FollowerActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        val intent = Intent(this@FollowerActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
+                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                            val intent = Intent(this@FollowerActivity, EditProfileActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(this@FollowerActivity, NoPermissionActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
 
                     R.id.fav -> {

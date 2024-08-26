@@ -19,6 +19,7 @@ import android.widget.PopupMenu
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.asLiveData
@@ -389,9 +390,11 @@ class ViewPostActivity : AppCompatActivity() {
                                         response.body()?.get("result"),
                                         Posts::class.java
                                     )
-                                    Log.e("postttttttt",post.toString())
                                     setPostContent(post)
                                 } else {
+                                    Toast.makeText(this@ViewPostActivity,"This post may deleted",
+                                        Toast.LENGTH_LONG).show()
+                                    finish()
                                     Log.e("code",response.code().toString())
                                     Log.e("err",response.errorBody().toString())
                                 }
@@ -426,11 +429,13 @@ class ViewPostActivity : AppCompatActivity() {
                                         response.body()?.get("announcement"),
                                         Posts::class.java
                                     )
-                                    Log.e("postttttttt",post.toString())
                                     setPostContent(post)
                                     likeBtn.visibility = View.GONE
                                     shareBtn.visibility = View.GONE
                                 } else {
+                                    Toast.makeText(this@ViewPostActivity,"This post may deleted",
+                                        Toast.LENGTH_LONG).show()
+                                    finish()
                                     Log.e("code",response.code().toString())
                                     Log.e("err",response.errorBody().toString())
                                 }

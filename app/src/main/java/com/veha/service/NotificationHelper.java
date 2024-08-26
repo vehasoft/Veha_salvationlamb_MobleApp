@@ -17,6 +17,8 @@ import com.veha.activity.R;
 import com.veha.activity.ViewPostActivity;
 import com.veha.activity.ViewProfileActivity;
 import com.veha.util.NotificationType;
+import com.veha.util.Permission;
+import com.veha.util.PermissionType;
 import com.veha.util.Util;
 
 import java.util.Map;
@@ -32,27 +34,33 @@ public class NotificationHelper {
     public static void displayNotification(Context context, String title, String body, Map data) {
         PendingIntent pendingIntent = null;
         if (Objects.equals(data.get("type"), NotificationType.POST.getValue())) {
-            Intent intent = new Intent(context, ViewPostActivity.class);
-            intent.putExtra("postId",data.get("id").toString());
-            intent.putExtra("type", NotificationType.POST.getValue());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            if (Util.hasPermission(PermissionType.POST.getValue(), Permission.READ.getValue())) {
+                Intent intent = new Intent(context, ViewPostActivity.class);
+                intent.putExtra("postId", data.get("id").toString());
+                intent.putExtra("type", NotificationType.POST.getValue());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            }
         } else if (Objects.equals(data.get("type"), NotificationType.USER.getValue())){
             Intent intent = new Intent(context, ViewProfileActivity.class);
             intent.putExtra("userId",data.get("id").toString());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         } else if (Objects.equals(data.get("type"),NotificationType.ANNOUNCEMENT.getValue())) {
-            Intent intent = new Intent(context, ViewPostActivity.class);
-            intent.putExtra("type", NotificationType.ANNOUNCEMENT.getValue());
-            intent.putExtra("postId",data.get("id").toString());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            if (Util.hasPermission(PermissionType.ANNOUNCEMENT.getValue(), Permission.READ.getValue())) {
+                Intent intent = new Intent(context, ViewPostActivity.class);
+                intent.putExtra("type", NotificationType.ANNOUNCEMENT.getValue());
+                intent.putExtra("postId", data.get("id").toString());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            }
         } else if (Objects.equals(data.get("type"),NotificationType.WARRIOR.getValue())) {
-            Intent intent = new Intent(context, ApproveRequestActivity.class);
-            intent.putExtra("userId",data.get("id").toString());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            if (Util.hasPermission(PermissionType.USER.getValue(), Permission.EDIT.getValue())) {
+                Intent intent = new Intent(context, ApproveRequestActivity.class);
+                intent.putExtra("userId", data.get("id").toString());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            }
         }
         //Bitmap icon = BitmapFactory.decodeResource(context.getResources(),R.drawable.logo);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Util.CHANNEL_ID);

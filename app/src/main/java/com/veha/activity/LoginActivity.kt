@@ -1,15 +1,19 @@
 package com.veha.activity
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
@@ -29,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var privacyPolicy: TextView
     private lateinit var email: TextView
     private lateinit var password: TextView
+    var token = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
@@ -41,7 +46,6 @@ class LoginActivity : AppCompatActivity() {
         privacyPolicy = findViewById(R.id.privacy)
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
-        var token = ""
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 Util.CHANNEL_ID,
@@ -54,17 +58,12 @@ class LoginActivity : AppCompatActivity() {
         }
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            if (it.isSuccessful){
+            if (it.isSuccessful) {
                 token = it.result
-                lifecycleScope.launch {
-                    userPreferences.savefcmToken(token)
-                }
-                Log.e("token###########",token)
             } else {
-                Log.e("token error",it.exception.toString())
+                Log.e("token error", it.exception.toString())
             }
         }
-        Log.e("token###########",token)
         signupButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -84,7 +83,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
         loginButton.setOnClickListener {
-            Log.e("token###########",token)
             val emailstr = email.text.toString()
             val passwordstr = password.text.toString()
             val data = JsonObject()
@@ -92,6 +90,8 @@ class LoginActivity : AppCompatActivity() {
             data.addProperty("password", passwordstr)
             data.addProperty("isMobile", true)
             data.addProperty("token", token)
+            data.addProperty("deviceInfo", getSystemDetails().toString())
+            Log.e("deviceeee",getSystemDetails().toString())
             if (!Util.isValidEmail(emailstr))
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
@@ -110,10 +110,14 @@ class LoginActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("login", data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            val loginresp: Loginresp = Gson().fromJson(resp?.get("result"), Loginresp::class.java)
+                            val loginresp: Loginresp =
+                                Gson().fromJson(resp?.get("result"), Loginresp::class.java)
                             Util.isFirst = loginresp.isFreshUser.toBoolean()
                             Util.isWarrior = loginresp.isWarrior.toBoolean()
                             Util.userId = loginresp.id
@@ -121,31 +125,46 @@ class LoginActivity : AppCompatActivity() {
                                 userPreferences.saveAuthToken(loginresp.token)
                                 userPreferences.saveUserId(loginresp.id)
                                 userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
+                                userPreferences.savefcmToken(token)
                                 userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
                                 Util.isFirst = loginresp.isFreshUser.toBoolean()
                                 Util.isWarrior = loginresp.isWarrior.toBoolean()
                                 Util.userId = loginresp.id
                                 getMyDetails(loginresp.token)
+                                //postDeviceDetails(loginresp.token)
                                 /*val intent = Intent(this@LoginActivity, MainActivity::class.java)
                                 startActivity(intent)
                                 finish()*/
                             }
 
                         } else if (response.code() == 401) {
-                            Toast.makeText(this@LoginActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@LoginActivity,
+                                resources.getString(R.string.Deleted_account),
+                                Toast.LENGTH_LONG
+                            ).show()
                             val intent = Intent(this@LoginActivity, LoginActivity::class.java)
                             startActivity(intent)
                         } else {
                             val resp = response.errorBody()
-                            val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val loginresp: JsonObject =
+                                Gson().fromJson(resp?.string(), JsonObject::class.java)
                             val status = loginresp.get("status").toString()
                             val errorMessage = loginresp.get("errorMessage").toString()
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
                             if (errorMessage.contains("Invalid password", true)) {
-                                Toast.makeText(this@LoginActivity, "INVALID PASSWORD", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "INVALID PASSWORD",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             } else if (errorMessage.contains("Invalid Email-Id", true)) {
-                                Toast.makeText(this@LoginActivity, "INVALID USER", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "INVALID USER",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
@@ -157,8 +176,7 @@ class LoginActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("LoginActivity.login", e.toString())
-        }
-        finally {
+        } finally {
             loginButton.isEnabled = true
         }
     }
@@ -169,13 +187,21 @@ class LoginActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                            val loginresp: UserRslt =
+                                Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
-                            if (loginresp.blocked.toBoolean()){
-                                Toast.makeText(this@LoginActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
+                            if (loginresp.blocked.toBoolean()) {
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    resources.getString(R.string.Blocked_account),
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 val intent = Intent(this@LoginActivity, LoginActivity::class.java)
                                 startActivity(intent)
                             }
@@ -193,12 +219,13 @@ class LoginActivity : AppCompatActivity() {
                                 startActivity(intent)
                                 finish()
                             } else {
-                                val intent = Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
+                                val intent =
+                                    Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
                                 intent.putExtra("page", "verify")
                                 intent.putExtra("email", loginresp.email)
                                 startActivity(intent)
                             }
-                        }  else if (response.code() == 401) {
+                        } else if (response.code() == 401) {
                             Toast.makeText(
                                 this@LoginActivity,
                                 resources.getString(R.string.Deleted_account),
@@ -207,8 +234,8 @@ class LoginActivity : AppCompatActivity() {
                             val intent = Intent(this@LoginActivity, LoginActivity::class.java)
                             startActivity(intent)
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -225,5 +252,49 @@ class LoginActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
     }
+
+    @SuppressLint("HardwareIds")
+    private fun getSystemDetails(): JsonObject {
+        val devicedetails = JsonObject()
+        devicedetails.addProperty("Brand", Build.BRAND)
+        devicedetails.addProperty(
+            "DeviceID",
+            Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        )
+        devicedetails.addProperty("Model", Build.MODEL)
+        devicedetails.addProperty("ID", Build.ID)
+        devicedetails.addProperty("SDK", Build.VERSION.SDK_INT)
+        devicedetails.addProperty("Manufacture", Build.MANUFACTURER)
+        devicedetails.addProperty("User", Build.USER)
+        devicedetails.addProperty("Type", Build.TYPE)
+        devicedetails.addProperty("Base", Build.VERSION_CODES.BASE)
+        devicedetails.addProperty("Incremental", Build.VERSION.INCREMENTAL)
+        devicedetails.addProperty("Board", Build.BOARD)
+        devicedetails.addProperty("Host", Build.HOST)
+        devicedetails.addProperty("FingerPrint", Build.FINGERPRINT)
+        devicedetails.addProperty("Version Code", Build.VERSION.RELEASE)
+        /* return "Brand: ${Build.BRAND} \n" +
+                 "DeviceID: ${
+                     Settings.Secure.getString(
+                         contentResolver,
+                         Settings.Secure.ANDROID_ID
+                     )
+                 } \n" +
+                 "Model: ${Build.MODEL} \n" +
+                 "ID: ${Build.ID} \n" +
+                 "SDK: ${Build.VERSION.SDK_INT} \n" +
+                 "Manufacture: ${Build.MANUFACTURER} \n" +
+                 "Brand: ${Build.BRAND} \n" +
+                 "User: ${Build.USER} \n" +
+                 "Type: ${Build.TYPE} \n" +
+                 "Base: ${Build.VERSION_CODES.BASE} \n" +
+                 "Incremental: ${Build.VERSION.INCREMENTAL} \n" +
+                 "Board: ${Build.BOARD} \n" +
+                 "Host: ${Build.HOST} \n" +
+                 "FingerPrint: ${Build.FINGERPRINT} \n" +
+                 "Version Code: ${Build.VERSION.RELEASE}"*/
+        return devicedetails
+    }
+
 }
 

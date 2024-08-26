@@ -13,6 +13,10 @@ import com.veha.activity.R
 import com.veha.activity.ViewProfileActivity
 import com.veha.util.PostLikes
 import com.squareup.picasso.Picasso
+import com.veha.activity.NoPermissionActivity
+import com.veha.util.Permission
+import com.veha.util.PermissionType
+import com.veha.util.Util
 
 class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     private lateinit var posts: ArrayList<PostLikes>
@@ -50,9 +54,14 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
         }
 
         holder.likeListLinear.setOnClickListener {
-            val intent = Intent(context, ViewProfileActivity::class.java)
-            intent.putExtra("userId",post.userId)
-            context.startActivity(intent)
+            if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                val intent = Intent(context, ViewProfileActivity::class.java)
+                intent.putExtra("userId", post.userId)
+                context.startActivity(intent)
+            } else {
+                val intent = Intent(context, NoPermissionActivity::class.java)
+                context.startActivity(intent)
+            }
         }
     }
 }

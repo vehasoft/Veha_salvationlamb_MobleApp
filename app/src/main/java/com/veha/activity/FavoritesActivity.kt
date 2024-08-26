@@ -11,6 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.veha.fragments.HomeFragment
 import com.veha.util.Commons
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import dmax.dialog.SpotsDialog
@@ -71,8 +73,13 @@ class FavoritesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile ->{
-                        val intent = Intent(this@FavoritesActivity, EditProfileActivity::class.java)
-                        startActivity(intent)
+                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                            val intent = Intent(this@FavoritesActivity, EditProfileActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(this@FavoritesActivity, NoPermissionActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
                     R.id.fav ->{
                         val intent = Intent(this@FavoritesActivity, FavoritesActivity::class.java)

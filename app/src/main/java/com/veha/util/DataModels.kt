@@ -237,6 +237,23 @@ public enum class USERType(s: String) {
     WARRIOR("warrior"),
     ADMIN("admin"),
 }
+public enum class Permission( val value: String) {
+    ALL("All"),
+    READ("Read"),
+    EDIT("Edit"),
+    DELETE("Delete"),
+    CREATE("Create"),
+}
+public enum class PermissionType( val value: String) {
+    POST("POST"),
+    USER("USER"),
+    PROFILE("PROFILE"),
+    FILE("FILE"),
+    AUDIO("AUDIO"),
+    VIDEO("VIDEO"),
+    WARRIOR("WARRIOR"),
+    ANNOUNCEMENT("ANNOUNCEMENT"),
+}
 public enum class PostType(val type: String) {
     IMAGE("image"),
     TEXT("text"),

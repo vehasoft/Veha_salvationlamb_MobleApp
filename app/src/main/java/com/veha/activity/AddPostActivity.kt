@@ -1,6 +1,7 @@
 package com.veha.activity
 
 import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,6 +23,7 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.veha.activity.R
@@ -76,7 +78,7 @@ class AddPostActivity : AppCompatActivity() {
             if (checkedId == R.id.text_btn) {
                 video.visibility = View.GONE
                 postPic.visibility = View.GONE
-                postTypeStr = PostType.TEXT.type
+                postTypeStr = PostType.IMAGE.type
             }else if (checkedId == R.id.image_btn) {
                 video.visibility = View.GONE
                 postTypeStr = PostType.IMAGE.type
@@ -106,6 +108,11 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("type", postTypeStr)
                 data.addProperty("userId", Util.userId)
                 postData(data)
+                postBtn.isEnabled = true
+                Log.e("posttt",data.toString())
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
         imgPostBtn.setOnClickListener {
@@ -117,6 +124,7 @@ class AddPostActivity : AppCompatActivity() {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
+                val userPreferences = UserPreferences(this);
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
@@ -125,14 +133,13 @@ class AddPostActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     title.text.clear()
                                     content.text.clear()
-                                    postBtn.isEnabled = true
                                     val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    postBtn.isEnabled = true
                                     Log.e("failAddPost - Status", response.code().toString())
                                     Log.e("failAddPost", response.errorBody().toString())
+                                    Log.e("failAddPost", response.toString())
                                 }
                                 call1.cancel()
                             }

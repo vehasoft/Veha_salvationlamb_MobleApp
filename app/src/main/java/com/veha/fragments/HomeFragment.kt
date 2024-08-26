@@ -31,6 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.veha.activity.NoPermissionActivity
 import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -102,8 +103,13 @@ class HomeFragment : Fragment() {
             addPost.visibility = View.GONE
         }
         addPost.setOnClickListener {
-            val intent = Intent(contexts, AddPostActivity::class.java)
-            contexts.startActivity(intent)
+            if (!Util.hasPermission(PermissionType.POST.value,Permission.CREATE.value)){
+                val intent = Intent(contexts, NoPermissionActivity::class.java)
+                startActivity(intent)
+            } else {
+                val intent = Intent(contexts, AddPostActivity::class.java)
+                contexts.startActivity(intent)
+            }
         }
         getMyDetails(viewLifecycleOwner)
         getallLikes(viewLifecycleOwner)

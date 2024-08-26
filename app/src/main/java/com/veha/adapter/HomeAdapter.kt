@@ -29,6 +29,8 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import com.squareup.picasso.Picasso
 import com.veha.activity.*
 import com.veha.util.Commons
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
@@ -95,7 +97,11 @@ class HomeAdapter(
             viewHolder.saveTxt.visibility = View.VISIBLE
         } else if (page.contentEquals("profile")) {
             viewHolder.followBtn.visibility = View.GONE
-            viewHolder.deleteBtn.visibility = View.VISIBLE
+            if (Util.hasPermission(PermissionType.POST.value, Permission.DELETE.value)) {
+                viewHolder.deleteBtn.visibility = View.VISIBLE
+            } else {
+                viewHolder.deleteBtn.visibility = View.GONE
+            }
             viewHolder.fav.visibility = View.GONE
             viewHolder.saveTxt.visibility = View.GONE
         } else if (page.contentEquals("OtherProfile") || page.contentEquals("searchProfile")) {
@@ -374,7 +380,7 @@ class HomeAdapter(
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
                 var shareMessage = "${post.content} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
-                    ${shareMessage + "https://salvationlamb.com/"}                    
+                    ${shareMessage + "https://salvationlamb.com/redirect?id=" + post.id}                    
                     """.trimIndent()
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 context.startActivity(Intent.createChooser(shareIntent, "choose one"))
@@ -397,9 +403,14 @@ class HomeAdapter(
         }
         holder.headLinear.setOnClickListener {
             if (page != "profile" && page != "OtherProfile") {
-                val intent = Intent(context, ViewProfileActivity::class.java)
-                intent.putExtra("userId", post.userId)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewProfileActivity::class.java)
+                    intent.putExtra("userId", post.userId)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }
         }
         holder.deleteBtn.setOnClickListener {
@@ -474,7 +485,6 @@ class HomeAdapter(
     private fun deletePost(post: Posts, holder: ViewHolder) {
         try {
             if (Commons().isNetworkAvailable(context)) {
-                Log.e("deleted post : postid  ==== ", post.id)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
@@ -522,7 +532,6 @@ class HomeAdapter(
                                 if (response.code() == 200) {
                                     val msg: String =
                                         Gson().fromJson(response.body()!!.get("message"), String::class.java)
-                                    Log.e("msg follow", msg)
                                     if (msg == "unfollow") {
                                         holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"

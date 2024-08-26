@@ -120,6 +120,9 @@ class ProfileFragment : Fragment() {
             editProfile.visibility = View.GONE
 
         } else {
+            if (!Util.hasPermission(PermissionType.POST.value, Permission.DELETE.value)) {
+                Toast.makeText(contexts,"You don't have permission to delete your post please contact administrator",Toast.LENGTH_LONG).show()
+            }
             editProfile.visibility = View.VISIBLE
         }
         profilePic.setOnClickListener {

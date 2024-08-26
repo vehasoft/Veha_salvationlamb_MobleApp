@@ -15,11 +15,11 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
 import com.veha.activity.ApproveRequestActivity
 import com.veha.activity.MainActivity
+import com.veha.activity.NoPermissionActivity
 import com.veha.activity.PdfActivity2
 import com.veha.activity.R
 import com.veha.activity.ViewPostActivity
@@ -28,6 +28,8 @@ import com.veha.activity.WebViewActivity
 import com.veha.util.Commons
 import com.veha.util.NotificationList
 import com.veha.util.NotificationType
+import com.veha.util.Permission
+import com.veha.util.PermissionType
 import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
@@ -92,25 +94,44 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         holder.notificationtime.text = Util.getTimeAgo(notification.createdAt)
         holder.notificationLayout.setOnClickListener {
             readNotification(holder,notification.id)
-            Log.e("notification",notification.toString())
             if (NotificationType.POST.value == notification.type) {
-                val intent = Intent(context, ViewPostActivity::class.java)
-                intent.putExtra("type", NotificationType.POST.value)
-                intent.putExtra("postId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewPostActivity::class.java)
+                    intent.putExtra("type", NotificationType.POST.value)
+                    intent.putExtra("postId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             } else if (NotificationType.USER.value == notification.type) {
-                val intent = Intent(context, ViewProfileActivity::class.java)
-                intent.putExtra("userId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewProfileActivity::class.java)
+                    intent.putExtra("userId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             } else if (NotificationType.WARRIOR.value == notification.type) {
-                val intent = Intent(context, ApproveRequestActivity::class.java)
-                intent.putExtra("userId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.USER.value, Permission.EDIT.value)) {
+                    val intent = Intent(context, ApproveRequestActivity::class.java)
+                    intent.putExtra("userId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
-                val intent = Intent(context, ViewPostActivity::class.java)
-                intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
-                intent.putExtra("postId", notification.data)
-                context.startActivity(intent)
+                if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                    val intent = Intent(context, ViewPostActivity::class.java)
+                    intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
+                    intent.putExtra("postId", notification.data)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, NoPermissionActivity::class.java)
+                    context.startActivity(intent)
+                }
             }else if (NotificationType.FILE.value == notification.type) {
                 val intent = Intent(context, PdfActivity2::class.java)
                 intent.putExtra("fileName", notification.data)

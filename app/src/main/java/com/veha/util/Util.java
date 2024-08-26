@@ -1,11 +1,31 @@
 package com.veha.util;
 
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.os.AsyncTask;
 
+import com.google.gson.JsonObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -20,6 +40,7 @@ public class Util {
    // public static String url = "https://server.salvationlamb.com";
     public static String url = "https://server.salvationlamb.com";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
+    public static Map<String,String> permissionMap = new HashMap<>();
     public static String userId;
     public static Boolean isFirst = true;
     public static boolean listview = true;
@@ -34,6 +55,8 @@ public class Util {
     public static final String CHANNEL_ID = "VEHA";
     public static final String CHANNEL_NAME = "VEHA";
     public static final String CHANNEL_DESC = "veha notification";
+
+    public static JSONObject bible = null;
 
     public static ArrayList getReligion() {
         religion = new ArrayList<>();
@@ -89,6 +112,17 @@ public class Util {
                 .client(okHttpClient)
                 .build();
         retrofitAPI = retrofit.create(RetrofitAPI.class);
+        return retrofitAPI;
+    }
+    public static RetrofitAPI getRetrofit(String urll) {
+        OkHttpClient.Builder okhttpClientBuilder = new OkHttpClient.Builder();
+        OkHttpClient okHttpClient = okhttpClientBuilder.build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(urll)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
         return retrofitAPI;
     }
 
@@ -155,8 +189,137 @@ public class Util {
         url = "https://salvationlamb.com/video/" + url;
         return url;
     }
+   /* private static void setMap(){
+        permissionMap.put("Post","Read,Edit,Delete,Create");
+        permissionMap.put("User","Read,Edit,Delete,Create");
+        permissionMap.put("Profile","Read,Edit,Delete,Create");
+        permissionMap.put("File","Read,Edit,Delete,Create");
+        permissionMap.put("Audio","Read,Edit,Delete,Create");
+        permissionMap.put("Video","Read,Edit,Delete,Create");
+        permissionMap.put("Announcement","Read,Edit,Delete,Create");
+    }*/
+    public static boolean hasPermission(String type,String permission) {
+        //setMap();
+        if (permissionMap != null || permissionMap.isEmpty()){
+            return true;
+        }
+        if (permissionMap.containsKey(type)){
+            List<String> permissionList = Arrays.asList(permissionMap.get(type).split(","));
+            if (permissionList.contains("All")){
+                return true;
+            } else return permissionList.contains(permission);
+        }
+        return false;
+    }
+    public static void getBible(){
 
+        RetrofitAPI retrofitAPI1 = getRetrofit("https://files.salvationlamb.com/");
+        //retrofitAPI1.getContent();
+        Call<JsonObject> call = retrofitAPI1.getContent();
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                try {
+                    bible = new JSONObject(response.body().toString());
+                } catch (Exception e) {
+                    Log.e("bible.error",e.toString());
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("bible.fail",t.toString());
+            }
+        });
+/*
+        String urlString = "https://files.salvationlamb.com/salvationlamb-images/bible.json"; // Replace with your target URL
+        try {
+            // Create a URL object from the string
+            URL url = new URL(urlString);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set the request method to GET
+            connection.setRequestMethod("GET");
+
+            // Get the input stream from the connection
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // Read the content line by line and build a StringBuilder
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+            Log.e("biblee",content.toString());
+
+            // Close the reader
+            reader.close();
+            bible =new JSONObject(content.toString());
+
+            // Print the downloaded content
+            System.out.println(content.toString());
+
+        } catch (Exception e) {
+            Log.e("biblee",e.toString());
+            e.printStackTrace();
+        }*/
+        /*
+
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new InputStreamReader(
+                    context.getAssets().open("test.json")));
+            String line;
+            StringBuffer content = new StringBuffer();
+            char[] buffer = new char[1024];
+            int num;
+            while ((num = input.read(buffer)) > 0) {
+                content.append(buffer, 0, num);
+            }
+            if (content.toString().isEmpty()){
+                //new DownloadFileTask(context).execute();
+                //getBible(context);
+            }
+            bible = new JSONObject(content.toString());
+
+        } catch (Exception e) {
+
+            Log.e("bible parsing",e.toString());
+        }*/
+    }/*
+    private static class DownloadFileTask extends AsyncTask<Void,Void,Boolean> {
+        private Context context;
+
+        DownloadFileTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            URL website = null;
+            try {
+                website = new URL("https://files.salvationlamb.com/salvationlamb-images/bible.json");
+                try (InputStream in = website.openStream()) {
+                    File file = new File(context.getFilesDir(), "test.json");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Log.e("bible parsing", ex.toString());
+            }
+
+            return null;
+        }
+
+
+    }*/
 }
+
 
 
 
