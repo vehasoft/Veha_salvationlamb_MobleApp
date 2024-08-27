@@ -100,6 +100,9 @@ class SplashScreenActivity : AppCompatActivity() {
                             val isWarrior: Boolean =
                                 loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
+                            if (loginresp.role == "admin"){
+                                Util.isWarrior = true
+                            }
                             Util.isFirst = loginresp.isFreshUser.toBoolean()
                             lifecycleScope.launch {
                                 userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())

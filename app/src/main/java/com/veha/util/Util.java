@@ -38,7 +38,7 @@ public class Util {
     public static final String DEFAULT = "Default";
     public static Float fontSize = 10.0F;
    // public static String url = "https://server.salvationlamb.com";
-    public static String url = "https://server.salvationlamb.com";
+    public static String url = "https://dev-server.salvationlamb.com";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static Map<String,String> permissionMap = new HashMap<>();
     public static String userId;

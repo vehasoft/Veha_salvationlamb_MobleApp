@@ -186,6 +186,7 @@ class MainActivity : AppCompatActivity() {
 
         checkPermission()
         getMyDetails()
+        Util.getBible()
         getNotificationCount()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {
@@ -480,6 +481,9 @@ class MainActivity : AppCompatActivity() {
                                     Util.isFirst = loginresp.isFreshUser.toBoolean()
                                     val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
                                     Util.isWarrior = isWarrior
+                                    if (loginresp.role == "admin"){
+                                        Util.isWarrior = true
+                                    }
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
                                     if (loginresp.isWarrior.toBoolean()) {
                                         banner.visibility = View.GONE

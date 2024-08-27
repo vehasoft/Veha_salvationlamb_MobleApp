@@ -148,6 +148,7 @@
         <jp.wasabeef.richeditor.RichEditor
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:id="@+id/richtext_editor"
             />
     </LinearLayout>
