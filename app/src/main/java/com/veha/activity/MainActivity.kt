@@ -441,6 +441,16 @@ class MainActivity : AppCompatActivity() {
                 Util.userId = it
             }
         }
+        userPreferences.fcmToken.asLiveData().observe(this){
+            if (it.isNullOrEmpty()){
+                lifecycleScope.launch {
+                    userPreferences.deleteAuthToken()
+                    userPreferences.deleteUserId()
+                }
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
