@@ -92,7 +92,9 @@ class AddPostActivity : AppCompatActivity() {
 
         postBtn.isEnabled = true
         postBtn.setOnClickListener {
-            if (content.text.toString().trim().isNullOrEmpty() && postTypeStr.contentEquals("text")) {
+            if (title.text.toString().trim().isEmpty()) {
+                title.error = "Content must not be empty"
+            } else if (content.text.toString().trim().isEmpty()) {
                 content.error = "Content must not be empty"
             } else {
                 postBtn.isEnabled = false

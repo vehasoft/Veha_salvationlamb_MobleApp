@@ -9,12 +9,13 @@ import android.webkit.WebViewClient
 class WebViewActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private var url = ""
+    private var page = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
         webView = findViewById(R.id.webView)
         if (intent.getStringExtra("WebPageName") != null) {
-            val page: String = intent.getStringExtra("WebPageName").toString()
+            page = intent.getStringExtra("WebPageName").toString()
             url = if (page.contentEquals("terms")) {
                 "https://salvationlamb.com/terms"
             } else {
@@ -42,7 +43,9 @@ class WebViewActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent = Intent(this@WebViewActivity, MainActivity::class.java)
-        startActivity(intent)
+        if (page.isEmpty()) {
+            val intent = Intent(this@WebViewActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

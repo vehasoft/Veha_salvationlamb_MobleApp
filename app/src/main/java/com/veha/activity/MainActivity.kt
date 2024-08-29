@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity() {
                                 "Join me and let's stay connected like never before. Here's why you'll love it:\n" +
                                 "It's all about making connections and having fun! Click the link below to download Salvation Lamb and join me on this journey. Let's create something awesome together!\n" +
                                 "\n" +
-                                "[App Store/Google Play Store Link]\n" +
+                                "https://salvationlamb.com/redirect?from=invite\n" +
                                 "\n" +
                                 "Can't wait to see you there! "
                         shareMessage = """
