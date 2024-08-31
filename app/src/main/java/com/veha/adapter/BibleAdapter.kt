@@ -1,5 +1,6 @@
 package com.veha.adapter
 
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -28,6 +29,7 @@ import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
@@ -37,8 +39,13 @@ import retrofit2.Response
 class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner, var details: String) :
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
+    lateinit var dialog: AlertDialog
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         userPreferences = UserPreferences(context)
+        dialog = SpotsDialog.Builder().setContext(context).build()
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         val view = LayoutInflater.from(context).inflate(R.layout.child_bible, parent, false)
         val views: ViewHolder = ViewHolder(view)
         /*if (!Util.listview) {
@@ -169,6 +176,7 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
     }
     private fun postData(data: JsonObject) {
         try {
+            dialog.show()
             if (Commons().isNetworkAvailable(context)) {
                 val retrofit = Util.getRetrofit()
                 val userPreferences = UserPreferences(context);
@@ -197,6 +205,8 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             }
         } catch (e: Exception) {
             Log.e("AddPostActivity.postData", e.toString())
+        } finally {
+            dialog.dismiss()
         }
     }
 }

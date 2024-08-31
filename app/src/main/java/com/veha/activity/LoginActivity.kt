@@ -1,6 +1,7 @@
 package com.veha.activity
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
@@ -19,12 +20,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.veha.util.*
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: AlertDialog
 
     private lateinit var signupButton: Button
     private lateinit var loginButton: Button
@@ -37,6 +40,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this@LoginActivity)
+        dialog = SpotsDialog.Builder().setContext(this).build()
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
         setContentView(R.layout.activity_login)
 
         signupButton = findViewById(R.id.signup_btn)
@@ -106,6 +113,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun login(data: JsonObject) {
         try {
+            dialog.show()
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("login", data)
@@ -167,9 +175,11 @@ class LoginActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
+                        dialog.dismiss()
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        dialog.dismiss()
                         Log.e("LoginActivity.login()", "fail")
                     }
                 })
@@ -177,6 +187,7 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("LoginActivity.login", e.toString())
         } finally {
+            dialog.dismiss()
             loginButton.isEnabled = true
         }
     }

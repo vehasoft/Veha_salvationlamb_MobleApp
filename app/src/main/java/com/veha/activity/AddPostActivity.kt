@@ -1,7 +1,6 @@
 package com.veha.activity
 
 import android.Manifest
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -23,15 +22,14 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import com.veha.activity.R
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import com.google.gson.JsonObject
 import com.veha.util.PostType
+import dmax.dialog.SpotsDialog
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -53,11 +51,16 @@ class AddPostActivity : AppCompatActivity() {
     var postTypeStr = "image"
 
     lateinit var userPreferences: UserPreferences
+    lateinit var dialog: android.app.AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
 
         userPreferences = UserPreferences(this@AddPostActivity)
+        dialog = SpotsDialog.Builder().setContext(this).build()
+        dialog.setMessage("Please Wait")
+        dialog.setCancelable(false)
+        dialog.setInverseBackgroundForced(false)
 
         postBtn = findViewById(R.id.post_btn)
         imgPostBtn = findViewById(R.id.add_img_btn)
@@ -121,6 +124,7 @@ class AddPostActivity : AppCompatActivity() {
 
     private fun postData(data: JsonObject) {
         try {
+            dialog.show()
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 val userPreferences = UserPreferences(this);
@@ -164,6 +168,8 @@ class AddPostActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("AddPostActivity.postData", e.toString())
+        } finally {
+            dialog.dismiss()
         }
     }
 
