@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.veha.activity.R;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -116,6 +118,12 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
 
         @Override
         protected void onPostExecute(InputStream inputStream) {
+            if (inputStream == null){
+                progressDialog.dismiss();
+                Toast.makeText(PdfActivity2.this, "Invalid Document", Toast.LENGTH_SHORT).show();
+                PdfActivity2.this.finish();
+                return;
+            }
             Log.e("inputstream",inputStream.toString());
             Log.e("pdfView",pdfView.toString());
             pdfView.fromStream(inputStream)
