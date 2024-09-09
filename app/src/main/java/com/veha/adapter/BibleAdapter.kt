@@ -186,6 +186,9 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
                         call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
                                 if (response.code() == 200) {
+                                    data.remove("userId")
+                                    data.remove("title")
+                                    data.remove("content")
                                     val intent = Intent(context, MainActivity::class.java)
                                     context.startActivity(intent)
                                 } else {

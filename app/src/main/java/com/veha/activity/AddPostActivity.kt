@@ -136,6 +136,9 @@ class AddPostActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     title.text.clear()
                                     content.text.clear()
+                                    data.remove("userId")
+                                    data.remove("title")
+                                    data.remove("content")
                                     val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
