@@ -105,14 +105,11 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
                     inputStream = new
                             BufferedInputStream(urlConnection.getInputStream());
 
-                } else {
-
                 }
             } catch (IOException e) {
                 Log.e("Exception",e.toString());
                 return null;
             }
-            Log.e("inputstream",inputStream.toString());
             return inputStream;
         }
 
