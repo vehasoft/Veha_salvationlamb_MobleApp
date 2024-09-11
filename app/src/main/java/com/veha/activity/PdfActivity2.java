@@ -121,8 +121,8 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
                 PdfActivity2.this.finish();
                 return;
             }
-            Log.e("inputstream",inputStream.toString());
-            Log.e("pdfView",pdfView.toString());
+            //Log.e("inputstream",inputStream.toString());
+            //Log.e("pdfView",pdfView.toString());
             pdfView.fromStream(inputStream)
                     .defaultPage(pageNumber)
                     .onPageChange(PdfActivity2.this)
