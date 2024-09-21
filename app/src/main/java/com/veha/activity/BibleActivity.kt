@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.JsonObject
@@ -53,21 +54,26 @@ class BibleActivity : AppCompatActivity() {
         var type: String = intent.extras!!.getString("type").toString()
         var details: String = intent.extras!!.getString("details").toString()
         var obj: JSONArray
-        if (type == "old"){
+        if (type == "old") {
             obj = JSONArray(Util.bible.get("Old").toString())
             type = "list"
-        } else if (type == "new"){
+            recyclerView.layoutManager = LinearLayoutManager(this)
+        } else if (type == "new") {
             obj = JSONArray(Util.bible.get("New").toString())
             type = "list"
+            recyclerView.layoutManager = LinearLayoutManager(this)
+        } else if (type == "chapter") {
+            obj = JSONArray(intent.extras!!.get("content").toString())
+            recyclerView.layoutManager = GridLayoutManager(this, 3)
         } else {
             obj = JSONArray(intent.extras!!.get("content").toString())
-        }
-            recyclerView.visibility = View.VISIBLE
-            txtLinear.visibility = View.GONE
             recyclerView.layoutManager = LinearLayoutManager(this)
-            //Log.e("biblejsonarray",obj.toString())
-            recyclerView.adapter = BibleAdapter(this,obj,type,this,details)
-        copy.setOnClickListener {
+        }
+        recyclerView.visibility = View.VISIBLE
+        txtLinear.visibility = View.GONE
+        recyclerView.adapter = BibleAdapter(this, obj, type, this, details)
+    }
+   /*     copy.setOnClickListener {
             val clipBoardManager: ClipboardManager = this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("bible",content.text.toString())
             clipBoardManager.setPrimaryClip(clipData)
@@ -103,12 +109,12 @@ class BibleActivity : AppCompatActivity() {
                                     finish()
                                 } else {
                                     post.isEnabled = true
-                                    /*val resp = response.errorBody()
+                                    *//*val resp = response.errorBody()
                                     val loginresp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
                                     val status = loginresp.get("status").toString()
                                     val errorMessage = loginresp.get("errorMessage").toString()
                                     Log.e("Status", status)
-                                    Log.e("result", errorMessage)*/
+                                    Log.e("result", errorMessage)*//*
                                 }
                                 call1.cancel()
                             }
@@ -136,5 +142,5 @@ class BibleActivity : AppCompatActivity() {
             android.util.Log.e("AddPostActivity.postData", e.toString())
         }
     }
-
+*/
 }

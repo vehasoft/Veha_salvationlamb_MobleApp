@@ -220,6 +220,10 @@ data class Announcement(
     val createdAt: String,
     val updatedAt: String,
 )
+data class BibleSelector(
+    val content: String,
+    val isSelected: Boolean
+)
 public enum class NotificationType( val value: String) {
     POST("post"),
     USER("user"),

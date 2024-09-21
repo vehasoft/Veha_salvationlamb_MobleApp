@@ -5,8 +5,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,27 +16,24 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.JsonObject
-import com.veha.activity.AddPostActivity
 import com.veha.activity.BibleActivity
 import com.veha.activity.ExpandableView
-import com.veha.activity.LoginActivity
 import com.veha.activity.MainActivity
 import com.veha.activity.R
+import com.veha.util.BibleSelector
 import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 import dmax.dialog.SpotsDialog
-import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
+
 
 class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: String, val owner: LifecycleOwner, var details: String) :
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
@@ -76,14 +75,23 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
                 holder.bibleTitle.text = bible.get("n").toString()
                 val json: JSONArray = bible.get(name) as JSONArray
                 holder.count.text = "Total Chapters : " + json.length().toString()
-                jsonType = "list"
-            } else if (name == "V") {
+                jsonType = "chapter"
+            } /*else if (name == "V") {
                 val json: JSONArray = bible.get(name) as JSONArray
                 holder.count.text = "Total Verses : " + json.length().toString()
                 holder.bibleTitle.text = "Chapter "+ (position+1)
                 jsonType = "content"
-            }
+            }*/
+        } else if (type == "chapter"){
+            val json: JSONArray = bible.get(name) as JSONArray
+            holder.count.visibility = View.GONE
+            holder.bibleTitle.background = context.getDrawable(R.drawable.rounded_border_login_register)
+            holder.bibleTitle.gravity = Gravity.CENTER
+            holder.bibleContent.layoutParams.height = 100
+            holder.bibleTitle.text =(position+1).toString()
+            jsonType = "content"
         } else {
+            holder.bind(BibleSelector(bible.get("V").toString(),false))
             holder.bibleContent.text = bible.get("V").toString()
         }
         holder.titleLayout.setOnClickListener { v: View? ->
@@ -153,6 +161,13 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
         var bibleDef: TextView
         var bibleName: TextView
 
+
+        fun bind(selector: BibleSelector) {
+            bibleContent.text = selector.content
+            itemView.setBackgroundColor(if (selector.isSelected) Color.LTGRAY else Color.WHITE)
+
+        }
+
         init {
             bibleContent = itemView.findViewById(R.id.bible_content)
             postBtn = itemView.findViewById(R.id.post_btn)
@@ -164,7 +179,7 @@ class BibleAdapter(val context: Context, val bibleContent: JSONArray, val type: 
             count = itemView.findViewById(R.id.count)
             bibleName = itemView.findViewById(R.id.bible_name)
             bibleDef = itemView.findViewById(R.id.bible_definition)
-            if (type == "list"){
+            if (type == "list" || type == "chapter"){
                 bodyLayout.visibility = View.GONE
                 titleLayout.visibility = View.VISIBLE
                 copyBtn.visibility = View.GONE
