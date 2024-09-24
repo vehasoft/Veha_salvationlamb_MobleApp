@@ -76,6 +76,8 @@ class HomeAdapter(
         val deleteBtn: Button = view.findViewById(R.id.Delete_btn)
         val fav: ImageButton = view.findViewById(R.id.fav)
         val overallLayout: ConstraintLayout = view.findViewById(R.id.child_post_layout)
+        var isYouTubePlayerInitialized = false
+        var youTubePlayer: YouTubePlayer? = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -139,7 +141,8 @@ class HomeAdapter(
                     holder.postVideo.visibility = View.GONE
                     if (!post.picture.isNullOrEmpty()) {
                         holder.postPic.visibility = View.VISIBLE
-                        Picasso.with(context).load(post.picture).fit().centerInside().into(holder.postPic)
+                        Picasso.with(context).load(post.picture).fit().centerInside()
+                            .into(holder.postPic)
                     } else {
                         holder.postPic.visibility = View.GONE
                     }
@@ -194,10 +197,15 @@ class HomeAdapter(
                                 myHandler.postDelayed(updateSongTime, 100)
                                 holder.playBtn.visibility = View.GONE
                                 holder.pauseBtn.visibility = View.VISIBLE
-                                holder.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                                holder.seekbar.setOnSeekBarChangeListener(object :
+                                    OnSeekBarChangeListener {
                                     override fun onStopTrackingTouch(seekBar: SeekBar) {}
                                     override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                                    override fun onProgressChanged(
+                                        seekBar: SeekBar,
+                                        progress: Int,
+                                        fromUser: Boolean
+                                    ) {
                                         if (fromUser) {
                                             Util.player.seekTo(progress)
                                         }
@@ -230,26 +238,34 @@ class HomeAdapter(
                         holder.postVideo.visibility = View.VISIBLE
                         try {
                             (context as MainActivity).lifecycle.addObserver(holder.postVideo)
-                        }catch (e: Exception){
+                        } catch (e: Exception) {
                             try {
                                 (context as SearchActivity).lifecycle.addObserver(holder.postVideo)
-                            }catch (e: Exception){
+                            } catch (e: Exception) {
                                 (context as ViewProfileActivity).lifecycle.addObserver(holder.postVideo)
                             }
                         }
-                        val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
-                            override fun onReady(youTubePlayer: YouTubePlayer) {
-                                youTubePlayer.cueVideo(post.url, 0f)
+                        // Initialize the YouTube player if it's not already initialized
+                        if (holder.youTubePlayer == null) {
+                            val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
+                                override fun onReady(youTubePlayer: YouTubePlayer) {
+                                    holder.youTubePlayer = youTubePlayer // Save the instance
+                                    youTubePlayer.cueVideo(post.url, 0f)  // Cue video
+                                    Log.e("YouTubePlayer", "Loaded video: ${post.url} at position $position")
+                                }
                             }
-                        }
-                        val iFramePlayerOptions = IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
 
-                        holder.postVideo.enableAutomaticInitialization = false
-                        try {
+                            val iFramePlayerOptions = IFramePlayerOptions.Builder()
+                                .controls(1)
+                                .autoplay(0)
+                                .build()
 
+                            holder.postVideo.enableAutomaticInitialization = false
                             holder.postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
-                        } catch (e: Exception) {
-                            Log.e("Exception", e.toString());
+                        } else {
+                            // If already initialized, simply cue the video
+                            holder.youTubePlayer?.cueVideo(post.url, 0f)
+                            Log.e("YouTubePlayer else", "Loaded video: ${post.url} at position $position")
                         }
                     } else {
                         holder.postVideo.visibility = View.GONE
@@ -257,7 +273,7 @@ class HomeAdapter(
                 }
             }
         }
-        if (post.contentURL.isNullOrEmpty()){
+        if (post.contentURL.isNullOrEmpty()) {
             holder.contentUrl.visibility = View.GONE
         } else {
             holder.contentUrl.visibility = View.VISIBLE
@@ -378,7 +394,8 @@ class HomeAdapter(
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
-                var shareMessage = "${post.content} \n\n\n\nLet me recommend you this application\n\n"
+                var shareMessage =
+                    "${post.content} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/redirect?id=" + post.id}                    
                     """.trimIndent()
@@ -419,7 +436,7 @@ class HomeAdapter(
             builder.setTitle("Alert !")
             builder.setCancelable(false)
             builder.setPositiveButton("Delete") { _: DialogInterface?, _: Int ->
-                deletePost(post,holder)
+                deletePost(post, holder)
                 posts.removeAt(position)
                 notifyItemRemoved(position)
             }
@@ -429,6 +446,13 @@ class HomeAdapter(
             alertDialog.show()
 
         }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        // Stop video playback and reset the player when the view is recycled
+        holder.youTubePlayer?.pause()
+        //holder.isYouTubePlayerInitialized = false // Reset initialization flag
     }
 
     private fun likePost(post: Posts, reaction: String, holder: ViewHolder) {
@@ -443,14 +467,24 @@ class HomeAdapter(
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         holder.likeBtn.isEnabled = false
-                        val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.postCallHead("Bearer $it", "like", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val msg: String =
-                                        Gson().fromJson(response.body()!!.get("message"), String::class.java)
+                                        Gson().fromJson(
+                                            response.body()!!.get("message"),
+                                            String::class.java
+                                        )
                                     val likesCount: String =
-                                        Gson().fromJson(response.body()!!.get("likesCount"), String::class.java)
+                                        Gson().fromJson(
+                                            response.body()!!.get("likesCount"),
+                                            String::class.java
+                                        )
                                     if (msg == "liked") {
                                         myList.put(post.id, reaction)
                                         holder.likeBtn.text = reaction
@@ -461,8 +495,8 @@ class HomeAdapter(
                                         holder.reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.likeBtn.isEnabled = true
@@ -491,14 +525,17 @@ class HomeAdapter(
                         holder.deleteBtn.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.deletePost("Bearer $it", post.id)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     /*Toast.makeText(
                                         context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
                                     ).show()*/
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                                 holder.deleteBtn.isEnabled = true
@@ -528,10 +565,16 @@ class HomeAdapter(
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val msg: String =
-                                        Gson().fromJson(response.body()!!.get("message"), String::class.java)
+                                        Gson().fromJson(
+                                            response.body()!!.get("message"),
+                                            String::class.java
+                                        )
                                     if (msg == "unfollow") {
                                         holder.followBtn.isEnabled = true
                                         holder.followBtn.text = "Follow"
@@ -576,11 +619,15 @@ class HomeAdapter(
                         holder.fav.isEnabled = false
                         val call: Call<JsonObject?>? = retrofit.postFav("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     Log.e("Follow", response.body().toString())
                                     val resp = response.body()
-                                    val msg: String = Gson().fromJson(resp!!.get("message"), String::class.java)
+                                    val msg: String =
+                                        Gson().fromJson(resp!!.get("message"), String::class.java)
                                     Log.e("Status", postId)
                                     Log.e("map bef", myFavList.toString())
                                     if (msg.equals("fav")) {
@@ -594,8 +641,8 @@ class HomeAdapter(
                                     }
                                     notifyDataSetChanged()
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 holder.fav.isEnabled = true
                                 call.cancel()
@@ -622,13 +669,19 @@ class HomeAdapter(
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getPost("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    val post: Posts = Gson().fromJson(response.body()?.get("result"), Posts::class.java)
+                                    val post: Posts = Gson().fromJson(
+                                        response.body()?.get("result"),
+                                        Posts::class.java
+                                    )
 
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
