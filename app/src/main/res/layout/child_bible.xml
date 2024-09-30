@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/child_post_layout"
@@ -7,112 +8,18 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
     android:background="@color/white">
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/title_layout"
-        android:layout_margin="10dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ExtraText">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Title"
-        android:id="@+id/bible_title"
-        android:textSize="20dp"
-        android:textColor="@color/black"
-        android:layout_marginStart="10dp"
-/>
-        <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/count"
-        android:textSize="15dp"
-        android:textColor="@color/black"
-        android:layout_marginStart="10dp"
-/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="2dp"
-            android:background="@color/cardview_shadow_start_color"
-            android:layout_below="@id/file_linear"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:id="@+id/body_layout"
-        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@color/white"
         android:orientation="vertical"
+        android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ExtraText">
-        <LinearLayout
-            android:id="@+id/head_linear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="250dp">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center"
-                    app:cardCornerRadius="250dp">
-
-                    <ImageView
-                        android:id="@+id/profile_pic"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_profile" />
-
-                </androidx.cardview.widget.CardView>
-
-            </androidx.cardview.widget.CardView>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/bible_name"
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:gravity="left"
-                    android:textColor="@color/black"
-                    android:textSize="20dp" />
-
-
-                <TextView
-                    android:id="@+id/bible_definition"
-                    android:layout_width="wrap_content"
-                    android:text=""
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:textColor="@color/black"
-                    android:textSize="15dp" />
-            </LinearLayout>
-
-
-        </LinearLayout>
 
 
         <LinearLayout
@@ -120,6 +27,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/selected"
+                />
 
             <com.veha.activity.ExpandableView
                 android:id="@+id/bible_content"
@@ -130,45 +42,8 @@
                 android:layout_weight="0.5"
                 android:textColor="@color/black"
                 android:textSize="20dp" />
-            <ImageView
-                android:id="@+id/copy_btn"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/baseline_content_copy_24"
-                app:tint="@color/black"
-                android:layout_gravity="top"
-                />
-
 
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/child_btn_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/post_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/white"
-                android:inputType="textCapWords"
-                android:text="Post"
-                android:textColor="@color/black" />
-
-            <Button
-                android:id="@+id/share_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/white"
-                android:inputType="textCapWords"
-                android:text="Share"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
 
     </LinearLayout>
 
