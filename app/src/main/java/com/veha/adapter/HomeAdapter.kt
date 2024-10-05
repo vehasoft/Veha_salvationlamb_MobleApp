@@ -3,6 +3,7 @@ package com.veha.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Handler
 import android.text.Html
@@ -62,6 +63,9 @@ class HomeAdapter(
         val contentUrl: TextView = view.findViewById(R.id.content_url)
         val content: ExpandableView = view.findViewById(R.id.post_content)
         val reacts: TextView = view.findViewById(R.id.no_of_reacts)
+        val bibleTitle: TextView = view.findViewById(R.id.bible_title)
+        val bibleTags: TextView = view.findViewById(R.id.bible_tags)
+        val bibleContent: TextView = view.findViewById(R.id.bible_content)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic)
         val postPic: ImageView = view.findViewById(R.id.post_pic)
         val postVideo: YouTubePlayerView = view.findViewById(R.id.post_video)
@@ -75,6 +79,7 @@ class HomeAdapter(
         val followBtn: Button = view.findViewById(R.id.follow_post_btn)
         val deleteBtn: Button = view.findViewById(R.id.Delete_btn)
         val fav: ImageButton = view.findViewById(R.id.fav)
+        val bibleLayout: ConstraintLayout = view.findViewById(R.id.bible_cons_layout)
         val overallLayout: ConstraintLayout = view.findViewById(R.id.child_post_layout)
         var isYouTubePlayerInitialized = false
         var youTubePlayer: YouTubePlayer? = null
@@ -153,6 +158,22 @@ class HomeAdapter(
                             context.startActivity(intent)
                         }
                     }
+                }
+
+                "bible" -> {
+                    holder.audioLayout.visibility = View.GONE
+                    holder.postVideo.visibility = View.GONE
+                    holder.postPic.visibility = View.GONE
+                    holder.content.visibility = View.GONE
+                    holder.title.visibility = View.GONE
+                    holder.tags.visibility = View.GONE
+                    holder.bibleLayout.visibility = View.VISIBLE
+
+
+                    holder.bibleLayout.setBackgroundColor(Color.parseColor(post.colorCode))
+                    holder.bibleTitle.text = post.title
+                    holder.bibleTags.text = post.tags
+                    holder.bibleContent.text = post.content
                 }
 
                 "audio" -> {
@@ -251,7 +272,10 @@ class HomeAdapter(
                                 override fun onReady(youTubePlayer: YouTubePlayer) {
                                     holder.youTubePlayer = youTubePlayer // Save the instance
                                     youTubePlayer.cueVideo(post.url, 0f)  // Cue video
-                                    Log.e("YouTubePlayer", "Loaded video: ${post.url} at position $position")
+                                    Log.e(
+                                        "YouTubePlayer",
+                                        "Loaded video: ${post.url} at position $position"
+                                    )
                                 }
                             }
 
@@ -265,7 +289,10 @@ class HomeAdapter(
                         } else {
                             // If already initialized, simply cue the video
                             holder.youTubePlayer?.cueVideo(post.url, 0f)
-                            Log.e("YouTubePlayer else", "Loaded video: ${post.url} at position $position")
+                            Log.e(
+                                "YouTubePlayer else",
+                                "Loaded video: ${post.url} at position $position"
+                            )
                         }
                     } else {
                         holder.postVideo.visibility = View.GONE

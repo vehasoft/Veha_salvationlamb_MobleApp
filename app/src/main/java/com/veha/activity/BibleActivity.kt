@@ -78,7 +78,7 @@ class BibleActivity : AppCompatActivity() {
 
         recyclerView.visibility = View.VISIBLE
         recyclerView.layoutManager = LinearLayoutManager(this)
-        var type: String = intent.extras!!.getString("type").toString()
+        val type: String = intent.extras!!.getString("type").toString()
         var obj: JsonArray
         if (type == "old") {
             obj = Gson().fromJson(Util.bible.get("Old").toString(), JsonArray::class.java)
@@ -133,24 +133,38 @@ class BibleActivity : AppCompatActivity() {
             selectedText = ArrayList()
         }
         post.setOnClickListener {
-            post.isEnabled = false
-            text = ""
-            for (selectedTexts in selectedText) {
-                Log.e("hgvhgzdv", selectedTexts)
-                text = text + selectedTexts + "\n"
+            if (selectedText.size <= 0){
+                Toast.makeText(this,"Please select atleast one",Toast.LENGTH_LONG).show()
+            } else {
+                text = ""
+                var i = 0
+                for (selectedTexts in selectedText) {
+                    text = text + ++i + ". " + selectedTexts + "\n" + "\n"
+                }
+
+
+                val intent = Intent(this, BiblePostActivity::class.java)
+                intent.putExtra("edition", type)
+                intent.putExtra("content", text)
+                intent.putExtra(
+                    "tags",
+                    contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString()
+                )
+                startActivity(intent)
             }
-            val data = JsonObject()
-            data.addProperty("title", "bible content")
-            data.addProperty("content", text)
-            data.addProperty("tags", "Bible")
-            data.addProperty("image", "")
-            data.addProperty("url", "")
-            data.addProperty("type", "image")
-            data.addProperty("userId", Util.userId)
-            postData(data)
+
+//            val data = JsonObject()
+//            data.addProperty("title", "bible content")
+//            data.addProperty("content", text)
+//            data.addProperty("tags", "Bible")
+//            data.addProperty("image", "")
+//            data.addProperty("url", "")
+//            data.addProperty("type", "image")
+//            data.addProperty("userId", Util.userId)
+//            postData(data)
             selectedText = ArrayList()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, MainActivity::class.java)
+//            startActivity(intent)
         }
 
         for (bibleContent in obj) {

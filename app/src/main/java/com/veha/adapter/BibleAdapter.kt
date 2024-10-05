@@ -26,6 +26,7 @@ class BibleAdapter(val context: Context, val bibleContent: JsonArray, val owner:
     RecyclerView.Adapter<BibleAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     lateinit var dialog: AlertDialog
+    private var showCheckboxes = false
 
     //val selectedText: ArrayList<String> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -40,12 +41,16 @@ class BibleAdapter(val context: Context, val bibleContent: JsonArray, val owner:
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val bible: JsonObject = bibleContent[position] as JsonObject
-            holder.bind(BibleSelector(bible.get("V").toString(),false))
+            //holder.bind(BibleSelector(bible.get("V").toString(),false))
+        holder.selectedCheckBox.visibility = if (showCheckboxes) View.VISIBLE else View.GONE
             holder.bibleContent.text = bible.get("V").asString
+        holder.selectedCheckBox.setOnCheckedChangeListener(null) // Prevent triggering listener on data bind
+        holder.selectedCheckBox.isChecked = holder.isChecked
 
         holder.bibleContent.setOnLongClickListener {
             Log.e("longpress","pressed")
-            holder.selectedCheckBox.isChecked = true
+            showCheckboxes = !showCheckboxes
+            notifyDataSetChanged()
             true
         }
         holder.selectedCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -53,13 +58,13 @@ class BibleAdapter(val context: Context, val bibleContent: JsonArray, val owner:
             {
                 Log.e("checked",position.toString())
                 BibleActivity.selectedText.add(holder.bibleContent.text.toString())
-                holder.bind(BibleSelector(holder.bibleContent.text.toString(), true))
+                //holder.bind(BibleSelector(holder.bibleContent.text.toString(), true))
             } else {
                 Log.e("Not checked",position.toString())
                 BibleActivity.selectedText.remove(holder.bibleContent.text.toString())
-                holder.bind(BibleSelector(holder.bibleContent.text.toString(), false))
+                //holder.bind(BibleSelector(holder.bibleContent.text.toString(), false))
             }
-            notifyDataSetChanged()
+            holder.selectedCheckBox.isChecked = isChecked
         }
     }
 
@@ -71,6 +76,8 @@ class BibleAdapter(val context: Context, val bibleContent: JsonArray, val owner:
         var bibleContent: ExpandableView
         var bodyLayout: LinearLayout
         var selectedCheckBox: CheckBox
+
+        var isChecked = false
 
 
         fun bind(selector: BibleSelector) {

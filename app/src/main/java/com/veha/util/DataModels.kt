@@ -172,6 +172,7 @@ data class Posts(
     val picture: String,
     val type: String,
     val url: String,
+    val colorCode: String,
     val contentURL: String,
     val likesCount: String,
     val shareCount: String,

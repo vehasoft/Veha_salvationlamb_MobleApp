@@ -8,4 +8,13 @@
     <color name="white">#131C30</color>
     <color name="always_white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
+
+
+
+    <!-- bible post colors -->
+    <color name="color1">#25B567</color>
+    <color name="color2">#E24B4B</color>
+    <color name="color3">#6E26A6</color>
+    <color name="color4">#2C95E1</color>
+    <color name="color5">#C121C1</color>
 </resources>
