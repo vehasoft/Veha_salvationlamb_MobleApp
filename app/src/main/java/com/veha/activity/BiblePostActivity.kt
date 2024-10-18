@@ -101,8 +101,6 @@ class BiblePostActivity : AppCompatActivity() {
             data.addProperty("colorCode", colorCode)
             postData(data)
         }
-
-        Log.e("colorcodeeee", colorCode)
     }
 
     private fun postData(data: JsonObject) {
@@ -131,8 +129,8 @@ class BiblePostActivity : AppCompatActivity() {
                                         Gson().fromJson(resp?.string(), JsonObject::class.java)
                                     val status = loginresp.get("status").toString()
                                     val errorMessage = loginresp.get("errorMessage").toString()
-                                    org.chromium.base.Log.e("Status", status)
-                                    org.chromium.base.Log.e("result", errorMessage)
+                                    Log.e("Status", status)
+                                    Log.e("result", errorMessage)
                                 }
                                 call1.cancel()
                             }

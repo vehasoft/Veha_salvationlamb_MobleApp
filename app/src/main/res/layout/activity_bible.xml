@@ -179,6 +179,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_marginTop="10dp"
             >
             <ImageView
@@ -186,34 +187,32 @@
                 android:layout_height="30dp"
                 android:id="@+id/prev_btn"
                 android:src="@drawable/baseline_keyboard_arrow_left_24"
-                android:tint="@color/black"
+                app:tint="@color/black"
                 android:layout_marginLeft="10dp"
                 />
-            <TextView
-                android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/bible"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Bible"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                android:padding="2dp"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"/>
+                android:gravity="start"
+                android:layout_weight=".6"
+                android:backgroundTint="@color/home_bg"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown"/>
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:id="@+id/next_btn"
                 android:src="@drawable/baseline_keyboard_arrow_right_24"
-                android:tint="@color/black"
                 android:layout_marginRight="10dp"
-                />
+                app:tint="@color/black" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             >
@@ -242,8 +241,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:id="@+id/button_container"
+            android:visibility="gone"
             android:background="@color/home_bg"
-            android:layout_marginTop="10dp"
             android:gravity="right"
             >
             <ImageView

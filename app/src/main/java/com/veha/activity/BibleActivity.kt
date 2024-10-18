@@ -6,31 +6,28 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.veha.adapter.BibleAdapter
-import com.veha.util.Commons
 import com.veha.util.UserPreferences
 import com.veha.util.Util
-import kotlinx.coroutines.launch
 import org.chromium.base.Log
-import retrofit2.Call
-import retrofit2.Response
 
 class BibleActivity : AppCompatActivity() {
     lateinit var logo: ImageView
@@ -41,14 +38,20 @@ class BibleActivity : AppCompatActivity() {
     lateinit var next: ImageView
     lateinit var previous: ImageView
     lateinit var post: Button
+    lateinit var adapterr: MyAdapter
+    private lateinit var buttonContainer: ConstraintLayout
+    lateinit var bibleDropdown: Spinner
     lateinit var contentDropdown: Spinner
     lateinit var chapterDropdown: Spinner
     lateinit var userPreferences: UserPreferences
     lateinit var shimmerFrameLayout: ShimmerFrameLayout
     val bibleMap: HashMap<String, JsonArray> = HashMap()
-    val keyList: ArrayList<String> = ArrayList()
+    var keyList: ArrayList<String> = ArrayList()
     val chapterMap: HashMap<String, JsonArray> = HashMap()
-    val chapterList: ArrayList<String> = ArrayList()
+    var chapterList: ArrayList<String> = ArrayList()
+    var bibleList: ArrayList<String> = ArrayList()
+
+    private var isMultiSelect = false
 
     companion object {
         var selectedText: ArrayList<String> = ArrayList()
@@ -65,9 +68,11 @@ class BibleActivity : AppCompatActivity() {
         next = findViewById(R.id.next_btn)
         previous = findViewById(R.id.prev_btn)
         post = findViewById(R.id.post_txt)
+        bibleDropdown = findViewById(R.id.bible)
         contentDropdown = findViewById(R.id.heading)
         chapterDropdown = findViewById(R.id.chapter)
         bibleLinear = findViewById(R.id.bible_linear)
+        buttonContainer = findViewById(R.id.button_container)
         shimmerFrameLayout = findViewById(R.id.bible_shimmer_layout)
         shimmerFrameLayout.startShimmer()
         bibleCheck()
@@ -79,12 +84,7 @@ class BibleActivity : AppCompatActivity() {
         recyclerView.visibility = View.VISIBLE
         recyclerView.layoutManager = LinearLayoutManager(this)
         val type: String = intent.extras!!.getString("type").toString()
-        var obj: JsonArray
-        if (type == "old") {
-            obj = Gson().fromJson(Util.bible.get("Old").toString(), JsonArray::class.java)
-        } else {
-            obj = Gson().fromJson(Util.bible.get("New").toString(), JsonArray::class.java)
-        }
+        setBibleEdition(type)
         next.setOnClickListener {
             if (chapterDropdown.selectedItemPosition < chapterList.size - 1) {
                 selectedText = ArrayList()
@@ -101,10 +101,8 @@ class BibleActivity : AppCompatActivity() {
         copy.setOnClickListener {
             text = ""
             for (selectedTexts in selectedText) {
-                Log.e("hgvhgzdv", selectedTexts)
                 text = text + selectedTexts + "\n"
             }
-            Log.e("selected text", text)
             val clipBoardManager: ClipboardManager =
                 this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("bible", text)
@@ -113,10 +111,8 @@ class BibleActivity : AppCompatActivity() {
         share.setOnClickListener {
             text = ""
             for (selectedTexts in selectedText) {
-                Log.e("hgvhgzdv", selectedTexts)
                 text = text + selectedTexts + "\n"
             }
-            Log.e("selected text", text)
             try {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
@@ -137,11 +133,9 @@ class BibleActivity : AppCompatActivity() {
                 Toast.makeText(this,"Please select atleast one",Toast.LENGTH_LONG).show()
             } else {
                 text = ""
-                var i = 0
                 for (selectedTexts in selectedText) {
-                    text = text + ++i + ". " + selectedTexts + "\n" + "\n"
+                    text = text + selectedTexts + "\n" + "\n"
                 }
-
 
                 val intent = Intent(this, BiblePostActivity::class.java)
                 intent.putExtra("edition", type)
@@ -152,22 +146,49 @@ class BibleActivity : AppCompatActivity() {
                 )
                 startActivity(intent)
             }
-
-//            val data = JsonObject()
-//            data.addProperty("title", "bible content")
-//            data.addProperty("content", text)
-//            data.addProperty("tags", "Bible")
-//            data.addProperty("image", "")
-//            data.addProperty("url", "")
-//            data.addProperty("type", "image")
-//            data.addProperty("userId", Util.userId)
-//            postData(data)
             selectedText = ArrayList()
-//            val intent = Intent(this, MainActivity::class.java)
-//            startActivity(intent)
         }
+    }
+    fun setBibleEdition(edition: String){
+        bibleDropdown.adapter = null
+        bibleList = ArrayList()
+        bibleList.add("Old Edition")
+        bibleList.add("New Edition")
 
-        for (bibleContent in obj) {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bibleList)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        bibleDropdown.adapter = adapter
+        if (edition.contentEquals("old")){
+            bibleDropdown.setSelection(0)
+        } else {
+            bibleDropdown.setSelection(1)
+        }
+        bibleDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
+                if (pos == 0) {
+                    setHeading(
+                        Gson().fromJson(
+                            Util.bible.get("Old").toString(),
+                            JsonArray::class.java
+                        )
+                    )
+                } else {
+                    setHeading(
+                        Gson().fromJson(
+                            Util.bible.get("New").toString(),
+                            JsonArray::class.java
+                        )
+                    )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+    fun setHeading(list: JsonArray){
+        contentDropdown.adapter = null
+        keyList = ArrayList()
+        for (bibleContent in list) {
             val key = Gson().fromJson(bibleContent, JsonObject::class.java)
             keyList.add(key.get("n").asString)
             bibleMap.put(key.get("n").asString, key.get("C").asJsonArray)
@@ -185,9 +206,9 @@ class BibleActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
-
     fun setChapter(list: JsonArray) {
         chapterDropdown.adapter = null
+        chapterList = ArrayList()
         var chapter = 0
         for (bibleContent in list) {
             chapter++
@@ -201,17 +222,15 @@ class BibleActivity : AppCompatActivity() {
         chapterDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
                 // Log.e(chapterList[pos],chapterMap.get(chapterList[pos]).toString())
+                isMultiSelect = false
+                buttonContainer.visibility = View.GONE
                 selectedText = ArrayList()
-                recyclerView.adapter = BibleAdapter(
-                    this@BibleActivity,
-                    chapterMap[chapterList[pos]]!!,
-                    this@BibleActivity
-                )
+                adapterr = MyAdapter(chapterMap[chapterList[pos]]!!)
+                recyclerView.adapter = adapterr
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-        //recyclerView.adapter = BibleAdapter(this, chapterMap[chapterList[0]]!!, "", this, "")
     }
 
     fun bibleCheck() {
@@ -224,61 +243,71 @@ class BibleActivity : AppCompatActivity() {
             bibleCheck()
         }
     }
+    inner class MyAdapter(private val bibleArray: JsonArray) :
+        RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
-    private fun postData(data: JsonObject) {
-        try {
-            if (Commons().isNetworkAvailable(this)) {
-                val retrofit = Util.getRetrofit()
-                userPreferences.authToken.asLiveData().observe(this) {
-                    if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call1: Call<JsonObject?>? =
-                            retrofit.postCallHead("Bearer $it", "post", data)
-                        call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(
-                                call: Call<JsonObject?>,
-                                response: Response<JsonObject?>
-                            ) {
-                                if (response.code() == 200) {
-                                    post.isEnabled = true
-                                    val intent =
-                                        Intent(this@BibleActivity, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                } else {
-                                    post.isEnabled = true
-                                    val resp = response.errorBody()
-                                    val loginresp: JsonObject =
-                                        Gson().fromJson(resp?.string(), JsonObject::class.java)
-                                    val status = loginresp.get("status").toString()
-                                    val errorMessage = loginresp.get("errorMessage").toString()
-                                    Log.e("Status", status)
-                                    Log.e("result", errorMessage)
-                                }
-                                call1.cancel()
-                            }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+            val view = LayoutInflater.from(this@BibleActivity).inflate(R.layout.child_bible, parent, false)
+            return MyViewHolder(view)
+        }
 
-                            override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                android.util.Log.e("AddPostActivity.postData", "fail")
-                            }
-                        })
-                    } else {
-                        Toast.makeText(
-                            this@BibleActivity,
-                            "Somthing Went Wrong \nLogin again to continue",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        lifecycleScope.launch {
-                            userPreferences.deleteAuthToken()
-                            userPreferences.deleteUserId()
-                        }
-                        val intent = Intent(this@BibleActivity, LoginActivity::class.java)
-                        startActivity(intent)
-                    }
+        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+            val bible: JsonObject = bibleArray[position] as JsonObject
+            val text = "" + (position + 1) + ". " + bible.get("V").asString
+            holder.content.text = text
+            holder.itemView.setOnLongClickListener {
+                if (!isMultiSelect) {
+                    isMultiSelect = true
+                    buttonContainer.visibility = View.VISIBLE
+                    adapterr.notifyDataSetChanged()
+                }
+                toggleSelection(holder, text)
+                true
+            }
+
+            holder.itemView.setOnClickListener {
+                if (isMultiSelect) {
+                    toggleSelection(holder, text)
                 }
             }
-        } catch (e: Exception) {
-            android.util.Log.e("AddPostActivity.postData", e.toString())
+
+            holder.selectedCheckBox.visibility = if (isMultiSelect) View.VISIBLE else View.GONE
+            holder.selectedCheckBox.isChecked = selectedText.contains(text)
+        }
+
+        override fun getItemCount() = bibleArray.size()
+
+        inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val content: TextView = itemView.findViewById(R.id.bible_content)
+            val selectedCheckBox: CheckBox = itemView.findViewById(R.id.selected)
         }
     }
 
+    private fun toggleSelection(holder: MyAdapter.MyViewHolder, text: String) {
+        Log.e("selected text", selectedText.toString())
+        Log.e("selected text", selectedText.size.toString())
+        if (selectedText.contains(text)) {
+            selectedText.remove(text)
+            holder.selectedCheckBox.isChecked = false
+        } else {
+            selectedText.add(text)
+            holder.selectedCheckBox.isChecked = true
+        }
+
+        if (selectedText.isEmpty()) {
+            isMultiSelect = false
+            buttonContainer.visibility = View.GONE
+            adapterr.notifyDataSetChanged()
+        }
+    }
+
+    override fun onBackPressed() {
+        if (isMultiSelect){
+            isMultiSelect = false
+            buttonContainer.visibility = View.GONE
+            adapterr.notifyDataSetChanged()
+            return
+        }
+        super.onBackPressed()
+    }
 }
