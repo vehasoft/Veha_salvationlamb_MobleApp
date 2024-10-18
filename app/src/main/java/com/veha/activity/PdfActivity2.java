@@ -32,7 +32,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
     TextView tv_header = null;
     String pdfFileName;
     int pageNumber = 0;
-    String url ;
+    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
         PdfDocument.Meta meta = pdfView.getDocumentMeta();
         printBookmarksTree(pdfView.getTableOfContents(), "-");
     }
+
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
         for (PdfDocument.Bookmark b : tree) {
 
@@ -75,7 +76,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
         }
     }
 
-    public class LOADURL extends AsyncTask<String,Void,InputStream> {
+    public class LOADURL extends AsyncTask<String, Void, InputStream> {
         private ProgressDialog progressDialog;
 
         public LOADURL(PdfActivity2 loadPdf) {
@@ -107,7 +108,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
 
                 }
             } catch (IOException e) {
-                Log.e("Exception",e.toString());
+                Log.e("Exception", e.toString());
                 return null;
             }
             return inputStream;
@@ -115,7 +116,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
 
         @Override
         protected void onPostExecute(InputStream inputStream) {
-            if (inputStream == null){
+            if (inputStream == null) {
                 progressDialog.dismiss();
                 Toast.makeText(PdfActivity2.this, "Invalid Document", Toast.LENGTH_SHORT).show();
                 PdfActivity2.this.finish();
@@ -136,7 +137,8 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
             progressDialog.dismiss();
         }
     }
-    private class DownloadFile extends AsyncTask<String, Void, Void>{
+
+    private class DownloadFile extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... strings) {
             String fileUrl = strings[0];   // -> http://maven.apache.org/maven-1.x/maven.pdf
@@ -147,19 +149,20 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
 
             File pdfFile = new File(folder, fileName);
 
-            try{
+            try {
                 pdfFile.createNewFile();
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             downloadFile(fileUrl, pdfFile);
             return null;
         }
-        public void downloadFile(String fileUrl, File directory){
+
+        public void downloadFile(String fileUrl, File directory) {
             try {
 
                 URL url = new URL(fileUrl);
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 //urlConnection.setRequestMethod("GET");
                 //urlConnection.setDoOutput(true);
                 urlConnection.connect();
@@ -170,7 +173,7 @@ public class PdfActivity2 extends Activity implements OnPageChangeListener, OnLo
 
                 byte[] buffer = new byte[MEGABYTE];
                 int bufferLength = 0;
-                while((bufferLength = inputStream.read(buffer))>0 ){
+                while ((bufferLength = inputStream.read(buffer)) > 0) {
                     fileOutputStream.write(buffer, 0, bufferLength);
                 }
                 fileOutputStream.close();

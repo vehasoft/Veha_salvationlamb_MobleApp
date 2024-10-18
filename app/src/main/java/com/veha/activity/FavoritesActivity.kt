@@ -37,28 +37,35 @@ class FavoritesActivity : AppCompatActivity() {
 
         val viewProfile = HomeFragment.getInstance("fav")
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.view_fav,viewProfile)
+        ft.replace(R.id.view_fav, viewProfile)
         ft.commit()
 
         menu.setOnClickListener {
             val myContext: Context = ContextThemeWrapper(this@FavoritesActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
+            if (Util.isWarrior) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
             popup.menu.findItem(R.id.logout).isVisible = false
             popup.menu.findItem(R.id.fav).isVisible = false
-            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
+            if (Util.user.isReviewState.toBoolean()) {
+                popup.menu.findItem(R.id.warrior).isVisible = false
+            }
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
+                when (item.itemId) {
                     R.id.warrior -> {
-                       Commons().makeWarrior(this,this)
+                        Commons().makeWarrior(this, this)
                     }
-                    R.id.logout ->{
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@FavoritesActivity)
+
+                    R.id.logout -> {
+                        val builder: AlertDialog.Builder =
+                            AlertDialog.Builder(this@FavoritesActivity)
                         builder.setMessage("Do you want to Logout?")
                         builder.setTitle("Logout")
                         builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
+                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int ->
+                            finish()
                             lifecycleScope.launch {
                                 userPreferences.deleteAuthToken()
                                 userPreferences.deleteUserId()
@@ -72,19 +79,27 @@ class FavoritesActivity : AppCompatActivity() {
                         alertDialog.show()
                     }
 
-                    R.id.edit_profile ->{
-                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
-                            val intent = Intent(this@FavoritesActivity, EditProfileActivity::class.java)
+                    R.id.edit_profile -> {
+                        if (Util.hasPermission(
+                                PermissionType.PROFILE.value,
+                                Permission.EDIT.value
+                            )
+                        ) {
+                            val intent =
+                                Intent(this@FavoritesActivity, EditProfileActivity::class.java)
                             startActivity(intent)
                         } else {
-                            val intent = Intent(this@FavoritesActivity, NoPermissionActivity::class.java)
+                            val intent =
+                                Intent(this@FavoritesActivity, NoPermissionActivity::class.java)
                             startActivity(intent)
                         }
                     }
-                    R.id.fav ->{
+
+                    R.id.fav -> {
                         val intent = Intent(this@FavoritesActivity, FavoritesActivity::class.java)
                         startActivity(intent)
                     }
+
                     R.id.settings -> {
                         val intent = Intent(this@FavoritesActivity, SettingsActivity::class.java)
                         startActivity(intent)
@@ -95,12 +110,15 @@ class FavoritesActivity : AppCompatActivity() {
             popup.show()
         }
     }
+
     override fun onPause() {
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
     }
+
     override fun onDestroy() {
         super.onDestroy()
     }

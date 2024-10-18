@@ -22,7 +22,7 @@ class SearchProfileFragment() : Fragment() {
     lateinit var profileList: ArrayList<PostUser>
 
     companion object {
-        fun getFragment( profileList: ArrayList<PostUser>): SearchProfileFragment {
+        fun getFragment(profileList: ArrayList<PostUser>): SearchProfileFragment {
             val profileFrag = SearchProfileFragment()
             val bundle = Bundle()
             bundle.putParcelableArrayList("profileList", profileList as (ArrayList<Parcelable>))
@@ -30,28 +30,30 @@ class SearchProfileFragment() : Fragment() {
             return profileFrag
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         contexts = container!!.context
         profileList = arguments?.get("profileList") as ArrayList<PostUser>
-        val view =  inflater.inflate(R.layout.fragment_search_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_search_profile, container, false)
 
         lists = view.findViewById(R.id.search_profile_list)
         nodata = view.findViewById(R.id.no_data)
 
-        if (profileList.size <= 0){
+        if (profileList.size <= 0) {
             lists.visibility = View.GONE
             nodata.visibility = View.VISIBLE
-        } else{
+        } else {
             lists.visibility = View.VISIBLE
             nodata.visibility = View.GONE
             lists.layoutManager = LinearLayoutManager(context)
-            lists.adapter = UsersAdapter(profileList, contexts,this)
+            lists.adapter = UsersAdapter(profileList, contexts, this)
         }
         return view
     }

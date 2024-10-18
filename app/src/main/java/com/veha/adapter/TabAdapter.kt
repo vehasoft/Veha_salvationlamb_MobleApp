@@ -10,7 +10,8 @@ import com.veha.util.PermissionType
 import com.veha.util.Util
 
 
-internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : FragmentPagerAdapter(fm!!) {
+internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) :
+    FragmentPagerAdapter(fm!!) {
     var context: Context
     var totalTabs: Int
 
@@ -20,7 +21,7 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
     }
 
     override fun getItem(position: Int): Fragment {
-        var b : Any ? =null
+        var b: Any? = null
         return when (position) {
             0 -> {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
@@ -29,6 +30,7 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
                     NoPermissionFragment()
                 }
             }
+
             1 -> {
                 if (Util.hasPermission(PermissionType.FILE.value, Permission.READ.value)) {
                     FilesFragment()
@@ -36,30 +38,43 @@ internal class TabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) : Fr
                     NoPermissionFragment()
                 }
             }
+
             2 -> {
                 BibleFragment()
             }
+
             3 -> {
-                if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value) && Util.hasPermission(PermissionType.VIDEO.value, Permission.READ.value)) {
+                if (Util.hasPermission(
+                        PermissionType.POST.value,
+                        Permission.READ.value
+                    ) && Util.hasPermission(PermissionType.VIDEO.value, Permission.READ.value)
+                ) {
                     AdminVideoFragment()
                 } else {
                     NoPermissionFragment()
                 }
             }
+
             4 -> {
-                if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value) && Util.hasPermission(PermissionType.AUDIO.value, Permission.READ.value)) {
+                if (Util.hasPermission(
+                        PermissionType.POST.value,
+                        Permission.READ.value
+                    ) && Util.hasPermission(PermissionType.AUDIO.value, Permission.READ.value)
+                ) {
                     AdminAudioFragment()
                 } else {
                     NoPermissionFragment()
                 }
             }
+
             5 -> {
                 if (Util.hasPermission(PermissionType.PROFILE.value, Permission.READ.value)) {
-                    ProfileFragment.getInstance(Util.userId,"me")
+                    ProfileFragment.getInstance(Util.userId, "me")
                 } else {
                     NoPermissionFragment()
                 }
             }
+
             else -> b as Fragment
         }
     }

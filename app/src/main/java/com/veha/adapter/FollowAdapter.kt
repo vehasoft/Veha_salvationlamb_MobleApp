@@ -56,7 +56,7 @@ class FollowAdapter(
             Picasso.with(context).load(follow.picture).into(holder.profilePic)
         }
         if (Util.userId == null) {
-            userPreferences.userId.asLiveData().observe(owner){
+            userPreferences.userId.asLiveData().observe(owner) {
                 Util.userId = it
             }
         }
@@ -102,16 +102,21 @@ class FollowAdapter(
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.postFollow("Bearer $it", followData)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
+                                    followData.remove("userId")
+                                    followData.remove("followerId")
                                     if (myFollowList.containsKey(followerId)) {
                                         myFollowList.remove(followerId)
                                     } else {
                                         myFollowList.put(followerId, userId)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

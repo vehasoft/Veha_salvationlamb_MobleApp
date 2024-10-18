@@ -41,7 +41,10 @@ class SearchActivity : AppCompatActivity() {
             searchEditText.requestFocus()
         } else {
             val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            inputManager.hideSoftInputFromWindow(searchEditText.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            inputManager.hideSoftInputFromWindow(
+                searchEditText.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
         }
     }
 
@@ -102,17 +105,29 @@ class SearchActivity : AppCompatActivity() {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getSearch("Bearer $it", text)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     profilelist = ArrayList()
                                     postlist = ArrayList()
                                     val loginresp: JsonObject =
-                                        Gson().fromJson(resp?.get("results"), JsonObject::class.java)
+                                        Gson().fromJson(
+                                            resp?.get("results"),
+                                            JsonObject::class.java
+                                        )
                                     val allProfiles: JsonArray =
-                                        Gson().fromJson(loginresp.get("users"), JsonArray::class.java)
+                                        Gson().fromJson(
+                                            loginresp.get("users"),
+                                            JsonArray::class.java
+                                        )
                                     val allPosts: JsonArray =
-                                        Gson().fromJson(loginresp.get("posts"), JsonArray::class.java)
+                                        Gson().fromJson(
+                                            loginresp.get("posts"),
+                                            JsonArray::class.java
+                                        )
 
                                     for (post in allPosts) {
                                         val pos = Gson().fromJson(post, Posts::class.java)
@@ -132,8 +147,8 @@ class SearchActivity : AppCompatActivity() {
                                     Log.e("current tab", currentTab.toString())
                                     viewPager.currentItem = currentTab
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -142,7 +157,11 @@ class SearchActivity : AppCompatActivity() {
                             }
                         })
                     } else {
-                        Toast.makeText(this, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        ).show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
                             userPreferences.deleteUserId()

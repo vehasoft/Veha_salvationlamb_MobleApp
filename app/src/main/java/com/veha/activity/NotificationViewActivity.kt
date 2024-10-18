@@ -41,7 +41,7 @@ class NotificationViewActivity : AppCompatActivity() {
         warrior.text = "Warrior"
         tabLayout.addTab(user, 0)
         tabLayout.addTab(admin, 1)
-        if (Util.user == null){
+        if (Util.user == null) {
             MainActivity().getMyDetails()
         }
         if (Util.user.role == "admin") {

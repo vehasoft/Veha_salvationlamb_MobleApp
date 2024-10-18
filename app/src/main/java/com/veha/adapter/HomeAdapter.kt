@@ -406,11 +406,6 @@ class HomeAdapter(
                     R.id.react14 -> {
                         likePost(post, myContext.getString(R.string.react14), holder)
                     }
-
-                    /*R.id.react15 -> {
-                        likePost(post, myContext.getString(R.string.react15), holder)
-                    }*/
-
                 }
                 true
             })
@@ -434,7 +429,6 @@ class HomeAdapter(
         }
         holder.fav.setOnClickListener {
             favPost(Util.userId, post.id, holder)
-
         }
         holder.followBtn.setOnClickListener {
             holder.followBtn.isEnabled = false
@@ -471,7 +465,6 @@ class HomeAdapter(
 
             val alertDialog: AlertDialog = builder.create()
             alertDialog.show()
-
         }
     }
 
@@ -502,6 +495,9 @@ class HomeAdapter(
                                 response: Response<JsonObject?>
                             ) {
                                 if (response.code() == 200) {
+                                    data.remove("userId")
+                                    data.remove("postId")
+                                    data.remove("reaction")
                                     val msg: String =
                                         Gson().fromJson(
                                             response.body()!!.get("message"),
@@ -556,11 +552,7 @@ class HomeAdapter(
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
-                                if (response.code() == 200) {
-                                    /*Toast.makeText(
-                                        context, "Deleted Successfully" + posts.indexOf(post), Toast.LENGTH_LONG
-                                    ).show()*/
-                                } else {
+                                if (response.code() != 200) {
                                     Log.e("code", response.code().toString())
                                     Log.e("err", response.errorBody().toString())
                                 }
@@ -597,6 +589,8 @@ class HomeAdapter(
                                 response: Response<JsonObject?>
                             ) {
                                 if (response.code() == 200) {
+                                    followData.remove("userId")
+                                    followData.remove("followerId")
                                     val msg: String =
                                         Gson().fromJson(
                                             response.body()!!.get("message"),
@@ -651,7 +645,8 @@ class HomeAdapter(
                                 response: Response<JsonObject?>
                             ) {
                                 if (response.code() == 200) {
-                                    Log.e("Follow", response.body().toString())
+                                    followData.remove("userId")
+                                    followData.remove("postId")
                                     val resp = response.body()
                                     val msg: String =
                                         Gson().fromJson(resp!!.get("message"), String::class.java)

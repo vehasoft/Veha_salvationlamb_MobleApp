@@ -14,14 +14,14 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        if (message.getNotification() != null){
-            Log.e("notification",message.getNotification().getTitle());
-            Log.e("notification",message.getNotification().getBody());
-            Log.e("notification",message.getData().toString());
+        if (message.getNotification() != null) {
+            Log.e("notification", message.getNotification().getTitle());
+            Log.e("notification", message.getNotification().getBody());
+            Log.e("notification", message.getData().toString());
             String title = message.getNotification().getTitle();
             String text = message.getNotification().getBody();
             message.getData();
-            NotificationHelper.displayNotification(getApplicationContext(),title,text,message.getData());
+            NotificationHelper.displayNotification(getApplicationContext(), title, text, message.getData());
         }
     }
 
@@ -30,7 +30,8 @@ public class NotificationService extends FirebaseMessagingService {
         super.onNewToken(token);
         updateToken(token);
     }
-    void updateToken(String token){
+
+    void updateToken(String token) {
         try {
             UserPreferences userPreferences = new UserPreferences(this);
             JsonObject data = new JsonObject();
@@ -39,8 +40,8 @@ public class NotificationService extends FirebaseMessagingService {
             data.addProperty("oldToken", String.valueOf(userPreferences.getFcmToken()));
             //userPreferences.savefcmToken(token);
 
-        }catch (Exception e){
-            Log.e("error while updating token",e.toString());
+        } catch (Exception e) {
+            Log.e("error while updating token", e.toString());
         }
     }
 }

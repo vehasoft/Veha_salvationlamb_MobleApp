@@ -17,12 +17,11 @@ import com.veha.util.Permission
 import com.veha.util.PermissionType
 import com.veha.util.Util
 
-class UsersAdapter(private  val follows:  ArrayList<PostUser>,
-                    private val context: Context,
-                    private  var owner: LifecycleOwner
+class UsersAdapter(
+    private val follows: ArrayList<PostUser>,
+    private val context: Context,
+    private var owner: LifecycleOwner
 ) : RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
-
-
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -33,8 +32,8 @@ class UsersAdapter(private  val follows:  ArrayList<PostUser>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var layoutInflater : LayoutInflater = LayoutInflater.from(parent.context)
-        var items : View = layoutInflater.inflate(R.layout.child_follow,parent,false)
+        var layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
+        var items: View = layoutInflater.inflate(R.layout.child_follow, parent, false)
         var viewHolder = ViewHolder(items)
 
         return viewHolder

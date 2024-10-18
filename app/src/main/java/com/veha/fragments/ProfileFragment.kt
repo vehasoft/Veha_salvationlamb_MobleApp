@@ -121,7 +121,11 @@ class ProfileFragment : Fragment() {
 
         } else {
             if (!Util.hasPermission(PermissionType.POST.value, Permission.DELETE.value)) {
-                Toast.makeText(contexts,"You don't have permission to delete your post please contact administrator",Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    contexts,
+                    "You don't have permission to delete your post please contact administrator",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             editProfile.visibility = View.VISIBLE
         }
@@ -223,8 +227,8 @@ class ProfileFragment : Fragment() {
                                         })
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -278,8 +282,8 @@ class ProfileFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 getallPosts(contexts, owner)
                             }
@@ -335,8 +339,8 @@ class ProfileFragment : Fragment() {
                                     followerCount = followersList.size
                                     profileFollowers.text = followerCount.toString()
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 getallFollowing(owner)
                             }
@@ -391,7 +395,11 @@ class ProfileFragment : Fragment() {
                                     followingCount = followingList.size
                                     profileFollowing.text = followingCount.toString()
                                 } else {
-                                    Log.e("following", "fails - " + response.code() + response.errorBody().toString())
+                                    Log.e(
+                                        "following",
+                                        "fails - " + response.code() + response.errorBody()
+                                            .toString()
+                                    )
                                 }
                                 getmyDetails(contexts, owner)
                             }
@@ -472,8 +480,8 @@ class ProfileFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

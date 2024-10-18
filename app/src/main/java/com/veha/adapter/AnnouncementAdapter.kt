@@ -24,9 +24,14 @@ import com.veha.util.Posts
 import com.veha.util.UserPreferences
 import com.veha.util.Util
 
-class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Context,owner: LifecycleOwner) :
+class AnnouncementAdapter(
+    var announcements: ArrayList<Posts>,
+    var context: Context,
+    owner: LifecycleOwner
+) :
     RecyclerView.Adapter<NotificationListAdapter.ViewHolder>() {
     lateinit var userPreferences: UserPreferences
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         //val name : TextView = view.findViewById(R.id.name_fol)
         //val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
@@ -35,6 +40,7 @@ class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Cont
         val notificationLayout: LinearLayout = view.findViewById(R.id.notification_list_linear)
         val profilePic: ImageView = view.findViewById(R.id.profile_pic_fol)
     }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -76,6 +82,7 @@ class AnnouncementAdapter(var announcements: ArrayList<Posts>, var context: Cont
             }
         }
     }
+
     fun addItem(post: ArrayList<Posts>) {
         announcements.addAll(post)
         notifyItemRangeInserted(announcements.size, post.size)

@@ -9,7 +9,7 @@ import com.veha.fragments.AdminNotificationFragment
 import com.veha.fragments.UserNotificationFragment
 import com.veha.fragments.WarriorNotificationFragment
 
-class NotificationTabAdapter (c: Context, fm: FragmentManager?, totalTabs: Int) :
+class NotificationTabAdapter(c: Context, fm: FragmentManager?, totalTabs: Int) :
     FragmentPagerAdapter(fm!!) {
     var context: Context
     var totalTabs: Int
@@ -33,6 +33,7 @@ class NotificationTabAdapter (c: Context, fm: FragmentManager?, totalTabs: Int) 
             2 -> {
                 WarriorNotificationFragment()
             }
+
             else -> b as Fragment
         }
     }

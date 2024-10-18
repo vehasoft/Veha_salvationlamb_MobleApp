@@ -104,7 +104,12 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun cameraIntent() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val outputFileUri = Uri.fromFile(File(this@EditProfileActivity.externalCacheDir!!.path, "pickImageResult.jpeg"))
+        val outputFileUri = Uri.fromFile(
+            File(
+                this@EditProfileActivity.externalCacheDir!!.path,
+                "pickImageResult.jpeg"
+            )
+        )
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri)
         startActivityForResult(intent, 150)
     }
@@ -121,19 +126,21 @@ class EditProfileActivity : AppCompatActivity() {
             }
         } else if (requestCode == 150) {
             if (data != null) {
-                Log.e("###########",data.extras!![MediaStore.EXTRA_OUTPUT].toString())
-                Log.e("###########",data.data.toString())
+                Log.e("###########", data.extras!![MediaStore.EXTRA_OUTPUT].toString())
+                Log.e("###########", data.data.toString())
                 if (data.extras!!["data"] != null) {
                     CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap))
                         .setGuidelines(CropImageView.Guidelines.ON)
-                        .setFixAspectRatio(true).setMultiTouchEnabled(true).start(this@EditProfileActivity)
+                        .setFixAspectRatio(true).setMultiTouchEnabled(true)
+                        .start(this@EditProfileActivity)
                 }
             }
         } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === RESULT_OK) {
                 val resultUri = result.uri
-                val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
+                val bitmap =
+                    MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
                 profilestr = encodeTobase64(bitmap)
                 val data = JsonObject()
                 data.addProperty("base64Image", profilestr)
@@ -142,7 +149,7 @@ class EditProfileActivity : AppCompatActivity() {
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
                 Log.e("errorrr", error.toString())
-                Toast.makeText(this@EditProfileActivity,error.toString(),Toast.LENGTH_LONG).show()
+                Toast.makeText(this@EditProfileActivity, error.toString(), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -203,7 +210,9 @@ class EditProfileActivity : AppCompatActivity() {
         citySp.setAdapter(adapter)
 
         countrySP.onItemClickListener = OnItemClickListener { parent, view, pos, id ->
-            if (countrySP.text.toString() != "Country" && !countrySP.text.toString().isNullOrEmpty()) {
+            if (countrySP.text.toString() != "Country" && !countrySP.text.toString()
+                    .isNullOrEmpty()
+            ) {
                 countrystr = countrySP.text.toString()
                 getStates(countrystr)
             }
@@ -274,7 +283,8 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         menu.setOnClickListener {
-            val myContext: Context = ContextThemeWrapper(this@EditProfileActivity, R.style.menuStyle)
+            val myContext: Context =
+                ContextThemeWrapper(this@EditProfileActivity, R.style.menuStyle)
             val popup = PopupMenu(myContext, menu)
             popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
             if (Util.isWarrior) {
@@ -325,15 +335,22 @@ class EditProfileActivity : AppCompatActivity() {
                         val data = JsonObject()
                         data.addProperty("firstName", firstName.text.toString())
                         data.addProperty("lastName", lastName.text.toString())
-                        data.addProperty("name", firstName.text.toString() + " " + lastName.text.toString())
+                        data.addProperty(
+                            "name",
+                            firstName.text.toString() + " " + lastName.text.toString()
+                        )
                         data.addProperty("email", email.text.toString())
                         data.addProperty("mobile", mobile.text.toString())
                         data.addProperty("address", address.text.toString())
                         data.addProperty(
                             "gender",
-                            findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString().toLowerCase()
+                            findViewById<RadioButton>(gender.checkedRadioButtonId).text.toString()
+                                .toLowerCase()
                         )
-                        data.addProperty("dateOfBirth", Util.formatDate(date.text.toString(), "MM-dd-yyyy","dd-MM-yyyy"))
+                        data.addProperty(
+                            "dateOfBirth",
+                            Util.formatDate(date.text.toString(), "MM-dd-yyyy", "dd-MM-yyyy")
+                        )
                         data.addProperty("isWarrior", warriorStr)
                         data.addProperty("country", countrystr)
                         data.addProperty("state", statestr)
@@ -345,7 +362,8 @@ class EditProfileActivity : AppCompatActivity() {
                         data.addProperty("pinCode", pincode.text.toString())
                         edit(data)
                     } else {
-                        Toast.makeText(this@EditProfileActivity,doValidation(),Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@EditProfileActivity, doValidation(), Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
                 builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
@@ -377,7 +395,14 @@ class EditProfileActivity : AppCompatActivity() {
             return true
         } else if (!address.text!!.contentEquals(myDetails.address, false)) {
             return true
-        } else if (!date.text!!.contentEquals(Util.formatDate(myDetails.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"), false)) {
+        } else if (!date.text!!.contentEquals(
+                Util.formatDate(
+                    myDetails.dateOfBirth,
+                    "dd-MM-yyyy",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                ), false
+            )
+        ) {
             return true
         } else if (!pincode.text!!.contentEquals(myDetails.pinCode, false)) {
             return true
@@ -427,22 +452,28 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun edit(data: JsonObject) {
         try {
+            var userID = Util.userId
             if (Commons().isNetworkAvailable(this)) {
                 userPreferences = UserPreferences(this@EditProfileActivity)
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", Util.userId, data)
+                        val call: Call<JsonObject?>? = retrofit.putUser("Bearer $it", userID, data)
                         call!!.enqueue(object : Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
+                                    userID = ""
+                                    val intent =
+                                        Intent(this@EditProfileActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -466,53 +497,83 @@ class EditProfileActivity : AppCompatActivity() {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     shimmerFrameLayout.stopShimmer()
                                     shimmerFrameLayout.visibility = View.GONE
                                     editLayout.visibility = View.VISIBLE
                                     val resp = response.body()
-                                    val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    val loginresp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                                     myDetails = loginresp
-                                    if (loginresp.blocked.toBoolean()){
-                                        Toast.makeText(this@EditProfileActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
-                                        val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                                    if (loginresp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            this@EditProfileActivity,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        val intent = Intent(
+                                            this@EditProfileActivity,
+                                            LoginActivity::class.java
+                                        )
                                         startActivity(intent)
                                     }
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
-                                        Picasso.with(context).load(loginresp.picture).into(profilePic)
+                                        Picasso.with(context).load(loginresp.picture)
+                                            .into(profilePic)
                                     }
                                     if (!TextUtils.isEmpty(loginresp.firstName)) firstName.text =
-                                        Editable.Factory.getInstance().newEditable(loginresp.firstName)
+                                        Editable.Factory.getInstance()
+                                            .newEditable(loginresp.firstName)
                                     warriorStr = loginresp.isWarrior.toBoolean()
                                     if (!TextUtils.isEmpty(loginresp.lastName)) lastName.text =
-                                        Editable.Factory.getInstance().newEditable(loginresp.lastName)
+                                        Editable.Factory.getInstance()
+                                            .newEditable(loginresp.lastName)
                                     if (!TextUtils.isEmpty(loginresp.address)) address.text =
-                                        Editable.Factory.getInstance().newEditable(loginresp.address)
+                                        Editable.Factory.getInstance()
+                                            .newEditable(loginresp.address)
                                     if (!TextUtils.isEmpty(loginresp.email)) email.text =
                                         Editable.Factory.getInstance().newEditable(loginresp.email)
                                     if (!TextUtils.isEmpty(loginresp.mobile)) {
-                                        mobile.text = Editable.Factory.getInstance().newEditable(loginresp.mobile)
+                                        mobile.text = Editable.Factory.getInstance()
+                                            .newEditable(loginresp.mobile)
                                         mobileTxt = loginresp.mobile
                                     }
-                                    if (!TextUtils.isEmpty(loginresp.religion)) religion = loginresp.religion
-                                    if (!TextUtils.isEmpty(loginresp.churchName)) churchName = loginresp.churchName
+                                    if (!TextUtils.isEmpty(loginresp.religion)) religion =
+                                        loginresp.religion
+                                    if (!TextUtils.isEmpty(loginresp.churchName)) churchName =
+                                        loginresp.churchName
                                     loginresp.isWarrior.toBoolean()
                                     if (!TextUtils.isEmpty(loginresp.dateOfBirth)) {
-                                        var dateArr = Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").split("-")
+                                        var dateArr = Util.formatDate(
+                                            loginresp.dateOfBirth,
+                                            "dd-MM-yyyy",
+                                            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                        ).split("-")
                                         year = dateArr[2].toInt()
                                         month = dateArr[1].toInt() - 1
                                         day = dateArr[0].toInt()
                                         //val viewDate: String = day + "" + month + "" + year
                                         date.text =
                                             Editable.Factory.getInstance()
-                                                .newEditable(Util.formatDate(loginresp.dateOfBirth, "dd-MM-yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+                                                .newEditable(
+                                                    Util.formatDate(
+                                                        loginresp.dateOfBirth,
+                                                        "dd-MM-yyyy",
+                                                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                                    )
+                                                )
                                     }
                                     if (!TextUtils.isEmpty(loginresp.pinCode)) pincode.text =
-                                        Editable.Factory.getInstance().newEditable(loginresp.pinCode)
+                                        Editable.Factory.getInstance()
+                                            .newEditable(loginresp.pinCode)
                                     if (!TextUtils.isEmpty(loginresp.language)) language.text =
-                                        Editable.Factory.getInstance().newEditable(loginresp.language)
+                                        Editable.Factory.getInstance()
+                                            .newEditable(loginresp.language)
                                     if (!TextUtils.isEmpty(loginresp.country)) {
                                         countrySP.setText(loginresp.country)
                                         countrystr = loginresp.country
@@ -535,12 +596,17 @@ class EditProfileActivity : AppCompatActivity() {
                                         gender.check(genderbtn)
                                     }
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(this@EditProfileActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                                    val intent = Intent(this@EditProfileActivity, LoginActivity::class.java)
+                                    Toast.makeText(
+                                        this@EditProfileActivity,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent =
+                                        Intent(this@EditProfileActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -570,21 +636,28 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun updateProfilePic(data: JsonObject) {
         try {
+            var userID = Util.userId
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.postProfilePic("Bearer $it", Util.userId, data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.postProfilePic("Bearer $it", userID, data)
                         call!!.enqueue(object : Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    val intent = Intent(this@EditProfileActivity, MainActivity::class.java)
+                                    userID = ""
+                                    val intent =
+                                        Intent(this@EditProfileActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -630,8 +703,10 @@ class EditProfileActivity : AppCompatActivity() {
 
     private val myDateListener =
         DatePickerDialog.OnDateSetListener { _, year, month, day ->
-            date?.text = Editable.Factory.getInstance().newEditable(StringBuilder().append(day).append("-")
-                .append(month + 1).append("-").append(year))
+            date?.text = Editable.Factory.getInstance().newEditable(
+                StringBuilder().append(day).append("-")
+                    .append(month + 1).append("-").append(year)
+            )
         }
 
     private fun getCountries() {
@@ -639,7 +714,10 @@ class EditProfileActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val call = Util.getRetrofit().getCountries()
                 call!!.enqueue(object : Callback<JsonObject> {
-                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    override fun onResponse(
+                        call: Call<JsonObject>,
+                        response: Response<JsonObject>
+                    ) {
                         if (response.code() == 200) {
                             Log.e("country", response.body().toString())
                             val data = response.body()!!["results"] as JsonObject
@@ -657,8 +735,8 @@ class EditProfileActivity : AppCompatActivity() {
                             adapter.setDropDownViewResource(android.R.layout.simple_gallery_item)
                             countrySP.setAdapter(adapter)
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -677,7 +755,10 @@ class EditProfileActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val call = Util.getRetrofit().getState(countryId)
                 call!!.enqueue(object : Callback<JsonObject> {
-                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    override fun onResponse(
+                        call: Call<JsonObject>,
+                        response: Response<JsonObject>
+                    ) {
                         if (response.code() == 200) {
                             val data = response.body()!!["results"] as JsonObject
                             state = ArrayList()
@@ -691,8 +772,8 @@ class EditProfileActivity : AppCompatActivity() {
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                             stateSp.setAdapter(adapter)
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -711,7 +792,10 @@ class EditProfileActivity : AppCompatActivity() {
             if (Commons().isNetworkAvailable(this)) {
                 val call = Util.getRetrofit().getCity(stateId)
                 call!!.enqueue(object : Callback<JsonObject> {
-                    override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    override fun onResponse(
+                        call: Call<JsonObject>,
+                        response: Response<JsonObject>
+                    ) {
                         if (response.code() == 200) {
                             val data = response.body()!!["results"] as JsonObject
                             val array = data["cities"] as JsonArray
@@ -725,8 +809,8 @@ class EditProfileActivity : AppCompatActivity() {
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                             citySp.setAdapter(adapter)
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -743,9 +827,11 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
     }
+
     override fun onDestroy() {
         super.onDestroy()
     }

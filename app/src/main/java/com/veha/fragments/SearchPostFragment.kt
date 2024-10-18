@@ -18,9 +18,10 @@ import com.veha.util.UserPreferences
 class SearchPostFragment : Fragment() {
     lateinit var userPreferences: UserPreferences
     private lateinit var contexts: Context
-    lateinit var list : RecyclerView
+    lateinit var list: RecyclerView
     lateinit var nodata: LinearLayout
     lateinit var postList: ArrayList<Posts>
+
     companion object {
         fun getFragment(postList: ArrayList<Posts>): SearchPostFragment {
             val profileFrag = SearchPostFragment()
@@ -43,18 +44,26 @@ class SearchPostFragment : Fragment() {
         contexts = container!!.context
         postList = arguments?.get("postList") as ArrayList<Posts>
         userPreferences = UserPreferences(contexts)
-        val view =  inflater.inflate(R.layout.fragment_search_post, container, false)
+        val view = inflater.inflate(R.layout.fragment_search_post, container, false)
         list = view.findViewById(R.id.list)
         nodata = view.findViewById(R.id.no_data)
 
-        if (postList.size <= 0){
+        if (postList.size <= 0) {
             list.visibility = View.GONE
             nodata.visibility = View.VISIBLE
         } else {
             list.visibility = View.VISIBLE
             nodata.visibility = View.GONE
             list.layoutManager = LinearLayoutManager(contexts)
-            list.adapter = HomeAdapter(postList, contexts,"searchProfile",HashMap(),HashMap(),HashMap(),this@SearchPostFragment)
+            list.adapter = HomeAdapter(
+                postList,
+                contexts,
+                "searchProfile",
+                HashMap(),
+                HashMap(),
+                HashMap(),
+                this@SearchPostFragment
+            )
         }
 
         return view

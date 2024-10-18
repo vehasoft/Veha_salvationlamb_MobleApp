@@ -87,7 +87,7 @@ class AboutActivity : AppCompatActivity() {
     private fun getmyDetails() {
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -98,42 +98,68 @@ class AboutActivity : AppCompatActivity() {
                         val call: Call<JsonObject?>? = retrofit.getUser("Bearer $it", Util.userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val loginResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                                    val loginResp: UserRslt =
+                                        Gson().fromJson(resp?.get("result"), UserRslt::class.java)
 
                                     shimmerFrameLayout.stopShimmer()
                                     shimmerFrameLayout.visibility = View.GONE
                                     aboutLayout.visibility = View.VISIBLE
 
                                     var add = ""
-                                    if (loginResp.blocked.toBoolean()){
-                                        Toast.makeText(this@AboutActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
-                                        val intent = Intent(this@AboutActivity, LoginActivity::class.java)
+                                    if (loginResp.blocked.toBoolean()) {
+                                        Toast.makeText(
+                                            this@AboutActivity,
+                                            resources.getString(R.string.Blocked_account),
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        val intent =
+                                            Intent(this@AboutActivity, LoginActivity::class.java)
                                         startActivity(intent)
                                     }
                                     gender.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                                    if (!TextUtils.isEmpty(loginResp.name)) name.text = loginResp.name
+                                    if (!TextUtils.isEmpty(loginResp.name)) name.text =
+                                        loginResp.name
                                     if (!TextUtils.isEmpty(loginResp.dateOfBirth)) dob.text =
-                                        Util.formatDate(loginResp.dateOfBirth, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                                    if (!TextUtils.isEmpty(loginResp.mobile)) phone.text = loginResp.mobile
+                                        Util.formatDate(
+                                            loginResp.dateOfBirth,
+                                            "dd MMMM yyyy",
+                                            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                        )
+                                    if (!TextUtils.isEmpty(loginResp.mobile)) phone.text =
+                                        loginResp.mobile
                                     if (!TextUtils.isEmpty(loginResp.gender)) gender.text =
                                         loginResp.gender.capitalize()
-                                    if (!TextUtils.isEmpty(loginResp.address)) add = "${loginResp.address}, "
+                                    if (!TextUtils.isEmpty(loginResp.address)) add =
+                                        "${loginResp.address}, "
                                     if (!TextUtils.isEmpty(loginResp.city)) add += "${loginResp.city}"
                                     if (!TextUtils.isEmpty(loginResp.pinCode)) add += " - ${loginResp.pinCode}\n"
                                     if (!TextUtils.isEmpty(loginResp.state)) add += "${loginResp.state}, "
                                     if (!TextUtils.isEmpty(loginResp.country)) add += "${loginResp.country}"
                                     address.text = add
-                                    if (!TextUtils.isEmpty(loginResp.email)) email.text = loginResp.email
+                                    if (!TextUtils.isEmpty(loginResp.email)) email.text =
+                                        loginResp.email
                                     if (!TextUtils.isEmpty(loginResp.createdAt)) join.text =
-                                        Util.formatDate(loginResp.createdAt, "dd MMMM yyyy","yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                                        Util.formatDate(
+                                            loginResp.createdAt,
+                                            "dd MMMM yyyy",
+                                            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                                        )
 
                                 } else if (response.code() == 401) {
-                                        Toast.makeText(this@AboutActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                                        val intent = Intent(this@AboutActivity, LoginActivity::class.java)
-                                        startActivity(intent)
+                                    Toast.makeText(
+                                        this@AboutActivity,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent =
+                                        Intent(this@AboutActivity, LoginActivity::class.java)
+                                    startActivity(intent)
                                 } else {
                                     Log.e("failAbout - Status", response.code().toString())
                                     Log.e("failAbout", response.errorBody().toString())
@@ -167,14 +193,16 @@ class AboutActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        
+
     }
+
     override fun onResume() {
         super.onResume()
-        
+
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        
+
     }
 }

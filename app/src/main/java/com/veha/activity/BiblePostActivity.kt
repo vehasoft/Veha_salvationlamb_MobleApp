@@ -118,6 +118,10 @@ class BiblePostActivity : AppCompatActivity() {
                             ) {
                                 if (response.code() == 200) {
                                     postBtn.isEnabled = true
+                                    data.remove("tags")
+                                    data.remove("content")
+                                    data.remove("title")
+                                    data.remove("userId")
                                     val intent =
                                         Intent(this@BiblePostActivity, MainActivity::class.java)
                                     startActivity(intent)
@@ -161,11 +165,10 @@ class BiblePostActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        super.onBackPressed()
-
         val intent = Intent(this, BibleActivity::class.java)
         intent.putExtra("type", editionTxt)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+        super.onBackPressed()
     }
 }

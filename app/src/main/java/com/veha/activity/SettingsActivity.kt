@@ -41,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
         delete = findViewById(R.id.settings_delete)
 
         changePass.setOnClickListener {
-            val intent = Intent(this,ChangePasswordActivity::class.java)
+            val intent = Intent(this, ChangePasswordActivity::class.java)
             startActivity(intent)
         }
 
@@ -93,7 +93,7 @@ class SettingsActivity : AppCompatActivity() {
                 Util.NIGHT,
                 Util.DEFAULT,
             )
-            Log.e("mode",AppCompatDelegate.getDefaultNightMode().toString())//.getLocalNightMode())
+            Log.e("mode", AppCompatDelegate.getDefaultNightMode().toString())//.getLocalNightMode())
             val builder1 = AlertDialog.Builder(this@SettingsActivity)
             builder1.setTitle("Change Theme")
             builder1.setItems(items) { dialog, item ->
@@ -104,8 +104,7 @@ class SettingsActivity : AppCompatActivity() {
                     } else if (items[item] == Util.NIGHT) {
                         Util.isNight = Util.NIGHT
                         userPreferences.saveIsNightModeEnabled(Util.NIGHT)
-                    }
-                    else if (items[item] == Util.DEFAULT) {
+                    } else if (items[item] == Util.DEFAULT) {
                         userPreferences.saveIsNightModeEnabled(Util.DEFAULT)
                         Util.isNight = Util.DEFAULT
                     }
@@ -123,28 +122,40 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-    fun deleteAccount(){
+
+    fun deleteAccount() {
         try {
+            var userID = Util.userId
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
-                    Log.e("tokennnn",it)
+                    Log.e("tokennnn", it)
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.deleteUser("Bearer $it", Util.userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.deleteUser("Bearer $it", userID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                                Log.e("tokennnn",response.toString())
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                Log.e("tokennnn", response.toString())
                                 if (response.code() == 200) {
+                                    userID = ""
                                     finishAffinity()
                                     lifecycleScope.launch {
                                         userPreferences.deleteAuthToken()
                                         userPreferences.deleteUserId()
                                     }
-                                    val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
+                                    val intent =
+                                        Intent(this@SettingsActivity, LoginActivity::class.java)
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                     startActivity(intent)
                                 } else {
-                                    Toast.makeText(this@SettingsActivity,response.message().toString(),Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        this@SettingsActivity,
+                                        response.message().toString(),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             }
 

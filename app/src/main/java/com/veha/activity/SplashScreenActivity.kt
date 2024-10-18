@@ -87,20 +87,29 @@ class SplashScreenActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.getUser("Bearer $token", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            val loginresp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                            val loginresp: UserRslt =
+                                Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = loginresp
-                            if (loginresp.blocked.toBoolean()){
-                                Toast.makeText(this@SplashScreenActivity,resources.getString(R.string.Blocked_account),Toast.LENGTH_LONG).show()
-                                val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
+                            if (loginresp.blocked.toBoolean()) {
+                                Toast.makeText(
+                                    this@SplashScreenActivity,
+                                    resources.getString(R.string.Blocked_account),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                val intent =
+                                    Intent(this@SplashScreenActivity, LoginActivity::class.java)
                                 startActivity(intent)
                             }
                             val isWarrior: Boolean =
                                 loginresp.isWarrior.isNullOrEmpty() || loginresp.isWarrior != "false"
                             Util.isWarrior = isWarrior
-                            if (loginresp.role == "admin"){
+                            if (loginresp.role == "admin") {
                                 Util.isWarrior = true
                             }
                             Util.isFirst = loginresp.isFreshUser.toBoolean()
@@ -121,8 +130,14 @@ class SplashScreenActivity : AppCompatActivity() {
                                         }
                                     }
                                     val id = intent.extras!!.getString("id")
-                                    if (intent.extras!!.getString("type").equals(NotificationType.POST.value)){
-                                        if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
+                                    if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.POST.value)
+                                    ) {
+                                        if (Util.hasPermission(
+                                                PermissionType.POST.value,
+                                                Permission.READ.value
+                                            )
+                                        ) {
                                             val intent = Intent(
                                                 this@SplashScreenActivity,
                                                 ViewPostActivity::class.java
@@ -132,26 +147,53 @@ class SplashScreenActivity : AppCompatActivity() {
                                             startActivity(intent)
                                             finish()
                                         } else {
-                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                NoPermissionActivity::class.java
+                                            )
                                             startActivity(intent)
                                             finish()
                                         }
-                                    } else if (intent.extras!!.getString("type").equals(NotificationType.USER.value)){
-                                        Log.e("extraaaa",intent.extras!!.getString("type").toString())
-                                        Log.e("extraaaa",intent.extras!!.getString("id").toString())
-                                        if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {
-                                            val intent = Intent(this@SplashScreenActivity, ViewProfileActivity::class.java)
+                                    } else if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.USER.value)
+                                    ) {
+                                        Log.e(
+                                            "extraaaa",
+                                            intent.extras!!.getString("type").toString()
+                                        )
+                                        Log.e(
+                                            "extraaaa",
+                                            intent.extras!!.getString("id").toString()
+                                        )
+                                        if (Util.hasPermission(
+                                                PermissionType.USER.value,
+                                                Permission.READ.value
+                                            )
+                                        ) {
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                ViewProfileActivity::class.java
+                                            )
                                             intent.putExtra("userId", id)
                                             intent.putExtra("type", NotificationType.USER.value)
                                             startActivity(intent)
                                             finish()
                                         } else {
-                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                NoPermissionActivity::class.java
+                                            )
                                             startActivity(intent)
                                             finish()
                                         }
-                                    }else if (intent.extras!!.getString("type").equals(NotificationType.WARRIOR.value)){
-                                        if (Util.hasPermission(PermissionType.USER.value, Permission.EDIT.value)) {
+                                    } else if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.WARRIOR.value)
+                                    ) {
+                                        if (Util.hasPermission(
+                                                PermissionType.USER.value,
+                                                Permission.EDIT.value
+                                            )
+                                        ) {
                                             val intent = Intent(
                                                 this@SplashScreenActivity,
                                                 ApproveRequestActivity::class.java
@@ -161,12 +203,21 @@ class SplashScreenActivity : AppCompatActivity() {
                                             startActivity(intent)
                                             finish()
                                         } else {
-                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                NoPermissionActivity::class.java
+                                            )
                                             startActivity(intent)
                                             finish()
                                         }
-                                    }else if (intent.extras!!.getString("type").equals(NotificationType.ANNOUNCEMENT.value)){
-                                        if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
+                                    } else if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.ANNOUNCEMENT.value)
+                                    ) {
+                                        if (Util.hasPermission(
+                                                PermissionType.ANNOUNCEMENT.value,
+                                                Permission.READ.value
+                                            )
+                                        ) {
                                             val intent = Intent(
                                                 this@SplashScreenActivity,
                                                 ViewPostActivity::class.java
@@ -179,30 +230,48 @@ class SplashScreenActivity : AppCompatActivity() {
                                             startActivity(intent)
                                             finish()
                                         } else {
-                                            val intent = Intent(this@SplashScreenActivity, NoPermissionActivity::class.java)
+                                            val intent = Intent(
+                                                this@SplashScreenActivity,
+                                                NoPermissionActivity::class.java
+                                            )
                                             startActivity(intent)
                                             finish()
                                         }
-                                    }else if (intent.extras!!.getString("type").equals(NotificationType.FILE.value)){
+                                    } else if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.FILE.value)
+                                    ) {
                                         val url = intent.extras!!.getString("fileUrl")
-                                        val intent = Intent(this@SplashScreenActivity, PdfActivity2::class.java)
+                                        val intent = Intent(
+                                            this@SplashScreenActivity,
+                                            PdfActivity2::class.java
+                                        )
                                         intent.putExtra("fileName", id)
                                         intent.putExtra("url", url)
                                         startActivity(intent)
                                         finish()
-                                    } else if (intent.extras!!.getString("type").equals(NotificationType.EVENT.value)){
-                                        val intent = Intent(this@SplashScreenActivity, WebViewActivity::class.java)
+                                    } else if (intent.extras!!.getString("type")
+                                            .equals(NotificationType.EVENT.value)
+                                    ) {
+                                        val intent = Intent(
+                                            this@SplashScreenActivity,
+                                            WebViewActivity::class.java
+                                        )
                                         intent.putExtra("url", id)
                                         startActivity(intent)
                                         finish()
                                     } else {
                                         val intent =
-                                            Intent(this@SplashScreenActivity, MainActivity::class.java)
+                                            Intent(
+                                                this@SplashScreenActivity,
+                                                MainActivity::class.java
+                                            )
                                         startActivity(intent)
                                         finish()
                                     }
-                                    if (intent.extras!!.getString("notificationId") != null){
-                                        readNotification(intent.extras!!.getString("notificationId").toString())
+                                    if (intent.extras!!.getString("notificationId") != null) {
+                                        readNotification(
+                                            intent.extras!!.getString("notificationId").toString()
+                                        )
                                     }
                                 } else {
                                     val intent =
@@ -212,23 +281,32 @@ class SplashScreenActivity : AppCompatActivity() {
                                 }
                                 getMyPermission(token)
                             } else {
-                                val intent = Intent(this@SplashScreenActivity, ForgotPasswordActivity::class.java)
+                                val intent = Intent(
+                                    this@SplashScreenActivity,
+                                    ForgotPasswordActivity::class.java
+                                )
                                 intent.putExtra("page", "verify")
                                 intent.putExtra("email", loginresp.email)
                                 startActivity(intent)
                             }
-                        }  else if (response.code() == 401) {
-                            Toast.makeText(this@SplashScreenActivity,resources.getString(R.string.Deleted_account),Toast.LENGTH_LONG).show()
-                            val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
+                        } else if (response.code() == 401) {
+                            Toast.makeText(
+                                this@SplashScreenActivity,
+                                resources.getString(R.string.Deleted_account),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            val intent =
+                                Intent(this@SplashScreenActivity, LoginActivity::class.java)
                             startActivity(intent)
-                        }else {
+                        } else {
                             Log.e("responseee", "fail")
                             Toast.makeText(
                                 this@SplashScreenActivity,
                                 "Somthing Went Wrong \nLogin again to continue",
                                 Toast.LENGTH_LONG
                             ).show()
-                            val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
+                            val intent =
+                                Intent(this@SplashScreenActivity, LoginActivity::class.java)
                             startActivity(intent)
                             finish()
                         }
@@ -243,29 +321,37 @@ class SplashScreenActivity : AppCompatActivity() {
             Log.e("Splashscreen", e.toString())
         }
     }
+
     private fun getMyPermission(token: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.getPermissions("Bearer $token", Util.userId)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            Log.e("reslt",resp.toString())
-                            Util.permissionMap = Gson().fromJson(resp?.get("results"), Map::class.java) as MutableMap<String, String>?
+                            Util.permissionMap = Gson().fromJson(
+                                resp?.get("results"),
+                                Map::class.java
+                            ) as MutableMap<String, String>?
                         }
                     }
-                        override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                            Log.e("Splashscreen", "fail")
-                        }
-                    })
-                }
-            } catch (e: Exception) {
-                Log.e("Splashscreen", e.toString())
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("Splashscreen", "fail")
+                    }
+                })
             }
+        } catch (e: Exception) {
+            Log.e("Splashscreen", e.toString())
+        }
     }
-    fun readNotification(id: String){
+
+    fun readNotification(id: String) {
         try {
             val data = JsonObject()
             data.addProperty("isVisited", true)
@@ -273,14 +359,16 @@ class SplashScreenActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this@SplashScreenActivity) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.putReadNotification("Bearer $it", id, data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.putReadNotification("Bearer $it", id, data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
-                                if (response.code() == 200) {
-
-                                } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
+                                if (response.code() != 200) {
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }

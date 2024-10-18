@@ -137,14 +137,26 @@ class Commons {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.postWarrior("Bearer $it", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    Toast.makeText(context, "Waiting for Admin Approval", Toast.LENGTH_LONG).show()
-                                    val intent = Intent(context,MainActivity::class.java)
+                                    data.remove("userId")
+                                    data.remove("isWarrior")
+                                    data.remove("religion")
+                                    data.remove("churchName")
+                                    data.remove("gift")
+                                    Toast.makeText(
+                                        context,
+                                        "Waiting for Admin Approval",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent = Intent(context, MainActivity::class.java)
                                     context.startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
@@ -178,9 +190,11 @@ class Commons {
     }
 
     fun isNetworkAvailable(context: Context?): Boolean {
-        val connectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
             if (capabilities != null) {
                 when {
                     capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {

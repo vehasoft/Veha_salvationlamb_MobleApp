@@ -30,7 +30,11 @@ import com.veha.util.Util
 import retrofit2.Call
 import retrofit2.Response
 
-class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndFolders>, val owner: LifecycleOwner) :
+class FileAdapter(
+    val context: Context,
+    val filesAndFolders: ArrayList<FilesAndFolders>,
+    val owner: LifecycleOwner
+) :
     RecyclerView.Adapter<FileAdapter.ViewHolder>() {
     private lateinit var userPreferences: UserPreferences
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,7 +60,7 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
         } else {
             holder.imageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
         }
-        if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)){
+        if (java.lang.Boolean.parseBoolean(filesAndFolder.isProtected)) {
             holder.lockSymbol.visibility = View.VISIBLE
         } else {
             holder.lockSymbol.visibility = View.GONE
@@ -67,18 +71,18 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
                 result = false
                 val builder = AlertDialog.Builder(context)
                 builder.setTitle("Password")
-                val view = View.inflate(context,R.layout.password_layout,null)
+                val view = View.inflate(context, R.layout.password_layout, null)
                 val passwordView = view.findViewById<TextInputEditText>(R.id.password)
                 builder.setView(view)
                 builder.setMessage("Enter Password")
                 builder.setPositiveButton("Ok") { dialog: DialogInterface?, which: Int ->
                     val password = passwordView.text.toString()
-                    if (password.isNotEmpty()){
+                    if (password.isNotEmpty()) {
                         val passwordJson = JsonObject()
-                        passwordJson.addProperty("password",password)
-                        checkPassword(passwordJson,filesAndFolder.id,filesAndFolder)
+                        passwordJson.addProperty("password", password)
+                        checkPassword(passwordJson, filesAndFolder.id, filesAndFolder)
                     } else {
-                        Toast.makeText(context,"No password provided",Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "No password provided", Toast.LENGTH_LONG).show()
                     }
                 }
                 builder.setNegativeButton("cancel") { dialog: DialogInterface, which: Int -> dialog.cancel() }
@@ -120,12 +124,13 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
         }
     }
 
-    fun checkPassword(password: JsonObject,fileId: String, filesAndFolder: FilesAndFolders) {
+    fun checkPassword(password: JsonObject, fileId: String, filesAndFolder: FilesAndFolders) {
         if (Commons().isNetworkAvailable(context)) {
             val retrofit = Util.getRetrofit()
             userPreferences.authToken.asLiveData().observe(owner) {
                 if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                    val call: Call<JsonObject?>? = retrofit.postCheckPassword("Bearer $it",fileId,password)
+                    val call: Call<JsonObject?>? =
+                        retrofit.postCheckPassword("Bearer $it", fileId, password)
                     call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                         override fun onResponse(
                             call: Call<JsonObject?>,
@@ -144,10 +149,12 @@ class FileAdapter(val context: Context, val filesAndFolders: ArrayList<FilesAndF
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     context.startActivity(intent)
                                 }
-                            } else{
-                                Toast.makeText(context,"Invalid password",Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(context, "Invalid password", Toast.LENGTH_LONG)
+                                    .show()
                             }
                         }
+
                         override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                             Log.e("FileAdapter.checkpassword", "fail")
                         }

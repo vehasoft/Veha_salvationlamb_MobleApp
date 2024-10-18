@@ -6,51 +6,57 @@ import androidx.datastore.preferences.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserPreferences (context: Context) {
+class UserPreferences(context: Context) {
     private val applicationContext = context.applicationContext
-    private val dataStorePref: DataStore<Preferences> = applicationContext.createDataStore(name = "SalvationLamb")
+    private val dataStorePref: DataStore<Preferences> =
+        applicationContext.createDataStore(name = "SalvationLamb")
 
     val authToken: Flow<String>
         get() = dataStorePref.data.map { preferences ->
             preferences[AUTH_TOKEN].toString()
         }
 
-    suspend fun saveAuthToken(token: String){
+    suspend fun saveAuthToken(token: String) {
         dataStorePref.edit { preferences ->
             preferences[AUTH_TOKEN] = token
         }
     }
-    suspend fun deleteAuthToken(){
+
+    suspend fun deleteAuthToken() {
         dataStorePref.edit {
             it.remove(AUTH_TOKEN)
         }
     }
+
     val fcmToken: Flow<String>
         get() = dataStorePref.data.map { preferences ->
             preferences[FCM_TOKEN].toString()
         }
 
-    suspend fun savefcmToken(fcmToken: String){
+    suspend fun savefcmToken(fcmToken: String) {
         dataStorePref.edit { preferences ->
             preferences[FCM_TOKEN] = fcmToken
         }
     }
-    suspend fun deletefcmToken(){
+
+    suspend fun deletefcmToken() {
         dataStorePref.edit {
             it.remove(FCM_TOKEN)
         }
     }
+
     val userId: Flow<String>
         get() = dataStorePref.data.map { preferences ->
             preferences[USER_ID].toString()
         }
 
-    suspend fun saveUserId(token: String){
+    suspend fun saveUserId(token: String) {
         dataStorePref.edit { preferences ->
             preferences[USER_ID] = token
         }
     }
-    suspend fun deleteUserId(){
+
+    suspend fun deleteUserId() {
         dataStorePref.edit {
             it.remove(USER_ID)
         }
@@ -61,30 +67,33 @@ class UserPreferences (context: Context) {
             preferences[IS_NIGHT].toString()
         }
 
-    suspend fun saveIsNightModeEnabled(isNight: String){
+    suspend fun saveIsNightModeEnabled(isNight: String) {
         dataStorePref.edit { preferences ->
             preferences[IS_NIGHT] = isNight
         }
     }
-    suspend fun deleteIsNightModeEnabled(){
+
+    suspend fun deleteIsNightModeEnabled() {
         dataStorePref.edit {
             it.remove(IS_NIGHT)
         }
     }
+
     val isFirstTime: Flow<Boolean>
         get() = dataStorePref.data.map { preferences ->
-            if (preferences[IS_FIRST] == null){
+            if (preferences[IS_FIRST] == null) {
                 return@map true
             }
             preferences[IS_FIRST] as Boolean
         }
 
-    suspend fun saveIsFirstTime(isFirst: Boolean){
+    suspend fun saveIsFirstTime(isFirst: Boolean) {
         dataStorePref.edit { preferences ->
             preferences[IS_FIRST] = isFirst
         }
     }
-    suspend fun deleteIsFirstTime(){
+
+    suspend fun deleteIsFirstTime() {
         dataStorePref.edit {
             it.remove(IS_FIRST)
         }
@@ -93,25 +102,26 @@ class UserPreferences (context: Context) {
 
     val textSize: Flow<Float>
         get() = dataStorePref.data.map { preferences ->
-            if (preferences[TEXT_SIZE] == null){
+            if (preferences[TEXT_SIZE] == null) {
                 return@map 10.0F
             }
             preferences[TEXT_SIZE]!!
         }
 
-    suspend fun saveTextSize(textSize: Float){
+    suspend fun saveTextSize(textSize: Float) {
         dataStorePref.edit { preferences ->
             preferences[TEXT_SIZE] = textSize
         }
     }
-    suspend fun deleteTextSize(){
+
+    suspend fun deleteTextSize() {
         dataStorePref.edit {
             it.remove(TEXT_SIZE)
         }
     }
 
 
-    companion object{
+    companion object {
         private val AUTH_TOKEN = preferencesKey<String>("token")
         private val FCM_TOKEN = preferencesKey<String>("fcmToken")
         private val USER_ID = preferencesKey<String>("userId")

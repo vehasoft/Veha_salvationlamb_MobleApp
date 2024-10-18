@@ -76,7 +76,8 @@ class FollowerActivity : AppCompatActivity() {
                     }
 
                     R.id.logout -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@FollowerActivity)
+                        val builder: AlertDialog.Builder =
+                            AlertDialog.Builder(this@FollowerActivity)
                         builder.setMessage("Do you want to Logout?")
                         builder.setTitle("Logout")
                         builder.setCancelable(false)
@@ -96,11 +97,17 @@ class FollowerActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
-                            val intent = Intent(this@FollowerActivity, EditProfileActivity::class.java)
+                        if (Util.hasPermission(
+                                PermissionType.PROFILE.value,
+                                Permission.EDIT.value
+                            )
+                        ) {
+                            val intent =
+                                Intent(this@FollowerActivity, EditProfileActivity::class.java)
                             startActivity(intent)
                         } else {
-                            val intent = Intent(this@FollowerActivity, NoPermissionActivity::class.java)
+                            val intent =
+                                Intent(this@FollowerActivity, NoPermissionActivity::class.java)
                             startActivity(intent)
                         }
                     }
@@ -130,7 +137,10 @@ class FollowerActivity : AppCompatActivity() {
                         val call: Call<JsonObject?>? = retrofit.getFollowers("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
 
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -151,11 +161,16 @@ class FollowerActivity : AppCompatActivity() {
                                         nodata.visibility = View.GONE
                                         lists.layoutManager = LinearLayoutManager(context)
                                         lists.adapter =
-                                            FollowAdapter(followList, context, myFollowerMap, this@FollowerActivity)
+                                            FollowAdapter(
+                                                followList,
+                                                context,
+                                                myFollowerMap,
+                                                this@FollowerActivity
+                                            )
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -179,7 +194,10 @@ class FollowerActivity : AppCompatActivity() {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getFollowing("Bearer $it", userId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -200,16 +218,25 @@ class FollowerActivity : AppCompatActivity() {
                                         nodata.visibility = View.GONE
                                         lists.layoutManager = LinearLayoutManager(context)
                                         lists.adapter =
-                                            FollowAdapter(followList, context, followingMap, this@FollowerActivity)
+                                            FollowAdapter(
+                                                followList,
+                                                context,
+                                                followingMap,
+                                                this@FollowerActivity
+                                            )
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                                Toast.makeText(this@FollowerActivity, "No Internet", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this@FollowerActivity,
+                                    "No Internet",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 Log.e("FollowerActivity.getAllFollowing", "fail")
                             }
                         })
@@ -224,9 +251,11 @@ class FollowerActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
     }
+
     override fun onDestroy() {
         super.onDestroy()
     }

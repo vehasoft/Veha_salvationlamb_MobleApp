@@ -20,7 +20,7 @@ import com.veha.util.Util
 
 class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     private lateinit var posts: ArrayList<PostLikes>
-    private  lateinit var context: Context
+    private lateinit var context: Context
 
     constructor(posts: ArrayList<PostLikes>, context: Context) : this() {
         this.posts = posts
@@ -28,10 +28,10 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name : TextView = view.findViewById(R.id.name_fol)
-        val profilePic : ImageView = view.findViewById(R.id.profile_pic_fol)
-        val react : TextView = view.findViewById(R.id.react_txt)
-        val likeListLinear : LinearLayout = view.findViewById(R.id.like_list_linear)
+        val name: TextView = view.findViewById(R.id.name_fol)
+        val profilePic: ImageView = view.findViewById(R.id.profile_pic_fol)
+        val react: TextView = view.findViewById(R.id.react_txt)
+        val likeListLinear: LinearLayout = view.findViewById(R.id.like_list_linear)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewLikesAdapter.ViewHolder {
@@ -41,15 +41,15 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return  posts.size
+        return posts.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post : PostLikes = posts[position]
+        val post: PostLikes = posts[position]
 
         holder.react.text = post.reaction
         holder.name.text = post.user.name
-        if (!post.user.picture.isNullOrEmpty()){
+        if (!post.user.picture.isNullOrEmpty()) {
             Picasso.with(context).load(post.user.picture).into(holder.profilePic)
         }
 

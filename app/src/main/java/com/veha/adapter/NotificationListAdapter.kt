@@ -42,7 +42,11 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
     private lateinit var userPreferences: UserPreferences
     private lateinit var owner: LifecycleOwner
 
-    constructor(notifications: ArrayList<NotificationList>, context: Context, owner: LifecycleOwner) : this() {
+    constructor(
+        notifications: ArrayList<NotificationList>,
+        context: Context,
+        owner: LifecycleOwner
+    ) : this() {
         this.notifications = notifications
         this.context = context
         this.owner = owner
@@ -78,13 +82,16 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         } else {
             holder.profilePic.setImageResource(R.drawable.ic_profile)
         }
-        if (!java.lang.Boolean.parseBoolean(notification.isVisited)){
+        if (!java.lang.Boolean.parseBoolean(notification.isVisited)) {
             holder.notificationLayout.setBackgroundColor(context.resources.getColor(R.color.secondary_blue))
         } else {
             holder.notificationLayout.setBackgroundColor(context.resources.getColor(R.color.white))
         }
 
-        val html = "<b>" + notification.user.name + "</b>" + "  " + notification.message.replace(notification.user.name,"")
+        val html = "<b>" + notification.user.name + "</b>" + "  " + notification.message.replace(
+            notification.user.name,
+            ""
+        )
 
         (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT)
@@ -93,7 +100,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
         }).also { holder.notificationContent.text = it }
         holder.notificationtime.text = Util.getTimeAgo(notification.createdAt)
         holder.notificationLayout.setOnClickListener {
-            readNotification(holder,notification.id)
+            readNotification(holder, notification.id)
             if (NotificationType.POST.value == notification.type) {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
                     val intent = Intent(context, ViewPostActivity::class.java)
@@ -122,7 +129,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                     val intent = Intent(context, NoPermissionActivity::class.java)
                     context.startActivity(intent)
                 }
-            }else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
+            } else if (NotificationType.ANNOUNCEMENT.value == notification.type) {
                 if (Util.hasPermission(PermissionType.ANNOUNCEMENT.value, Permission.READ.value)) {
                     val intent = Intent(context, ViewPostActivity::class.java)
                     intent.putExtra("type", NotificationType.ANNOUNCEMENT.value)
@@ -132,19 +139,20 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                     val intent = Intent(context, NoPermissionActivity::class.java)
                     context.startActivity(intent)
                 }
-            }else if (NotificationType.FILE.value == notification.type) {
+            } else if (NotificationType.FILE.value == notification.type) {
                 val intent = Intent(context, PdfActivity2::class.java)
                 intent.putExtra("fileName", notification.data)
                 intent.putExtra("url", notification.fileUrl)
                 context.startActivity(intent)
-            }else if (NotificationType.EVENT.value == notification.type) {
+            } else if (NotificationType.EVENT.value == notification.type) {
                 val intent = Intent(context, WebViewActivity::class.java)
                 intent.putExtra("pageUrl", notification.data)
                 context.startActivity(intent)
             }
         }
     }
-    fun readNotification(holder: ViewHolder,id: String){
+
+    fun readNotification(holder: ViewHolder, id: String) {
         try {
             val data = JsonObject()
             data.addProperty("isVisited", true)
@@ -152,14 +160,23 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.putReadNotification("Bearer $it", id, data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.putReadNotification("Bearer $it", id, data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    holder.notificationLayout.setBackgroundColor(context.resources.getColor(R.color.white))
+                                    data.remove("isVisited")
+                                    holder.notificationLayout.setBackgroundColor(
+                                        context.resources.getColor(
+                                            R.color.white
+                                        )
+                                    )
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
@@ -175,6 +192,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
             Log.e("NotificationListAdapter.readNotification", e.toString())
         }
     }
+
     fun addItem(post: ArrayList<NotificationList>) {
         notifications.addAll(post)
         notifyItemRangeInserted(notifications.size, post.size)

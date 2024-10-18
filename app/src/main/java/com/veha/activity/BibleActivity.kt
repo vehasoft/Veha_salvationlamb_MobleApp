@@ -129,8 +129,8 @@ class BibleActivity : AppCompatActivity() {
             selectedText = ArrayList()
         }
         post.setOnClickListener {
-            if (selectedText.size <= 0){
-                Toast.makeText(this,"Please select atleast one",Toast.LENGTH_LONG).show()
+            if (selectedText.size <= 0) {
+                Toast.makeText(this, "Please select atleast one", Toast.LENGTH_LONG).show()
             } else {
                 text = ""
                 for (selectedTexts in selectedText) {
@@ -149,7 +149,8 @@ class BibleActivity : AppCompatActivity() {
             selectedText = ArrayList()
         }
     }
-    fun setBibleEdition(edition: String){
+
+    fun setBibleEdition(edition: String) {
         bibleDropdown.adapter = null
         bibleList = ArrayList()
         bibleList.add("Old Edition")
@@ -158,7 +159,7 @@ class BibleActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bibleList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         bibleDropdown.adapter = adapter
-        if (edition.contentEquals("old")){
+        if (edition.contentEquals("old")) {
             bibleDropdown.setSelection(0)
         } else {
             bibleDropdown.setSelection(1)
@@ -185,7 +186,8 @@ class BibleActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
-    fun setHeading(list: JsonArray){
+
+    fun setHeading(list: JsonArray) {
         contentDropdown.adapter = null
         keyList = ArrayList()
         for (bibleContent in list) {
@@ -206,6 +208,7 @@ class BibleActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
+
     fun setChapter(list: JsonArray) {
         chapterDropdown.adapter = null
         chapterList = ArrayList()
@@ -243,11 +246,13 @@ class BibleActivity : AppCompatActivity() {
             bibleCheck()
         }
     }
+
     inner class MyAdapter(private val bibleArray: JsonArray) :
         RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-            val view = LayoutInflater.from(this@BibleActivity).inflate(R.layout.child_bible, parent, false)
+            val view =
+                LayoutInflater.from(this@BibleActivity).inflate(R.layout.child_bible, parent, false)
             return MyViewHolder(view)
         }
 
@@ -302,7 +307,7 @@ class BibleActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (isMultiSelect){
+        if (isMultiSelect) {
             isMultiSelect = false
             buttonContainer.visibility = View.GONE
             adapterr.notifyDataSetChanged()

@@ -272,6 +272,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.warrior -> {
                         Commons().makeWarrior(this, this)
                     }
+
                     R.id.feedback -> {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
                         builder.setTitle("FEEDBACK FORM")
@@ -285,26 +286,35 @@ class MainActivity : AppCompatActivity() {
                         list.add("Customer Support")
                         list.add("Performance")
                         var feedbackTypeTxt = ""
-                        val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, list)
+                        val adapter = ArrayAdapter(
+                            this@MainActivity,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            list
+                        )
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         feedbackType.adapter = adapter
-                        feedbackType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                                if (list[pos] != "Select") {
-                                    feedbackTypeTxt = list[pos].toString()
+                        feedbackType.onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>?,
+                                    view: View,
+                                    pos: Int,
+                                    id: Long
+                                ) {
+                                    if (list[pos] != "Select") {
+                                        feedbackTypeTxt = list[pos].toString()
+                                    }
                                 }
-                            }
 
-                            override fun onNothingSelected(parent: AdapterView<*>?) {}
-                        }
+                                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                            }
                         builder.setCancelable(false)
                         builder.setPositiveButton("Send") { dialog: DialogInterface?, _: Int ->
-                            //apicall
                             val data = JsonObject()
-                            data.addProperty("userName",Util.user.name)
-                            data.addProperty("email",Util.user.email)
-                            data.addProperty("type",feedbackTypeTxt)
-                            data.addProperty("feedback",feedback.text.toString())
+                            data.addProperty("userName", Util.user.name)
+                            data.addProperty("email", Util.user.email)
+                            data.addProperty("type", feedbackTypeTxt)
+                            data.addProperty("feedback", feedback.text.toString())
                             postFeedback(data)
                             dialog?.cancel()
 
@@ -312,29 +322,30 @@ class MainActivity : AppCompatActivity() {
                         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.cancel() }
                         builder.create().show()
                     }
+
                     R.id.invite -> {
                         try {
-                        val shareIntent = Intent(Intent.ACTION_SEND)
-                        shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
-                        var shareMessage = " Hey friends! \n" +
-                                "\n" +
-                                "Exciting news! I've just joined Salvation Lamb, a vibrant new social media platform where we can connect, share, and discover together! \n" +
-                                "\n" +
-                                "Join me and let's stay connected like never before. Here's why you'll love it:\n" +
-                                "It's all about making connections and having fun! Click the link below to download Salvation Lamb and join me on this journey. Let's create something awesome together!\n" +
-                                "\n" +
-                                "https://salvationlamb.com/redirect?from=invite\n" +
-                                "\n" +
-                                "Can't wait to see you there! "
-                        shareMessage = """
+                            val shareIntent = Intent(Intent.ACTION_SEND)
+                            shareIntent.type = "text/plain"
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
+                            var shareMessage = " Hey friends! \n" +
+                                    "\n" +
+                                    "Exciting news! I've just joined Salvation Lamb, a vibrant new social media platform where we can connect, share, and discover together! \n" +
+                                    "\n" +
+                                    "Join me and let's stay connected like never before. Here's why you'll love it:\n" +
+                                    "It's all about making connections and having fun! Click the link below to download Salvation Lamb and join me on this journey. Let's create something awesome together!\n" +
+                                    "\n" +
+                                    "https://salvationlamb.com/redirect?from=invite\n" +
+                                    "\n" +
+                                    "Can't wait to see you there! "
+                            shareMessage = """
                     $shareMessage                    
                     """.trimIndent()
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
-                        startActivity(Intent.createChooser(shareIntent, "choose one"))
-                    } catch (e: Exception) {
-                        Log.e("exception", e.toString())
-                    }
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+                            startActivity(Intent.createChooser(shareIntent, "choose one"))
+                        } catch (e: Exception) {
+                            Log.e("exception", e.toString())
+                        }
                     }
 
                     R.id.logout -> {
@@ -358,7 +369,11 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
+                        if (Util.hasPermission(
+                                PermissionType.PROFILE.value,
+                                Permission.EDIT.value
+                            )
+                        ) {
                             val intent = Intent(this@MainActivity, EditProfileActivity::class.java)
                             startActivity(intent)
                         } else {
@@ -431,19 +446,19 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
-        if (intent.extras != null){
+        if (intent.extras != null) {
             viewPager.currentItem = intent.extras!!.getInt("gotopage")
         }
     }
 
     public fun getMyDetails() {
         if (Util.userId == null) {
-            userPreferences.userId.asLiveData().observe(this){
+            userPreferences.userId.asLiveData().observe(this) {
                 Util.userId = it
             }
         }
-        userPreferences.fcmToken.asLiveData().observe(this){
-            if (it.isNullOrEmpty()){
+        userPreferences.fcmToken.asLiveData().observe(this) {
+            if (it.isNullOrEmpty()) {
                 lifecycleScope.launch {
                     userPreferences.deleteAuthToken()
                     userPreferences.deleteUserId()
@@ -481,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                                     Util.isFirst = loginresp.isFreshUser.toBoolean()
                                     val isWarrior: Boolean = loginresp.isWarrior.toBoolean()
                                     Util.isWarrior = isWarrior
-                                    if (loginresp.role == "admin"){
+                                    if (loginresp.role == "admin") {
                                         Util.isWarrior = true
                                     }
                                     userType = if (isWarrior) Util.WARRIOR else Util.USER
@@ -507,8 +522,8 @@ class MainActivity : AppCompatActivity() {
                                         Intent(this@MainActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -557,6 +572,7 @@ class MainActivity : AppCompatActivity() {
                                     Log.e("err", response.errorBody().toString())
                                 }
                             }
+
                             override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
                                 Log.e("MainActivity.firstTime", "fail")
                             }
@@ -580,6 +596,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity.firstTime", e.toString())
         }
     }
+
     private fun getNotificationCount() {
         try {
             if (Commons().isNetworkAvailable(this)) {
@@ -596,13 +613,13 @@ class MainActivity : AppCompatActivity() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val count = Integer.parseInt(resp?.get("count").toString())
-                                    if (count > 0 ){
+                                    if (count > 0) {
                                         notificationCount.visibility = View.VISIBLE
                                         notificationCount.text = count.toString()
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -629,6 +646,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity.firstTime", e.toString())
         }
     }
+
     private fun postFeedback(data: JsonObject) {
         try {
             if (Commons().isNetworkAvailable(this)) {
@@ -636,18 +654,30 @@ class MainActivity : AppCompatActivity() {
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? =
-                            retrofit.postCallHead("Bearer $it", "feedback",data)
+                            retrofit.postCallHead("Bearer $it", "feedback", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
                                 if (response.code() == 200) {
-                                    Toast.makeText(this@MainActivity,"Feedback submitted successfully",Toast.LENGTH_LONG).show()
+                                    data.remove("feedback")
+                                    data.remove("type")
+                                    data.remove("email")
+                                    data.remove("userName")
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Feedback submitted successfully",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 } else {
-                                    Toast.makeText(this@MainActivity,"Feedback submission failed",Toast.LENGTH_LONG).show()
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Feedback submission failed",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

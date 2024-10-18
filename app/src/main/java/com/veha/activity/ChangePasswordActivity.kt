@@ -49,7 +49,8 @@ class ChangePasswordActivity : AppCompatActivity() {
 
         val email = intent.getStringExtra("email")
         val otp = intent.getStringExtra("otp")
-        if (TextUtils.isEmpty(email?.trim())) oldPasswordOp.visibility = View.VISIBLE else oldPasswordOp.visibility =
+        if (TextUtils.isEmpty(email?.trim())) oldPasswordOp.visibility =
+            View.VISIBLE else oldPasswordOp.visibility =
             View.GONE
 
         changePasswordButton.setOnClickListener {
@@ -57,23 +58,36 @@ class ChangePasswordActivity : AppCompatActivity() {
             cnfmPasswordTxt = cnfmPasswordTextView.text.toString()
             oldPasswordTxt = oldPasswordTextView.text.toString()
             if (!Util.isValidPassword(passwordTxt)) {
-                Toast.makeText(this@ChangePasswordActivity, "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ChangePasswordActivity,
+                    "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8",
+                    Toast.LENGTH_LONG
+                ).show()
                 newPasswordTextView.error =
                     "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
             } else if (TextUtils.isEmpty(passwordTxt.trim())) {
-                Toast.makeText(this@ChangePasswordActivity, "Enter Password", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ChangePasswordActivity, "Enter Password", Toast.LENGTH_LONG)
+                    .show()
                 newPasswordTextView.error = "Enter Password"
             } else if (!passwordTxt.equals(cnfmPasswordTxt, false)) {
-                Toast.makeText(this@ChangePasswordActivity, "New Password and confirm password are not same", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ChangePasswordActivity,
+                    "New Password and confirm password are not same",
+                    Toast.LENGTH_LONG
+                ).show()
                 newPasswordTextView.error = "New Password and confirm password are not same"
             } else if (oldPasswordTxt.equals(cnfmPasswordTxt, false)) {
-                Toast.makeText(this@ChangePasswordActivity, "new password is same as old password", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ChangePasswordActivity,
+                    "new password is same as old password",
+                    Toast.LENGTH_LONG
+                ).show()
                 newPasswordTextView.error = "new password is same as old password"
             } else {
                 changePasswordButton.isEnabled = false
                 if (TextUtils.isEmpty(email?.trim())) {
                     if (Util.userId == null) {
-                        userPreferences.userId.asLiveData().observe(this){
+                        userPreferences.userId.asLiveData().observe(this) {
                             Util.userId = it
                         }
                     }
@@ -103,10 +117,17 @@ class ChangePasswordActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.postChangePassword("Bearer $it", data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.postChangePassword("Bearer $it", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
+                                    data.remove("newPassword")
+                                    data.remove("oldPassword")
+                                    data.remove("userId")
                                     Toast.makeText(
                                         this@ChangePasswordActivity,
                                         "Password changed successfully",
@@ -114,8 +135,8 @@ class ChangePasswordActivity : AppCompatActivity() {
                                     ).show()
                                     finish()
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                             }
@@ -141,8 +162,7 @@ class ChangePasswordActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("ChangePasswordActivity.changePassword", e.toString())
-        }
-        finally {
+        } finally {
             changePasswordButton.isEnabled = true
         }
     }
@@ -153,13 +173,19 @@ class ChangePasswordActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postChangeForgotPassword(data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
+                            data.remove("email")
+                            data.remove("otp")
+                            data.remove("password")
                             Log.e("ok1", response.code().toString())
                             finish()
-                        }  else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                        } else {
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                         call.cancel()
                     }
@@ -171,8 +197,7 @@ class ChangePasswordActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("ChangePasswordActivity.forgotPassword", e.toString())
-        }
-        finally {
+        } finally {
             changePasswordButton.isEnabled = true
         }
     }
@@ -180,9 +205,11 @@ class ChangePasswordActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
     }
+
     override fun onDestroy() {
         super.onDestroy()
     }

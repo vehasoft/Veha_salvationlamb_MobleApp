@@ -103,7 +103,7 @@ class HomeFragment : Fragment() {
             addPost.visibility = View.GONE
         }
         addPost.setOnClickListener {
-            if (!Util.hasPermission(PermissionType.POST.value,Permission.CREATE.value)){
+            if (!Util.hasPermission(PermissionType.POST.value, Permission.CREATE.value)) {
                 val intent = Intent(contexts, NoPermissionActivity::class.java)
                 startActivity(intent)
             } else {
@@ -150,7 +150,7 @@ class HomeFragment : Fragment() {
     fun getfavPosts(context: Context, owner: LifecycleOwner) {
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -193,8 +193,8 @@ class HomeFragment : Fragment() {
                                         )
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
@@ -279,8 +279,8 @@ class HomeFragment : Fragment() {
                                         })
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                     list.visibility = View.GONE
                                     nodata.visibility = View.VISIBLE
                                 }
@@ -337,8 +337,8 @@ class HomeFragment : Fragment() {
                                         myLikesMap.put(pos.postId, pos.reaction)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 getallFav(owner)
                             }
@@ -390,8 +390,8 @@ class HomeFragment : Fragment() {
                                         myFollowMap.put(pos.id, Util.userId)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 if (type == "fav") getfavPosts(contexts, owner) else getallPosts(
                                     contexts,
@@ -427,7 +427,7 @@ class HomeFragment : Fragment() {
     fun getallFav(owner: LifecycleOwner) {
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -451,8 +451,8 @@ class HomeFragment : Fragment() {
                                         myFavMap.put(pos.postId, pos.userId)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 getallFollowers(owner)
                             }
@@ -485,7 +485,7 @@ class HomeFragment : Fragment() {
     private fun getMyDetails(owner: LifecycleOwner) {
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -526,8 +526,8 @@ class HomeFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

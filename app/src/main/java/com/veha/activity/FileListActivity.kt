@@ -73,16 +73,21 @@ class FileListActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     filesAndFolders = ArrayList()
                                     val resp = response.body()
                                     val loginresp: JsonArray =
                                         Gson().fromJson(resp?.get("files"), JsonArray::class.java)
                                     for (files in loginresp) {
-                                        val pos = Gson().fromJson(files, FilesAndFolders::class.java)
+                                        val pos =
+                                            Gson().fromJson(files, FilesAndFolders::class.java)
                                         filesAndFolders.add(pos)
                                     }
                                     shimmerFrameLayout.stopShimmer()
@@ -95,15 +100,21 @@ class FileListActivity : AppCompatActivity() {
                                         recyclerView.visibility = View.VISIBLE
 
                                         if (Util.listview) {
-                                            recyclerView.layoutManager = LinearLayoutManager(context)
+                                            recyclerView.layoutManager =
+                                                LinearLayoutManager(context)
                                         } else {
-                                            recyclerView.layoutManager = GridLayoutManager(context, 3)
+                                            recyclerView.layoutManager =
+                                                GridLayoutManager(context, 3)
                                         }
-                                        recyclerView.adapter = FileAdapter(applicationContext, filesAndFolders,this@FileListActivity)
+                                        recyclerView.adapter = FileAdapter(
+                                            applicationContext,
+                                            filesAndFolders,
+                                            this@FileListActivity
+                                        )
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

@@ -125,20 +125,25 @@ class ApproveRequestActivity : AppCompatActivity() {
             finish()
         }
         val userId: String = intent.extras!!.getString("userId").toString()
-        getUpdateRequest(this@ApproveRequestActivity,userId)
+        getUpdateRequest(this@ApproveRequestActivity, userId)
         approve.setOnClickListener {
-            postUpdateRequest("approve",userId)
+            postUpdateRequest("approve", userId)
         }
         reject.setOnClickListener {
-            postUpdateRequest("reject",userId)
+            postUpdateRequest("reject", userId)
         }
     }
-    fun setValue(existing: TextView,new: TextView,exString: String?,newString: String?){
+
+    fun setValue(existing: TextView, new: TextView, exString: String?, newString: String?) {
         var exString = exString
         var newString = newString
-        if (exString.isNullOrEmpty()) { exString = ""}
-        if (newString.isNullOrEmpty()) { newString = ""}
-        if (exString == newString){
+        if (exString.isNullOrEmpty()) {
+            exString = ""
+        }
+        if (newString.isNullOrEmpty()) {
+            newString = ""
+        }
+        if (exString == newString) {
             new.visibility = View.GONE
             existing.visibility = View.VISIBLE
             existing.text = newString
@@ -151,18 +156,25 @@ class ApproveRequestActivity : AppCompatActivity() {
         }
     }
 
-    private fun getUpdateRequest(context: Context,userId: String) {
+    private fun getUpdateRequest(context: Context, userId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getUpdateRequest("Bearer $it", userId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getUpdateRequest("Bearer $it", userId)
                         call!!.enqueue(object : Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     val resp = response.body()
-                                    val result: JsonObject = Gson().fromJson(resp?.get("results"), JsonObject::class.java)
+                                    val result: JsonObject = Gson().fromJson(
+                                        resp?.get("results"),
+                                        JsonObject::class.java
+                                    )
                                     var exObj: ProfileChange
                                     var newObj: ProfileChange
                                     if (!result.get("user").isJsonNull && !result.get("updateRequest").isJsonNull) {
@@ -248,19 +260,29 @@ class ApproveRequestActivity : AppCompatActivity() {
                                         } else {
                                             newpic.setImageResource(R.drawable.ic_profile)
                                         }
-                                    } else{
-                                        Toast.makeText(this@ApproveRequestActivity,"This request is already handled",Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(
+                                            this@ApproveRequestActivity,
+                                            "This request is already handled",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         finish()
                                     }
 
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(this@ApproveRequestActivity,resources.getString(R.string.Deleted_account),
-                                        Toast.LENGTH_LONG).show()
-                                    val intent = Intent(this@ApproveRequestActivity, LoginActivity::class.java)
+                                    Toast.makeText(
+                                        this@ApproveRequestActivity,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent = Intent(
+                                        this@ApproveRequestActivity,
+                                        LoginActivity::class.java
+                                    )
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -287,30 +309,51 @@ class ApproveRequestActivity : AppCompatActivity() {
             Log.e("EditProfileActivity.getMyDetails", e.toString())
         }
     }
-    private fun postUpdateRequest(status: String,userId: String) {
+
+    private fun postUpdateRequest(status: String, userId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.postUpdateRequest("Bearer $it", userId,status)
+                        val call: Call<JsonObject?>? =
+                            retrofit.postUpdateRequest("Bearer $it", userId, status)
                         call!!.enqueue(object : Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
-                                    val intent = Intent(this@ApproveRequestActivity, MainActivity::class.java)
+                                    val intent = Intent(
+                                        this@ApproveRequestActivity,
+                                        MainActivity::class.java
+                                    )
                                     startActivity(intent)
 
                                 } else if (response.code() == 401) {
-                                    Toast.makeText(this@ApproveRequestActivity,resources.getString(R.string.Deleted_account),
-                                        Toast.LENGTH_LONG).show()
-                                    val intent = Intent(this@ApproveRequestActivity, LoginActivity::class.java)
+                                    Toast.makeText(
+                                        this@ApproveRequestActivity,
+                                        resources.getString(R.string.Deleted_account),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent = Intent(
+                                        this@ApproveRequestActivity,
+                                        LoginActivity::class.java
+                                    )
                                     startActivity(intent)
                                 } else {
-                                    Toast.makeText(this@ApproveRequestActivity,"Something went wrong",Toast.LENGTH_LONG).show()
-                                    val intent = Intent(this@ApproveRequestActivity, MainActivity::class.java)
+                                    Toast.makeText(
+                                        this@ApproveRequestActivity,
+                                        "Something went wrong",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    val intent = Intent(
+                                        this@ApproveRequestActivity,
+                                        MainActivity::class.java
+                                    )
                                     startActivity(intent)
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

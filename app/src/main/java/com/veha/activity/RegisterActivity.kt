@@ -84,9 +84,12 @@ class RegisterActivity : AppCompatActivity() {
                 data.addProperty("name", "$fNameTxt $lNameTxt")
                 data.addProperty("email", emailTxt)
                 data.addProperty("mobile", mobileTxt)
-                data.addProperty("gender", findViewById<RadioButton>(genderId).text.toString().toLowerCase())
+                data.addProperty(
+                    "gender",
+                    findViewById<RadioButton>(genderId).text.toString().toLowerCase()
+                )
                 data.addProperty("password", passwordTxt)
-                data.addProperty("dateOfBirth", Util.formatDate(dobTxt, "MM-dd-yyyy","dd-MM-yyyy"))
+                data.addProperty("dateOfBirth", Util.formatDate(dobTxt, "MM-dd-yyyy", "dd-MM-yyyy"))
                 data.addProperty("isWarrior", false)
                 data.addProperty("isFreshUser", true)
                 register(data)
@@ -122,8 +125,10 @@ class RegisterActivity : AppCompatActivity() {
 
     private val myDateListener =
         OnDateSetListener { _, year, month, day ->
-            date?.text = Editable.Factory.getInstance().newEditable(StringBuilder().append(day).append("-")
-                .append(month + 1).append("-").append(year))
+            date?.text = Editable.Factory.getInstance().newEditable(
+                StringBuilder().append(day).append("-")
+                    .append(month + 1).append("-").append(year)
+            )
         }
 
     private fun doValidation(): String {
@@ -149,7 +154,8 @@ class RegisterActivity : AppCompatActivity() {
             password.error = "Enter Password"
             return "Enter Password"
         } else if (!Util.isValidPassword(passwordTxt)) {
-            password.error = "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
+            password.error =
+                "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
             return "Password must contain 1 capital, 1 small, 1 number, 1 spl char and length greater than 8"
         } else if (TextUtils.isEmpty(dobTxt.trim()) || dobTxt.equals("Date of birth", true)) {
             date.error = "Select Date of birth"
@@ -168,23 +174,33 @@ class RegisterActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postCall("users", data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
+                            data.remove("password")
+                            data.remove("mobile")
+                            data.remove("email")
                             val resp = response.body()
-                            val registerResp: UserRslt = Gson().fromJson(resp?.get("result"), UserRslt::class.java)
+                            val registerResp: UserRslt =
+                                Gson().fromJson(resp?.get("result"), UserRslt::class.java)
                             Util.user = registerResp
-                            val intent = Intent(this@RegisterActivity, ForgotPasswordActivity::class.java)
+                            val intent =
+                                Intent(this@RegisterActivity, ForgotPasswordActivity::class.java)
                             intent.putExtra("page", "verify")
                             intent.putExtra("email", emailTxt)
                             startActivity(intent)
                         } else {
                             val resp = response.errorBody()
-                            val registerResp: JsonObject = Gson().fromJson(resp?.string(), JsonObject::class.java)
+                            val registerResp: JsonObject =
+                                Gson().fromJson(resp?.string(), JsonObject::class.java)
                             val status = registerResp.get("status").toString()
                             val errorMessage = registerResp.get("errorMessage").toString()
                             Log.e("Status", status)
                             Log.e("result", errorMessage)
-                            Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@RegisterActivity, errorMessage, Toast.LENGTH_LONG)
+                                .show()
                         }
                     }
 

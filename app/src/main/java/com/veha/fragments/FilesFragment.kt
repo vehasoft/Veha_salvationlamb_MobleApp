@@ -71,7 +71,8 @@ class FilesFragment : Fragment() {
         }
         listIcon.setOnClickListener {
             Util.listview = !Util.listview
-            requireFragmentManager().beginTransaction().detach(this@FilesFragment).attach(this@FilesFragment).commit()
+            requireFragmentManager().beginTransaction().detach(this@FilesFragment)
+                .attach(this@FilesFragment).commit()
         }
 
         recyclerView = view.findViewById(R.id.recycler_view)
@@ -91,16 +92,21 @@ class FilesFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(viewLifecycleOwner) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getFilesAndFolders("Bearer $it", folderID)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getFilesAndFolders("Bearer $it", folderID)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     filesAndFolders = ArrayList()
                                     val resp = response.body()
                                     val loginresp: JsonArray =
                                         Gson().fromJson(resp?.get("files"), JsonArray::class.java)
                                     for (files in loginresp) {
-                                        val pos = Gson().fromJson(files, FilesAndFolders::class.java)
+                                        val pos =
+                                            Gson().fromJson(files, FilesAndFolders::class.java)
                                         filesAndFolders.add(pos)
                                     }
                                     shimmerFrameLayout.stopShimmer()
@@ -112,15 +118,21 @@ class FilesFragment : Fragment() {
                                         noFilesText.visibility = View.GONE
                                         recyclerView.visibility = View.VISIBLE
                                         if (Util.listview) {
-                                            recyclerView.layoutManager = LinearLayoutManager(context)
+                                            recyclerView.layoutManager =
+                                                LinearLayoutManager(context)
                                         } else {
-                                            recyclerView.layoutManager = GridLayoutManager(context, 3)
+                                            recyclerView.layoutManager =
+                                                GridLayoutManager(context, 3)
                                         }
-                                        recyclerView.adapter = FileAdapter(context, filesAndFolders,this@FilesFragment)
+                                        recyclerView.adapter = FileAdapter(
+                                            context,
+                                            filesAndFolders,
+                                            this@FilesFragment
+                                        )
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -129,7 +141,11 @@ class FilesFragment : Fragment() {
                             }
                         })
                     } else {
-                        Toast.makeText(context, "Somthing Went Wrong \nLogin again to continue", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            context,
+                            "Somthing Went Wrong \nLogin again to continue",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                         lifecycleScope.launch {
                             userPreferences.deleteAuthToken()
@@ -144,16 +160,19 @@ class FilesFragment : Fragment() {
             Log.e("FilesFragment.getFilesAndFolder", e.toString())
         }
     }
+
     override fun onPause() {
         super.onPause()
 
     }
+
     override fun onResume() {
         super.onResume()
-        
+
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        
+
     }
 }

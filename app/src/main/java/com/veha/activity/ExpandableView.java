@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 
 public class ExpandableView extends TextView implements View.OnClickListener {
@@ -19,7 +20,6 @@ public class ExpandableView extends TextView implements View.OnClickListener {
         linearLayout.addView(this);
 
     }
-
     public ExpandableView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
@@ -27,17 +27,17 @@ public class ExpandableView extends TextView implements View.OnClickListener {
     public ExpandableView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-    public void setText(String text){
+
+    public void setText(String text) {
         this.text = text;
         Spannable spannable = null;
-        if (text.length()>300){
+        if (text.length() > 300) {
             this.isExpanded = false;
-            text = text.substring(0,300);
+            text = text.substring(0, 300);
             text += " Read more...";//"<font color=#0F52BA> Read more...</font>";
             spannable = new SpannableString(text);
-            spannable.setSpan(new ForegroundColorSpan(getContext().getColor(R.color.primary_blue)),300,text.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        else {
+            spannable.setSpan(new ForegroundColorSpan(getContext().getColor(R.color.primary_blue)), 300, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
             spannable = new SpannableString(text);
         }
         super.setText(spannable);
@@ -45,15 +45,14 @@ public class ExpandableView extends TextView implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
         super.setText(this.text);
     }
 
     public void expand() {
-        if (this.isExpanded){
+        if (this.isExpanded) {
             this.isExpanded = false;
             this.setText(this.text);
-        }else {
+        } else {
             this.isExpanded = true;
             super.setText(this.text);
         }

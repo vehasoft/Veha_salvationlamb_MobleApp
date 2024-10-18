@@ -29,15 +29,24 @@ interface RetrofitAPI {
     ): Call<JsonObject?>?
 
     @POST("api/v1/users/warrior")
-    fun postWarrior(@Header(value = "Authorization") head: String, @Body dataModal: JsonObject?): Call<JsonObject?>?
+    fun postWarrior(
+        @Header(value = "Authorization") head: String,
+        @Body dataModal: JsonObject?
+    ): Call<JsonObject?>?
 
     //use it for like post changepassword
     @POST("api/v1/follows")
-    fun postFollow(@Header(value = "Authorization") head: String, @Body dataModal: JsonObject?): Call<JsonObject?>?
+    fun postFollow(
+        @Header(value = "Authorization") head: String,
+        @Body dataModal: JsonObject?
+    ): Call<JsonObject?>?
 
     //userid followerid
     @POST("api/v1/favorites")
-    fun postFav(@Header(value = "Authorization") head: String, @Body dataModal: JsonObject?): Call<JsonObject?>?
+    fun postFav(
+        @Header(value = "Authorization") head: String,
+        @Body dataModal: JsonObject?
+    ): Call<JsonObject?>?
 //userid and postid
 
     @POST("api/v1/Users/image/{userId}")
@@ -53,7 +62,7 @@ interface RetrofitAPI {
         @Body dataModal: JsonObject?
     ): Call<JsonObject?>?
 
-//password protected files
+    //password protected files
     @POST("api/v1/files/access/{fileId}")
     fun postCheckPassword(
         @Header(value = "Authorization") head: String,
@@ -68,8 +77,6 @@ interface RetrofitAPI {
         @Path(value = "userId") userId: String,
         @Path(value = "status") status: String,
     ): Call<JsonObject?>?
-
-
 
 
     @GET("api/v1/favorites/{userId}")
@@ -157,17 +164,20 @@ interface RetrofitAPI {
         @Query("size") size: Int,
         @Query("type") type: String
     ): Call<JsonObject?>?
+
     @GET("api/v1/announcements")
     fun getAnnouncements(
         @Header("Authorization") dataModal: String?,
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Call<JsonObject?>?
+
     @GET("api/v1/announcements/{postId}")
     fun getAnnouncements(
         @Header("Authorization") dataModal: String?,
         @Path(value = "postId") postId: String,
     ): Call<JsonObject?>?
+
     @GET("api/v1/notifications/count/{userId}")
     fun getNotificationCount(
         @Header("Authorization") dataModal: String?,
@@ -181,10 +191,16 @@ interface RetrofitAPI {
     ): Call<JsonObject?>?
 
     @GET("api/v1/search")
-    fun getSearch(@Header(value = "Authorization") head: String, @Query("query") query: String?): Call<JsonObject?>?
+    fun getSearch(
+        @Header(value = "Authorization") head: String,
+        @Query("query") query: String?
+    ): Call<JsonObject?>?
 
     @GET("api/v1/post/{postId}")
-    fun getPost(@Header("Authorization") dataModal: String?, @Path(value = "postId") postId: String): Call<JsonObject?>?
+    fun getPost(
+        @Header("Authorization") dataModal: String?,
+        @Path(value = "postId") postId: String
+    ): Call<JsonObject?>?
 
     @GET("api/v1/files/{folderId}")
     fun getFilesAndFolders(
@@ -212,6 +228,7 @@ interface RetrofitAPI {
         @Path(value = "userId") userId: String,
         @Body dataModal: JsonObject?
     ): Call<JsonObject?>?
+
     @PUT("/api/v1/users/token/update")
     fun putToken(
         @Header(value = "Authorization") head: String,

@@ -98,7 +98,7 @@ class LoginActivity : AppCompatActivity() {
             data.addProperty("isMobile", true)
             data.addProperty("token", token)
             data.addProperty("deviceInfo", getSystemDetails().toString())
-            Log.e("deviceeee",getSystemDetails().toString())
+            Log.e("deviceeee", getSystemDetails().toString())
             if (!Util.isValidEmail(emailstr))
                 Toast.makeText(this, "Invalid Email", Toast.LENGTH_LONG).show()
             else if (!Util.isValidPassword(passwordstr))
@@ -123,6 +123,9 @@ class LoginActivity : AppCompatActivity() {
                         response: Response<JsonObject?>
                     ) {
                         if (response.code() == 200) {
+                            data.remove("password")
+                            data.remove("email")
+                            data.remove("token")
                             val resp = response.body()
                             val loginresp: Loginresp =
                                 Gson().fromJson(resp?.get("result"), Loginresp::class.java)

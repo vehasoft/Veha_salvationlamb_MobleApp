@@ -27,9 +27,9 @@ class ViewProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_view_profile)
         userPreferences = UserPreferences(this)
         val userId = intent.getStringExtra("userId")
-        val viewProfile = ProfileFragment.getInstance(userId!!,"other")
+        val viewProfile = ProfileFragment.getInstance(userId!!, "other")
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.view_profile,viewProfile)
+        ft.replace(R.id.view_profile, viewProfile)
         ft.commit()
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
@@ -40,70 +40,5 @@ class ViewProfileActivity : AppCompatActivity() {
         close.setOnClickListener {
             finish()
         }
-        /*menu.setOnClickListener {
-            val myContext: Context = ContextThemeWrapper(this@ViewProfileActivity, R.style.menuStyle)
-            val popup = PopupMenu(myContext, menu)
-            popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
-            if (Util.isWarrior){ popup.menu.findItem(R.id.warrior).isVisible = false }
-            if (Util.user.isReviewState.toBoolean()) { popup.menu.findItem(R.id.warrior).isVisible = false }
-            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
-                    R.id.warrior -> {
-                       Commons().makeWarrior(this,this)
-                    }
-                    R.id.logout ->{
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewProfileActivity)
-                        builder.setMessage("Do you want to Logout?")
-                        builder.setTitle("Logout")
-                        builder.setCancelable(false)
-                        builder.setPositiveButton("Yes") { _: DialogInterface?, _: Int -> finish()
-                            lifecycleScope.launch {
-                                userPreferences.deleteAuthToken()
-                                userPreferences.deleteUserId()
-                            }
-                            val intent = Intent(this@ViewProfileActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                        }
-                        builder.setNegativeButton("No") { dialog: DialogInterface, _: Int -> dialog.cancel() }
-
-                        val alertDialog: AlertDialog = builder.create()
-                        alertDialog.show()
-                    }
-
-                    R.id.edit_profile ->{
-                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
-                            val intent = Intent(this@ViewProfileActivity, EditProfileActivity::class.java)
-                            startActivity(intent)
-                        } else {
-                            val intent = Intent(this@ViewProfileActivity, NoPermissionActivity::class.java)
-                            startActivity(intent)
-                        }
-                    }
-                    R.id.fav ->{
-                        val intent = Intent(this@ViewProfileActivity, FavoritesActivity::class.java)
-                        startActivity(intent)
-                    }
-                    R.id.settings -> {
-                        val intent = Intent(this@ViewProfileActivity, SettingsActivity::class.java)
-                        startActivity(intent)
-                    }
-                    *//*R.id.nightmode ->{
-                        if (Util.isNight){
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            Util.isNight = false
-                            night.title = "Day Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(false) }
-                        } else {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            Util.isNight = true
-                            night.title = "Night Mode"
-                            lifecycleScope.launch { userPreferences.saveIsNightModeEnabled(true) }
-                        }
-                    }*//*
-                }
-                true
-            })
-            popup.show()
-        }*/
     }
 }

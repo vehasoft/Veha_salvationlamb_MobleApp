@@ -52,14 +52,14 @@ class AdminNotificationFragment : Fragment() {
     ): View? {
         updated = false
         // Inflate the layout for this fragment
-        val view =  inflater.inflate(R.layout.fragment_admin_notification, container, false)
+        val view = inflater.inflate(R.layout.fragment_admin_notification, container, false)
         contexts = container!!.context
         userPreferences = UserPreferences(contexts)
         list = view.findViewById(R.id.notification_admin_recycler)
         nodata = view.findViewById(R.id.no_data)
         page = 1
 
-        adapter = NotificationListAdapter(ArrayList(),contexts,this@AdminNotificationFragment)
+        adapter = NotificationListAdapter(ArrayList(), contexts, this@AdminNotificationFragment)
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
@@ -67,11 +67,15 @@ class AdminNotificationFragment : Fragment() {
 
         return view
     }
-    private fun getNotifications(owner: LifecycleOwner,postlist: ArrayList<NotificationList> = ArrayList()){
+
+    private fun getNotifications(
+        owner: LifecycleOwner,
+        postlist: ArrayList<NotificationList> = ArrayList()
+    ) {
 
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -80,7 +84,8 @@ class AdminNotificationFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,page,10,"admin")
+                        val call: Call<JsonObject?>? =
+                            retrofit.getNotifications("Bearer $it", Util.userId, page, 10, "admin")
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -89,11 +94,17 @@ class AdminNotificationFragment : Fragment() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
-                                        Gson().fromJson(resp?.get("notification"), JsonArray::class.java)
+                                        Gson().fromJson(
+                                            resp?.get("notification"),
+                                            JsonArray::class.java
+                                        )
                                     count = Integer.parseInt(resp?.get("count").toString())
                                     count /= 10
                                     for (notification in loginresp) {
-                                        val pos = Gson().fromJson(notification, NotificationList::class.java)
+                                        val pos = Gson().fromJson(
+                                            notification,
+                                            NotificationList::class.java
+                                        )
                                         postlist.add(pos)
                                     }
                                     if (postlist.size <= 0 && page == 1) {
@@ -114,7 +125,7 @@ class AdminNotificationFragment : Fragment() {
                                                 dx: Int
                                             ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
-                                                    if ((count+2) > page) {
+                                                    if ((count + 2) > page) {
                                                         page++
                                                         getNotifications(owner)
                                                         updated = false
@@ -133,8 +144,8 @@ class AdminNotificationFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

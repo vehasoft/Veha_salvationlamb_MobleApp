@@ -14,12 +14,13 @@ import com.veha.util.Posts
 import com.veha.util.Util
 
 
-internal class SearchAdapter(val context: Context,
-                             fm: FragmentManager?,
-                             private var totalTabs: Int,
-                             val profilelist: ArrayList<PostUser>,
-                             val postlist: ArrayList<Posts>)
-    : FragmentPagerAdapter(fm!!) {
+internal class SearchAdapter(
+    val context: Context,
+    fm: FragmentManager?,
+    private var totalTabs: Int,
+    val profilelist: ArrayList<PostUser>,
+    val postlist: ArrayList<Posts>
+) : FragmentPagerAdapter(fm!!) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
@@ -30,13 +31,15 @@ internal class SearchAdapter(val context: Context,
                     NoPermissionFragment()
                 }
             }
+
             0 -> {
                 if (Util.hasPermission(PermissionType.POST.value, Permission.READ.value)) {
-                SearchPostFragment.getFragment(postlist)
+                    SearchPostFragment.getFragment(postlist)
                 } else {
                     NoPermissionFragment()
                 }
             }
+
             else -> null as Fragment
         }
     }

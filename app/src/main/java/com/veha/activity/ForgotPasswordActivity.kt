@@ -50,7 +50,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
         if (page.contentEquals("verify")) {
             emailID = intent.getStringExtra("email").toString()
             forgotPasswordHead.text = "OTP Verification"
-            forgotPasswordContent.text = "Welcome to SalvationLamb. Please enter otp to verify your registered email id"
+            forgotPasswordContent.text =
+                "Welcome to SalvationLamb. Please enter otp to verify your registered email id"
             email.text = Editable.Factory.getInstance().newEditable(emailID)
             otpOp.visibility = View.VISIBLE
             cancelButton.visibility = View.VISIBLE
@@ -59,7 +60,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
             forgotButton.setOnClickListener {
                 if (TextUtils.isEmpty(otp.text!!.trim())) {
                     otp.error = "Enter OTP"
-                    Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG)
+                        .show()
                 } else {
                     forgotButton.isEnabled = false
                     checkOtp(emailID, otp.text.toString())
@@ -77,7 +79,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
             forgotButton.setOnClickListener {
                 if (TextUtils.isEmpty(email.text!!.trim())) {
                     email.error = "Enter Email"
-                    Toast.makeText(this@ForgotPasswordActivity, "Enter Email", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ForgotPasswordActivity, "Enter Email", Toast.LENGTH_LONG)
+                        .show()
                 } else {
                     forgotButton.isEnabled = false
                     checkValid(email.text.toString())
@@ -101,8 +104,12 @@ class ForgotPasswordActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = retrofit.postForgotPassword(data)
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
+                            data.remove("email")
                             val resp = response.body()
                             Toast.makeText(
                                 this@ForgotPasswordActivity,
@@ -116,7 +123,11 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 forgotButton.setOnClickListener {
                                     if (TextUtils.isEmpty(otp.text!!.trim())) {
                                         otp.error = "Enter OTP"
-                                        Toast.makeText(this@ForgotPasswordActivity, "Enter OTP", Toast.LENGTH_LONG)
+                                        Toast.makeText(
+                                            this@ForgotPasswordActivity,
+                                            "Enter OTP",
+                                            Toast.LENGTH_LONG
+                                        )
                                             .show()
                                     } else {
                                         checkOtp(email.text.toString(), otp.text.toString())
@@ -124,8 +135,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 }
                             }
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -136,8 +147,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("ForgotPasswordActivity.checkValid", e.toString())
-        }
-        finally {
+        } finally {
             forgotButton.isEnabled = true
         }
     }
@@ -148,7 +158,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
                 val data = JsonObject()
                 data.addProperty("email", emailtxt)
                 data.addProperty("otp", otpTxt)
-                Log.e("data", data.toString())
                 val retrofit = Util.getRetrofit()
                 val call: Call<JsonObject?>? = if (page.contentEquals("verify")) {
                     retrofit.postVerifyUser(data)
@@ -156,8 +165,13 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     retrofit.postForgotPasswordOtp(data)
                 }
                 call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                    override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
                         if (response.code() == 200) {
+                            data.remove("email")
+                            data.remove("otp")
                             val resp = response.body()
                             Toast.makeText(
                                 this@ForgotPasswordActivity,
@@ -167,16 +181,25 @@ class ForgotPasswordActivity : AppCompatActivity() {
                                 .show()
                             if (page.contentEquals("verify")) {
                                 if (Util.userId.isNullOrEmpty()) {
-                                    val intent = Intent(this@ForgotPasswordActivity, LoginActivity::class.java)
+                                    val intent = Intent(
+                                        this@ForgotPasswordActivity,
+                                        LoginActivity::class.java
+                                    )
                                     startActivity(intent)
                                     finish()
                                 } else {
-                                    val intent = Intent(this@ForgotPasswordActivity, MainActivity::class.java)
+                                    val intent = Intent(
+                                        this@ForgotPasswordActivity,
+                                        MainActivity::class.java
+                                    )
                                     startActivity(intent)
                                     finish()
                                 }
                             } else {
-                                val intent = Intent(this@ForgotPasswordActivity, ChangePasswordActivity::class.java)
+                                val intent = Intent(
+                                    this@ForgotPasswordActivity,
+                                    ChangePasswordActivity::class.java
+                                )
                                 intent.putExtra("email", emailtxt)
                                 intent.putExtra("otp", otpTxt)
                                 startActivity(intent)
@@ -184,8 +207,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             }
 
                         } else {
-                            Log.e("code",response.code().toString())
-                            Log.e("err",response.errorBody().toString())
+                            Log.e("code", response.code().toString())
+                            Log.e("err", response.errorBody().toString())
                         }
                     }
 
@@ -196,8 +219,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("ForgotPasswordActivity.checkOTP", e.toString())
-        }
-        finally {
+        } finally {
             forgotButton.isEnabled = true
         }
     }

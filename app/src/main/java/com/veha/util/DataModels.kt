@@ -38,6 +38,7 @@ data class PostLikes(
     val updatedAt: String,
     val user: PostUser,
 )
+
 data class AllFavList(
     val id: String,
     val userId: String,
@@ -46,6 +47,7 @@ data class AllFavList(
     val updatedAt: String,
     val posts: Posts
 )
+
 data class AllFollowerList(
     val id: String,
     val userId: String,
@@ -54,6 +56,7 @@ data class AllFollowerList(
     val updatedAt: String,
     val user: PostUser,
 )
+
 data class FilesAndFolders(
     val id: String,
     val parentId: String,
@@ -67,6 +70,7 @@ data class FilesAndFolders(
     val createdAt: String,
     val updatedAt: String,
 )
+
 data class Countries(
     val id: String,
     val name: String,
@@ -83,6 +87,7 @@ data class Countries(
     val region: String,
     val subregion: String,
 )
+
 data class State(
     val id: String,
     val name: String,
@@ -94,6 +99,7 @@ data class State(
     val latitude: String,
     val longitude: String,
 )
+
 data class City(
     val id: String,
     val name: String,
@@ -107,6 +113,7 @@ data class City(
     val longitude: String,
     val wikidataid: String,
 )
+
 data class UserRslt(
     val id: String,
     val name: String,
@@ -137,6 +144,7 @@ data class UserRslt(
     val isFreshUser: String,
     val blocked: String,
 )
+
 data class ProfileChange(
     val id: String,
     val userId: String,
@@ -162,6 +170,7 @@ data class ProfileChange(
     val language: String,
     val createdAt: String,
 )
+
 data class Posts(
     val id: String,
     val title: String,
@@ -190,7 +199,8 @@ data class PostUser(
     val isWarrior: String,
     val email: String
 )
-data class FavPost (
+
+data class FavPost(
     val id: String,
     val userId: String,
     val postId: String,
@@ -198,6 +208,7 @@ data class FavPost (
     val updatedAt: String,
     val posts: Posts,
 )
+
 data class NotificationList(
     val id: String,
     val acterId: String,
@@ -212,6 +223,7 @@ data class NotificationList(
     val updatedAt: String,
     val user: PostUser,
 )
+
 data class Announcement(
     val id: String,
     val title: String,
@@ -221,11 +233,13 @@ data class Announcement(
     val createdAt: String,
     val updatedAt: String,
 )
+
 data class BibleSelector(
     val content: String,
     val isSelected: Boolean
 )
-public enum class NotificationType( val value: String) {
+
+public enum class NotificationType(val value: String) {
     POST("post"),
     USER("user"),
     WARRIOR("warrior"),
@@ -233,23 +247,27 @@ public enum class NotificationType( val value: String) {
     FILE("file"),
     EVENT("event"),
 }
+
 public enum class FileType(s: String) {
     FILE("file"),
     FOLDER("folder"),
 }
+
 public enum class USERType(s: String) {
     USER("user"),
     WARRIOR("warrior"),
     ADMIN("admin"),
 }
-public enum class Permission( val value: String) {
+
+public enum class Permission(val value: String) {
     ALL("All"),
     READ("Read"),
     EDIT("Edit"),
     DELETE("Delete"),
     CREATE("Create"),
 }
-public enum class PermissionType( val value: String) {
+
+public enum class PermissionType(val value: String) {
     POST("POST"),
     USER("USER"),
     PROFILE("PROFILE"),
@@ -259,6 +277,7 @@ public enum class PermissionType( val value: String) {
     WARRIOR("WARRIOR"),
     ANNOUNCEMENT("ANNOUNCEMENT"),
 }
+
 public enum class PostType(val type: String) {
     IMAGE("image"),
     TEXT("text"),

@@ -54,7 +54,8 @@ class AnnouncementActivity : AppCompatActivity() {
         close.setOnClickListener {
             finish()
         }
-        adapter = AnnouncementAdapter(ArrayList(),this@AnnouncementActivity,this@AnnouncementActivity)
+        adapter =
+            AnnouncementAdapter(ArrayList(), this@AnnouncementActivity, this@AnnouncementActivity)
         val layoutManager = LinearLayoutManager(this)
         list.layoutManager = layoutManager
         list.adapter = adapter
@@ -62,7 +63,7 @@ class AnnouncementActivity : AppCompatActivity() {
 
     }
 
-    private fun getAnnouncenents(postlist: ArrayList<Posts> = ArrayList()){
+    private fun getAnnouncenents(postlist: ArrayList<Posts> = ArrayList()) {
 
         try {
             if (Commons().isNetworkAvailable(this@AnnouncementActivity)) {
@@ -70,13 +71,14 @@ class AnnouncementActivity : AppCompatActivity() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this@AnnouncementActivity) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it",page,10)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getAnnouncements("Bearer $it", page, 10)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
-                                Log.e("response",response.body().toString())
+                                Log.e("response", response.body().toString())
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
@@ -105,7 +107,7 @@ class AnnouncementActivity : AppCompatActivity() {
                                                 dx: Int
                                             ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
-                                                    if ((count+2) > page) {
+                                                    if ((count + 2) > page) {
                                                         getAnnouncenents()
                                                         updated = false
                                                     }
@@ -120,7 +122,8 @@ class AnnouncementActivity : AppCompatActivity() {
                                         resources.getString(R.string.Deleted_account),
                                         Toast.LENGTH_LONG
                                     ).show()
-                                    val intent = Intent(this@AnnouncementActivity, LoginActivity::class.java)
+                                    val intent =
+                                        Intent(this@AnnouncementActivity, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
                                     Log.e("failAnnouncements - Status", response.code().toString())

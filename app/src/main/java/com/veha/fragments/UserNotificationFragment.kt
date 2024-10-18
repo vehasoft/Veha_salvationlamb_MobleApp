@@ -56,18 +56,22 @@ class UserNotificationFragment : Fragment() {
         list = view.findViewById(R.id.notification_user_recycler)
         nodata = view.findViewById(R.id.no_data)
         page = 1
-        adapter = NotificationListAdapter(ArrayList(),contexts,this@UserNotificationFragment)
+        adapter = NotificationListAdapter(ArrayList(), contexts, this@UserNotificationFragment)
         val layoutManager = LinearLayoutManager(activity)
         list.layoutManager = layoutManager
         list.adapter = adapter
         getNotifications(viewLifecycleOwner)
         return view
     }
-    private fun getNotifications(owner: LifecycleOwner, postlist: ArrayList<NotificationList> = ArrayList()){
+
+    private fun getNotifications(
+        owner: LifecycleOwner,
+        postlist: ArrayList<NotificationList> = ArrayList()
+    ) {
 
         try {
             if (Util.userId == null) {
-                userPreferences.userId.asLiveData().observe(this){
+                userPreferences.userId.asLiveData().observe(this) {
                     Util.userId = it
                 }
             }
@@ -76,7 +80,8 @@ class UserNotificationFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getNotifications("Bearer $it", Util.userId,page,10,"user")
+                        val call: Call<JsonObject?>? =
+                            retrofit.getNotifications("Bearer $it", Util.userId, page, 10, "user")
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -85,11 +90,17 @@ class UserNotificationFragment : Fragment() {
                                 if (response.code() == 200) {
                                     val resp = response.body()
                                     val loginresp: JsonArray =
-                                        Gson().fromJson(resp?.get("notification"), JsonArray::class.java)
+                                        Gson().fromJson(
+                                            resp?.get("notification"),
+                                            JsonArray::class.java
+                                        )
                                     count = Integer.parseInt(resp?.get("count").toString())
                                     count /= 10
                                     for (notification in loginresp) {
-                                        val pos = Gson().fromJson(notification, NotificationList::class.java)
+                                        val pos = Gson().fromJson(
+                                            notification,
+                                            NotificationList::class.java
+                                        )
                                         postlist.add(pos)
                                     }
                                     if (postlist.size <= 0 && page == 1) {
@@ -110,7 +121,7 @@ class UserNotificationFragment : Fragment() {
                                                 dx: Int
                                             ) {
                                                 if (!recyclerView.canScrollVertically(1)) {
-                                                    if ((count+2) > page) {
+                                                    if ((count + 2) > page) {
                                                         getNotifications(owner)
                                                         updated = false
                                                     }
@@ -128,8 +139,8 @@ class UserNotificationFragment : Fragment() {
                                     val intent = Intent(contexts, LoginActivity::class.java)
                                     startActivity(intent)
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 

@@ -99,9 +99,9 @@ class ViewPostActivity : AppCompatActivity() {
         type = intent.extras!!.get("type").toString()
         if (type == NotificationType.POST.value) {
             postId = intent.extras!!.get("postId").toString()
-            Log.e("post",postId.toString())
+            Log.e("post", postId.toString())
             getPost(postId)
-        }else if (type == NotificationType.ANNOUNCEMENT.value) {
+        } else if (type == NotificationType.ANNOUNCEMENT.value) {
             postId = intent.extras!!.get("postId").toString()
             getAnnouncement(postId)
         }
@@ -198,7 +198,8 @@ class ViewPostActivity : AppCompatActivity() {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
-                var shareMessage = "${content.text} \n\n\n\nLet me recommend you this application\n\n"
+                var shareMessage =
+                    "${content.text} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/"}                    
                     """.trimIndent()
@@ -211,13 +212,17 @@ class ViewPostActivity : AppCompatActivity() {
     }
 
     fun setPostContent(post: Posts) {
-        if (type == NotificationType.ANNOUNCEMENT.value){
-            if (!post.message.isNullOrEmpty()){content.setText(post.message)}
-        } else if (type == NotificationType.POST.value){
-            if (!post.content.isNullOrEmpty()){content.setText(post.content)}
+        if (type == NotificationType.ANNOUNCEMENT.value) {
+            if (!post.message.isNullOrEmpty()) {
+                content.setText(post.message)
+            }
+        } else if (type == NotificationType.POST.value) {
+            if (!post.content.isNullOrEmpty()) {
+                content.setText(post.content)
+            }
         }
         content.setOnClickListener { content.expand() }
-        if (post.user != null){
+        if (post.user != null) {
             name.text = post.user.name
             if (!post.user.picture.isNullOrEmpty()) {
                 Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
@@ -225,7 +230,7 @@ class ViewPostActivity : AppCompatActivity() {
                 profilePic.setImageResource(R.drawable.ic_profile)
             }
         }
-        if (post.contentURL.isNullOrEmpty()){
+        if (post.contentURL.isNullOrEmpty()) {
             contentUrl.visibility = View.GONE
         } else {
             contentUrl.visibility = View.VISIBLE
@@ -238,11 +243,17 @@ class ViewPostActivity : AppCompatActivity() {
             contentUrl.text = Html.fromHtml(url)
             contentUrl.isClickable = true
         }
-        if (!post.tags.isNullOrEmpty()){tags.text = getTags(post.tags)}
-        if (!post.title.isNullOrEmpty()){title.text = post.title}
+        if (!post.tags.isNullOrEmpty()) {
+            tags.text = getTags(post.tags)
+        }
+        if (!post.title.isNullOrEmpty()) {
+            title.text = post.title
+        }
         time.text = Util.getTimeAgo(post.createdAt)
         fullTime.text = post.createdAt
-        if (!post.likesCount.isNullOrEmpty()){reacts.text = post.likesCount + "people reacts"}
+        if (!post.likesCount.isNullOrEmpty()) {
+            reacts.text = post.likesCount + "people reacts"
+        }
         if (!post.type.isNullOrEmpty()) {
             when (post.type) {
                 "image" -> {
@@ -250,17 +261,19 @@ class ViewPostActivity : AppCompatActivity() {
                     postVideo.visibility = View.GONE
                     if (type == NotificationType.POST.value && post.picture != null) {
                         postPic.visibility = View.VISIBLE
-                        Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside().into(postPic)
-                    } else if(type == NotificationType.ANNOUNCEMENT.value && post.url != null){
+                        Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside()
+                            .into(postPic)
+                    } else if (type == NotificationType.ANNOUNCEMENT.value && post.url != null) {
                         postPic.visibility = View.VISIBLE
-                        Picasso.with(this@ViewPostActivity).load(post.url).fit().centerInside().into(postPic)
-                    }
-                    else {
+                        Picasso.with(this@ViewPostActivity).load(post.url).fit().centerInside()
+                            .into(postPic)
+                    } else {
                         postPic.visibility = View.GONE
                     }
                     postPic.setOnClickListener {
                         if (!post.picture.isNullOrEmpty()) {
-                            val intent = Intent(this@ViewPostActivity, ImageDetailActivity::class.java)
+                            val intent =
+                                Intent(this@ViewPostActivity, ImageDetailActivity::class.java)
                             intent.putExtra("profilePic", post.picture)
                             startActivity(intent)
                         }
@@ -313,7 +326,11 @@ class ViewPostActivity : AppCompatActivity() {
                                     SeekBar.OnSeekBarChangeListener {
                                     override fun onStopTrackingTouch(seekBar: SeekBar) {}
                                     override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                                    override fun onProgressChanged(
+                                        seekBar: SeekBar,
+                                        progress: Int,
+                                        fromUser: Boolean
+                                    ) {
                                         if (fromUser) {
                                             Util.player.seekTo(progress)
                                         }
@@ -346,7 +363,7 @@ class ViewPostActivity : AppCompatActivity() {
                         postVideo.visibility = View.VISIBLE
                         try {
                             this@ViewPostActivity.lifecycle.addObserver(postVideo)
-                        }catch (e: Exception){
+                        } catch (e: Exception) {
                             this@ViewPostActivity.lifecycle.addObserver(postVideo)
                         }
                         val youTubePlayerListener = object : AbstractYouTubePlayerListener() {
@@ -354,7 +371,8 @@ class ViewPostActivity : AppCompatActivity() {
                                 youTubePlayer.cueVideo(post.url, 0f)
                             }
                         }
-                        val iFramePlayerOptions = IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
+                        val iFramePlayerOptions =
+                            IFramePlayerOptions.Builder().controls(1).autoplay(0).build()
 
                         postVideo.enableAutomaticInitialization = false
                         try {
@@ -369,10 +387,10 @@ class ViewPostActivity : AppCompatActivity() {
                 }
 
 
-
             }
         }
     }
+
     fun getPost(postId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
@@ -392,11 +410,13 @@ class ViewPostActivity : AppCompatActivity() {
                                     )
                                     setPostContent(post)
                                 } else {
-                                    Toast.makeText(this@ViewPostActivity,"This post may deleted",
-                                        Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        this@ViewPostActivity, "This post may deleted",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     finish()
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -411,20 +431,22 @@ class ViewPostActivity : AppCompatActivity() {
             Log.e("ViewPost", e.toString())
         }
     }
+
     fun getAnnouncement(postId: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getAnnouncements("Bearer $it", postId)
+                        val call: Call<JsonObject?>? =
+                            retrofit.getAnnouncements("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
                                 response: Response<JsonObject?>
                             ) {
                                 if (response.code() == 200) {
-                                    Log.e("announcement",response.body().toString())
+                                    Log.e("announcement", response.body().toString())
                                     val post: Posts = Gson().fromJson(
                                         response.body()?.get("announcement"),
                                         Posts::class.java
@@ -433,11 +455,13 @@ class ViewPostActivity : AppCompatActivity() {
                                     likeBtn.visibility = View.GONE
                                     shareBtn.visibility = View.GONE
                                 } else {
-                                    Toast.makeText(this@ViewPostActivity,"This post may deleted",
-                                        Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        this@ViewPostActivity, "This post may deleted",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     finish()
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
@@ -464,14 +488,27 @@ class ViewPostActivity : AppCompatActivity() {
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         likeBtn.isEnabled = false
-                        val call: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "like", data)
+                        val call: Call<JsonObject?>? =
+                            retrofit.postCallHead("Bearer $it", "like", data)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
+                                    data.remove("userId")
+                                    data.remove("postId")
+                                    data.remove("reaction")
                                     val msg: String =
-                                        Gson().fromJson(response.body()!!.get("message"), String::class.java)
+                                        Gson().fromJson(
+                                            response.body()!!.get("message"),
+                                            String::class.java
+                                        )
                                     val likesCount: String =
-                                        Gson().fromJson(response.body()!!.get("likesCount"), String::class.java)
+                                        Gson().fromJson(
+                                            response.body()!!.get("likesCount"),
+                                            String::class.java
+                                        )
                                     if (msg == "liked") {
                                         likeBtn.text = reaction
                                         reacts.text = "$likesCount people reacts"
@@ -480,8 +517,8 @@ class ViewPostActivity : AppCompatActivity() {
                                         reacts.text = "$likesCount people reacts"
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                                 call.cancel()
                                 likeBtn.isEnabled = true
@@ -510,6 +547,7 @@ class ViewPostActivity : AppCompatActivity() {
         }
         return opTags
     }
+
     override fun onBackPressed() {
         if (Util.player != null) {
             Util.player.stop()
@@ -526,13 +564,14 @@ class ViewPostActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    override fun onDestroy() { if (
-        Util.player != null) {
-        Util.player.stop()
-        Util.player.reset()
-        Util.player.release()
-        Util.player = null
-    }
+    override fun onDestroy() {
+        if (
+            Util.player != null) {
+            Util.player.stop()
+            Util.player.reset()
+            Util.player.release()
+            Util.player = null
+        }
         super.onDestroy()
     }
 }

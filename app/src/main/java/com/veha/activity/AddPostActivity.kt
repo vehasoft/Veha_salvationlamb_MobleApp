@@ -82,7 +82,7 @@ class AddPostActivity : AppCompatActivity() {
                 video.visibility = View.GONE
                 postPic.visibility = View.GONE
                 postTypeStr = PostType.IMAGE.type
-            }else if (checkedId == R.id.image_btn) {
+            } else if (checkedId == R.id.image_btn) {
                 video.visibility = View.GONE
                 postTypeStr = PostType.IMAGE.type
                 addImg()
@@ -111,7 +111,7 @@ class AddPostActivity : AppCompatActivity() {
                 data.addProperty("userId", Util.userId)
                 postData(data)
                 postBtn.isEnabled = true
-                Log.e("posttt",data.toString())
+                Log.e("posttt", data.toString())
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -130,16 +130,21 @@ class AddPostActivity : AppCompatActivity() {
                 val userPreferences = UserPreferences(this);
                 userPreferences.authToken.asLiveData().observe(this) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call1: Call<JsonObject?>? = retrofit.postCallHead("Bearer $it", "post", data)
+                        val call1: Call<JsonObject?>? =
+                            retrofit.postCallHead("Bearer $it", "post", data)
                         call1!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     title.text.clear()
                                     content.text.clear()
                                     data.remove("userId")
                                     data.remove("title")
                                     data.remove("content")
-                                    val intent = Intent(this@AddPostActivity, MainActivity::class.java)
+                                    val intent =
+                                        Intent(this@AddPostActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 } else {
@@ -239,7 +244,8 @@ class AddPostActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100) {
             if (data?.data != null) {
-                val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, data.data)
+                val bitmap =
+                    MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, data.data)
                 if (bitmap != null) {
                     postPic.visibility = View.VISIBLE
                     postPic.setImageBitmap(bitmap)
@@ -275,6 +281,7 @@ class AddPostActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
     }

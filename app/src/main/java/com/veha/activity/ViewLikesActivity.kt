@@ -79,7 +79,8 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
 
                     R.id.logout -> {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@ViewLikesActivity)
+                        val builder: AlertDialog.Builder =
+                            AlertDialog.Builder(this@ViewLikesActivity)
                         builder.setMessage("Do you want to Logout?")
                         builder.setTitle("Logout")
                         builder.setCancelable(false)
@@ -99,11 +100,17 @@ class ViewLikesActivity : AppCompatActivity() {
                     }
 
                     R.id.edit_profile -> {
-                        if (Util.hasPermission(PermissionType.PROFILE.value, Permission.EDIT.value)) {
-                            val intent = Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
+                        if (Util.hasPermission(
+                                PermissionType.PROFILE.value,
+                                Permission.EDIT.value
+                            )
+                        ) {
+                            val intent =
+                                Intent(this@ViewLikesActivity, EditProfileActivity::class.java)
                             startActivity(intent)
                         } else {
-                            val intent = Intent(this@ViewLikesActivity, NoPermissionActivity::class.java)
+                            val intent =
+                                Intent(this@ViewLikesActivity, NoPermissionActivity::class.java)
                             startActivity(intent)
                         }
                     }
@@ -132,7 +139,10 @@ class ViewLikesActivity : AppCompatActivity() {
                     if (!TextUtils.isEmpty(it) && !it.equals("null") && !it.isNullOrEmpty()) {
                         val call: Call<JsonObject?>? = retrofit.getPostLike("Bearer $it", postId)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
-                            override fun onResponse(call: Call<JsonObject?>, response: Response<JsonObject?>) {
+                            override fun onResponse(
+                                call: Call<JsonObject?>,
+                                response: Response<JsonObject?>
+                            ) {
                                 if (response.code() == 200) {
                                     likeslist = ArrayList()
                                     val resp = response.body()
@@ -154,8 +164,8 @@ class ViewLikesActivity : AppCompatActivity() {
                                         list.adapter = ViewLikesAdapter(likeslist, context)
                                     }
                                 } else {
-                                    Log.e("code",response.code().toString())
-                                    Log.e("err",response.errorBody().toString())
+                                    Log.e("code", response.code().toString())
+                                    Log.e("err", response.errorBody().toString())
                                 }
                             }
 
