@@ -142,7 +142,7 @@ class BibleActivity : AppCompatActivity() {
                 intent.putExtra("content", text)
                 intent.putExtra(
                     "tags",
-                    contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString()
+                    contentDropdown.selectedItem.toString() + ", " + chapterDropdown.selectedItem.toString()
                 )
                 startActivity(intent)
             }
@@ -153,8 +153,8 @@ class BibleActivity : AppCompatActivity() {
     fun setBibleEdition(edition: String) {
         bibleDropdown.adapter = null
         bibleList = ArrayList()
-        bibleList.add("Old Edition")
-        bibleList.add("New Edition")
+        bibleList.add(this@BibleActivity.getString(R.string.oldBible))
+        bibleList.add(this@BibleActivity.getString(R.string.newBible))
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bibleList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -216,8 +216,8 @@ class BibleActivity : AppCompatActivity() {
         for (bibleContent in list) {
             chapter++
             val key = Gson().fromJson(bibleContent, JsonObject::class.java)
-            chapterList.add("ch $chapter")
-            chapterMap.put("ch $chapter", key.get("V").asJsonArray)
+            chapterList.add("அதிகாரம் $chapter")
+            chapterMap.put("அதிகாரம் $chapter", key.get("V").asJsonArray)
         }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, chapterList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

@@ -144,6 +144,7 @@ class HomeAdapter(
                 "image" -> {
                     holder.audioLayout.visibility = View.GONE
                     holder.postVideo.visibility = View.GONE
+                    holder.bibleLayout.visibility = View.GONE
                     if (!post.picture.isNullOrEmpty()) {
                         holder.postPic.visibility = View.VISIBLE
                         Picasso.with(context).load(post.picture).fit().centerInside()
@@ -165,13 +166,13 @@ class HomeAdapter(
                     holder.postVideo.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
                     holder.content.visibility = View.GONE
-                    holder.title.visibility = View.GONE
+                    holder.title.text = post.title
                     holder.tags.visibility = View.GONE
                     holder.bibleLayout.visibility = View.VISIBLE
 
 
                     holder.bibleLayout.setBackgroundColor(Color.parseColor(post.colorCode))
-                    holder.bibleTitle.text = post.title
+                    //holder.bibleTitle.text = post.title
                     holder.bibleTags.text = post.tags
                     holder.bibleContent.text = post.content
                 }
@@ -179,6 +180,7 @@ class HomeAdapter(
                 "audio" -> {
                     holder.postVideo.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
+                    holder.bibleLayout.visibility = View.GONE
                     val myHandler = Handler()
                     if (!post.url.isNullOrEmpty()) {
                         holder.audioLayout.visibility = View.VISIBLE
@@ -255,6 +257,7 @@ class HomeAdapter(
                 "video" -> {
                     holder.audioLayout.visibility = View.GONE
                     holder.postPic.visibility = View.GONE
+                    holder.bibleLayout.visibility = View.GONE
                     if (!post.url.isNullOrEmpty()) {
                         holder.postVideo.visibility = View.VISIBLE
                         try {

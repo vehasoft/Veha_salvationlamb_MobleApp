@@ -64,7 +64,7 @@ class BiblePostActivity : AppCompatActivity() {
         val tagsTxt = intent.extras!!.getString("tags")
         val contentTxt = intent.extras!!.getString("content")
 
-        title.text = "Bible post - " + if (editionTxt == "old") "Old edition" else "New Edition"
+        val title = "Bible post - " + if (editionTxt == "old")  this.resources.getString(R.string.oldBible) else this.resources.getString(R.string.newBible)
         tags.text = tagsTxt
         content.text = contentTxt
 
@@ -91,7 +91,7 @@ class BiblePostActivity : AppCompatActivity() {
         postBtn.setOnClickListener {
             postBtn.isEnabled = false
             val data = JsonObject()
-            data.addProperty("title", title.text.toString())
+            data.addProperty("title", title)
             data.addProperty("content", contentTxt)
             data.addProperty("tags", tagsTxt)
             data.addProperty("image", "")

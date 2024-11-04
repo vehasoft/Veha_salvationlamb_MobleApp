@@ -6,6 +6,8 @@
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
+    <string name="oldBible">பழைய ஏற்பாடு</string>
+    <string name="newBible">புதிய ஏற்பாடு</string>
     <string name="previous">Previous</string>
     <string name="Blocked_account">Your account is blocked\n please contact administrator</string>
     <string name="Deleted_account">Your account is removed\n please contact administrator</string>
