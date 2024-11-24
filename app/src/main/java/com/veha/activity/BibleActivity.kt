@@ -105,7 +105,7 @@ class BibleActivity : AppCompatActivity() {
             }
             val clipBoardManager: ClipboardManager =
                 this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData: ClipData = ClipData.newPlainText("bible", text)
+            val clipData: ClipData = ClipData.newPlainText("bible", text.trim())
             clipBoardManager.setPrimaryClip(clipData)
         }
         share.setOnClickListener {
@@ -117,7 +117,7 @@ class BibleActivity : AppCompatActivity() {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
-                var shareMessage = "$text \n\n\n\nLet me recommend you this application\n\n"
+                var shareMessage = "${text.trim()} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/redirect"}                    
                     """.trimIndent()
@@ -139,7 +139,7 @@ class BibleActivity : AppCompatActivity() {
 
                 val intent = Intent(this, BiblePostActivity::class.java)
                 intent.putExtra("edition", type)
-                intent.putExtra("content", text)
+                intent.putExtra("content", text.trim())
                 intent.putExtra(
                     "tags",
                     contentDropdown.selectedItem.toString() + ", " + chapterDropdown.selectedItem.toString()
