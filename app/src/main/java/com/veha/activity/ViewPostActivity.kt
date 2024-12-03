@@ -2,6 +2,7 @@ package com.veha.activity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -66,6 +67,9 @@ class ViewPostActivity : AppCompatActivity() {
     lateinit var type: String
     lateinit var reacted: LinearLayout
     lateinit var contentUrl: TextView
+    lateinit var bibleContent: TextView
+    lateinit var bibleTags: TextView
+    lateinit var bibleLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_post)
@@ -91,6 +95,9 @@ class ViewPostActivity : AppCompatActivity() {
         overallLayout = findViewById(R.id.child_post_layout)
         contentUrl = findViewById(R.id.content_url)
         reacted = findViewById(R.id.react_btn)
+        bibleLayout = findViewById(R.id.bible_cons_layout)
+        bibleContent = findViewById(R.id.bible_content)
+        bibleTags = findViewById(R.id.bible_tags)
         logo = findViewById(R.id.prod_logo)
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -279,7 +286,21 @@ class ViewPostActivity : AppCompatActivity() {
                         }
                     }
                 }
+                "bible" -> {
+                    audioLayout.visibility = View.GONE
+                    postVideo.visibility = View.GONE
+                    postPic.visibility = View.GONE
+                    content.visibility = View.GONE
+                    title.text = post.title
+                    tags.visibility = View.GONE
+                    bibleLayout.visibility = View.VISIBLE
 
+
+                    bibleLayout.setBackgroundColor(Color.parseColor(post.colorCode))
+                    //holder.bibleTitle.text = post.title
+                    bibleTags.text = post.tags
+                    bibleContent.text = post.content
+                }
                 "audio" -> {
                     postVideo.visibility = View.GONE
                     postPic.visibility = View.GONE

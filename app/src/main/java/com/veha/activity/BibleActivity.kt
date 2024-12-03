@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -19,6 +20,8 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -27,6 +30,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.veha.util.UserPreferences
 import com.veha.util.Util
+import com.veha.util.Util.bookmarkedBible
+import kotlinx.coroutines.launch
 import org.chromium.base.Log
 
 class BibleActivity : AppCompatActivity() {
@@ -37,6 +42,8 @@ class BibleActivity : AppCompatActivity() {
     lateinit var share: ImageView
     lateinit var next: ImageView
     lateinit var previous: ImageView
+    lateinit var homeBtn: ImageView
+    lateinit var bookmarkBtn: ImageView
     lateinit var post: Button
     lateinit var adapterr: MyAdapter
     private lateinit var buttonContainer: ConstraintLayout
@@ -50,6 +57,10 @@ class BibleActivity : AppCompatActivity() {
     val chapterMap: HashMap<String, JsonArray> = HashMap()
     var chapterList: ArrayList<String> = ArrayList()
     var bibleList: ArrayList<String> = ArrayList()
+    var type: String = "old"
+    var bookmarkedChapter: String = "DUMMY"
+    var bookmarkedEdition: String = "DUMMY"
+    var bookmarkedContent: String = "DUMMY"
 
     private var isMultiSelect = false
 
@@ -67,6 +78,8 @@ class BibleActivity : AppCompatActivity() {
         share = findViewById(R.id.share_txt)
         next = findViewById(R.id.next_btn)
         previous = findViewById(R.id.prev_btn)
+        homeBtn = findViewById(R.id.bible_to_home)
+        bookmarkBtn = findViewById(R.id.bible_bookmark)
         post = findViewById(R.id.post_txt)
         bibleDropdown = findViewById(R.id.bible)
         contentDropdown = findViewById(R.id.heading)
@@ -80,11 +93,21 @@ class BibleActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        homeBtn.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         recyclerView.visibility = View.VISIBLE
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val type: String = intent.extras!!.getString("type").toString()
-        setBibleEdition(type)
+        if (!intent.extras!!.getString("type").isNullOrEmpty()) {
+            type = intent.extras!!.getString("type").toString()
+        }
+        if (!bookmarkedBible.isNullOrEmpty() && bookmarkedBible.split(",").size == 3) {
+            bookmarkedEdition = bookmarkedBible.split(",")[0]
+            bookmarkedContent = bookmarkedBible.split(",")[1]
+            bookmarkedChapter = bookmarkedBible.split(",")[2]
+        }
         next.setOnClickListener {
             if (chapterDropdown.selectedItemPosition < chapterList.size - 1) {
                 selectedText = ArrayList()
@@ -100,6 +123,7 @@ class BibleActivity : AppCompatActivity() {
         var text = ""
         copy.setOnClickListener {
             text = ""
+            selectedText.sort()
             for (selectedTexts in selectedText) {
                 text = text + selectedTexts + "\n"
             }
@@ -109,7 +133,9 @@ class BibleActivity : AppCompatActivity() {
             clipBoardManager.setPrimaryClip(clipData)
         }
         share.setOnClickListener {
-            text = ""
+            text =
+                contentDropdown.selectedItem.toString() + ", " + chapterDropdown.selectedItem.toString() + "\n\n"
+            selectedText.sort()
             for (selectedTexts in selectedText) {
                 text = text + selectedTexts + "\n"
             }
@@ -117,7 +143,8 @@ class BibleActivity : AppCompatActivity() {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Salvation Lamb")
-                var shareMessage = "${text.trim()} \n\n\n\nLet me recommend you this application\n\n"
+                var shareMessage =
+                    "${text.trim()} \n\n\n\nLet me recommend you this application\n\n"
                 shareMessage = """
                     ${shareMessage + "https://salvationlamb.com/redirect"}                    
                     """.trimIndent()
@@ -133,10 +160,13 @@ class BibleActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please select atleast one", Toast.LENGTH_LONG).show()
             } else {
                 text = ""
+                selectedText.sort()
                 for (selectedTexts in selectedText) {
                     text = text + selectedTexts + "\n" + "\n"
                 }
 
+                Log.e("selected text", selectedText.toString())
+                Log.e("selected text", selectedText.size.toString())
                 val intent = Intent(this, BiblePostActivity::class.java)
                 intent.putExtra("edition", type)
                 intent.putExtra("content", text.trim())
@@ -148,38 +178,60 @@ class BibleActivity : AppCompatActivity() {
             }
             selectedText = ArrayList()
         }
+
+        setBibleEdition()
+        bookmarkBtn.setOnClickListener {
+            if (bookmarkedBible.equals(bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString())) {
+                lifecycleScope.launch {
+                    userPreferences.deleteBibleBookmark()
+                }
+                bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
+            } else {
+                bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_24))
+                lifecycleScope.launch {
+                    userPreferences.saveBibleBookmark(
+                        bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString()
+                    )
+                }
+            }
+        }
     }
 
-    fun setBibleEdition(edition: String) {
+    fun setBibleEdition() {
         bibleDropdown.adapter = null
         bibleList = ArrayList()
         bibleList.add(this@BibleActivity.getString(R.string.oldBible))
         bibleList.add(this@BibleActivity.getString(R.string.newBible))
-
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bibleList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         bibleDropdown.adapter = adapter
-        if (edition.contentEquals("old")) {
-            bibleDropdown.setSelection(0)
+        if (bookmarkedEdition != "DUMMY") {
+            bibleDropdown.setSelection(bibleList.indexOf(bookmarkedEdition))
         } else {
-            bibleDropdown.setSelection(1)
+            if (type.contentEquals("old")) {
+                bibleDropdown.setSelection(0)
+            } else {
+                bibleDropdown.setSelection(1)
+            }
         }
         bibleDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                if (pos == 0) {
-                    setHeading(
-                        Gson().fromJson(
-                            Util.bible.get("Old").toString(),
-                            JsonArray::class.java
+                if (parent?.selectedItem != null && view != null) {
+                    if (pos == 0) {
+                        setHeading(
+                            Gson().fromJson(
+                                Util.bible.get("Old").toString(),
+                                JsonArray::class.java
+                            )
                         )
-                    )
-                } else {
-                    setHeading(
-                        Gson().fromJson(
-                            Util.bible.get("New").toString(),
-                            JsonArray::class.java
+                    } else {
+                        setHeading(
+                            Gson().fromJson(
+                                Util.bible.get("New").toString(),
+                                JsonArray::class.java
+                            )
                         )
-                    )
+                    }
                 }
             }
 
@@ -199,10 +251,15 @@ class BibleActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, keyList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         contentDropdown.adapter = adapter
+
+        if (bookmarkedContent != "DUMMY") {
+            contentDropdown.setSelection(keyList.indexOf(bookmarkedContent))
+        }
         contentDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                Log.e(keyList[pos], bibleMap[keyList[pos]].toString())
-                setChapter(bibleMap[keyList[pos]]!!)
+                if (parent?.selectedItem != null) {
+                    setChapter(bibleMap[keyList[pos]]!!)
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -219,17 +276,53 @@ class BibleActivity : AppCompatActivity() {
             chapterList.add("அதிகாரம் $chapter")
             chapterMap.put("அதிகாரம் $chapter", key.get("V").asJsonArray)
         }
+//
+//        val adapter = object : BaseAdapter() {
+//            override fun getCount(): Int = chapterList.size
+//
+//            override fun getItem(position: Int): Any = chapterList[position]
+//
+//            override fun getItemId(position: Int): Long = position.toLong()
+//
+//            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+//                val view = convertView ?: LayoutInflater.from(this@BibleActivity)
+//                    .inflate(R.layout.grid_spinner_item, parent, false)
+//                val textItem = view.findViewById<TextView>(R.id.textItem)
+//                textItem.text = chapterList[position]
+//                return view
+//            }
+//        }
+//
+
+
+
+
+
+
+
+
+
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, chapterList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         chapterDropdown.adapter = adapter
+
+        if (bookmarkedChapter != "DUMMY") {
+            chapterDropdown.setSelection(chapterList.indexOf(bookmarkedChapter))
+        }
         chapterDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-                // Log.e(chapterList[pos],chapterMap.get(chapterList[pos]).toString())
-                isMultiSelect = false
-                buttonContainer.visibility = View.GONE
-                selectedText = ArrayList()
-                adapterr = MyAdapter(chapterMap[chapterList[pos]]!!)
-                recyclerView.adapter = adapterr
+                if (parent?.selectedItem != null) {
+                    isMultiSelect = false
+                    buttonContainer.visibility = View.GONE
+                    selectedText = ArrayList()
+                    adapterr = MyAdapter(chapterMap[chapterList[pos]]!!)
+                    recyclerView.adapter = adapterr
+                }
+                if (bookmarkedBible == bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString()) {
+                    bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_24))
+                } else {
+                    bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -289,8 +382,6 @@ class BibleActivity : AppCompatActivity() {
     }
 
     private fun toggleSelection(holder: MyAdapter.MyViewHolder, text: String) {
-        Log.e("selected text", selectedText.toString())
-        Log.e("selected text", selectedText.size.toString())
         if (selectedText.contains(text)) {
             selectedText.remove(text)
             holder.selectedCheckBox.isChecked = false

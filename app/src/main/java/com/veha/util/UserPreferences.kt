@@ -119,6 +119,22 @@ class UserPreferences(context: Context) {
             it.remove(TEXT_SIZE)
         }
     }
+    val bibleBookmark: Flow<String>
+        get() = dataStorePref.data.map { preferences ->
+            preferences[BIBLE_BOOKMARK].toString()
+        }
+
+    suspend fun saveBibleBookmark(bibleBookmark: String) {
+        dataStorePref.edit { preferences ->
+            preferences[BIBLE_BOOKMARK] = bibleBookmark
+        }
+    }
+
+    suspend fun deleteBibleBookmark() {
+        dataStorePref.edit {
+            it.remove(BIBLE_BOOKMARK)
+        }
+    }
 
 
     companion object {
@@ -128,5 +144,6 @@ class UserPreferences(context: Context) {
         private val IS_NIGHT = preferencesKey<String>("isNight")
         private val IS_FIRST = preferencesKey<Boolean>("isFirst")
         private val TEXT_SIZE = preferencesKey<Float>("textSize")
+        private val BIBLE_BOOKMARK = preferencesKey<String>("bibleBookmark")
     }
 }

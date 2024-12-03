@@ -74,6 +74,9 @@ class SplashScreenActivity : AppCompatActivity() {
                 userPreferences.textSize.asLiveData().observe(this) {
                     Util.fontSize = it
                 }
+                userPreferences.bibleBookmark.asLiveData().observe(this) {
+                    Util.bookmarkedBible = it
+                }
 
                 Util.getBible()
                 getMyDetails(it)

@@ -250,6 +250,9 @@ class MainActivity : AppCompatActivity() {
         userPreferences.userId.asLiveData().observe(this) {
             Util.userId = it
         }
+        userPreferences.bibleBookmark.asLiveData().observe(this) {
+            Util.bookmarkedBible = it
+        }
         search = findViewById(R.id.search)
         search.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)

@@ -40,6 +40,8 @@
             android:exported="false" />
         <activity
             android:name=".BibleActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="sensorPortrait"
             android:exported="false" />
 
         <meta-data
@@ -133,6 +135,8 @@
             android:exported="false" />
         <activity
             android:name=".EditProfileActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="sensorPortrait"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
