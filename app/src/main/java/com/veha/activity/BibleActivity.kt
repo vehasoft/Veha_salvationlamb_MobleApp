@@ -182,11 +182,13 @@ class BibleActivity : AppCompatActivity() {
         setBibleEdition()
         bookmarkBtn.setOnClickListener {
             if (bookmarkedBible.equals(bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString())) {
+                bookmarkedBible = "Dummy"
+                bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
                 lifecycleScope.launch {
                     userPreferences.deleteBibleBookmark()
                 }
-                bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
             } else {
+                bookmarkedBible = bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + chapterDropdown.selectedItem.toString()
                 bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_24))
                 lifecycleScope.launch {
                     userPreferences.saveBibleBookmark(
