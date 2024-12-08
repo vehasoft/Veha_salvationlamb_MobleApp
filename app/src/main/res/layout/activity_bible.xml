@@ -256,16 +256,26 @@
                 android:backgroundTint="@color/home_bg"
                 android:background="@android:drawable/btn_dropdown"
                 android:spinnerMode="dropdown"/>
-            <Spinner
-                android:id="@+id/chapter"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
+<!--            <Spinner-->
+<!--                android:id="@+id/chapter"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="60dp"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:gravity="start"-->
+<!--                android:visibility="gone"-->
+<!--                android:layout_weight=".4"-->
+<!--                android:backgroundTint="@color/home_bg"-->
+<!--                android:background="@android:drawable/btn_dropdown"-->
+<!--                android:spinnerMode="dropdown"/>-->
+            <TextView
+                android:id="@+id/fakeSpinner"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="10dp"
-                android:gravity="start"
-                android:layout_weight=".4"
-                android:backgroundTint="@color/home_bg"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"/>
+                android:background="@color/home_bg"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/black"
+                android:gravity="center" />
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"

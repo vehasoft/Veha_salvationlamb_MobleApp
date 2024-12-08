@@ -113,6 +113,10 @@ class ViewPostActivity : AppCompatActivity() {
             getAnnouncement(postId)
         }
         close.setOnClickListener {
+            if (isTaskRoot){
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
             finish()
         }
         /*if (!intent.extras!!.get("postId").toString().isNullOrEmpty()) {

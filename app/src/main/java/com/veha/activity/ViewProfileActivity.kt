@@ -1,22 +1,12 @@
 package com.veha.activity
 
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.ContextThemeWrapper
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.lifecycleScope
+import android.util.Log
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import com.veha.fragments.ProfileFragment
-import com.veha.util.Commons
-import com.veha.util.Permission
-import com.veha.util.PermissionType
 import com.veha.util.UserPreferences
-import com.veha.util.Util
-import dmax.dialog.SpotsDialog
-import kotlinx.coroutines.launch
 
 class ViewProfileActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
@@ -38,7 +28,20 @@ class ViewProfileActivity : AppCompatActivity() {
         }
         close = findViewById(R.id.close)
         close.setOnClickListener {
+            if (isTaskRoot){
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        if (isTaskRoot){
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        super.onBackPressed()
     }
 }
