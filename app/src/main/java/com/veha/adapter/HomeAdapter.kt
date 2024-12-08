@@ -170,8 +170,11 @@ class HomeAdapter(
                     holder.tags.visibility = View.GONE
                     holder.bibleLayout.visibility = View.VISIBLE
 
-
-                    holder.bibleLayout.setBackgroundColor(Color.parseColor(post.colorCode))
+                    if (post.colorCode != null){
+                        holder.bibleLayout.setBackgroundColor(Color.parseColor(post.colorCode))
+                    } else {
+                        holder.bibleLayout.setBackgroundColor(Color.parseColor("#25B567"))
+                    }
                     //holder.bibleTitle.text = post.title
                     holder.bibleTags.text = post.tags
                     holder.bibleContent.text = post.content
