@@ -38,6 +38,7 @@ import com.veha.util.Util
 import dmax.dialog.SpotsDialog
 import retrofit2.Call
 import retrofit2.Response
+import java.lang.IllegalStateException
 
 
 class HomeAdapter(
@@ -291,7 +292,15 @@ class HomeAdapter(
                                 .build()
 
                             holder.postVideo.enableAutomaticInitialization = false
-                            holder.postVideo.initialize(youTubePlayerListener, iFramePlayerOptions)
+                            try {
+                                holder.postVideo.initialize(
+                                    youTubePlayerListener,
+                                    iFramePlayerOptions
+                                )
+                            } catch (e:IllegalStateException) {
+                                Log.e("youtubeplayer error" , e.toString())
+                                holder.youTubePlayer?.cueVideo(post.url, 0f)
+                            }
                         } else {
                             // If already initialized, simply cue the video
                             holder.youTubePlayer?.cueVideo(post.url, 0f)

@@ -119,7 +119,7 @@ class BibleActivity : AppCompatActivity() {
 //                selectedText = ArrayList()
 //                chapterDropdown.setSelection(chapterDropdown.selectedItemPosition + 1)// = chapterList[chapterDropdown.selectedItemPosition+1]
 //            }
-            if (fakeSpinner.text.toString().toInt() < chapterList.size - 1) {
+            if (fakeSpinner.text.toString().toInt() < chapterList.size) {
                 selectedText = ArrayList()
                 val count = fakeSpinner.text.toString().toInt() + 1
                 fakeSpinner.text = count.toString()
@@ -132,7 +132,7 @@ class BibleActivity : AppCompatActivity() {
 //                chapterDropdown.setSelection(chapterDropdown.selectedItemPosition - 1)// = chapterList[chapterDropdown.selectedItemPosition+1]
 //            }
 
-            if (fakeSpinner.text.toString().toInt() > 0) {
+            if (fakeSpinner.text.toString().toInt() > 1) {
                 selectedText = ArrayList()
                 val count = fakeSpinner.text.toString().toInt() - 1
                 fakeSpinner.text = count.toString()
