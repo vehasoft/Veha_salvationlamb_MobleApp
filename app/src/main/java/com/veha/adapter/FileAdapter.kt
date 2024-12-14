@@ -121,6 +121,8 @@ class FileAdapter(
             imageView = itemView.findViewById(R.id.icon_view)
             lockSymbol = itemView.findViewById(R.id.lock_symbol)
             fileLinear = itemView.findViewById(R.id.file_linear)
+
+            textView.setTextColor(context.getColor(R.color.black))
         }
     }
 

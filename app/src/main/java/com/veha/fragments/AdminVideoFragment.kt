@@ -102,7 +102,7 @@ class AdminVideoFragment : Fragment() {
                 val retrofit = Util.getRetrofit()
                 userPreferences.authToken.asLiveData().observe(owner) {
                     if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty()) {
-                        val call: Call<JsonObject?>? = retrofit.getVideoPost("Bearer $it", page, 10)
+                        val call: Call<JsonObject?>? = retrofit.getVideoPost("Bearer $it", page, 100)
                         call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
                             override fun onResponse(
                                 call: Call<JsonObject?>,
@@ -113,7 +113,7 @@ class AdminVideoFragment : Fragment() {
                                     val loginresp: JsonArray =
                                         Gson().fromJson(resp?.get("results"), JsonArray::class.java)
                                     count = Integer.parseInt(resp?.get("count").toString())
-                                    count /= 10
+                                    count /= 100
                                     for (post in loginresp) {
                                         val pos = Gson().fromJson(post, Posts::class.java)
                                         postlist.add(pos)
@@ -123,7 +123,7 @@ class AdminVideoFragment : Fragment() {
                                     if (postlist.size <= 0 && page == 1) {
                                         list.visibility = View.GONE
                                         nodata.visibility = View.VISIBLE
-                                    } else {
+                                    } else if(postlist.size > 0) {
                                         list.visibility = View.VISIBLE
                                         nodata.visibility = View.GONE
                                         if (!updated) {
