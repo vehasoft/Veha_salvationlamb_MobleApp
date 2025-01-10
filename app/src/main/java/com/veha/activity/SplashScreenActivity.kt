@@ -12,7 +12,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.veha.adapter.NotificationListAdapter
 import com.veha.util.Commons
 import com.veha.util.NotificationType
 import com.veha.util.Permission
@@ -21,8 +20,12 @@ import com.veha.util.UserPreferences
 import com.veha.util.UserRslt
 import com.veha.util.Util
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 
 class SplashScreenActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
@@ -31,6 +34,7 @@ class SplashScreenActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splashh_screen)
         userPreferences = UserPreferences(this)
 
+        getBible()
         val content = findViewById<View>(android.R.id.content)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             content.viewTreeObserver.addOnDrawListener { false }
@@ -78,12 +82,44 @@ class SplashScreenActivity : AppCompatActivity() {
                     Util.bookmarkedBible = it
                 }
 
-                Util.getBible()
                 getMyDetails(it)
             }
         }
     }
+    fun getBible() {
+        val file = File(filesDir,"bible.json")
+        if (!file.exists()) {
+            val retrofitAPI1 = Util.getRetrofit("https://files.salvationlamb.com/")
+            val call = retrofitAPI1.getContent()
+            call!!.enqueue(object : Callback<JsonObject> {
+                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    try {
+                        try {
+                            FileOutputStream(file).use {
+                                it.write(response.body().toString().toByteArray())
+                            }
+                            Util.bible = JSONObject(file.readText())
+                        } catch (e: Exception) {
+                            Log.e("FILE_ERROR", "Error saving JSON to file", e)
+                        }
+                        //Util.bible = JSONObject(response.body().toString())
 
+//                    Util.oldBible = Util.bible.get("old") as JSONObject
+//                    Util.newBible = Util.bible.get("new") as JSONObject
+                    } catch (e: java.lang.Exception) {
+                        Log.e("bible.error", e.toString())
+                        throw RuntimeException(e)
+                    }
+                }
+
+                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                    Log.e("bible.fail", t.toString())
+                }
+            })
+        } else {
+            Util.bible = JSONObject(file.readText())
+        }
+    }
     private fun getMyDetails(token: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {

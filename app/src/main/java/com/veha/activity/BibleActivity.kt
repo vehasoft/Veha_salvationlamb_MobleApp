@@ -36,7 +36,7 @@ import com.veha.util.Util.bookmarkedBible
 import kotlinx.coroutines.launch
 import org.chromium.base.Log
 
-class BibleActivity : AppCompatActivity() {
+class  BibleActivity : AppCompatActivity() {
     lateinit var logo: ImageView
     lateinit var recyclerView: RecyclerView
     lateinit var bibleLinear: LinearLayout
@@ -93,8 +93,6 @@ class BibleActivity : AppCompatActivity() {
         buttonContainer = findViewById(R.id.button_container)
         shimmerFrameLayout = findViewById(R.id.bible_shimmer_layout)
         fakeSpinner = findViewById(R.id.fakeSpinner)
-        shimmerFrameLayout.startShimmer()
-        bibleCheck()
         logo.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -419,18 +417,6 @@ class BibleActivity : AppCompatActivity() {
             bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
         }
     }
-
-    fun bibleCheck() {
-        if (Util.bible != null) {
-            shimmerFrameLayout.stopShimmer()
-            shimmerFrameLayout.visibility = View.GONE
-            bibleLinear.visibility = View.VISIBLE
-        } else {
-            Util.getBible()
-            bibleCheck()
-        }
-    }
-
     inner class MyAdapter(private val bibleArray: JsonArray) :
         RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 

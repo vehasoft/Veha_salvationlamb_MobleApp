@@ -38,8 +38,8 @@ public class Util {
     public static final String NIGHT = "Night";
     public static final String DEFAULT = "Default";
     public static Float fontSize = 10.0F;
-    public static String url = "https://server.salvationlamb.com";
-    //public static String url = "https://dev-server.salvationlamb.com";
+    //public static String url = "https://server.salvationlamb.com";
+    public static String url = "https://dev-server.salvationlamb.com";
     //public static String url = "https://salvationlamb-env.eba-smicznsb.ap-south-1.elasticbeanstalk.com";
     public static Map<String, String> permissionMap = new HashMap<>();
     public static String userId;
@@ -214,28 +214,6 @@ public class Util {
             } else return permissionList.contains(permission);
         }
         return false;
-    }
-
-    public static void getBible() {
-
-        RetrofitAPI retrofitAPI1 = getRetrofit("https://files.salvationlamb.com/");
-        Call<JsonObject> call = retrofitAPI1.getContent();
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                try {
-                    bible = new JSONObject(response.body().toString());
-                } catch (Exception e) {
-                    Log.e("bible.error", e.toString());
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("bible.fail", t.toString());
-            }
-        });
     }
 }
 

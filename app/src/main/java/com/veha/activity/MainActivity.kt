@@ -186,7 +186,6 @@ class MainActivity : AppCompatActivity() {
 
         checkPermission()
         getMyDetails()
-        Util.getBible()
         getNotificationCount()
         if (Util.isFirst != null && Util.isFirst) {
             if (Util.isWarrior) {

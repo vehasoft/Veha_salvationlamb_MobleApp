@@ -45,8 +45,6 @@ class BibleFragment : Fragment() {
         neww = view.findViewById(R.id.neww)
         bibleLayout = view.findViewById(R.id.bible_layout)
         shimmerFrameLayout = view.findViewById(R.id.bible_shimmer_layout)
-        shimmerFrameLayout.startShimmer()
-        bibleCheck()
         oldd.setOnClickListener {
             val intent = Intent(contexts, BibleActivity::class.java)
             intent.putExtra("type", "old")
@@ -61,16 +59,5 @@ class BibleFragment : Fragment() {
         }
 
         return view
-    }
-
-    fun bibleCheck() {
-        if (Util.bible != null) {
-            shimmerFrameLayout.stopShimmer()
-            shimmerFrameLayout.visibility = View.GONE
-            bibleLayout.visibility = View.VISIBLE
-        } else {
-            Util.getBible()
-            bibleCheck()
-        }
     }
 }
