@@ -196,6 +196,11 @@ interface RetrofitAPI {
         @Query("query") query: String?
     ): Call<JsonObject?>?
 
+    @GET("api/v1/version")
+    fun getAndroidVersion(
+        @Query("os") os: String?
+    ): Call<JsonObject?>?
+
     @GET("api/v1/post/{postId}")
     fun getPost(
         @Header("Authorization") dataModal: String?,

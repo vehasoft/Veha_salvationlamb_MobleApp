@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.database.ContentObserver
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -451,8 +452,54 @@ class MainActivity : AppCompatActivity() {
         if (intent.extras != null) {
             viewPager.currentItem = intent.extras!!.getInt("gotopage")
         }
+        versionCheck()
     }
+    private fun versionCheck() {
+        try {
+            if (Commons().isNetworkAvailable(this)) {
+                val retrofit = Util.getRetrofit()
+                val call: Call<JsonObject?>? = retrofit.getAndroidVersion("android ")
+                call!!.enqueue(object : retrofit2.Callback<JsonObject?> {
+                    override fun onResponse(
+                        call: Call<JsonObject?>,
+                        response: Response<JsonObject?>
+                    ) {
+                        if (response.code() == 200) {
+                            val json = JSONObject(response.body().toString())
+                            try {
+                                val packageInfo = packageManager.getPackageInfo(packageName, 0)
+                                val versionCode = packageInfo.versionCode
+                                val versionName = packageInfo.versionName
+                                Log.e("version",versionName)
+                                Log.e("version", versionCode.toString())
+                                if (versionCode < (json.getString("versionCode") as Int)){
+//                                if ((versionName.replace(".","").trim() as Int)
+//                                    < (json.getString("version").replace(".","").trim() as Int)){
+                                    val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+                                    builder.setTitle("New Update")
+                                    builder.setMessage("Good news!!. New Update available")
+                                    builder.setCancelable(false)
+                                    builder.setPositiveButton("Update") { dialog: DialogInterface?, _: Int ->
+                                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.veha.activity")))
+                                    }
+                                    builder.show()
+                                }
+                            } catch (e: PackageManager.NameNotFoundException) {
+                                e.printStackTrace()
+                            }
 
+                        }
+                    }
+
+                    override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
+                        Log.e("LoginActivity.login()", "fail")
+                    }
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("LoginActivity.login", e.toString())
+        }
+    }
     public fun getMyDetails() {
         if (Util.userId == null) {
             userPreferences.userId.asLiveData().observe(this) {
