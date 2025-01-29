@@ -53,7 +53,7 @@ class FollowAdapter(
         val follow: PostUser = follows[position]
         holder.name.text = follow.name
         if (!follow.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(follow.picture).into(holder.profilePic)
+            Picasso.get().load(follow.picture).into(holder.profilePic)
         }
         if (Util.userId == null) {
             userPreferences.userId.asLiveData().observe(owner) {

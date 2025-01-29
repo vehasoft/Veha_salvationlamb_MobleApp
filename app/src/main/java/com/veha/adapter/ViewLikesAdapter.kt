@@ -50,7 +50,7 @@ class ViewLikesAdapter() : RecyclerView.Adapter<ViewLikesAdapter.ViewHolder>() {
         holder.react.text = post.reaction
         holder.name.text = post.user.name
         if (!post.user.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(post.user.picture).into(holder.profilePic)
+            Picasso.get().load(post.user.picture).into(holder.profilePic)
         }
 
         holder.likeListLinear.setOnClickListener {

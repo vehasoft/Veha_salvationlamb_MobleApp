@@ -58,7 +58,7 @@ class AnnouncementAdapter(
     override fun onBindViewHolder(holder: NotificationListAdapter.ViewHolder, position: Int) {
         val announcement = announcements[position]
         if (!announcement.user.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(announcement.user.picture).into(holder.profilePic)
+            Picasso.get().load(announcement.user.picture).into(holder.profilePic)
         } else {
             holder.profilePic.setImageResource(R.drawable.ic_profile)
         }

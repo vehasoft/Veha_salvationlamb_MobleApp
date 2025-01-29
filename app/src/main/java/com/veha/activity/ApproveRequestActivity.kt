@@ -251,12 +251,12 @@ class ApproveRequestActivity : AppCompatActivity() {
                                         )
                                         setValue(exGift, newGift, exObj.gift, newObj.gift)
                                         if (!exObj.picture.isNullOrEmpty()) {
-                                            Picasso.with(context).load(exObj.picture).into(profile)
+                                            Picasso.get().load(exObj.picture).into(profile)
                                         } else {
                                             expic.setImageResource(R.drawable.ic_profile)
                                         }
                                         if (!newObj.picture.isNullOrEmpty()) {
-                                            Picasso.with(context).load(newObj.picture).into(newpic)
+                                            Picasso.get().load(newObj.picture).into(newpic)
                                         } else {
                                             newpic.setImageResource(R.drawable.ic_profile)
                                         }

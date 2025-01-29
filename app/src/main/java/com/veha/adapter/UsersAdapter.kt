@@ -47,7 +47,7 @@ class UsersAdapter(
         val follow: PostUser = follows[position]
         holder.name.text = follow.name
         if (!follow.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(follow.picture).into(holder.profilePic)
+            Picasso.get().load(follow.picture).into(holder.profilePic)
         }
         holder.listLinear.setOnClickListener {
             if (Util.hasPermission(PermissionType.USER.value, Permission.READ.value)) {

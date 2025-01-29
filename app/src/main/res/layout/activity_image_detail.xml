@@ -6,11 +6,11 @@
         android:layout_height="match_parent"
         tools:context=".ImageDetailActivity">
 
-    <!--image view to display our image-->
-    <ImageView
-            android:id="@+id/idIVImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/idIVImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        />
 
 </RelativeLayout>

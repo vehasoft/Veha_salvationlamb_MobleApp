@@ -148,7 +148,7 @@ class HomeAdapter(
                     holder.bibleLayout.visibility = View.GONE
                     if (!post.picture.isNullOrEmpty()) {
                         holder.postPic.visibility = View.VISIBLE
-                        Picasso.with(context).load(post.picture).fit().centerInside()
+                        Picasso.get().load(post.picture).fit().centerInside()
                             .into(holder.postPic)
                     } else {
                         holder.postPic.visibility = View.GONE
@@ -356,7 +356,7 @@ class HomeAdapter(
         holder.fullTime.text = post.createdAt
         holder.reacts.text = "$likesCount people reacts"
         if (!post.user.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(post.user.picture).into(holder.profilePic)
+            Picasso.get().load(post.user.picture).into(holder.profilePic)
         } else {
             holder.profilePic.setImageResource(R.drawable.ic_profile)
         }

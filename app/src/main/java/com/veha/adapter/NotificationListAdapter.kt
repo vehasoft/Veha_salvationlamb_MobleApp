@@ -78,7 +78,7 @@ class NotificationListAdapter() : RecyclerView.Adapter<NotificationListAdapter.V
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification: NotificationList = notifications[position]
         if (!notification.user.picture.isNullOrEmpty()) {
-            Picasso.with(context).load(notification.user.picture).into(holder.profilePic)
+            Picasso.get().load(notification.user.picture).into(holder.profilePic)
         } else {
             holder.profilePic.setImageResource(R.drawable.ic_profile)
         }

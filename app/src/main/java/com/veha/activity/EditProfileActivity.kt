@@ -523,7 +523,7 @@ class EditProfileActivity : AppCompatActivity() {
                                     }
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         imgStr = loginresp.picture
-                                        Picasso.with(context).load(loginresp.picture)
+                                        Picasso.get().load(loginresp.picture)
                                             .into(profilePic)
                                     }
                                     if (!TextUtils.isEmpty(loginresp.firstName)) firstName.text =

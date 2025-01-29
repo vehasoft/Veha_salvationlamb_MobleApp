@@ -472,7 +472,7 @@ class MainActivity : AppCompatActivity() {
                                 val versionName = packageInfo.versionName
                                 Log.e("version",versionName)
                                 Log.e("version", versionCode.toString())
-                                if (versionCode < (json.getString("versionCode") as Int)){
+                                if (versionCode < (json.getString("versionCode").toInt())){
 //                                if ((versionName.replace(".","").trim() as Int)
 //                                    < (json.getString("version").replace(".","").trim() as Int)){
                                     val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)

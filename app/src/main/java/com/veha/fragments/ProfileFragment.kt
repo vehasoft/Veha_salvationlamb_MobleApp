@@ -458,7 +458,7 @@ class ProfileFragment : Fragment() {
                                     shimmerFrameLayout.visibility = View.GONE
                                     if (!loginresp.picture.isNullOrEmpty()) {
                                         picture = loginresp.picture
-                                        Picasso.with(context).load(loginresp.picture)
+                                        Picasso.get().load(loginresp.picture)
                                             .into(profilePic)
                                     } else {
                                         picture = ""

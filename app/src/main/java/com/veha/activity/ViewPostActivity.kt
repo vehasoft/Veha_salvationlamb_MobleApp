@@ -236,7 +236,7 @@ class ViewPostActivity : AppCompatActivity() {
         if (post.user != null) {
             name.text = post.user.name
             if (!post.user.picture.isNullOrEmpty()) {
-                Picasso.with(this@ViewPostActivity).load(post.user.picture).into(profilePic)
+                Picasso.get().load(post.user.picture).into(profilePic)
             } else {
                 profilePic.setImageResource(R.drawable.ic_profile)
             }
@@ -272,11 +272,11 @@ class ViewPostActivity : AppCompatActivity() {
                     postVideo.visibility = View.GONE
                     if (type == NotificationType.POST.value && post.picture != null) {
                         postPic.visibility = View.VISIBLE
-                        Picasso.with(this@ViewPostActivity).load(post.picture).fit().centerInside()
+                        Picasso.get().load(post.picture).fit().centerInside()
                             .into(postPic)
                     } else if (type == NotificationType.ANNOUNCEMENT.value && post.url != null) {
                         postPic.visibility = View.VISIBLE
-                        Picasso.with(this@ViewPostActivity).load(post.url).fit().centerInside()
+                        Picasso.get().load(post.url).fit().centerInside()
                             .into(postPic)
                     } else {
                         postPic.visibility = View.GONE
