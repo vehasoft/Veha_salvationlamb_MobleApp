@@ -236,6 +236,7 @@ class MainActivity : AppCompatActivity() {
         }
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
+            SplashScreenActivity().getMyPermission(it)
             if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
@@ -470,19 +471,28 @@ class MainActivity : AppCompatActivity() {
                                 val packageInfo = packageManager.getPackageInfo(packageName, 0)
                                 val versionCode = packageInfo.versionCode
                                 val versionName = packageInfo.versionName
+                                Log.e("version",json.toString())
                                 Log.e("version",versionName)
                                 Log.e("version", versionCode.toString())
-                                if (versionCode < (json.getString("versionCode").toInt())){
+                                if (json.getString("versionCode") != null) {
+                                    if (versionCode < (json.getString("versionCode").toInt())) {
 //                                if ((versionName.replace(".","").trim() as Int)
 //                                    < (json.getString("version").replace(".","").trim() as Int)){
-                                    val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-                                    builder.setTitle("New Update")
-                                    builder.setMessage("Good news!!. New Update available")
-                                    builder.setCancelable(false)
-                                    builder.setPositiveButton("Update") { dialog: DialogInterface?, _: Int ->
-                                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.veha.activity")))
+                                        val builder: AlertDialog.Builder =
+                                            AlertDialog.Builder(this@MainActivity)
+                                        builder.setTitle("New Update")
+                                        builder.setMessage("Good news!!. New Update available")
+                                        builder.setCancelable(false)
+                                        builder.setPositiveButton("Update") { dialog: DialogInterface?, _: Int ->
+                                            startActivity(
+                                                Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse("https://play.google.com/store/apps/details?id=com.veha.activity")
+                                                )
+                                            )
+                                        }
+                                        builder.show()
                                     }
-                                    builder.show()
                                 }
                             } catch (e: PackageManager.NameNotFoundException) {
                                 e.printStackTrace()

@@ -361,7 +361,7 @@ class SplashScreenActivity : AppCompatActivity() {
         }
     }
 
-    private fun getMyPermission(token: String) {
+    public fun getMyPermission(token: String) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()

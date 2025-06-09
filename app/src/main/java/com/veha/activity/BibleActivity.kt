@@ -36,7 +36,7 @@ import com.veha.util.Util.bookmarkedBible
 import kotlinx.coroutines.launch
 import org.chromium.base.Log
 
-class  BibleActivity : AppCompatActivity() {
+class BibleActivity : AppCompatActivity() {
     lateinit var logo: ImageView
     lateinit var recyclerView: RecyclerView
     lateinit var bibleLinear: LinearLayout
@@ -51,7 +51,8 @@ class  BibleActivity : AppCompatActivity() {
     private lateinit var buttonContainer: ConstraintLayout
     lateinit var bibleDropdown: Spinner
     lateinit var contentDropdown: Spinner
-//    lateinit var chapterDropdown: Spinner
+
+    //    lateinit var chapterDropdown: Spinner
     lateinit var fakeSpinner: TextView
     lateinit var userPreferences: UserPreferences
     lateinit var shimmerFrameLayout: ShimmerFrameLayout
@@ -119,8 +120,8 @@ class  BibleActivity : AppCompatActivity() {
 //            }
             if (fakeSpinner.text.toString().toInt() < chapterList.size) {
                 selectedText = ArrayList()
-                val count = fakeSpinner.text.toString().toInt() + 1
-                fakeSpinner.text = count.toString()
+                val count = fakeSpinner.text.toString().toInt()
+                fakeSpinner.text = (count+1).toString()
                 setVersesList(count)
             }
         }
@@ -132,8 +133,8 @@ class  BibleActivity : AppCompatActivity() {
 
             if (fakeSpinner.text.toString().toInt() > 1) {
                 selectedText = ArrayList()
-                val count = fakeSpinner.text.toString().toInt() - 1
-                fakeSpinner.text = count.toString()
+                val count = fakeSpinner.text.toString().toInt() - 2
+                fakeSpinner.text = (count+1).toString()
                 setVersesList(count)
             }
         }
@@ -151,7 +152,8 @@ class  BibleActivity : AppCompatActivity() {
         }
         share.setOnClickListener {
             text =
-                contentDropdown.selectedItem.toString() + ", " + fakeSpinner.text.toString().toString() + "\n\n"
+                contentDropdown.selectedItem.toString() + ", " + fakeSpinner.text.toString()
+                    .toString() + "\n\n"
             selectedText.sortBy { it.substringBefore('.').toInt() }
             for (selectedTexts in selectedText) {
                 text = text + selectedTexts + "\n"
@@ -186,7 +188,8 @@ class  BibleActivity : AppCompatActivity() {
                 intent.putExtra("content", text.trim())
                 intent.putExtra(
                     "tags",
-                    contentDropdown.selectedItem.toString() + ", " + fakeSpinner.text.toString().toString()
+                    contentDropdown.selectedItem.toString() + ", " + fakeSpinner.text.toString()
+                        .toString()
                 )
                 startActivity(intent)
             }
@@ -205,7 +208,8 @@ class  BibleActivity : AppCompatActivity() {
                     userPreferences.deleteBibleBookmark()
                 }
             } else {
-                bookmarkedBible = bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + fakeSpinner.text.toString()
+                bookmarkedBible =
+                    bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + fakeSpinner.text.toString()
                 bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_24))
                 lifecycleScope.launch {
                     userPreferences.saveBibleBookmark(
@@ -285,7 +289,8 @@ class  BibleActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
-    fun loadChapterList(items: JsonArray){
+
+    fun loadChapterList(items: JsonArray) {
         chapterList = ArrayList()
         var chapter = 0
         for (bibleContent in items) {
@@ -300,8 +305,9 @@ class  BibleActivity : AppCompatActivity() {
         } else {
             fakeSpinner.text = 1.toString()
         }
-        setVersesList(fakeSpinner.text.toString().toInt())
+        setVersesList((fakeSpinner.text.toString().toInt()) - 1)
     }
+
     private fun showGridDropdown(items: ArrayList<String>) {
 
         // Inflate custom layout for grid dropdown
@@ -320,6 +326,7 @@ class  BibleActivity : AppCompatActivity() {
                 val view = convertView ?: LayoutInflater.from(this@BibleActivity)
                     .inflate(R.layout.grid_spinner_item, parent, false)
                 val textItem = view.findViewById<TextView>(R.id.textItem)
+                textItem.textSize = 10F
                 textItem.text = chapterList[position]
                 return view
             }
@@ -341,7 +348,7 @@ class  BibleActivity : AppCompatActivity() {
         alertDialog.show() // Show the dialog
     }
 
-//    fun setChapter(list: JsonArray) {
+    //    fun setChapter(list: JsonArray) {
 //        chapterDropdown.adapter = null
 //        chapterList = ArrayList()
 //        var chapter = 0
@@ -403,11 +410,15 @@ class  BibleActivity : AppCompatActivity() {
 //            override fun onNothingSelected(parent: AdapterView<*>?) {}
 //        }
 //    }
-    fun setVersesList(position: Int){
+    fun setVersesList(position: Int) {
         isMultiSelect = false
         buttonContainer.visibility = View.GONE
         selectedText = ArrayList()
-        adapterr = MyAdapter(chapterMap[chapterList[position]]!!)
+        adapterr = if (position < 0) {
+            MyAdapter(chapterMap[chapterList[0]]!!)
+        } else {
+            MyAdapter(chapterMap[chapterList[position]]!!)
+        }
         recyclerView.adapter = adapterr
 
 
@@ -417,6 +428,7 @@ class  BibleActivity : AppCompatActivity() {
             bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
         }
     }
+
     inner class MyAdapter(private val bibleArray: JsonArray) :
         RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
