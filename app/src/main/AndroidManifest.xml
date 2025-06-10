@@ -38,11 +38,12 @@
         <activity
             android:name=".ApproveRequestActivity"
             android:exported="false" />
-        <activity
+<activity
             android:name=".BibleActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="sensorPortrait"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/BibleMaterialTheme" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

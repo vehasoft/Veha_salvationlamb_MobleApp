@@ -11,26 +11,27 @@
         android:id="@+id/header_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
         android:background="@color/primary_blue"
-        >
-        <ImageView android:layout_width="200dp"
-            android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
             android:id="@+id/prod_logo"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_sl_logo_01_svg"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/bible_shimmer_layout"
         android:layout_width="match_parent"
-        android:visibility="gone"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -151,6 +152,7 @@
                     android:enabled="false" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,179 +170,197 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
 
-
     <LinearLayout
+        android:id="@+id/bible_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bible_linear"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            >
+            android:paddingEnd="10dp">
+
             <ImageView
+                android:id="@+id/bible_to_home"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginHorizontal="10dp"
                 android:src="@drawable/ic_baseline_home_24"
                 android:tint="@color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginHorizontal="10dp"
-                android:id="@+id/bible_to_home"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/bible_search"
+                app:layout_constraintTop_toTopOf="parent"
 
                 />
+
             <Spinner
                 android:id="@+id/bible"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:layout_weight=".6"
-                android:backgroundTint="@color/home_bg"
                 android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"/>
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:visibility="gone"
-                    android:src="@drawable/search"
-                    android:tint="@color/black"
-                    android:layout_marginHorizontal="10dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/bible_bookmark"
-                    android:id="@+id/bible_search"
+                android:backgroundTint="@color/home_bg"
+                android:gravity="start"
+                android:spinnerMode="dropdown" />
 
-                    />
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_baseline_bookmark_border_24"
-                    android:tint="@color/black"
-                    android:layout_marginHorizontal="10dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:id="@+id/bible_bookmark"
-                    app:layout_constraintRight_toRightOf="parent"
+            <ImageView
+                android:id="@+id/bible_search"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginHorizontal="10dp"
+                android:src="@drawable/search"
+                android:tint="@color/black"
+                android:visibility="gone"
+                app:layout_constraintRight_toLeftOf="@id/bible_bookmark"
+                app:layout_constraintTop_toTopOf="parent"
 
-                    />
+                />
+
+            <ImageView
+                android:id="@+id/bible_bookmark"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginHorizontal="10dp"
+                android:src="@drawable/ic_baseline_bookmark_border_24"
+                android:tint="@color/black"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+                />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:orientation="horizontal"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            >
+            android:paddingEnd="10dp">
+
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
                 android:id="@+id/prev_btn"
-                android:src="@drawable/baseline_keyboard_arrow_left_24"
-                app:tint="@color/black"
-                android:layout_gravity="center_vertical"
-                />
-            <Spinner
-                android:id="@+id/heading"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginTop="10dp"
-                android:gravity="start"
-                android:layout_weight=".6"
-                android:backgroundTint="@color/home_bg"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"/>
-<!--            <Spinner-->
-<!--                android:id="@+id/chapter"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="60dp"-->
-<!--                android:layout_marginTop="10dp"-->
-<!--                android:gravity="start"-->
-<!--                android:visibility="gone"-->
-<!--                android:layout_weight=".4"-->
-<!--                android:backgroundTint="@color/home_bg"-->
-<!--                android:background="@android:drawable/btn_dropdown"-->
-<!--                android:spinnerMode="dropdown"/>-->
-            <TextView
-                android:id="@+id/fakeSpinner"
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/home_bg"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/black"
-                android:gravity="center" />
-            <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:id="@+id/next_btn"
-                android:src="@drawable/baseline_keyboard_arrow_right_24"
                 android:layout_gravity="center_vertical"
+                android:src="@drawable/baseline_keyboard_arrow_left_24"
+                app:tint="@color/black" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/heading_input_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:backgroundTint="@color/home_bg"
+                android:paddingStart="10dp"
+                app:endIconMode="dropdown_menu">
+
+                <AutoCompleteTextView
+                    android:id="@+id/heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:dropDownHeight="wrap_content"
+                    android:dropDownVerticalOffset="0dp"
+                    android:hint=""
+                    android:inputType="none"
+                    android:paddingStart="10dp"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/rounded_border_login_register"
+                app:endIconMode="none">
+
+                <AutoCompleteTextView
+                    android:id="@+id/fakeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:dropDownHeight="wrap_content"
+                    android:dropDownVerticalOffset="0dp"
+                    android:hint=""
+                    android:inputType="none"
+                    android:paddingStart="2dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/next_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/baseline_keyboard_arrow_right_24"
                 app:tint="@color/black" />
         </LinearLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/button_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/button_container"
-            android:visibility="gone"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:background="@color/home_bg"
             android:gravity="right"
-            >
+            android:orientation="horizontal"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:visibility="gone">
+
             <ImageView
+                android:id="@+id/copy_txt"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginRight="10dp"
                 android:padding="5dp"
                 android:src="@drawable/baseline_content_copy_24"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:tint="@color/primary_blue"
-                android:layout_marginRight="10dp"
-                android:id="@+id/copy_txt"
-                />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <ImageView
+                android:id="@+id/share_txt"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginRight="20dp"
                 android:padding="5dp"
                 android:src="@drawable/baseline_share_24"
-                app:layout_constraintRight_toLeftOf="@id/copy_txt"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:tint="@color/primary_blue"
-                android:layout_marginRight="20dp"
-                android:id="@+id/share_txt"
-                />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/copy_txt"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <Button
+                android:id="@+id/post_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
+                android:layout_marginStart="10dp"
                 android:background="@drawable/rounded_border_login_register"
                 android:backgroundTint="@color/primary_blue"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:text="post"
                 android:textColor="@color/always_white"
-                android:id="@+id/post_txt"
-                android:layout_marginStart="10dp"
-                />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/home_bg"
-            android:visibility="gone"
             android:layout_marginTop="10dp"
-            android:id="@+id/recycler_view"/>
+            android:background="@color/home_bg"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>
