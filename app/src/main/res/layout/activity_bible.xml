@@ -257,7 +257,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="8"
                 android:backgroundTint="@color/home_bg"
-                android:paddingStart="10dp"
                 app:endIconMode="dropdown_menu">
 
                 <AutoCompleteTextView
