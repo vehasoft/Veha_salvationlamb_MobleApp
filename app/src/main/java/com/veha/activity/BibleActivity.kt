@@ -333,7 +333,6 @@ class BibleActivity : AppCompatActivity() {
                 val view = convertView ?: LayoutInflater.from(this@BibleActivity)
                     .inflate(R.layout.grid_spinner_item, parent, false)
                 val textItem = view.findViewById<TextView>(R.id.textItem)
-                textItem.textSize = 10F
                 textItem.text = chapterList[position]
                 return view
             }
@@ -361,69 +360,6 @@ class BibleActivity : AppCompatActivity() {
         // Show the popup anchored to fakeSpinner, just like a dropdown
         popupWindow.showAsDropDown(fakeSpinner)
     }
-
-    //    fun setChapter(list: JsonArray) {
-//        chapterDropdown.adapter = null
-//        chapterList = ArrayList()
-//        var chapter = 0
-//        for (bibleContent in list) {
-//            chapter++
-//            val key = Gson().fromJson(bibleContent, JsonObject::class.java)
-//            chapterList.add("அதிகாரம் $chapter")
-//            chapterMap.put("அதிகாரம் $chapter", key.get("V").asJsonArray)
-//        }
-////
-////        val adapter = object : BaseAdapter() {
-////            override fun getCount(): Int = chapterList.size
-////
-////            override fun getItem(position: Int): Any = chapterList[position]
-////
-////            override fun getItemId(position: Int): Long = position.toLong()
-////
-////            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-////                val view = convertView ?: LayoutInflater.from(this@BibleActivity)
-////                    .inflate(R.layout.grid_spinner_item, parent, false)
-////                val textItem = view.findViewById<TextView>(R.id.textItem)
-////                textItem.text = chapterList[position]
-////                return view
-////            }
-////        }
-////
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, chapterList)
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//        chapterDropdown.adapter = adapter
-//
-//        if (bookmarkedChapter != "DUMMY") {
-//            chapterDropdown.setSelection(chapterList.indexOf(bookmarkedChapter))
-//        }
-//        chapterDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-//            override fun onItemSelected(parent: AdapterView<*>?, view: View, pos: Int, id: Long) {
-//                if (parent?.selectedItem != null) {
-//                    isMultiSelect = false
-//                    buttonContainer.visibility = View.GONE
-//                    selectedText = ArrayList()
-//                    adapterr = MyAdapter(chapterMap[chapterList[pos]]!!)
-//                    recyclerView.adapter = adapterr
-//                }
-//                if (bookmarkedBible == bibleDropdown.selectedItem.toString() + "," + contentDropdown.selectedItem.toString() + "," + fakeSpinner.text.toString()) {
-//                    bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_24))
-//                } else {
-//                    bookmarkBtn.setImageDrawable(this@BibleActivity.getDrawable(R.drawable.ic_baseline_bookmark_border_24))
-//                }
-//            }
-//
-//            override fun onNothingSelected(parent: AdapterView<*>?) {}
-//        }
-//    }
     fun setVersesList(position: Int) {
         isMultiSelect = false
         buttonContainer.visibility = View.GONE
