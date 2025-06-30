@@ -271,7 +271,7 @@ public enum class PermissionType(val value: String) {
     POST("POST"),
     USER("USER"),
     PROFILE("PROFILE"),
-    FILE("FILE"),
+    FILE("FILES"),
     AUDIO("AUDIO"),
     VIDEO("VIDEO"),
     WARRIOR("WARRIOR"),
