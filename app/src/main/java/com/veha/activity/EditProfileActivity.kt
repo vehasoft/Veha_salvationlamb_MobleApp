@@ -33,8 +33,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.veha.util.*
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -88,11 +90,60 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var pincode: TextInputEditText
     private lateinit var gender: RadioGroup
 
+    private val cropImageLauncher = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            val resultUri = result.uriContent
+            if (resultUri != null) {
+                val bitmap =
+                    MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
+                profilestr = encodeTobase64(bitmap)
+                val data = JsonObject()
+                data.addProperty("base64Image", profilestr)
+                data.addProperty("name", Util.user.name + " picture")
+                updateProfilePic(data)
+            }
+        } else {
+            val error = result.error
+            Log.e("errorrr", error.toString())
+            Toast.makeText(this@EditProfileActivity, error.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val galleryLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK && result.data?.data != null) {
+            launchCropImage(result.data!!.data!!)
+        }
+    }
+
+    private val cameraLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            if (result.data!!.extras?.get("data") != null) {
+                val bitmap = result.data!!.extras!!["data"] as Bitmap
+                val uri = getImageUri(bitmap)
+                if (uri != null) {
+                    launchCropImage(uri)
+                }
+            }
+        }
+    }
+
+    private fun launchCropImage(uri: Uri) {
+        val cropOptions = CropImageOptions()
+        cropOptions.guidelines = CropImageView.Guidelines.ON
+        cropOptions.fixAspectRatio = true
+        cropOptions.multiTouchEnabled = true
+        cropImageLauncher.launch(CropImageContractOptions(uri, cropOptions))
+    }
+
     private fun galleryIntent() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT //
-        startActivityForResult(Intent.createChooser(intent, "Select File"), 100)
+        galleryLauncher.launch(Intent.createChooser(intent, "Select File"))
     }
 
     fun getImageUri(inImage: Bitmap): Uri? {
@@ -111,47 +162,7 @@ class EditProfileActivity : AppCompatActivity() {
             )
         )
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri)
-        startActivityForResult(intent, 150)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.e(requestCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE.toString())
-        Log.e(resultCode.toString(), RESULT_OK.toString())
-        Log.e(resultCode.toString(), CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE.toString())
-        if (requestCode == 100) {
-            if (data?.data != null) {
-                CropImage.activity(data.data).start(this@EditProfileActivity)
-
-            }
-        } else if (requestCode == 150) {
-            if (data != null) {
-                Log.e("###########", data.extras!![MediaStore.EXTRA_OUTPUT].toString())
-                Log.e("###########", data.data.toString())
-                if (data.extras!!["data"] != null) {
-                    CropImage.activity(getImageUri(data.extras!!["data"] as Bitmap))
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setFixAspectRatio(true).setMultiTouchEnabled(true)
-                        .start(this@EditProfileActivity)
-                }
-            }
-        } else if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode === RESULT_OK) {
-                val resultUri = result.uri
-                val bitmap =
-                    MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, resultUri)
-                profilestr = encodeTobase64(bitmap)
-                val data = JsonObject()
-                data.addProperty("base64Image", profilestr)
-                data.addProperty("name", Util.user.name + " picture")
-                updateProfilePic(data)
-            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                Log.e("errorrr", error.toString())
-                Toast.makeText(this@EditProfileActivity, error.toString(), Toast.LENGTH_LONG).show()
-            }
-        }
+        cameraLauncher.launch(intent)
     }
 
     fun encodeTobase64(image: Bitmap): String? {

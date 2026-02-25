@@ -1,5 +1,7 @@
-<RelativeLayout android:layout_width="match_parent"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
                 android:background="#ffffff"
                 xmlns:android="http://schemas.android.com/apk/res/android" >
 
@@ -13,12 +15,20 @@
             android:textSize="18dp"
             android:gravity="center"/>
 
-    <com.github.barteksc.pdfviewer.PDFView
-            android:id="@+id/pdfView1"
-            android:background="@color/home_bg"
-            android:layout_below="@+id/pdf_header"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+    <com.alamin5g.pdf.PDFView
+        android:id="@+id/pdfView"
+        android:layout_below="@+id/pdf_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F5F5F5" />
+
+<!--    <com.veha.activity.TouchPDFView-->
+<!--        android:id="@+id/pdfView"-->
+<!--        android:layout_below="@+id/pdf_header"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
+
 
 
 </RelativeLayout>

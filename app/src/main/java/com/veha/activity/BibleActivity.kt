@@ -35,7 +35,7 @@ import com.veha.util.UserPreferences
 import com.veha.util.Util
 import com.veha.util.Util.bookmarkedBible
 import kotlinx.coroutines.launch
-import org.chromium.base.Log
+import android.util.Log
 
 class BibleActivity : AppCompatActivity() {
     lateinit var logo: ImageView

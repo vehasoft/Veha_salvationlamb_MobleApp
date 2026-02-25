@@ -470,10 +470,7 @@ class MainActivity : AppCompatActivity() {
                             try {
                                 val packageInfo = packageManager.getPackageInfo(packageName, 0)
                                 val versionCode = packageInfo.versionCode
-                                val versionName = packageInfo.versionName
-                                Log.e("version",json.toString())
-                                Log.e("version",versionName)
-                                Log.e("version", versionCode.toString())
+                                val versionName: String? = packageInfo.versionName
                                 if (json.getString("versionCode") != null) {
                                     if (versionCode < (json.getString("versionCode").toInt())) {
 //                                if ((versionName.replace(".","").trim() as Int)
