@@ -289,8 +289,8 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | Severity | Count | Priority |
 |---|---|---|
 | Critical | 13 | P0 |
-| High | 206 | P1 |
-| Medium | 286 | P2 |
+| High | 205 | P1 |
+| Medium | 287 | P2 |
 | Low | 170 | P3 |
 | Cosmetic | 29 | P3 |
 | Rollup (team-lead aggregate) | 147 | -- |
@@ -304,7 +304,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | AUTH | 3 | 32 | 64 | 31 | 8 | 30 | **168** |
 | APPSHELL | 0 | 19 | 27 | 16 | 1 | 10 | **73** |
 | FEED | 1 | 28 | 34 | 24 | 4 | 13 | **104** |
-| PROFILE | 0 | 36 | 33 | 15 | 1 | 15 | **100** |
+| PROFILE | 0 | 35 | 34 | 15 | 1 | 15 | **100** |
 | MEDIA | 2 | 28 | 34 | 17 | 1 | 10 | **92** |
 | SEARCH | 0 | 9 | 15 | 10 | 0 | 9 | **43** |
 | BIBLE | 2 | 10 | 22 | 16 | 6 | 20 | **76** |
@@ -949,12 +949,12 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-462 | AR1 | P1 | High | **No permission check inside the screen.** The highest-privilege action in the app relies entirely on its three callers gating `USER`/`Edit`. Any new call site, deep link, or `adb am start` on a rooted device gets an unguarded approve/reject UI | gate in `onCreate` and route to `NoPermissionActivity`; verify server-side authorisation too |
-| BUG-463 | AR2 | P1 | High | Both methods register a **continuous `authToken` LiveData observer** (`CL-8`); a later token write re-fires them and can **re-submit the approval** | one-shot read (`first()`) |
-| BUG-464 | AR3 | P1 | High | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) — the admin cannot tell "rejected" from "network failed" | toast + retry |
-| BUG-465 | AR4 | P1 | High | HTTP 401 starts `LoginActivity` with **no `finish()` and no session clear**, so back returns to a dead screen and the next launch repeats the 401 | adopt the `bailToLogin` pattern from `SplashScreenActivity` (T-024) |
-| BUG-466 | AR6 | P1 | High | **No confirmation dialog.** A single tap on Approve or Reject is final and irreversible, on a screen reached straight from a notification tap | add a confirm dialog naming the user |
-| BUG-467 | AR7 | P1 | High | **No success feedback.** After a 200 the admin is dropped on `MainActivity` with no toast, so a mis-tap or double-tap is indistinguishable from success | toast the outcome before navigating |
+| BUG-462 | AR2 | P1 | High | Both methods register a **continuous `authToken` LiveData observer** (`CL-8`); a later token write re-fires them and can **re-submit the approval** | one-shot read (`first()`) |
+| BUG-463 | AR3 | P1 | High | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) — the admin cannot tell "rejected" from "network failed" | toast + retry |
+| BUG-464 | AR4 | P1 | High | HTTP 401 starts `LoginActivity` with **no `finish()` and no session clear**, so back returns to a dead screen and the next launch repeats the 401 | adopt the `bailToLogin` pattern from `SplashScreenActivity` (T-024) |
+| BUG-465 | AR6 | P1 | High | **No confirmation dialog.** A single tap on Approve or Reject is final and irreversible, on a screen reached straight from a notification tap | add a confirm dialog naming the user |
+| BUG-466 | AR7 | P1 | High | **No success feedback.** After a 200 the admin is dropped on `MainActivity` with no toast, so a mis-tap or double-tap is indistinguishable from success | toast the outcome before navigating |
+| BUG-467 | AR1 | P2 | Medium | **No permission check inside the screen** — the client relies entirely on its three callers gating `USER`/`Edit`, so a deep link or `adb am start` opens an apparently working approve/reject UI. **Downgraded 2026-10-08: the customer confirmed the backend authorises `POST api/v1/review/approve\|reject/{userId}` server-side**, so this is a **UI-integrity** issue, not a privilege-escalation one — the buttons render but the API refuses. Still worth a gate in RN (defence in depth + the user gets a clear message instead of a silent failure) | gate in `onCreate` and route to `NoPermissionActivity` |
 | BUG-468 | AR5 | P2 | Medium | `intent.extras!!.getString("userId").toString()` double force-unwrap — launching without the extra is an immediate NPE, and a missing key yields the literal string `"null"` | `intent.getStringExtra("userId") ?: return finish()` |
 | BUG-469 | AR8 | P2 | Medium | Logo tap and post-decision navigation both `startActivity(MainActivity)` with **no `finish()` or `CLEAR_TOP`**, stacking duplicate `MainActivity` instances behind this screen | `CLEAR_TOP` + `finish()` |
 | BUG-470 | AR9 | P2 | Medium | Approval is **all-or-nothing**; an admin cannot accept the name change but reject the avatar | per-field approval, if the API supports it |

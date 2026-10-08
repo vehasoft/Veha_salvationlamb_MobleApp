@@ -353,7 +353,7 @@ harmful — each is cheap to get right while writing new code.
 |---|---|---|
 | 1 | FCM token refresh is **never sent** → push silently dies | `NOTIFICATIONS/PUSH_SERVICE.md` `NP1` |
 | 2 | Tray notification bypasses the `USER`/`Read` gate the in-app list enforces | `PUSH_SERVICE.md` `NP2` |
-| 3 | The moderation screen (approve/reject) has **no permission check of its own** | `PROFILE/APPROVE_REQUEST.md` `AR1` |
+| 3 | The moderation screen (approve/reject) has **no client-side permission check** — the backend does authorise it, so this is UI integrity, not escalation. Add the gate anyway so the user gets a message instead of two buttons that silently fail | `PROFILE/APPROVE_REQUEST.md` `AR1` |
 | 4 | Approve/reject is irreversible with **no confirmation and no success feedback** | `APPROVE_REQUEST.md` `AR6`, `AR7` |
 | 5 | The Bible tab is **ungated**, and the Bible post composer bypasses `POST`/`Create` | `BIBLE/BIBLE_LEAD.md` `B-1`, `B-9` |
 | 6 | Paging is broken 4 different ways (listener per page, wrong insert index, double increment, page-size mismatch) | `NOTIFICATIONS/NOTIFICATION_LISTS.md` `NL3`–`NL5`, `NL21` |
@@ -370,9 +370,14 @@ Worth answering before phase 0.
 
 1. **`isWarrior` semantics** — which of the two contradictory parsings (§2.3) does the backend
    intend? What values does it actually send?
-2. **Server-side authorisation** — are `POST api/v1/review/approve/{userId}` and
-   `.../reject/{userId}` authorised on the server, or do they trust the client? The Android
-   client has **no gate** on that screen (`AR1`).
+2. ~~**Server-side authorisation** of the review endpoints~~ — **ANSWERED 2026-10-08: yes, the
+   backend authorises `POST api/v1/review/approve\|reject/{userId}`.** The client's missing gate
+   (`AR1`) is therefore a UI-integrity issue only. Still add the gate in RN for a clear message
+   and defence in depth.
+   **Follow-up worth confirming:** is the same server-side authorisation applied to the *other*
+   privileged endpoints — `DELETE api/v1/post/{postId}`, `DELETE api/v1/users/{userId}`,
+   `POST api/v1/post`? The client gates all of them with `Util.hasPermission`, and the same
+   reasoning applies: client gates are UX, only the server decides.
 3. **Bible cache invalidation** — should a corrected verse reach existing installs? Today it
    never does.
 4. **Announcement write operations** — the permission model defines `ANNOUNCEMENT`/`Create`,
@@ -389,6 +394,7 @@ Worth answering before phase 0.
 
 | Change | Detail |
 |---|---|
+| Updated (2026-10-08 20:30) | Customer answers folded in. (a) The review endpoints are **two concrete paths**, `POST api/v1/review/approve/{userId}` and `.../reject/{userId}` — the Retrofit `{status}` template only ever takes those two literals (`ApproveRequestActivity.kt:130,133`). (b) **§8 Q2 answered: the backend authorises approve/reject server-side**, so `AR1` is a UI-integrity gap, not privilege escalation — downgraded High → Medium in `APPROVE_REQUEST.md` and re-worded in §7. Added a follow-up question about whether the same server-side authorisation covers the other privileged endpoints (post delete, user delete, post create). |
 | Created (T-027, 2026-10-08) | Written from the v1.2.0 source and the 54 agent docs. Covers the 7 fixed constraints (`applicationId`, signing key, Firebase project, base URLs), the 5 porting traps, all 44 endpoints with their envelopes, the 4 core models, the fixed session-bootstrap contract, the 6-type FCM routing table, the 37-screen inventory, a 10-phase build order and 10 bugs to fix rather than copy. |
 
 

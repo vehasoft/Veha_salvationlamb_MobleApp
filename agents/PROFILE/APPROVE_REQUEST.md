@@ -195,7 +195,7 @@ shadows both parameters with local `var`s of the same name — legal but confusi
 
 | # | Issue | Severity | Suggested fix |
 |---|---|---|---|
-| AR1 | **No permission check inside the screen.** The highest-privilege action in the app relies entirely on its three callers gating `USER`/`Edit`. Any new call site, deep link, or `adb am start` on a rooted device gets an unguarded approve/reject UI | **High** | gate in `onCreate` and route to `NoPermissionActivity`; verify server-side authorisation too |
+| AR1 | **No permission check inside the screen** — the client relies entirely on its three callers gating `USER`/`Edit`, so a deep link or `adb am start` opens an apparently working approve/reject UI. **Downgraded 2026-10-08: the customer confirmed the backend authorises `POST api/v1/review/approve\|reject/{userId}` server-side**, so this is a **UI-integrity** issue, not a privilege-escalation one — the buttons render but the API refuses. Still worth a gate in RN (defence in depth + the user gets a clear message instead of a silent failure) | Medium | gate in `onCreate` and route to `NoPermissionActivity` |
 | AR6 | **No confirmation dialog.** A single tap on Approve or Reject is final and irreversible, on a screen reached straight from a notification tap | **High** | add a confirm dialog naming the user |
 | AR7 | **No success feedback.** After a 200 the admin is dropped on `MainActivity` with no toast, so a mis-tap or double-tap is indistinguishable from success | **High** | toast the outcome before navigating |
 | AR3 | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) — the admin cannot tell "rejected" from "network failed" | **High** | toast + retry |
@@ -227,11 +227,14 @@ shadows both parameters with local `var`s of the same name — legal but confusi
 
 ## 14. How to make common changes
 
-**Add the missing permission gate (`AR1` — highest value):** add
+**Add the missing permission gate (`AR1`):** add
 `if (!Util.hasPermission(PermissionType.USER.value, Permission.EDIT.value)) { … NoPermissionActivity; finish(); return }`
-at the top of `onCreate`. Local to this file. Note that since T-025 `hasPermission` fails closed,
-so a push-started process with no loaded permission map would be denied — the correct outcome
-here, but coordinate with NOTIFICATIONS (see `PUSH_SERVICE NP13`).
+at the top of `onCreate`. Local to this file. **This is UI integrity, not security** — the backend
+authorises approve/reject server-side (confirmed 2026-10-08), so an ungated caller already gets
+refused by the API; the gate just means the user sees a clear "no permission" message instead of
+two buttons that silently fail. Note that since T-025 `hasPermission` fails closed, so a
+push-started process with no loaded permission map would be denied — correct here, but coordinate
+with NOTIFICATIONS (see `PUSH_SERVICE NP13`).
 
 **Add a confirmation dialog (`AR6`):** wrap both click handlers in an `AlertDialog` naming the
 requesting user. Local change, no API impact.
@@ -247,6 +250,7 @@ changing the values is a NETWORK change plus both literals here. PM sign-off.
 
 | Change | Detail |
 |---|---|
+| Updated (2026-10-08 20:30) | **Customer confirmed the backend authorises approve/reject server-side.** `AR1` downgraded **High → Medium** and re-framed as a UI-integrity gap rather than privilege escalation: an ungated caller can open the screen, but the API refuses the action. §14 recipe updated to say the same. Also pinned the two concrete endpoints — `POST api/v1/review/approve/{userId}` and `.../reject/{userId}` (`ApproveRequestActivity.kt:130,133`) — in place of the templated `{status}` form. |
 | Created (T-026, 2026-10-08) | Documented the app's only moderation screen from `ApproveRequestActivity.kt` (383) + `activity_approve_request.xml`, previously unowned since the v1.2.0 branch. Captured the 16-pair side-by-side diff UI and its 34 view bindings, the `setValue` equal-vs-changed rule (unchanged → hide the `new_` view; changed → show both and paint the requested value red), the `GET api/v1/review/{userId}` + `POST api/v1/review/{status}/{userId}` contract, the already-handled guard, and all 3 entry points. **16 issues** recorded. Headline: `AR1` — **the screen performs no permission check of its own**, delegating entirely to its three callers, leaving the app's highest-privilege action one unguarded call site away from exposure. Also `AR6`/`AR7`: an irreversible approve/reject with **no confirmation and no success feedback**; and `AR2`: the `CL-8` observer pattern can **re-submit the approval** on a later token write. |
 
 
