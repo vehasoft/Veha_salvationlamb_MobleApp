@@ -14,3 +14,19 @@
 .cxx
 local.properties
 /.idea/
+
+# agent tooling (agents/tools/*.py)
+__pycache__/
+*.pyc
+
+# IDE / tooling noise
+.hacksaw/
+agent/
+
+# signing material — never add NEW key files.
+# NOTE: app/Key/key.jks and app/Key/private_key.pepk are ALREADY tracked in the
+# remote history (since commit 3d34164, 2023-08-29). These rules only stop new
+# ones; purging the existing pair requires a history rewrite — see TASKS.md T-020.
+*.keystore
+!app/Key/key.jks
+!app/Key/private_key.pepk
