@@ -5,6 +5,20 @@
 > understand the whole product, decide which team owns a request, delegate to a TEAM LEAD
 > agent, and report the result back to the customer in plain language.
 
+> ## ⚠️ This app is DEPRECATED — the product is moving to React Native
+>
+> Decided by the customer on **2026-10-08**. Consequences for every agent in this hierarchy:
+>
+> * **Do not start refactors or bug-fix sweeps** on the Kotlin code. It stays in production
+>   until the RN app ships, so *crashes affecting live users* are still worth fixing — nothing
+>   else is.
+> * **The agent docs are now the migration spec.** Accuracy about behaviour and API contracts
+>   matters more than anything else.
+> * **Start at [`MIGRATION_SPEC.md`](MIGRATION_SPEC.md)** — the rebuild-shaped summary. These
+>   agent docs are the per-screen detail behind it.
+> * The RN app must keep `applicationId` `com.veha.activity` and the **same signing key**
+>   (`G11`, T-020) or existing users will not receive it as an update.
+
 ---
 
 ## 1. Project snapshot
@@ -24,7 +38,7 @@
 | Layouts | `app/src/main/res/layout/` (55 XML files) |
 | Launcher | `SplashScreenActivity` (425 LOC; only `exported="true"` entry point with intent-filter) |
 | Tests | only stock `ExampleInstrumentedTest.kt` + `ExampleUnitTest.kt` — **effectively zero coverage** |
-| VCS | git ✅ — branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (**not yet pushed**) |
+| VCS | git ✅ — branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); **pushed** to `github.com/vehasoft/Veha_salvationlamb_MobleApp` |
 
 > **Baseline (T-019, 2026-10-08):** the docs now target **`salvation_lamb_permissions_final_1`**
 > (v1.2.0, 2026-02-26), the newest branch on the remote. The previous baseline was `master`
@@ -51,7 +65,7 @@
   `bookmarkedBible`, `CHANNEL_ID/NAME/DESC`.
 - **Permissions model (new):** `Util.permissionMap` + `Util.hasPermission(type, permission)`,
   seeded from `GET /api/v1/permission/users/{userId}` at splash; **34 call sites**. Gates route to
-  `NoPermissionActivity`. ⚠️ `hasPermission` **returns `true` when the map is empty** (fail-open).
+  `NoPermissionActivity`. Since T-025 `hasPermission` **fails CLOSED** when the map is not loaded.
 - **Async:** Retrofit `enqueue` callbacks + `lifecycleScope.launch` for DataStore writes.
 - **Media/3rd-party:** Picasso, android-pdf-viewer, **canhub cropper** (replaced edmodo),
   SpotsDialog, androidyoutubeplayer, android-gif-drawable, richeditor-android, cronet-embedded.
