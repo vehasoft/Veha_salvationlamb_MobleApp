@@ -184,6 +184,8 @@ timezone. Both extensions are declared as **members** of `Commons`, so they are 
 
 | # | Issue | Severity | Suggested fix |
 |---|---|---|---|
+| C-21 | **NEW (T-025, `G13`)** — ~~`Util.hasPermission()` **failed open**: `if (permissionMap == null \|\| permissionMap.isEmpty()) return true;`. A failed `GET /api/v1/permission/users/{userId}` at splash left the map empty, so **all 34 permission gates granted access**, including admin-only screens~~ — **FIXED 2026-10-08**: now fail-CLOSED, backed by a new `permissionsLoaded` flag that distinguishes "not fetched yet" from "fetched, user has nothing". New API: `setPermissionMap()`, `clearPermissions()`, `isPermissionsLoaded()`. Covered by **10 unit tests** in `app/src/test/java/com/veha/util/UtilPermissionTest.kt` | ~~**Critical (security)**~~ | — |
+| C-22 | **NEW (T-025)** — `permissionMap` is still a **public mutable static**, so any screen can bypass `setPermissionMap()` and leave `permissionsLoaded` stale | Medium | make the field private and route all writes through the setter |
 | C-12 | `makeWarrior` returns a status assigned **asynchronously**, so it is always `""`; `MainActivity:185`'s `contentEquals("success")` can never be true | **High** | take a callback/`suspend`, or move to a ViewModel |
 | C-13 | The token guard is an always-true `||` chain (same bug as CHANGE_PASSWORD) | **High** | use `&&`, or test the token explicitly |
 | C-1 | `Util` statics are the de-facto session object but do **not** survive process death | **High** | re-hydrate from DataStore on resume, or stop relying on statics |
@@ -252,6 +254,7 @@ backend accepts the new value.
 
 | Change | Detail |
 |---|---|
+| T-025 (2026-10-08) | **`G13` fail-open permissions fixed.** `Util.hasPermission()` now denies when the permission map has not been loaded, instead of returning `true`. Added `permissionsLoaded`, `setPermissionMap()`, `clearPermissions()`, `isPermissionsLoaded()` to `Util.java`. Verified by 10 new unit tests (`UtilPermissionTest.kt`) — mutation-tested by reintroducing the old `return true` and confirming 4 tests fail. Issues `C-21` (fixed) and `C-22` (new, follow-up) recorded. |
 | Created | Initial COMMONS module agent documented from `Commons.kt` (215 lines) and `Util.java` (158 lines): 5 constants, 10 global statics with their writers/readers, 4 validators with regexes, 2 date helpers, the 36-item religion list, `getVideo`'s second host, the 62-site `isNetworkAvailable` guard with its hidden toast, the 9-call-site `makeWarrior` dialog and its always-`""` return value, and 20 known issues. |
 
 

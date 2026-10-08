@@ -11,6 +11,10 @@
     <string name="previous">Previous</string>
     <string name="Blocked_account">Your account is blocked\n please contact administrator</string>
     <string name="Deleted_account">Your account is removed\n please contact administrator</string>
+    <!-- Splash / session bootstrap failures (T-024) -->
+    <string name="splash_offline">No internet connection.\nPlease connect and open the app again.</string>
+    <string name="splash_server_unreachable">Could not reach the server.\nPlease sign in again.</string>
+    <string name="splash_permissions_failed">Could not load your permissions.\nPlease sign in again.</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>

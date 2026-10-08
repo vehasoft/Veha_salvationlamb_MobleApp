@@ -236,7 +236,19 @@ class MainActivity : AppCompatActivity() {
         }
         val userPreferences = UserPreferences(this)
         userPreferences.authToken.asLiveData().observe(this) {
-            SplashScreenActivity().getMyPermission(it)
+            // T-025 / G13: this line used to read
+            //     SplashScreenActivity().getMyPermission(it)
+            // which manually instantiates an Activity with `new`. Such an instance has no
+            // Context attached, so isNetworkAvailable() threw immediately and the call was
+            // swallowed by the catch block — the permission map was never actually refreshed
+            // here. SplashScreenActivity now loads the map before routing, so the correct
+            // behaviour is to rely on that rather than re-fetch from a broken instance.
+            if (!Util.isPermissionsLoaded()) {
+                Log.w("MainActivity", "permissions not loaded - returning to splash")
+                startActivity(Intent(this, SplashScreenActivity::class.java))
+                finish()
+                return@observe
+            }
             if (TextUtils.isEmpty(it) && it.equals("null") && it.isNullOrEmpty()) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)

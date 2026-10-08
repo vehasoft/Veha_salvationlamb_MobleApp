@@ -29,6 +29,10 @@ import java.io.FileOutputStream
 
 class SplashScreenActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
+
+    /** Guards [bailToLogin] — four DataStore observers can each reach a failure path. */
+    private var bailedOut = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splashh_screen)
@@ -156,8 +160,11 @@ class SplashScreenActivity : AppCompatActivity() {
                                 userPreferences.saveIsFirstTime(loginresp.isFreshUser.toBoolean())
                                 Util.isFirst = loginresp.isFreshUser.toBoolean()
                             }
-                            Thread.sleep(2000)
                             if (loginresp.isVerified.toBoolean()) {
+                                // T-025 / G13: the permission map must be loaded BEFORE we route,
+                                // otherwise every Util.hasPermission() gate on the destination
+                                // screen is evaluated against an empty map.
+                                getMyPermission(token) {
                                 if (intent.extras != null) {
                                     val bundle = intent.extras
                                     if (bundle != null) {
@@ -318,7 +325,7 @@ class SplashScreenActivity : AppCompatActivity() {
                                     startActivity(intent)
                                     finish()
                                 }
-                                getMyPermission(token)
+                                } // end getMyPermission callback (T-025)
                             } else {
                                 val intent = Intent(
                                     this@SplashScreenActivity,
@@ -329,39 +336,70 @@ class SplashScreenActivity : AppCompatActivity() {
                                 startActivity(intent)
                             }
                         } else if (response.code() == 401) {
-                            Toast.makeText(
-                                this@SplashScreenActivity,
-                                resources.getString(R.string.Deleted_account),
-                                Toast.LENGTH_LONG
-                            ).show()
-                            val intent =
-                                Intent(this@SplashScreenActivity, LoginActivity::class.java)
-                            startActivity(intent)
+                            // T-024: was a toast + startActivity with no finish() and no session
+                            // clear, so the dead token survived and the 401 repeated next launch.
+                            bailToLogin(R.string.Deleted_account)
                         } else {
-                            Log.e("responseee", "fail")
-                            Toast.makeText(
-                                this@SplashScreenActivity,
-                                "Somthing Went Wrong \nLogin again to continue",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            val intent =
-                                Intent(this@SplashScreenActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                            Log.e(
+                                "SplashScreenActivity.getMyDetails",
+                                "HTTP ${response.code()}"
+                            )
+                            bailToLogin(R.string.splash_server_unreachable)
                         }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("Splashscreen", "fail")
+                        Log.e("SplashScreenActivity.getMyDetails", "fail", t)
+                        bailToLogin(R.string.splash_server_unreachable)
                     }
                 })
+            } else {
+                bailToLogin(R.string.splash_offline)
             }
         } catch (e: Exception) {
-            Log.e("Splashscreen", e.toString())
+            Log.e("SplashScreenActivity.getMyDetails", e.toString())
+            bailToLogin(R.string.splash_server_unreachable)
         }
     }
 
-    public fun getMyPermission(token: String) {
+    /**
+     * Single recovery path for a failed session bootstrap (T-024, closes P0 #1 and #2).
+     *
+     * The splash is the app's only launcher entry point, so a silent failure here left the user
+     * staring at the logo forever. Every dead end now clears the proven-unusable session and
+     * routes to Login, so the next cold start begins cleanly instead of repeating the failure.
+     *
+     * Guarded by [bailedOut] because four DataStore observers can re-enter this flow.
+     */
+    private fun bailToLogin(messageRes: Int) {
+        if (bailedOut) return
+        bailedOut = true
+        Toast.makeText(this, resources.getString(messageRes), Toast.LENGTH_LONG).show()
+        lifecycleScope.launch {
+            try {
+                userPreferences.deleteAuthToken()
+                userPreferences.deleteUserId()
+            } catch (e: Exception) {
+                Log.e("SplashScreenActivity.bailToLogin", e.toString())
+            }
+            Util.userId = null
+            Util.user = null
+            Util.clearPermissions()
+            startActivity(Intent(this@SplashScreenActivity, LoginActivity::class.java))
+            finish()
+        }
+    }
+
+    /**
+     * Loads the permission map, then runs [onComplete] — **always**, success or failure.
+     *
+     * T-025 / `G13`: previously this was fire-and-forget and ran *after* routing, so the
+     * destination screen evaluated its `Util.hasPermission()` gates against an empty map.
+     * Combined with the fail-open default in `Util.hasPermission`, a failed fetch silently
+     * granted every permission. Now routing waits for the map, and a failure is a hard stop
+     * (`bailToLogin`) rather than a silent full-access grant.
+     */
+    public fun getMyPermission(token: String, onComplete: (() -> Unit)? = null) {
         try {
             if (Commons().isNetworkAvailable(this)) {
                 val retrofit = Util.getRetrofit()
@@ -373,20 +411,42 @@ class SplashScreenActivity : AppCompatActivity() {
                     ) {
                         if (response.code() == 200) {
                             val resp = response.body()
-                            Util.permissionMap = Gson().fromJson(
-                                resp?.get("results"),
-                                Map::class.java
-                            ) as MutableMap<String, String>?
+                            Util.setPermissionMap(
+                                Gson().fromJson(
+                                    resp?.get("results"),
+                                    Map::class.java
+                                ) as MutableMap<String, String>?
+                            )
+                            onComplete?.invoke()
+                        } else {
+                            Log.e(
+                                "SplashScreenActivity.getMyPermission",
+                                "HTTP ${response.code()}"
+                            )
+                            // Do NOT continue with an unknown permission set (G13).
+                            if (onComplete != null) {
+                                bailToLogin(R.string.splash_permissions_failed)
+                            }
                         }
                     }
 
                     override fun onFailure(call: Call<JsonObject?>, t: Throwable) {
-                        Log.e("Splashscreen", "fail")
+                        Log.e("SplashScreenActivity.getMyPermission", "fail", t)
+                        if (onComplete != null) {
+                            bailToLogin(R.string.splash_permissions_failed)
+                        }
                     }
                 })
+            } else {
+                if (onComplete != null) {
+                    bailToLogin(R.string.splash_offline)
+                }
             }
         } catch (e: Exception) {
-            Log.e("Splashscreen", e.toString())
+            Log.e("SplashScreenActivity.getMyPermission", e.toString())
+            if (onComplete != null) {
+                bailToLogin(R.string.splash_permissions_failed)
+            }
         }
     }
 

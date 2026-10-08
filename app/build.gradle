@@ -41,6 +41,12 @@ android {
     namespace 'com.veha.activity'
     buildFeatures {
         viewBinding true
+    }
+    // T-025: android.util.Log is a stub in local unit tests and throws by default.
+    // Util.hasPermission() logs on the deny path, so default-value stubs are required
+    // to test the G13 fail-closed logic on the JVM without Robolectric.
+    testOptions {
+        unitTests.returnDefaultValues = true
     }/*
     configurations {
         all {

@@ -202,13 +202,53 @@ public class Util {
          permissionMap.put("Video","Read,Edit,Delete,Create");
          permissionMap.put("Announcement","Read,Edit,Delete,Create");
      }*/
+
+    /**
+     * True once GET /api/v1/permission/users/{userId} has returned 200 for this process.
+     *
+     * T-025 / G13: {@link #hasPermission} used to return true whenever permissionMap was
+     * empty, so a failed permission fetch silently granted every permission across all
+     * 34 gates. The map alone cannot distinguish "not fetched yet" from "fetched, user has
+     * nothing", so that state is tracked explicitly here.
+     */
+    private static boolean permissionsLoaded = false;
+
+    /** Called only by the splash bootstrap after a successful 200. */
+    public static void setPermissionMap(Map<String, String> map) {
+        permissionMap = map;
+        permissionsLoaded = true;
+    }
+
+    /** Clears the permission state — use on logout and on any failed bootstrap. */
+    public static void clearPermissions() {
+        permissionMap = new HashMap<>();
+        permissionsLoaded = false;
+    }
+
+    public static boolean isPermissionsLoaded() {
+        return permissionsLoaded;
+    }
+
+    /**
+     * Fail-CLOSED permission check (T-025 / G13).
+     *
+     * Denies when the map has not been loaded yet, instead of the previous fail-open
+     * {@code return true}. The splash now blocks routing until the map is loaded, so a
+     * denial here means the bootstrap genuinely failed — in which case no screen should
+     * be reachable anyway.
+     */
     public static boolean hasPermission(String type, String permission) {
-        //setMap();
-        if (permissionMap == null || permissionMap.isEmpty()) {
-            return true;
+        if (!permissionsLoaded || permissionMap == null || permissionMap.isEmpty()) {
+            Log.w("Util.hasPermission",
+                    "denying " + type + "/" + permission + " - permissions not loaded");
+            return false;
         }
         if (permissionMap.containsKey(type)) {
-            List<String> permissionList = Arrays.asList(permissionMap.get(type).split(","));
+            String granted = permissionMap.get(type);
+            if (granted == null) {
+                return false;
+            }
+            List<String> permissionList = Arrays.asList(granted.split(","));
             if (permissionList.contains("All")) {
                 return true;
             } else return permissionList.contains(permission);

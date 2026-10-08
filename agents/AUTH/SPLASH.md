@@ -282,11 +282,12 @@ Not used here: Kotlin synthetics, `SpotsDialog`, `Util.isValid*` validators.
 
 | # | Issue | Severity | Suggested fix |
 |---|---|---|---|
-| S5 | **`onFailure` does nothing** — no toast, no navigation. A server timeout leaves the user stuck on the splash forever | **Critical** | toast + fall back to `LoginActivity` |
-| S12 | Offline -> `isNetworkAvailable` false -> the method returns silently, same permanent hang **at app launch** | **Critical** | detect offline and route to Login (or an offline screen) with a message |
-| S9 / S16 | **Two** `Thread.sleep(2000)` calls on the **main thread** (one before the request, one inside its callback) — guaranteed ≥ 4 s of frozen UI for a returning user | **High (ANR)** | delete both, or use `Handler.postDelayed` / `lifecycleScope.launch { delay(...) }` |
-| S11 | A proven-invalid session is **not cleared** (no `deleteAuthToken`/`deleteUserId`), unlike every other 401-ish handler in the app, so the failure repeats on every launch | **High** | clear the session before routing to Login |
-| S13 | Four **continuous** LiveData observers; any later write to `token`/`userId`/`isNight`/`textSize` re-fires them and can launch `getMyDetails` again | **High** | one-shot reads (`first()`), or guard with a `hasBootstrapped` flag |
+| S5 | ~~**`onFailure` does nothing**~~ — **FIXED 2026-10-08 (T-024)**: `onFailure` now calls `bailToLogin(R.string.splash_server_unreachable)` | ~~Critical~~ | — |
+| S12 | ~~Offline -> `isNetworkAvailable` false -> silent return, permanent hang at launch~~ — **FIXED 2026-10-08 (T-024)**: the `if` now has an `else { bailToLogin(R.string.splash_offline) }` | ~~Critical~~ | — |
+| S9 / S16 | ~~**Two** `Thread.sleep(2000)` calls on the main thread~~ — **FIXED 2026-10-08 (T-024)**: on the v1.2.0 baseline only one remained (line 159) and it is now deleted. **0 `Thread.sleep` left in this file** | ~~High (ANR)~~ | — |
+| S11 | ~~A proven-invalid session is **not cleared**~~ — **FIXED 2026-10-08 (T-024)**: `bailToLogin` calls `deleteAuthToken()` + `deleteUserId()` and clears `Util.userId` / `Util.user` / `Util.clearPermissions()` before routing | ~~High~~ | — |
+| S22 | **NEW (T-025, `G13`)** — ~~`getMyPermission` was fire-and-forget **after** routing, so the destination screen read an empty `permissionMap`; combined with the fail-open `Util.hasPermission` this granted every permission~~ — **FIXED 2026-10-08**: `getMyPermission(token) { … }` now takes a completion lambda, routing happens **inside** it, and any failure calls `bailToLogin` | ~~**Critical (security)**~~ | — |
+| S13 | Four **continuous** LiveData observers; any later write to `token`/`userId`/`isNight`/`textSize` re-fires them and can launch `getMyDetails` again. *(Partially mitigated by the new `bailedOut` guard, which makes the failure path idempotent; the happy path can still re-fire.)* | **High** | one-shot reads (`first()`), or guard with a `hasBootstrapped` flag |
 | S6 | The empty-`userId` branch starts Login and calls `finish()` but **does not return**, so `Util.userId` is still assigned and the flow continues to `GET api/v1/users/` | **High** | add `return@observe` |
 | S7 | `getMyDetails` depends on a **sibling observer** having already set `Util.userId`; the ordering is incidental, not guaranteed | Medium | read `userId` once and pass it explicitly |
 | S8 | `isWarrior` treats empty/null as **true** (`isNullOrEmpty() \|\| != "false"`) | Medium | compare explicitly with `"true"` (same as LOGIN L5) |
@@ -295,12 +296,13 @@ Not used here: Kotlin synthetics, `SpotsDialog`, `Util.isValid*` validators.
 | S4 | The API 31+ `addOnDrawListener { false }` block is a **no-op** (mis-port of `addOnPreDrawListener`); `androidx.core:core-splashscreen` is not used | Medium | adopt the official SplashScreen API, or delete the dead block |
 | S1 | No splash theme / `windowBackground`, so a blank window shows before the layout inflates | Medium | add a themed `windowBackground` |
 | S2 | Hard-coded `#F0F3F9` and `#FFFFFF`; the splash ignores night mode despite a `DayNight` theme | Medium | move to `colors.xml` + `values-night` |
-| S14 | No progress indicator or text during a ≥ 2 s (often ≥ 4 s) wait | Medium | add a spinner, or remove the artificial delay |
+| S14 | No progress indicator during the bootstrap wait *(the artificial 2 s delay is gone, but a slow network still shows a static logo)* | Medium | add a spinner |
+| S23 | **NEW (T-024)** — `getBible()` throws `RuntimeException(e)` from inside a Retrofit callback on a malformed payload, and its `onFailure` only logs | **High** | handle the parse failure without rethrowing |
 | S3 | The `ImageView` has no `scaleType` and is stretched to `match_parent` | Low | use `centerInside` / `centerCrop`, or a vector |
-| S17 | `Log.e("responseee", "fail")` and `Log.e("Splashscreen", ...)` — debug-grade tags that do not follow the `Class.method` convention | Low | use `Log.e("SplashhScreenActivity.getMyDetails", ...)` |
-| S18 | `"Somthing Went Wrong"` is misspelled (shared with 5 other files) | Cosmetic | fix app-wide (cross-team) |
-| S19 | The class name `SplashhScreenActivity` contains a typo (double "h") and is referenced in the manifest | Cosmetic | rename only with PM sign-off (touches the manifest) |
-| S20 | `getMyDetails` is **triplicated** across Splash, Login and MainActivity, with three different error behaviours | **High** | extract a shared `SessionBootstrap` (PM-level refactor) |
+| S17 | ~~`Log.e("responseee", …)` / `Log.e("Splashscreen", …)` debug-grade tags~~ — **FIXED 2026-10-08 (T-024)** in `getMyDetails` / `getMyPermission` / `bailToLogin`; `getBible` and `readNotification` still use ad-hoc tags | Low | finish the sweep in the two remaining methods |
+| S18 | ~~`"Somthing Went Wrong"` is misspelled~~ — **FIXED here 2026-10-08 (T-024)**: replaced by `@string/splash_server_unreachable`. Still present in 5 other files | Cosmetic | fix the remaining files app-wide (cross-team) |
+| S19 | ~~The class name `SplashhScreenActivity` contains a typo (double "h")~~ — **FIXED upstream** on the v1.2.0 baseline: renamed to `SplashScreenActivity` | ~~Cosmetic~~ | — |
+| S20 | `getMyDetails` is **triplicated** across Splash, Login and MainActivity, with three different error behaviours. *(T-025 removed MainActivity's broken `SplashScreenActivity().getMyPermission(it)` call, but the duplication itself remains.)* | **High** | extract a shared `SessionBootstrap` (PM-level refactor) |
 | S21 | Rotating during the bootstrap re-runs it from scratch, including a duplicate network call | Medium | guard with `savedInstanceState == null` |
 
 ---
@@ -359,4 +361,5 @@ screen is where every `Util` global is seeded.
 
 | Change | Detail |
 |---|---|
+| T-024 / T-025 (2026-10-08) | **Wave 1 + 2 fixes.** Closed P0 #1/#2 (`S5`, `S12`, `S11`) with a single `bailToLogin(messageRes)` recovery path: toast → clear `token`/`userId` → clear `Util` session + permissions → `LoginActivity` + `finish()`. Reached from `onFailure`, the offline `else`, the `catch`, HTTP 401 and any other non-200. Deleted the last main-thread `Thread.sleep(2000)` (`S9`/`S16`). Closed `G13` here (`S22`): `getMyPermission(token, onComplete)` now gates routing on the permission map being loaded, and a failed fetch bails instead of continuing with an empty map. Added 3 strings (`splash_offline`, `splash_server_unreachable`, `splash_permissions_failed`) and the `bailedOut` re-entry guard. New issues `S22` (fixed) and `S23` (`getBible` rethrows). Verified: `assembleDebug` + 11 unit tests green. |
 | Created | Initial SPLASH module agent, documented line-by-line from `SplashhScreenActivity.kt` (133 lines) and `activity_splashh_screen.xml` (16 lines): the launcher contract, a 2-view id-less layout, the 4 DataStore observers, the token/userId/verified routing fork, the `GET users/{userId}` call, 5 storage keys, 6 `Util` globals seeded, 1 user-visible string, 6 navigation edges, 21 known issues. Recorded the two main-thread `Thread.sleep(2000)` calls, the **silent `onFailure` that hangs the app at launch**, the missing `return@observe` on the empty-userId path, the no-op API 31+ draw listener, and the `getMyDetails` triplication shared with LOGIN and MAIN_NAV. |
