@@ -46,7 +46,19 @@ BEGIN = "<!-- AUTO-GENERATED:BEGIN -- do not edit by hand; run agents/tools/sync
 END = "<!-- AUTO-GENERATED:END -->"
 
 # Team order used throughout the register.
-TEAM_ORDER = ["PLATFORM", "AUTH", "APPSHELL", "FEED", "PROFILE", "MEDIA", "SEARCH"]
+# BIBLE / NOTIFICATIONS / ANNOUNCEMENTS added by T-026 (new teams on the v1.2.0 baseline).
+TEAM_ORDER = [
+    "PLATFORM",
+    "AUTH",
+    "APPSHELL",
+    "FEED",
+    "PROFILE",
+    "MEDIA",
+    "SEARCH",
+    "BIBLE",
+    "NOTIFICATIONS",
+    "ANNOUNCEMENTS",
+]
 
 # Heading that opens a known-issues table in either template.
 ISSUE_HEADING = re.compile(

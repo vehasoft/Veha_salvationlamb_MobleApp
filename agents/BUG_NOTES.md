@@ -284,17 +284,17 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 <!-- AUTO-GENERATED:BEGIN -- do not edit by hand; run agents/tools/sync_bug_notes.py -->
 
-**657 tracked entries** extracted from 42 agent docs, plus 14 PM-level global issues.
+**851 tracked entries** extracted from 54 agent docs, plus 14 PM-level global issues.
 
 | Severity | Count | Priority |
 |---|---|---|
-| Critical | 7 | P0 |
-| High | 166 | P1 |
-| Medium | 232 | P2 |
-| Low | 134 | P3 |
-| Cosmetic | 14 | P3 |
-| Rollup (team-lead aggregate) | 104 | -- |
-| **Distinct module-level defects** | **553** | |
+| Critical | 13 | P0 |
+| High | 207 | P1 |
+| Medium | 285 | P2 |
+| Low | 170 | P3 |
+| Cosmetic | 29 | P3 |
+| Rollup (team-lead aggregate) | 147 | -- |
+| **Distinct module-level defects** | **704** | |
 
 ### Per-team breakdown
 
@@ -302,11 +302,14 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 |---|---|---|---|---|---|---|---|
 | PLATFORM | 1 | 23 | 34 | 25 | 1 | 17 | **101** |
 | AUTH | 3 | 32 | 64 | 31 | 8 | 30 | **168** |
-| APPSHELL | 0 | 16 | 24 | 15 | 0 | 10 | **65** |
+| APPSHELL | 0 | 19 | 27 | 16 | 1 | 10 | **73** |
 | FEED | 1 | 28 | 34 | 24 | 4 | 13 | **104** |
-| PROFILE | 0 | 30 | 27 | 12 | 0 | 15 | **84** |
+| PROFILE | 0 | 36 | 33 | 15 | 1 | 15 | **100** |
 | MEDIA | 2 | 28 | 34 | 17 | 1 | 10 | **92** |
 | SEARCH | 0 | 9 | 15 | 10 | 0 | 9 | **43** |
+| BIBLE | 2 | 10 | 22 | 16 | 6 | 20 | **76** |
+| NOTIFICATIONS | 4 | 15 | 18 | 13 | 4 | 12 | **66** |
+| ANNOUNCEMENTS | 0 | 7 | 4 | 3 | 3 | 11 | **28** |
 
 ### PM-level global issues (`AGENTS.md` §7)
 
@@ -323,7 +326,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | G9 | No unit tests — **first real tests landed 2026-10-08 (T-025)**: `UtilPermissionTest.kt` (10 tests) pins the `G13` fail-closed behaviour. Still ~0% coverage overall; a QA team is needed | PM (future QA team) | regressions |
 | G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); tag `baseline-on-master-backup` preserves the old `master`-based docs | PM | ~~safety~~ |
 | G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
-| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; per-doc staleness is tracked in the "v1.2 audit" column in §3 — 3 `OK`, ~30 `DRIFT`, 6 `REWRITE`, 18 files with **no agent** (T-019) | PM | doc accuracy |
+| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; staleness per doc is tracked in the "v1.2 audit" column in §3. **T-026 closed the coverage gap** — all 18 previously unowned files now have agents (54 docs, 10 teams); ~30 `DRIFT` refreshes remain (T-023) | PM | doc accuracy |
 | G13 | ~~**`Util.hasPermission()` fails open**~~ — **FIXED 2026-10-08 (T-025)**: now fail-CLOSED via a `permissionsLoaded` flag; the splash loads the map **before** routing and bails to Login if the fetch fails. 10 unit tests in `UtilPermissionTest.kt` | PLATFORM / COMMONS | ~~security (high)~~ |
 | G14 | **`app/google-services.json` is committed** — contains the Firebase API key and project config | PLATFORM / BUILD_CONFIG | secret exposure (low-ish; FCM keys are client-side but should be reviewed) |
 
@@ -674,7 +677,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | BUG-268 | S18 | P3 | Cosmetic | ~~`"Somthing Went Wrong"` is misspelled~~ — **FIXED here 2026-10-08 (T-024)**: replaced by `@string/splash_server_unreachable`. Still present in 5 other files | fix the remaining files app-wide (cross-team) |
 | BUG-269 | S19 | P3 | Cosmetic | ~~The class name `SplashhScreenActivity` contains a typo (double "h")~~ — **FIXED upstream** on the v1.2.0 baseline: renamed to `SplashScreenActivity` | — |
 
-### APPSHELL — 65 entries
+### APPSHELL — 73 entries
 
 #### `APPSHELL_LEAD` — team lead (rollups) · `agents/APPSHELL/APPSHELL_LEAD.md` · 10 entries
 
@@ -728,43 +731,56 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | BUG-305 | MN11 | P3 | Low | `R.drawable.covre_pic` is misspelled | rename (THEMING) |
 | BUG-306 | MN15 | P3 | Low | No `onSaveInstanceState` for the selected tab | save `currentItem` |
 
+#### `NO_PERMISSION` — module · `agents/APPSHELL/NO_PERMISSION.md` · 8 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-307 | NOP2 | P1 | High | `NoPermissionFragment` declares `lateinit var goBack: Button` and **never binds it**, so the fragment's only control is inert. A user on a denied tab has **no action at all** | bind it and pop to a permitted tab, or remove the button from the layout |
+| BUG-308 | NOP4 | P1 | High | **The user is never told which permission was denied.** The Activity receives **no extras** and reads no state, so all 19 call sites produce one identical message. With `hasPermission` now failing closed (T-025), a failed permission fetch sends the user here from anywhere with no way to tell a real denial from a loading failure | pass `type` + `permission` as extras and render them; distinguish "not permitted" from "could not load permissions" |
+| BUG-309 | NOP5 | P1 | High | `TabAdapter` position 2 (**Bible**) is the only tab with **no permission gate** — every other tab and both search tabs are gated. Also recorded as `BIBLE B-1` | gate it, or add a `BIBLE` permission type |
+| BUG-310 | NOP3 | P2 | Medium | The logo tap starts `MainActivity` with **no `finish()` and no `CLEAR_TOP`**, stacking a duplicate `MainActivity` and leaving the denial screen underneath it | `FLAG_ACTIVITY_CLEAR_TOP` + `finish()` |
+| BUG-311 | NOP8 | P2 | Medium | Both the Activity and the Fragment exist to render the **same message**, with duplicated layout and duplicated hard-coded text | one shared layout `<include>`d by both |
+| BUG-312 | NOP9 | P2 | Medium | There is **no way to retry** — if the denial came from a transient permission-fetch failure the user must kill and relaunch the app | add a "Retry" action that re-runs the permission fetch |
+| BUG-313 | NOP6 | P3 | Low | The two user-visible strings are **hard-coded in the layouts**, absent from `strings.xml`, and therefore untranslatable. `textSize="20dp"` should be `20sp` | move to `strings.xml`; use `sp` |
+| BUG-314 | NOP7 | P3 | Cosmetic | `"You Don't have permission to access this page \n Please contact administrator"` is duplicated verbatim in two layouts; it also reads awkwardly (`Don't`, missing full stops) | single string resource, reworded |
+
 #### `SETTINGS` — module · `agents/APPSHELL/SETTINGS.md` · 14 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-307 | ST10 | P1 | High | **Account deletion needs only a Yes tap** — no re-authentication or typed confirmation | require the password, or a typed confirmation |
-| BUG-308 | ST11 | P1 | High | Deletion failure shows the user **nothing** | toast the error |
-| BUG-309 | ST12 | P1 | High | Deletion clears DataStore but leaves `Util.user` / `Util.userId` populated | clear global state too |
-| BUG-310 | ST13 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded in the menu copy | null-guard |
-| BUG-311 | ST14 | P1 | High | The overflow menu is duplicated here too (AS-1) | shared handler (PM-level) |
-| BUG-312 | ST2 | P2 | Medium | Options are matched by **display string** rather than index or enum | switch on the index |
-| BUG-313 | ST3 | P2 | Medium | Theme and font changes **restart `MainActivity`** | `recreate()` / live `AppCompatDelegate` update |
-| BUG-314 | ST4 | P2 | Medium | Font size affects **only** post content and tags | apply app-wide, or rename the setting |
-| BUG-315 | ST5 | P2 | Medium | Neither picker shows the current selection | use `setSingleChoiceItems` |
-| BUG-316 | ST6 | P2 | Medium | Theme is written here but applied in `MainActivity` — split responsibility | documented; centralise if refactoring |
-| BUG-317 | ST1 | P3 | Low | No app version, no about link, no notification or privacy settings | ask the customer |
-| BUG-318 | ST7 | P3 | Low | A large commented-out night-mode resolution block | delete |
-| BUG-319 | ST8 | P3 | Low | `Log.e("mode", ...)` debug logging | remove |
-| BUG-320 | ST9 | P3 | Low | The `DEFAULT` branch writes in the opposite order to the others | align |
+| BUG-315 | ST10 | P1 | High | **Account deletion needs only a Yes tap** — no re-authentication or typed confirmation | require the password, or a typed confirmation |
+| BUG-316 | ST11 | P1 | High | Deletion failure shows the user **nothing** | toast the error |
+| BUG-317 | ST12 | P1 | High | Deletion clears DataStore but leaves `Util.user` / `Util.userId` populated | clear global state too |
+| BUG-318 | ST13 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded in the menu copy | null-guard |
+| BUG-319 | ST14 | P1 | High | The overflow menu is duplicated here too (AS-1) | shared handler (PM-level) |
+| BUG-320 | ST2 | P2 | Medium | Options are matched by **display string** rather than index or enum | switch on the index |
+| BUG-321 | ST3 | P2 | Medium | Theme and font changes **restart `MainActivity`** | `recreate()` / live `AppCompatDelegate` update |
+| BUG-322 | ST4 | P2 | Medium | Font size affects **only** post content and tags | apply app-wide, or rename the setting |
+| BUG-323 | ST5 | P2 | Medium | Neither picker shows the current selection | use `setSingleChoiceItems` |
+| BUG-324 | ST6 | P2 | Medium | Theme is written here but applied in `MainActivity` — split responsibility | documented; centralise if refactoring |
+| BUG-325 | ST1 | P3 | Low | No app version, no about link, no notification or privacy settings | ask the customer |
+| BUG-326 | ST7 | P3 | Low | A large commented-out night-mode resolution block | delete |
+| BUG-327 | ST8 | P3 | Low | `Log.e("mode", ...)` debug logging | remove |
+| BUG-328 | ST9 | P3 | Low | The `DEFAULT` branch writes in the opposite order to the others | align |
 
 #### `THEMING` — module · `agents/APPSHELL/THEMING.md` · 14 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-321 | TH1 | P1 | High | **`black` and `white` are inverted in night mode** — the names lie | rename to `text_primary` / `surface`, app-wide |
-| BUG-322 | TH9 | P1 | High | Only 26 strings; nearly all UI text is hard-coded — the app is **not localisable** | extract strings (a very large, cross-team task) |
-| BUG-323 | TH2 | P2 | Medium | No error/success/warning colours; screens use `Color.RED` in code | add semantic colours |
-| BUG-324 | TH3 | P2 | Medium | No ActionBar, so all 21 screens hand-roll a header | a shared header layout/`include` |
-| BUG-325 | TH4 | P2 | Medium | `windowIsTranslucent=true` app-wide | verify it is needed |
-| BUG-326 | TH5 | P2 | Medium | `colorPrimaryDark` is `@color/black`, i.e. white at night | use an explicit colour |
-| BUG-327 | TH6 | P2 | Medium | `menuStyle` forces LTR despite `supportsRtl="true"` | remove, or justify |
-| BUG-328 | TH12 | P2 | Medium | Sizes are hard-coded in layouts rather than in `dimens.xml` | centralise |
-| BUG-329 | TH13 | P2 | Medium | Text sizes declared in **`dp`** rather than `sp` in several layouts | switch to `sp` |
-| BUG-330 | TH7 | P3 | Low | `styles.xml` and `themes.xml` split two styles across two files | merge |
-| BUG-331 | TH8 | P3 | Low | Both `app_name` and `Product_name` hold "SalvationLamb" | keep one |
-| BUG-332 | TH10 | P3 | Low | `values-night/dimens.xml` exists though dimensions do not vary by theme | delete |
-| BUG-333 | TH11 | P3 | Low | Tablet breakpoints exist with no tablet layouts | implement or remove |
-| BUG-334 | TH14 | P3 | Low | `covre_pic` is misspelled | rename (touches MAIN_NAV) |
+| BUG-329 | TH1 | P1 | High | **`black` and `white` are inverted in night mode** — the names lie | rename to `text_primary` / `surface`, app-wide |
+| BUG-330 | TH9 | P1 | High | Only 26 strings; nearly all UI text is hard-coded — the app is **not localisable** | extract strings (a very large, cross-team task) |
+| BUG-331 | TH2 | P2 | Medium | No error/success/warning colours; screens use `Color.RED` in code | add semantic colours |
+| BUG-332 | TH3 | P2 | Medium | No ActionBar, so all 21 screens hand-roll a header | a shared header layout/`include` |
+| BUG-333 | TH4 | P2 | Medium | `windowIsTranslucent=true` app-wide | verify it is needed |
+| BUG-334 | TH5 | P2 | Medium | `colorPrimaryDark` is `@color/black`, i.e. white at night | use an explicit colour |
+| BUG-335 | TH6 | P2 | Medium | `menuStyle` forces LTR despite `supportsRtl="true"` | remove, or justify |
+| BUG-336 | TH12 | P2 | Medium | Sizes are hard-coded in layouts rather than in `dimens.xml` | centralise |
+| BUG-337 | TH13 | P2 | Medium | Text sizes declared in **`dp`** rather than `sp` in several layouts | switch to `sp` |
+| BUG-338 | TH7 | P3 | Low | `styles.xml` and `themes.xml` split two styles across two files | merge |
+| BUG-339 | TH8 | P3 | Low | Both `app_name` and `Product_name` hold "SalvationLamb" | keep one |
+| BUG-340 | TH10 | P3 | Low | `values-night/dimens.xml` exists though dimensions do not vary by theme | delete |
+| BUG-341 | TH11 | P3 | Low | Tablet breakpoints exist with no tablet layouts | implement or remove |
+| BUG-342 | TH14 | P3 | Low | `covre_pic` is misspelled | rename (touches MAIN_NAV) |
 
 ### FEED — 104 entries
 
@@ -772,251 +788,272 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Bug | Agent id | Issue | Affects module(s) | Risk |
 |---|---|---|---|---|
-| BUG-335 | F-1 | `page`/`type` are magic strings with no constants, compared via `contentEquals` | HOME_FEED | silent mis-render |
-| BUG-336 | F-2 | List endpoints use `results` + `count`, unlike AUTH's `result` | all | empty lists, no error |
-| BUG-337 | F-3 | `HomeAdapter` (680 lines) holds **all** post actions — like, fav, follow, delete, share, playback — instead of the screen | HOME_FEED | untestable, cross-team coupling |
-| BUG-338 | F-4 | The always-true `!isEmpty \|\| !equals("null") \|\| !isNullOrEmpty` token guard appears **5 times** in `HomeFragment` alone | HOME_FEED | dead logout branches |
-| BUG-339 | F-5 | A new `authToken` observer is registered per call, in 5 methods | HOME_FEED | duplicate requests |
-| BUG-340 | F-6 | `dialog.hide()` is used instead of `dismiss()` in FEED callbacks | HOME_FEED | leaked window on config change |
-| BUG-341 | F-7 | Error branches are **commented out**; failures just show the "no data" view | HOME_FEED | indistinguishable empty vs failed |
-| BUG-342 | F-8 | Pull-to-refresh calls `detach().attach()` on the fragment — a full recreate | HOME_FEED | jank, duplicate calls |
-| BUG-343 | F-9 | A new `OnScrollListener` is added on **every** page load, never removed | HOME_FEED | listeners accumulate |
-| BUG-344 | F-10 | `Util.player` is a static `MediaPlayer` shared by every card | HOME_FEED, MEDIA | leaks, overlapping audio |
-| BUG-345 | F-11 | 14 reaction strings are addressed by `R.id.reactN` -> `R.string.reactN` pairs with no data structure | HOME_FEED | fragile |
-| BUG-346 | F-12 | `Posts.likesCount` / `shareCount` are `String` | all | conversion crashes |
-| BUG-347 | F-13 | `getMyDetails` duplicated here as well — the **4th** copy | HOME_FEED | drift (AUTH A4) |
+| BUG-343 | F-1 | `page`/`type` are magic strings with no constants, compared via `contentEquals` | HOME_FEED | silent mis-render |
+| BUG-344 | F-2 | List endpoints use `results` + `count`, unlike AUTH's `result` | all | empty lists, no error |
+| BUG-345 | F-3 | `HomeAdapter` (680 lines) holds **all** post actions — like, fav, follow, delete, share, playback — instead of the screen | HOME_FEED | untestable, cross-team coupling |
+| BUG-346 | F-4 | The always-true `!isEmpty \|\| !equals("null") \|\| !isNullOrEmpty` token guard appears **5 times** in `HomeFragment` alone | HOME_FEED | dead logout branches |
+| BUG-347 | F-5 | A new `authToken` observer is registered per call, in 5 methods | HOME_FEED | duplicate requests |
+| BUG-348 | F-6 | `dialog.hide()` is used instead of `dismiss()` in FEED callbacks | HOME_FEED | leaked window on config change |
+| BUG-349 | F-7 | Error branches are **commented out**; failures just show the "no data" view | HOME_FEED | indistinguishable empty vs failed |
+| BUG-350 | F-8 | Pull-to-refresh calls `detach().attach()` on the fragment — a full recreate | HOME_FEED | jank, duplicate calls |
+| BUG-351 | F-9 | A new `OnScrollListener` is added on **every** page load, never removed | HOME_FEED | listeners accumulate |
+| BUG-352 | F-10 | `Util.player` is a static `MediaPlayer` shared by every card | HOME_FEED, MEDIA | leaks, overlapping audio |
+| BUG-353 | F-11 | 14 reaction strings are addressed by `R.id.reactN` -> `R.string.reactN` pairs with no data structure | HOME_FEED | fragile |
+| BUG-354 | F-12 | `Posts.likesCount` / `shareCount` are `String` | all | conversion crashes |
+| BUG-355 | F-13 | `getMyDetails` duplicated here as well — the **4th** copy | HOME_FEED | drift (AUTH A4) |
 
 #### `ADD_POST` — module · `agents/FEED/ADD_POST.md` · 24 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-348 | AP4 | P1 | High | Permissions are **checked but never requested** — the user is bounced to settings | call `requestPermissions` first |
-| BUG-349 | AP5 | P1 | High | `MediaStore.Images.Media.getBitmap` (deprecated) decodes on the **main thread** | `ImageDecoder` off the main thread |
-| BUG-350 | AP6 | P1 | High | The camera path stores only the **thumbnail** from `extras["data"]` | use a `FileProvider` and the full-size file |
-| BUG-351 | AP11 | P1 | High | Base64 is sent inside JSON (`Base64.DEFAULT` adds newlines); no size limit | multipart upload (with NETWORK) |
-| BUG-352 | AP14 | P1 | High | The always-true token guard; the logout branch is dead | use `&&` |
-| BUG-353 | AP15 | P1 | High | `Log.e("data", data.toString())` prints the **entire base64 image** to logcat | remove the log |
-| BUG-354 | AP18 | P1 | High | A non-200 shows **no message**; error parsing is commented out | restore and toast |
-| BUG-355 | AP22 | P1 | High | Rotation loses the picked image and the post type | save to `onSaveInstanceState` |
-| BUG-356 | AP1 | P2 | Medium | No warrior check on the screen itself — it is reachable by intent | verify `Util.isWarrior` in `onCreate` |
-| BUG-357 | AP2 | P2 | Medium | Image/Video visibility handling is asymmetric | handle both in the listener |
-| BUG-358 | AP3 | P2 | Medium | `image_btn` has two listeners, so selecting the radio immediately opens the picker | pick one trigger |
-| BUG-359 | AP12 | P2 | Medium | A video post is accepted with an **empty or invalid URL** | validate the URL |
-| BUG-360 | AP13 | P2 | Medium | `post_btn` is not re-enabled in `onFailure` | re-enable |
-| BUG-361 | AP17 | P2 | Medium | Success clears only `title` and `content`, leaving tags/url/image | reset everything |
-| BUG-362 | AP19 | P2 | Medium | A stray `dialog.dismiss()` outside the observer dismisses the spinner early | remove it |
-| BUG-363 | AP20 | P2 | Medium | `resultCode` is ignored in `onActivityResult` | check `RESULT_OK` |
-| BUG-364 | AP21 | P2 | Medium | `onResume` dismisses the dialog of an in-flight request | remove the override |
-| BUG-365 | AP7 | P3 | Low | `data.extras!!["data"]` double force-unwrap | null-safe |
-| BUG-366 | AP8 | P3 | Low | Dead compression in the camera path (quality 90, result discarded) | delete |
-| BUG-367 | AP9 | P3 | Low | Permission dialog buttons are inverted ("cancel" positive, "settings" negative) | swap |
-| BUG-368 | AP10 | P3 | Low | Permission copy mentions *"profile picture"* on the post screen | reword |
-| BUG-369 | AP16 | P3 | Low | Body key `image` vs model field `picture` | document only |
-| BUG-370 | AP23 | P3 | Low | Deprecated `startActivityForResult` / `onActivityResult` | Activity Result API |
-| BUG-371 | AP24 | P3 | Low | Returns to `MainActivity` instead of the feed with a result | `setResult` + `finish()` |
+| BUG-356 | AP4 | P1 | High | Permissions are **checked but never requested** — the user is bounced to settings | call `requestPermissions` first |
+| BUG-357 | AP5 | P1 | High | `MediaStore.Images.Media.getBitmap` (deprecated) decodes on the **main thread** | `ImageDecoder` off the main thread |
+| BUG-358 | AP6 | P1 | High | The camera path stores only the **thumbnail** from `extras["data"]` | use a `FileProvider` and the full-size file |
+| BUG-359 | AP11 | P1 | High | Base64 is sent inside JSON (`Base64.DEFAULT` adds newlines); no size limit | multipart upload (with NETWORK) |
+| BUG-360 | AP14 | P1 | High | The always-true token guard; the logout branch is dead | use `&&` |
+| BUG-361 | AP15 | P1 | High | `Log.e("data", data.toString())` prints the **entire base64 image** to logcat | remove the log |
+| BUG-362 | AP18 | P1 | High | A non-200 shows **no message**; error parsing is commented out | restore and toast |
+| BUG-363 | AP22 | P1 | High | Rotation loses the picked image and the post type | save to `onSaveInstanceState` |
+| BUG-364 | AP1 | P2 | Medium | No warrior check on the screen itself — it is reachable by intent | verify `Util.isWarrior` in `onCreate` |
+| BUG-365 | AP2 | P2 | Medium | Image/Video visibility handling is asymmetric | handle both in the listener |
+| BUG-366 | AP3 | P2 | Medium | `image_btn` has two listeners, so selecting the radio immediately opens the picker | pick one trigger |
+| BUG-367 | AP12 | P2 | Medium | A video post is accepted with an **empty or invalid URL** | validate the URL |
+| BUG-368 | AP13 | P2 | Medium | `post_btn` is not re-enabled in `onFailure` | re-enable |
+| BUG-369 | AP17 | P2 | Medium | Success clears only `title` and `content`, leaving tags/url/image | reset everything |
+| BUG-370 | AP19 | P2 | Medium | A stray `dialog.dismiss()` outside the observer dismisses the spinner early | remove it |
+| BUG-371 | AP20 | P2 | Medium | `resultCode` is ignored in `onActivityResult` | check `RESULT_OK` |
+| BUG-372 | AP21 | P2 | Medium | `onResume` dismisses the dialog of an in-flight request | remove the override |
+| BUG-373 | AP7 | P3 | Low | `data.extras!!["data"]` double force-unwrap | null-safe |
+| BUG-374 | AP8 | P3 | Low | Dead compression in the camera path (quality 90, result discarded) | delete |
+| BUG-375 | AP9 | P3 | Low | Permission dialog buttons are inverted ("cancel" positive, "settings" negative) | swap |
+| BUG-376 | AP10 | P3 | Low | Permission copy mentions *"profile picture"* on the post screen | reword |
+| BUG-377 | AP16 | P3 | Low | Body key `image` vs model field `picture` | document only |
+| BUG-378 | AP23 | P3 | Low | Deprecated `startActivityForResult` / `onActivityResult` | Activity Result API |
+| BUG-379 | AP24 | P3 | Low | Returns to `MainActivity` instead of the feed with a result | `setResult` + `finish()` |
 
 #### `FAVORITES` — module · `agents/FEED/FAVORITES.md` · 11 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-372 | FV2 | P1 | High | `menu` is resolved via a **synthetic import of another layout** | use `findViewById` |
-| BUG-373 | FV7 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard `Util.user` |
-| BUG-374 | FV10 | P1 | High | The fragment is `replace()`d with no `savedInstanceState` guard — every rotation rebuilds it and re-fetches | guard the transaction |
-| BUG-375 | FV11 | P1 | High | The ~60-line menu block is duplicated here too (team issue VL3) | shared handler (PM-level) |
-| BUG-376 | FV4 | P2 | Medium | No screen title or heading — the user cannot tell they are in Favorites | add a title |
-| BUG-377 | FV5 | P2 | Medium | `logout` is hidden but its full handler remains as dead code | remove the handler, or show the item |
-| BUG-378 | FV6 | P2 | Medium | Hiding `logout` here but not on sibling screens is undocumented and inconsistent | decide a rule with APPSHELL |
-| BUG-379 | FV3 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
-| BUG-380 | FV8 | P3 | Low | `UserPreferences` is instantiated but effectively unused | delete with FV5 |
-| BUG-381 | FV9 | P3 | Low | A `SpotsDialog` is built and never used | delete |
-| BUG-382 | FV1 | P3 | Cosmetic | The fragment variable is named `viewProfile` | rename |
+| BUG-380 | FV2 | P1 | High | `menu` is resolved via a **synthetic import of another layout** | use `findViewById` |
+| BUG-381 | FV7 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard `Util.user` |
+| BUG-382 | FV10 | P1 | High | The fragment is `replace()`d with no `savedInstanceState` guard — every rotation rebuilds it and re-fetches | guard the transaction |
+| BUG-383 | FV11 | P1 | High | The ~60-line menu block is duplicated here too (team issue VL3) | shared handler (PM-level) |
+| BUG-384 | FV4 | P2 | Medium | No screen title or heading — the user cannot tell they are in Favorites | add a title |
+| BUG-385 | FV5 | P2 | Medium | `logout` is hidden but its full handler remains as dead code | remove the handler, or show the item |
+| BUG-386 | FV6 | P2 | Medium | Hiding `logout` here but not on sibling screens is undocumented and inconsistent | decide a rule with APPSHELL |
+| BUG-387 | FV3 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
+| BUG-388 | FV8 | P3 | Low | `UserPreferences` is instantiated but effectively unused | delete with FV5 |
+| BUG-389 | FV9 | P3 | Low | A `SpotsDialog` is built and never used | delete |
+| BUG-390 | FV1 | P3 | Cosmetic | The fragment variable is named `viewProfile` | rename |
 
 #### `HOME_FEED` — module · `agents/FEED/HOME_FEED.md` · 19 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-383 | H5 | P1 | High | Audio uses the static `Util.player` plus a polling `Runnable` not tied to the card lifecycle | per-holder player, release on recycle |
-| BUG-384 | H7 | P1 | High | 5 `authToken` observers, one per method, re-firing on every DataStore write | one-shot read |
-| BUG-385 | H8 | P1 | High | The always-true token guard appears 5x; the logout branch is dead | use `&&` |
-| BUG-386 | H9 | P1 | High | Error parsing is commented out — a failed load is indistinguishable from an empty feed | restore it and show a distinct error state |
-| BUG-387 | H12 | P1 | High | A new `OnScrollListener` is added on **every** page load, never removed | add it once in `onCreateView` |
-| BUG-388 | H14 | P1 | High | The adapter does **network I/O** and owns a `UserPreferences` + dialog; 680 lines mixing view binding, playback and 5 API calls | move calls to the fragment/ViewModel |
-| BUG-389 | H17 | P1 | High | Retrofit calls are never cancelled; callbacks touch views after detach | cancel in `onDestroyView` |
-| BUG-390 | H3 | P2 | Medium | No `else` in the `page` visibility chain | add a default |
-| BUG-391 | H4 | P2 | Medium | No `else` in the `post.type` `when` | log/handle unknown types |
-| BUG-392 | H6 | P2 | Medium | Adding a reaction requires editing 3 places; the handler is a 14-branch `when` | drive it from a list |
-| BUG-393 | H10 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
-| BUG-394 | H11 | P2 | Medium | `page` starts at 1 but the empty check tests `page == 0`, so a genuinely empty first page never shows `no_data` | align the values |
-| BUG-395 | H15 | P2 | Medium | The three state maps are passed **empty** to the adapter and filled asynchronously | pass immutable data after load |
-| BUG-396 | H16 | P2 | Medium | Pull-to-refresh does `detach().attach()` via the deprecated `requireFragmentManager()` | re-fetch the data instead |
-| BUG-397 | H18 | P2 | Medium | `type` is read with `arguments?.get("type").toString()`, so a missing arg becomes the string `"null"` | same trap as AUTH A13 |
-| BUG-398 | H19 | P2 | Medium | `getMyDetails` here is the **4th** copy of the same block | shared helper (PM-level) |
-| BUG-399 | H1 | P3 | Low | `HomeFragment` imports `kotlinx.android.synthetic.main.activity_main.*` — the **wrong layout**, unused | delete the import |
-| BUG-400 | H13 | P3 | Low | `Integer.parseInt(get("count").toString())` is fragile | use `asInt` |
-| BUG-401 | H2 | P3 | Cosmetic | `Delete_btn` is capitalised, unlike every other id | rename |
+| BUG-391 | H5 | P1 | High | Audio uses the static `Util.player` plus a polling `Runnable` not tied to the card lifecycle | per-holder player, release on recycle |
+| BUG-392 | H7 | P1 | High | 5 `authToken` observers, one per method, re-firing on every DataStore write | one-shot read |
+| BUG-393 | H8 | P1 | High | The always-true token guard appears 5x; the logout branch is dead | use `&&` |
+| BUG-394 | H9 | P1 | High | Error parsing is commented out — a failed load is indistinguishable from an empty feed | restore it and show a distinct error state |
+| BUG-395 | H12 | P1 | High | A new `OnScrollListener` is added on **every** page load, never removed | add it once in `onCreateView` |
+| BUG-396 | H14 | P1 | High | The adapter does **network I/O** and owns a `UserPreferences` + dialog; 680 lines mixing view binding, playback and 5 API calls | move calls to the fragment/ViewModel |
+| BUG-397 | H17 | P1 | High | Retrofit calls are never cancelled; callbacks touch views after detach | cancel in `onDestroyView` |
+| BUG-398 | H3 | P2 | Medium | No `else` in the `page` visibility chain | add a default |
+| BUG-399 | H4 | P2 | Medium | No `else` in the `post.type` `when` | log/handle unknown types |
+| BUG-400 | H6 | P2 | Medium | Adding a reaction requires editing 3 places; the handler is a 14-branch `when` | drive it from a list |
+| BUG-401 | H10 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
+| BUG-402 | H11 | P2 | Medium | `page` starts at 1 but the empty check tests `page == 0`, so a genuinely empty first page never shows `no_data` | align the values |
+| BUG-403 | H15 | P2 | Medium | The three state maps are passed **empty** to the adapter and filled asynchronously | pass immutable data after load |
+| BUG-404 | H16 | P2 | Medium | Pull-to-refresh does `detach().attach()` via the deprecated `requireFragmentManager()` | re-fetch the data instead |
+| BUG-405 | H18 | P2 | Medium | `type` is read with `arguments?.get("type").toString()`, so a missing arg becomes the string `"null"` | same trap as AUTH A13 |
+| BUG-406 | H19 | P2 | Medium | `getMyDetails` here is the **4th** copy of the same block | shared helper (PM-level) |
+| BUG-407 | H1 | P3 | Low | `HomeFragment` imports `kotlinx.android.synthetic.main.activity_main.*` — the **wrong layout**, unused | delete the import |
+| BUG-408 | H13 | P3 | Low | `Integer.parseInt(get("count").toString())` is fragile | use `asInt` |
+| BUG-409 | H2 | P3 | Cosmetic | `Delete_btn` is capitalised, unlike every other id | rename |
 
 #### `IMAGE_DETAIL` — module · `agents/FEED/IMAGE_DETAIL.md` · 11 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-402 | ID4 | P1 | High | A null/invalid URL shows a **blank screen** with no message and no way to tell it failed | add Picasso `placeholder()` / `error()` and a fallback |
-| BUG-403 | ID5 | P1 | High | **Zoom without pan** — once magnified, the user cannot move around the image, making zoom nearly useless | add translation on drag, or use `PhotoView` |
-| BUG-404 | ID3 | P2 | Medium | No close button, no toolbar, no loading indicator — Back is the only exit | add a close affordance |
-| BUG-405 | ID6 | P2 | Medium | No double-tap to zoom/reset | add a `GestureDetector` |
-| BUG-406 | ID7 | P2 | Medium | Rotation resets the zoom level | save `mScaleFactor` in `onSaveInstanceState` |
-| BUG-407 | ID10 | P2 | Medium | No downsampling — a large image is decoded at full size | `fit().centerInside()` or explicit sizing |
-| BUG-408 | ID1 | P3 | Low | `preview_image.xml` is widely assumed to belong here but is actually used by `MainActivity` | documented; ownership stays with APPSHELL |
-| BUG-409 | ID2 | P3 | Low | The extra is called **`profilePic`** even when carrying a post image | rename to `imageUrl` — **two-team change** (HOME_FEED + PROFILE) |
-| BUG-410 | ID8 | P3 | Low | `Picasso.with(...)` is deprecated | upgrade with BUILD_CONFIG |
-| BUG-411 | ID9 | P3 | Low | `imageView!!` / `scaleGestureDetector!!` force-unwraps instead of `lateinit` | use `lateinit var` |
-| BUG-412 | ID11 | P3 | Low | No immersive/full-screen flags, so system bars overlay the image | consider immersive mode |
+| BUG-410 | ID4 | P1 | High | A null/invalid URL shows a **blank screen** with no message and no way to tell it failed | add Picasso `placeholder()` / `error()` and a fallback |
+| BUG-411 | ID5 | P1 | High | **Zoom without pan** — once magnified, the user cannot move around the image, making zoom nearly useless | add translation on drag, or use `PhotoView` |
+| BUG-412 | ID3 | P2 | Medium | No close button, no toolbar, no loading indicator — Back is the only exit | add a close affordance |
+| BUG-413 | ID6 | P2 | Medium | No double-tap to zoom/reset | add a `GestureDetector` |
+| BUG-414 | ID7 | P2 | Medium | Rotation resets the zoom level | save `mScaleFactor` in `onSaveInstanceState` |
+| BUG-415 | ID10 | P2 | Medium | No downsampling — a large image is decoded at full size | `fit().centerInside()` or explicit sizing |
+| BUG-416 | ID1 | P3 | Low | `preview_image.xml` is widely assumed to belong here but is actually used by `MainActivity` | documented; ownership stays with APPSHELL |
+| BUG-417 | ID2 | P3 | Low | The extra is called **`profilePic`** even when carrying a post image | rename to `imageUrl` — **two-team change** (HOME_FEED + PROFILE) |
+| BUG-418 | ID8 | P3 | Low | `Picasso.with(...)` is deprecated | upgrade with BUILD_CONFIG |
+| BUG-419 | ID9 | P3 | Low | `imageView!!` / `scaleGestureDetector!!` force-unwraps instead of `lateinit` | use `lateinit var` |
+| BUG-420 | ID11 | P3 | Low | No immersive/full-screen flags, so system bars overlay the image | consider immersive mode |
 
 #### `VIEW_LIKES` — module · `agents/FEED/VIEW_LIKES.md` · 14 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-413 | VL1 | P1 | High | Imports **`activity_edit_profile.*`** synthetics to resolve `menu`, coupling this screen to another layout | bind `menu` with `findViewById` |
-| BUG-414 | VL3 | P1 | High | The ~60-line overflow menu is **copy-pasted across 6+ screens**, each owning its own logout implementation | extract a shared menu handler (PM-level, cross-team) |
-| BUG-415 | VL4 | P1 | High | `Util.user.isReviewState.toBoolean()` with no null check — NPE after process death | null-guard `Util.user` |
-| BUG-416 | VL6 | P1 | High | A non-200 has **no `else` branch** — no data, no empty state, no message; the screen just stays blank | add an error state |
-| BUG-417 | VL5 | P2 | Medium | A brand-new adapter and layout manager are created on every load instead of updating the existing one | reuse + `notifyDataSetChanged` |
-| BUG-418 | VL7 | P2 | Medium | `getStringExtra("postId").toString()` yields `"null"` for a missing extra | validate the extra |
-| BUG-419 | VL8 | P2 | Medium | `react_txt` shows the **raw** reaction string with no icon or grouping | map to an icon/label |
-| BUG-420 | VL9 | P2 | Medium | The Retrofit call is never cancelled in `onDestroy` | cancel |
-| BUG-421 | VL10 | P3 | Low | `ViewLikesAdapter` uses a **secondary constructor** with `lateinit` fields instead of primary-constructor params | use a primary constructor |
-| BUG-422 | VL11 | P3 | Low | `Picasso.with(context)` — deprecated API (Picasso 2.5.2) | upgrade |
-| BUG-423 | VL12 | P3 | Low | `logo` navigates to `MainActivity` without `finish()` | `finish()` |
-| BUG-424 | VL13 | P3 | Low | No pagination — all reactions load at once | paginate if lists grow |
-| BUG-425 | VL14 | P3 | Cosmetic | Commented-out night-mode code left in the menu handler | delete |
-| BUG-426 | VL15 | P3 | Cosmetic | Method named `getALlLikes` (capital L) | rename |
+| BUG-421 | VL1 | P1 | High | Imports **`activity_edit_profile.*`** synthetics to resolve `menu`, coupling this screen to another layout | bind `menu` with `findViewById` |
+| BUG-422 | VL3 | P1 | High | The ~60-line overflow menu is **copy-pasted across 6+ screens**, each owning its own logout implementation | extract a shared menu handler (PM-level, cross-team) |
+| BUG-423 | VL4 | P1 | High | `Util.user.isReviewState.toBoolean()` with no null check — NPE after process death | null-guard `Util.user` |
+| BUG-424 | VL6 | P1 | High | A non-200 has **no `else` branch** — no data, no empty state, no message; the screen just stays blank | add an error state |
+| BUG-425 | VL5 | P2 | Medium | A brand-new adapter and layout manager are created on every load instead of updating the existing one | reuse + `notifyDataSetChanged` |
+| BUG-426 | VL7 | P2 | Medium | `getStringExtra("postId").toString()` yields `"null"` for a missing extra | validate the extra |
+| BUG-427 | VL8 | P2 | Medium | `react_txt` shows the **raw** reaction string with no icon or grouping | map to an icon/label |
+| BUG-428 | VL9 | P2 | Medium | The Retrofit call is never cancelled in `onDestroy` | cancel |
+| BUG-429 | VL10 | P3 | Low | `ViewLikesAdapter` uses a **secondary constructor** with `lateinit` fields instead of primary-constructor params | use a primary constructor |
+| BUG-430 | VL11 | P3 | Low | `Picasso.with(context)` — deprecated API (Picasso 2.5.2) | upgrade |
+| BUG-431 | VL12 | P3 | Low | `logo` navigates to `MainActivity` without `finish()` | `finish()` |
+| BUG-432 | VL13 | P3 | Low | No pagination — all reactions load at once | paginate if lists grow |
+| BUG-433 | VL14 | P3 | Cosmetic | Commented-out night-mode code left in the menu handler | delete |
+| BUG-434 | VL15 | P3 | Cosmetic | Method named `getALlLikes` (capital L) | rename |
 
 #### `VIEW_POST` — module · `agents/FEED/VIEW_POST.md` · 12 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-427 | VP0 | P0 | Critical | **All 14 `findViewById` calls run in the constructor, before `setContentView`** — guaranteed NPE on launch | move them into `onCreate` after `setContentView` |
-| BUG-428 | VP1 | P1 | High | Only 4 of 14 views are populated; like, share, fav and react have **no listeners** | implement, or remove the controls |
-| BUG-429 | VP5 | P1 | High | `onFailure` never dismisses the non-cancelable dialog — permanent spinner | dismiss in both callbacks |
-| BUG-430 | VP8 | P1 | High | **No caller anywhere** — the screen is unreachable dead code | wire it up from `HomeAdapter`, or delete it |
-| BUG-431 | VP2 | P2 | Medium | The layout duplicates `child_post.xml` ids without the behaviour | reuse the card, or delete |
-| BUG-432 | VP4 | P2 | Medium | Error logging uses the tag `"fail fav"` and prints `errorBody().toString()` (an object reference) | use `.string()` and a correct tag |
-| BUG-433 | VP6 | P2 | Medium | The (correct) `&&` guard has **no `else`**, so a missing token silently does nothing | add the standard logout branch |
-| BUG-434 | VP7 | P2 | Medium | `intent.extras!!.get("postId").toString()` — crashes with no extras, yields `"null"` with a missing key | `intent.getStringExtra("postId")` + validation |
-| BUG-435 | VP11 | P2 | Medium | No image/audio/video handling at all, unlike the feed card | port `when (post.type)` |
-| BUG-436 | VP3 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
-| BUG-437 | VP9 | P3 | Low | `tags` is shown raw, not via `HomeAdapter.getTags()`'s `#tag` formatting | reuse the helper |
-| BUG-438 | VP10 | P3 | Low | `"${post.likesCount} people reacts"` — grammar, and no singular form | pluralise |
+| BUG-435 | VP0 | P0 | Critical | **All 14 `findViewById` calls run in the constructor, before `setContentView`** — guaranteed NPE on launch | move them into `onCreate` after `setContentView` |
+| BUG-436 | VP1 | P1 | High | Only 4 of 14 views are populated; like, share, fav and react have **no listeners** | implement, or remove the controls |
+| BUG-437 | VP5 | P1 | High | `onFailure` never dismisses the non-cancelable dialog — permanent spinner | dismiss in both callbacks |
+| BUG-438 | VP8 | P1 | High | **No caller anywhere** — the screen is unreachable dead code | wire it up from `HomeAdapter`, or delete it |
+| BUG-439 | VP2 | P2 | Medium | The layout duplicates `child_post.xml` ids without the behaviour | reuse the card, or delete |
+| BUG-440 | VP4 | P2 | Medium | Error logging uses the tag `"fail fav"` and prints `errorBody().toString()` (an object reference) | use `.string()` and a correct tag |
+| BUG-441 | VP6 | P2 | Medium | The (correct) `&&` guard has **no `else`**, so a missing token silently does nothing | add the standard logout branch |
+| BUG-442 | VP7 | P2 | Medium | `intent.extras!!.get("postId").toString()` — crashes with no extras, yields `"null"` with a missing key | `intent.getStringExtra("postId")` + validation |
+| BUG-443 | VP11 | P2 | Medium | No image/audio/video handling at all, unlike the feed card | port `when (post.type)` |
+| BUG-444 | VP3 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
+| BUG-445 | VP9 | P3 | Low | `tags` is shown raw, not via `HomeAdapter.getTags()`'s `#tag` formatting | reuse the helper |
+| BUG-446 | VP10 | P3 | Low | `"${post.likesCount} people reacts"` — grammar, and no singular form | pluralise |
 
-### PROFILE — 84 entries
+### PROFILE — 100 entries
 
 #### `PROFILE_LEAD` — team lead (rollups) · `agents/PROFILE/PROFILE_LEAD.md` · 15 entries
 
 | Bug | Agent id | Issue | Affects module(s) | Risk |
 |---|---|---|---|---|
-| BUG-439 | F-1 | `ProfileFragment` serves two screens via `who`, with the adapter page derived as `if (who == "me") "profile" else "OtherProfile"` — no constants | MY_PROFILE, VIEW_PROFILE | silent mis-render |
-| BUG-440 | F-2 | The in-profile "Edit Profile" button opens **`AboutActivity`**, not `EditProfileActivity` | MY_PROFILE | confusing navigation |
-| BUG-441 | F-3 | `ProfileFragment.setUserVisibleHint` calls `detach().attach()` on **every** tab selection — a full recreate plus re-fetch, using deprecated APIs | MY_PROFILE | jank, duplicate calls |
-| BUG-442 | F-4 | `EditProfileActivity` is **738 lines** mixing a 14-field form, 3 cascading spinners, crop/camera and 4 API calls | EDIT_PROFILE | unmaintainable |
-| BUG-443 | F-5 | `MY_PROFILE` passes **two empty `HashMap()`s** for follow/fav state, so those states never render in profiles | MY_PROFILE | wrong UI state |
-| BUG-444 | F-6 | The always-true `\|\|` token guard appears in every PROFILE network method | all | dead logout branches |
-| BUG-445 | F-7 | `Util.user.isReviewState.toBoolean()` is unguarded in the duplicated overflow menus | FOLLOWERS, EDIT_PROFILE | NPE after process death |
-| BUG-446 | F-8 | `getmyDetails` here is the 5th/6th copy of the same block | MY_PROFILE, EDIT_PROFILE | drift |
-| BUG-447 | F-9 | `intent.extras!!.get(...)` and `arguments?.get(...).toString()` yield the literal `"null"` for missing values | all | malformed requests |
-| BUG-448 | F-10 | The overflow-menu block is duplicated here too (FEED VL3) | FOLLOWERS, EDIT_PROFILE, VIEW_PROFILE | 6+ copies app-wide |
-| BUG-449 | F-11 | **Follow state is unreliable app-wide**: `MY_PROFILE` passes empty maps to `HomeAdapter` (MP4) while `FollowAdapter` consults its map with the **wrong key** (FL7), so every row shows the same follow label | MY_PROFILE, FOLLOWERS + **FEED** | one PM-coordinated fix |
-| BUG-450 | F-12 | `EditProfileActivity` **disables StrictMode's VM policy** to pass a `file://` URI to the cropper | EDIT_PROFILE | security / correctness |
-| BUG-451 | F-13 | `activity_edit_profile.xml` shares **14 ids** with `activity_register.xml`, coupling PROFILE to AUTH's synthetic imports | EDIT_PROFILE | cross-team breakage |
-| BUG-452 | F-14 | `FollowerActivity` starts loading **before** binding its views, risking `UninitializedPropertyAccessException` | FOLLOWERS | crash |
-| BUG-453 | F-15 | `ViewProfileActivity` force-unwraps `userId!!`, so launching it without the extra crashes | VIEW_PROFILE | crash |
+| BUG-447 | F-1 | `ProfileFragment` serves two screens via `who`, with the adapter page derived as `if (who == "me") "profile" else "OtherProfile"` — no constants | MY_PROFILE, VIEW_PROFILE | silent mis-render |
+| BUG-448 | F-2 | The in-profile "Edit Profile" button opens **`AboutActivity`**, not `EditProfileActivity` | MY_PROFILE | confusing navigation |
+| BUG-449 | F-3 | `ProfileFragment.setUserVisibleHint` calls `detach().attach()` on **every** tab selection — a full recreate plus re-fetch, using deprecated APIs | MY_PROFILE | jank, duplicate calls |
+| BUG-450 | F-4 | `EditProfileActivity` is **738 lines** mixing a 14-field form, 3 cascading spinners, crop/camera and 4 API calls | EDIT_PROFILE | unmaintainable |
+| BUG-451 | F-5 | `MY_PROFILE` passes **two empty `HashMap()`s** for follow/fav state, so those states never render in profiles | MY_PROFILE | wrong UI state |
+| BUG-452 | F-6 | The always-true `\|\|` token guard appears in every PROFILE network method | all | dead logout branches |
+| BUG-453 | F-7 | `Util.user.isReviewState.toBoolean()` is unguarded in the duplicated overflow menus | FOLLOWERS, EDIT_PROFILE | NPE after process death |
+| BUG-454 | F-8 | `getmyDetails` here is the 5th/6th copy of the same block | MY_PROFILE, EDIT_PROFILE | drift |
+| BUG-455 | F-9 | `intent.extras!!.get(...)` and `arguments?.get(...).toString()` yield the literal `"null"` for missing values | all | malformed requests |
+| BUG-456 | F-10 | The overflow-menu block is duplicated here too (FEED VL3) | FOLLOWERS, EDIT_PROFILE, VIEW_PROFILE | 6+ copies app-wide |
+| BUG-457 | F-11 | **Follow state is unreliable app-wide**: `MY_PROFILE` passes empty maps to `HomeAdapter` (MP4) while `FollowAdapter` consults its map with the **wrong key** (FL7), so every row shows the same follow label | MY_PROFILE, FOLLOWERS + **FEED** | one PM-coordinated fix |
+| BUG-458 | F-12 | `EditProfileActivity` **disables StrictMode's VM policy** to pass a `file://` URI to the cropper | EDIT_PROFILE | security / correctness |
+| BUG-459 | F-13 | `activity_edit_profile.xml` shares **14 ids** with `activity_register.xml`, coupling PROFILE to AUTH's synthetic imports | EDIT_PROFILE | cross-team breakage |
+| BUG-460 | F-14 | `FollowerActivity` starts loading **before** binding its views, risking `UninitializedPropertyAccessException` | FOLLOWERS | crash |
+| BUG-461 | F-15 | `ViewProfileActivity` force-unwraps `userId!!`, so launching it without the extra crashes | VIEW_PROFILE | crash |
+
+#### `APPROVE_REQUEST` — module · `agents/PROFILE/APPROVE_REQUEST.md` · 16 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-462 | AR1 | P1 | High | **No permission check inside the screen.** The highest-privilege action in the app relies entirely on its three callers gating `USER`/`Edit`. Any new call site, deep link, or `adb am start` on a rooted device gets an unguarded approve/reject UI | gate in `onCreate` and route to `NoPermissionActivity`; verify server-side authorisation too |
+| BUG-463 | AR2 | P1 | High | Both methods register a **continuous `authToken` LiveData observer** (`CL-8`); a later token write re-fires them and can **re-submit the approval** | one-shot read (`first()`) |
+| BUG-464 | AR3 | P1 | High | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) — the admin cannot tell "rejected" from "network failed" | toast + retry |
+| BUG-465 | AR4 | P1 | High | HTTP 401 starts `LoginActivity` with **no `finish()` and no session clear**, so back returns to a dead screen and the next launch repeats the 401 | adopt the `bailToLogin` pattern from `SplashScreenActivity` (T-024) |
+| BUG-466 | AR6 | P1 | High | **No confirmation dialog.** A single tap on Approve or Reject is final and irreversible, on a screen reached straight from a notification tap | add a confirm dialog naming the user |
+| BUG-467 | AR7 | P1 | High | **No success feedback.** After a 200 the admin is dropped on `MainActivity` with no toast, so a mis-tap or double-tap is indistinguishable from success | toast the outcome before navigating |
+| BUG-468 | AR5 | P2 | Medium | `intent.extras!!.getString("userId").toString()` double force-unwrap — launching without the extra is an immediate NPE, and a missing key yields the literal string `"null"` | `intent.getStringExtra("userId") ?: return finish()` |
+| BUG-469 | AR8 | P2 | Medium | Logo tap and post-decision navigation both `startActivity(MainActivity)` with **no `finish()` or `CLEAR_TOP`**, stacking duplicate `MainActivity` instances behind this screen | `CLEAR_TOP` + `finish()` |
+| BUG-470 | AR9 | P2 | Medium | Approval is **all-or-nothing**; an admin cannot accept the name change but reject the avatar | per-field approval, if the API supports it |
+| BUG-471 | AR10 | P2 | Medium | `"approve"` / `"reject"` are **string literals** at the click sites, not an enum, unlike every other typed constant in the app | add a `ReviewStatus` enum to `DataModels.kt` |
+| BUG-472 | AR12 | P2 | Medium | The response uses `{"results": {object}}` — `results` holding an **object**, not an array; a fifth envelope shape (`CL-5`) | normalise server-side, or document |
+| BUG-473 | AR15 | P2 | Medium | 34 `findViewById` calls and 16 near-identical `setValue` invocations in one 383-line Activity, with no view binding | ViewBinding + a loop over a field list |
+| BUG-474 | AR11 | P3 | Low | `setValue` shadows both of its parameters with local `var`s of the same name | rename the locals |
+| BUG-475 | AR13 | P3 | Low | `onFailure` log tag reads `EditProfileActivity.getMyDetails` — copy-pasted from another class | use `<Class>.<method>` |
+| BUG-476 | AR16 | P3 | Low | `getUpdateRequest(context, userId)` takes a `context` parameter it never uses — the body uses `this@ApproveRequestActivity` throughout | drop the parameter |
+| BUG-477 | AR14 | P3 | Cosmetic | Hard-coded user-visible strings: `"This request is already handled"` and the misspelled `"Somthing Went Wrong \nLogin again to continue"` | move to `strings.xml`; fix app-wide |
 
 #### `EDIT_PROFILE` — module · `agents/PROFILE/EDIT_PROFILE.md` · 23 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-454 | EP2 | P1 | High | `onCreate` **disables StrictMode's VM policy** to allow a `file://` URI | use a `FileProvider` and remove the override |
-| BUG-455 | EP4 | P1 | High | State and city listeners compare against **`"Country"`**, so the `"State"`/`"City"` placeholders can be submitted as real values | compare against the right placeholder |
-| BUG-456 | EP12 | P1 | High | The camera path captures only a **thumbnail** | full-size via `FileProvider` |
-| BUG-457 | EP13 | P1 | High | Base64 avatar inside JSON at quality 100, no size limit | multipart (with NETWORK) |
-| BUG-458 | EP17 | P1 | High | The always-true `\|\|` token guard in every authenticated method; logout branches dead | use `&&` |
-| BUG-459 | EP19 | P1 | High | `getCountries()` and `getMyDetails()` race; the state spinner can be filled before its country list loads | chain the calls |
-| BUG-460 | EP20 | P1 | High | Rotation loses the picked image and spinner state | `onSaveInstanceState` |
-| BUG-461 | EP21 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroy` |
-| BUG-462 | EP23 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
-| BUG-463 | EP1 | P2 | Medium | `findViewById` **and** synthetics mixed in one class | pick one |
-| BUG-464 | EP5 | P2 | Medium | Country/state **names** are passed where ids are expected | confirm with the backend |
-| BUG-465 | EP6 | P2 | Medium | Changing the country does not reset state/city | clear dependents |
-| BUG-466 | EP7 | P2 | Medium | `lname`, `address`, `pincode`, `language`, geo and gender are **never validated** | extend `doValidation` |
-| BUG-467 | EP9 | P2 | Medium | DOB round-trips through two format conversions for change detection | compare normalised values |
-| BUG-468 | EP11 | P2 | Medium | Gender comparison ignores **`other`**, which exists in this layout | handle all three |
-| BUG-469 | EP15 | P2 | Medium | `===` referential comparison on boxed `Int` request codes | use `==` |
-| BUG-470 | EP16 | P2 | Medium | The "admin approval" confirmation dialog is commented out | confirm intent with the customer |
-| BUG-471 | EP18 | P2 | Medium | A new `authToken` observer per call | one-shot read |
-| BUG-472 | EP22 | P2 | Medium | `exported="true"` with no intent-filter | BUILD_CONFIG |
-| BUG-473 | EP3 | P3 | Low | Gender `other` is present here but commented out in Register | align the two screens |
-| BUG-474 | EP8 | P3 | Low | Returns `"SUCCESS"` while Register returns `"success"` | share a constant |
-| BUG-475 | EP10 | P3 | Low | 10 `text!!` force-unwraps in `isDataChanged` | null-safe |
-| BUG-476 | EP14 | P3 | Low | Request/result codes used as **log tags** | fix the tags |
+| BUG-478 | EP2 | P1 | High | `onCreate` **disables StrictMode's VM policy** to allow a `file://` URI | use a `FileProvider` and remove the override |
+| BUG-479 | EP4 | P1 | High | State and city listeners compare against **`"Country"`**, so the `"State"`/`"City"` placeholders can be submitted as real values | compare against the right placeholder |
+| BUG-480 | EP12 | P1 | High | The camera path captures only a **thumbnail** | full-size via `FileProvider` |
+| BUG-481 | EP13 | P1 | High | Base64 avatar inside JSON at quality 100, no size limit | multipart (with NETWORK) |
+| BUG-482 | EP17 | P1 | High | The always-true `\|\|` token guard in every authenticated method; logout branches dead | use `&&` |
+| BUG-483 | EP19 | P1 | High | `getCountries()` and `getMyDetails()` race; the state spinner can be filled before its country list loads | chain the calls |
+| BUG-484 | EP20 | P1 | High | Rotation loses the picked image and spinner state | `onSaveInstanceState` |
+| BUG-485 | EP21 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroy` |
+| BUG-486 | EP23 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
+| BUG-487 | EP1 | P2 | Medium | `findViewById` **and** synthetics mixed in one class | pick one |
+| BUG-488 | EP5 | P2 | Medium | Country/state **names** are passed where ids are expected | confirm with the backend |
+| BUG-489 | EP6 | P2 | Medium | Changing the country does not reset state/city | clear dependents |
+| BUG-490 | EP7 | P2 | Medium | `lname`, `address`, `pincode`, `language`, geo and gender are **never validated** | extend `doValidation` |
+| BUG-491 | EP9 | P2 | Medium | DOB round-trips through two format conversions for change detection | compare normalised values |
+| BUG-492 | EP11 | P2 | Medium | Gender comparison ignores **`other`**, which exists in this layout | handle all three |
+| BUG-493 | EP15 | P2 | Medium | `===` referential comparison on boxed `Int` request codes | use `==` |
+| BUG-494 | EP16 | P2 | Medium | The "admin approval" confirmation dialog is commented out | confirm intent with the customer |
+| BUG-495 | EP18 | P2 | Medium | A new `authToken` observer per call | one-shot read |
+| BUG-496 | EP22 | P2 | Medium | `exported="true"` with no intent-filter | BUILD_CONFIG |
+| BUG-497 | EP3 | P3 | Low | Gender `other` is present here but commented out in Register | align the two screens |
+| BUG-498 | EP8 | P3 | Low | Returns `"SUCCESS"` while Register returns `"success"` | share a constant |
+| BUG-499 | EP10 | P3 | Low | 10 `text!!` force-unwraps in `isDataChanged` | null-safe |
+| BUG-500 | EP14 | P3 | Low | Request/result codes used as **log tags** | fix the tags |
 
 #### `FOLLOWERS` — module · `agents/PROFILE/FOLLOWERS.md` · 20 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-477 | FL2 | P1 | High | Two bare `if`s with no `else`/fallback — an unknown `page` loads nothing, silently | `when` with an `else` |
-| BUG-478 | FL3 | P1 | High | `menu` resolved via a **synthetic import of another layout** | use `findViewById` |
-| BUG-479 | FL6 | P1 | High | Two consecutive contradictory blocks set the label; the first is **dead code** | delete the first, fix the second |
-| BUG-480 | FL7 | P1 | High | The follow button checks **`Util.userId`** instead of the row's `follow.id`, so **every row shows the same label** | key the map lookup on `follow.id` |
-| BUG-481 | FL8 | P1 | High | The surviving check is **inverted** relative to the map's meaning | invert |
-| BUG-482 | FL11 | P1 | High | The always-true `\|\|` guard in both list methods | use `&&` (the adapter already does) |
-| BUG-483 | FL13 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard |
-| BUG-484 | FL14 | P1 | High | List loading starts **before** `findViewById` binds `lists`/`nodata` — `UninitializedPropertyAccessException` on a fast response | bind views first |
-| BUG-485 | FL16 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
-| BUG-486 | FL1 | P2 | Medium | `getAllFollowers` / `getAllFollowing` are near-identical copies | one method + a path parameter |
-| BUG-487 | FL5 | P2 | Medium | **No title** — followers and following look identical | add a per-mode title |
-| BUG-488 | FL9 | P2 | Medium | Both button branches call the identical `follow(...)`, so the `if/else` is pointless | collapse it |
-| BUG-489 | FL10 | P2 | Medium | `follow()` logs the error properly but still shows the user nothing | toast on failure |
-| BUG-490 | FL12 | P2 | Medium | The activity's error branches are commented out — a failure looks like an empty list | restore |
-| BUG-491 | FL15 | P2 | Medium | `intent.extras!!.get(...).toString()` crashes / yields `"null"` | validate the extras |
-| BUG-492 | FL17 | P2 | Medium | A new adapter is created on every load rather than updating the existing one | reuse + notify |
-| BUG-493 | FL20 | P2 | Medium | Button labels are the lower-case literals `"follow"`/`"unfollow"`, compared by **text** rather than state | track state, not labels |
-| BUG-494 | FL4 | P3 | Low | `night_mode` and `day_mode` exist in the layout but are **never referenced** | remove, or wire to THEMING |
-| BUG-495 | FL18 | P3 | Low | No pagination — the whole list loads at once | paginate if needed |
-| BUG-496 | FL19 | P3 | Low | `Picasso.with(context)` deprecated | upgrade |
+| BUG-501 | FL2 | P1 | High | Two bare `if`s with no `else`/fallback — an unknown `page` loads nothing, silently | `when` with an `else` |
+| BUG-502 | FL3 | P1 | High | `menu` resolved via a **synthetic import of another layout** | use `findViewById` |
+| BUG-503 | FL6 | P1 | High | Two consecutive contradictory blocks set the label; the first is **dead code** | delete the first, fix the second |
+| BUG-504 | FL7 | P1 | High | The follow button checks **`Util.userId`** instead of the row's `follow.id`, so **every row shows the same label** | key the map lookup on `follow.id` |
+| BUG-505 | FL8 | P1 | High | The surviving check is **inverted** relative to the map's meaning | invert |
+| BUG-506 | FL11 | P1 | High | The always-true `\|\|` guard in both list methods | use `&&` (the adapter already does) |
+| BUG-507 | FL13 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard |
+| BUG-508 | FL14 | P1 | High | List loading starts **before** `findViewById` binds `lists`/`nodata` — `UninitializedPropertyAccessException` on a fast response | bind views first |
+| BUG-509 | FL16 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
+| BUG-510 | FL1 | P2 | Medium | `getAllFollowers` / `getAllFollowing` are near-identical copies | one method + a path parameter |
+| BUG-511 | FL5 | P2 | Medium | **No title** — followers and following look identical | add a per-mode title |
+| BUG-512 | FL9 | P2 | Medium | Both button branches call the identical `follow(...)`, so the `if/else` is pointless | collapse it |
+| BUG-513 | FL10 | P2 | Medium | `follow()` logs the error properly but still shows the user nothing | toast on failure |
+| BUG-514 | FL12 | P2 | Medium | The activity's error branches are commented out — a failure looks like an empty list | restore |
+| BUG-515 | FL15 | P2 | Medium | `intent.extras!!.get(...).toString()` crashes / yields `"null"` | validate the extras |
+| BUG-516 | FL17 | P2 | Medium | A new adapter is created on every load rather than updating the existing one | reuse + notify |
+| BUG-517 | FL20 | P2 | Medium | Button labels are the lower-case literals `"follow"`/`"unfollow"`, compared by **text** rather than state | track state, not labels |
+| BUG-518 | FL4 | P3 | Low | `night_mode` and `day_mode` exist in the layout but are **never referenced** | remove, or wire to THEMING |
+| BUG-519 | FL18 | P3 | Low | No pagination — the whole list loads at once | paginate if needed |
+| BUG-520 | FL19 | P3 | Low | `Picasso.with(context)` deprecated | upgrade |
 
 #### `MY_PROFILE` — module · `agents/PROFILE/MY_PROFILE.md` · 16 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-497 | MP4 | P1 | High | Two **empty `HashMap()`s** are passed for follow and fav state, so those states never render | build and pass the real maps |
-| BUG-498 | MP6 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
-| BUG-499 | MP7 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches are dead | use `&&` |
-| BUG-500 | MP8 | P1 | High | Error parsing commented out — a failure looks like an empty profile | restore and show an error |
-| BUG-501 | MP10 | P1 | High | `getallLikes` runs **before** the layout is inflated | move it after `inflate` |
-| BUG-502 | MP11 | P1 | High | `setUserVisibleHint` does `detach().attach()` on **every** tab visit — full recreate + 5 re-fetches, via a deprecated API | load once; use `setMaxLifecycle` |
-| BUG-503 | MP13 | P1 | High | Retrofit calls are never cancelled; callbacks touch views after detach | cancel in `onDestroyView` |
-| BUG-504 | MP1 | P2 | Medium | `profile_about` exists in the layout but is **never populated** | bind it or remove it |
-| BUG-505 | MP2 | P2 | Medium | "Edit Profile" opens **`AboutActivity`**, not `EditProfileActivity` | route directly, or rename the button |
-| BUG-506 | MP5 | P2 | Medium | The adapter argument order differs from `HomeFragment`'s call | named arguments |
-| BUG-507 | MP9 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
-| BUG-508 | MP12 | P2 | Medium | `arguments?.get(...).toString()` yields `"null"` when missing | `requireArguments().getString(...)` |
-| BUG-509 | MP15 | P2 | Medium | `page` starts at 0 here but at 1 in `HomeFragment` — inconsistent paging | align with HOME_FEED |
-| BUG-510 | MP3 | P3 | Low | `role == "admin"` is a magic string; the suffix is concatenated, not localised | constants + string resources |
-| BUG-511 | MP14 | P3 | Low | `posts_linear` has no listener while the other two counts do | add or remove |
-| BUG-512 | MP16 | P3 | Low | No pull-to-refresh, unlike the home feed | add if wanted |
+| BUG-521 | MP4 | P1 | High | Two **empty `HashMap()`s** are passed for follow and fav state, so those states never render | build and pass the real maps |
+| BUG-522 | MP6 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
+| BUG-523 | MP7 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches are dead | use `&&` |
+| BUG-524 | MP8 | P1 | High | Error parsing commented out — a failure looks like an empty profile | restore and show an error |
+| BUG-525 | MP10 | P1 | High | `getallLikes` runs **before** the layout is inflated | move it after `inflate` |
+| BUG-526 | MP11 | P1 | High | `setUserVisibleHint` does `detach().attach()` on **every** tab visit — full recreate + 5 re-fetches, via a deprecated API | load once; use `setMaxLifecycle` |
+| BUG-527 | MP13 | P1 | High | Retrofit calls are never cancelled; callbacks touch views after detach | cancel in `onDestroyView` |
+| BUG-528 | MP1 | P2 | Medium | `profile_about` exists in the layout but is **never populated** | bind it or remove it |
+| BUG-529 | MP2 | P2 | Medium | "Edit Profile" opens **`AboutActivity`**, not `EditProfileActivity` | route directly, or rename the button |
+| BUG-530 | MP5 | P2 | Medium | The adapter argument order differs from `HomeFragment`'s call | named arguments |
+| BUG-531 | MP9 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
+| BUG-532 | MP12 | P2 | Medium | `arguments?.get(...).toString()` yields `"null"` when missing | `requireArguments().getString(...)` |
+| BUG-533 | MP15 | P2 | Medium | `page` starts at 0 here but at 1 in `HomeFragment` — inconsistent paging | align with HOME_FEED |
+| BUG-534 | MP3 | P3 | Low | `role == "admin"` is a magic string; the suffix is concatenated, not localised | constants + string resources |
+| BUG-535 | MP14 | P3 | Low | `posts_linear` has no listener while the other two counts do | add or remove |
+| BUG-536 | MP16 | P3 | Low | No pull-to-refresh, unlike the home feed | add if wanted |
 
 #### `VIEW_PROFILE` — module · `agents/PROFILE/VIEW_PROFILE.md` · 10 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-513 | VPR1 | P1 | High | `menu` resolved via a **synthetic import of another layout** | use `findViewById` |
-| BUG-514 | VPR5 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard |
-| BUG-515 | VPR7 | P1 | High | `userId!!` force-unwrap — launching without the extra **crashes immediately** | validate and finish gracefully |
-| BUG-516 | VPR8 | P1 | High | The fragment is `replace()`d with no `savedInstanceState` guard — every rotation re-runs 5 network calls | guard the transaction |
-| BUG-517 | VPR9 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
-| BUG-518 | VPR3 | P2 | Medium | No title or subject indication before the fragment loads | show the name in the header |
-| BUG-519 | VPR4 | P2 | Medium | "Edit Profile" is offered while viewing someone else's profile, and edits your own | hide it here, or relabel |
-| BUG-520 | VPR10 | P2 | Medium | No "follow" action at the screen level — following is only possible from a post card | ask the customer |
-| BUG-521 | VPR2 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
-| BUG-522 | VPR6 | P3 | Low | A `SpotsDialog` is built and never shown | delete |
+| BUG-537 | VPR1 | P1 | High | `menu` resolved via a **synthetic import of another layout** | use `findViewById` |
+| BUG-538 | VPR5 | P1 | High | `Util.user.isReviewState.toBoolean()` unguarded — NPE after process death | null-guard |
+| BUG-539 | VPR7 | P1 | High | `userId!!` force-unwrap — launching without the extra **crashes immediately** | validate and finish gracefully |
+| BUG-540 | VPR8 | P1 | High | The fragment is `replace()`d with no `savedInstanceState` guard — every rotation re-runs 5 network calls | guard the transaction |
+| BUG-541 | VPR9 | P1 | High | The ~60-line overflow menu is duplicated here too | shared handler (PM-level) |
+| BUG-542 | VPR3 | P2 | Medium | No title or subject indication before the fragment loads | show the name in the header |
+| BUG-543 | VPR4 | P2 | Medium | "Edit Profile" is offered while viewing someone else's profile, and edits your own | hide it here, or relabel |
+| BUG-544 | VPR10 | P2 | Medium | No "follow" action at the screen level — following is only possible from a post card | ask the customer |
+| BUG-545 | VPR2 | P3 | Low | The logo navigates to `MainActivity` without `finish()` | `finish()` |
+| BUG-546 | VPR6 | P3 | Low | A `SpotsDialog` is built and never shown | delete |
 
 ### MEDIA — 92 entries
 
@@ -1024,128 +1061,128 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Bug | Agent id | Issue | Affects module(s) | Risk |
 |---|---|---|---|---|
-| BUG-523 | M-1 | `AdminAudioFragment` and `AdminVideoFragment` are **~390-line near-duplicates** differing only by endpoint and log tags | ADMIN_AUDIO, ADMIN_VIDEO | every fix must be made twice |
-| BUG-524 | M-2 | `FileAdapter` treats **anything that is not `"folder"` as a PDF** — images, audio and video all open in the PDF viewer | FILE_LIST, FILES_BROWSER | broken files UX |
-| BUG-525 | M-3 | `PdfActivity2` downloads over a raw `HttpURLConnection` inside a deprecated `AsyncTask`, writing to a hard-coded `"testthreepdf"` folder on external storage | PDF_VIEWER | leaks, permission failures, litter |
-| BUG-526 | M-4 | `WebViewActivity` enables **JavaScript and DOM storage** (the code comment even notes the XSS risk) | WEBVIEW | security |
-| BUG-527 | M-5 | `Util.player` is a static `MediaPlayer` shared by FEED and both admin feeds | ADMIN_AUDIO, ADMIN_VIDEO | overlapping audio, leaks |
-| BUG-528 | M-6 | `FilesFragment` and `FileListActivity` duplicate `getFilesAndFolder` almost exactly | FILES_BROWSER, FILE_LIST | drift |
-| BUG-529 | M-7 | The always-true `\|\|` token guard appears in every MEDIA network method | all | dead logout branches |
-| BUG-530 | M-8 | `getMyDetails` copies 7 and 8 live here | ADMIN_AUDIO, ADMIN_VIDEO | drift (AUTH A4) |
-| BUG-531 | M-9 | `PdfActivity2` extends **`Activity`**, not `AppCompatActivity`, and is the only screen setting `FLAG_SECURE` | PDF_VIEWER | inconsistent theming/behaviour |
-| BUG-532 | M-10 | Admin feeds pass page `"home"`, so curated content shows follow/fav buttons for admin authors | ADMIN_AUDIO, ADMIN_VIDEO | questionable UX — confirm with customer |
+| BUG-547 | M-1 | `AdminAudioFragment` and `AdminVideoFragment` are **~390-line near-duplicates** differing only by endpoint and log tags | ADMIN_AUDIO, ADMIN_VIDEO | every fix must be made twice |
+| BUG-548 | M-2 | `FileAdapter` treats **anything that is not `"folder"` as a PDF** — images, audio and video all open in the PDF viewer | FILE_LIST, FILES_BROWSER | broken files UX |
+| BUG-549 | M-3 | `PdfActivity2` downloads over a raw `HttpURLConnection` inside a deprecated `AsyncTask`, writing to a hard-coded `"testthreepdf"` folder on external storage | PDF_VIEWER | leaks, permission failures, litter |
+| BUG-550 | M-4 | `WebViewActivity` enables **JavaScript and DOM storage** (the code comment even notes the XSS risk) | WEBVIEW | security |
+| BUG-551 | M-5 | `Util.player` is a static `MediaPlayer` shared by FEED and both admin feeds | ADMIN_AUDIO, ADMIN_VIDEO | overlapping audio, leaks |
+| BUG-552 | M-6 | `FilesFragment` and `FileListActivity` duplicate `getFilesAndFolder` almost exactly | FILES_BROWSER, FILE_LIST | drift |
+| BUG-553 | M-7 | The always-true `\|\|` token guard appears in every MEDIA network method | all | dead logout branches |
+| BUG-554 | M-8 | `getMyDetails` copies 7 and 8 live here | ADMIN_AUDIO, ADMIN_VIDEO | drift (AUTH A4) |
+| BUG-555 | M-9 | `PdfActivity2` extends **`Activity`**, not `AppCompatActivity`, and is the only screen setting `FLAG_SECURE` | PDF_VIEWER | inconsistent theming/behaviour |
+| BUG-556 | M-10 | Admin feeds pass page `"home"`, so curated content shows follow/fav buttons for admin authors | ADMIN_AUDIO, ADMIN_VIDEO | questionable UX — confirm with customer |
 
 #### `ADMIN_AUDIO` — module · `agents/MEDIA/ADMIN_AUDIO.md` · 13 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-533 | AA2 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
-| BUG-534 | AA3 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches dead | use `&&` |
-| BUG-535 | AA4 | P1 | High | Error parsing commented out — a failure looks like an empty feed | restore and show an error |
-| BUG-536 | AA6 | P1 | High | A new `OnScrollListener` is added on **every** page load | add it once |
-| BUG-537 | AA7 | P1 | High | Relies on `onPause` to release the shared static `Util.player`, which the pager may not call when expected | per-card player, or explicit tab-change handling |
-| BUG-538 | AA8 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroyView` |
-| BUG-539 | M-1 | P1 | High | This file is a **~390-line near-duplicate** of `AdminVideoFragment` | extract a shared base fragment taking the endpoint (PM-level, two agents) |
-| BUG-540 | AA5 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
-| BUG-541 | M-8 | P2 | Medium | `getMyDetails` copy #7 | shared helper (PM-level) |
-| BUG-542 | M-10 | P2 | Medium | Page `"home"` shows follow/fav buttons on curated admin content | confirm the intended UX, then pass a new page value (needs FEED) |
-| BUG-543 | AA1 | P3 | Low | An unused `getInstance()` companion (the video twin has none) | use it or delete it |
-| BUG-544 | AA9 | P3 | Low | No pull-to-refresh, unlike the home feed | add if wanted |
-| BUG-545 | AA10 | P3 | Low | No screen title — the tab is identified only by its nav icon | confirm with APPSHELL |
+| BUG-557 | AA2 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
+| BUG-558 | AA3 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches dead | use `&&` |
+| BUG-559 | AA4 | P1 | High | Error parsing commented out — a failure looks like an empty feed | restore and show an error |
+| BUG-560 | AA6 | P1 | High | A new `OnScrollListener` is added on **every** page load | add it once |
+| BUG-561 | AA7 | P1 | High | Relies on `onPause` to release the shared static `Util.player`, which the pager may not call when expected | per-card player, or explicit tab-change handling |
+| BUG-562 | AA8 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroyView` |
+| BUG-563 | M-1 | P1 | High | This file is a **~390-line near-duplicate** of `AdminVideoFragment` | extract a shared base fragment taking the endpoint (PM-level, two agents) |
+| BUG-564 | AA5 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
+| BUG-565 | M-8 | P2 | Medium | `getMyDetails` copy #7 | shared helper (PM-level) |
+| BUG-566 | M-10 | P2 | Medium | Page `"home"` shows follow/fav buttons on curated admin content | confirm the intended UX, then pass a new page value (needs FEED) |
+| BUG-567 | AA1 | P3 | Low | An unused `getInstance()` companion (the video twin has none) | use it or delete it |
+| BUG-568 | AA9 | P3 | Low | No pull-to-refresh, unlike the home feed | add if wanted |
+| BUG-569 | AA10 | P3 | Low | No screen title — the tab is identified only by its nav icon | confirm with APPSHELL |
 
 #### `ADMIN_VIDEO` — module · `agents/MEDIA/ADMIN_VIDEO.md` · 14 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-546 | AV4 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
-| BUG-547 | AV5 | P1 | High | A new `OnScrollListener` per page load | add it once |
-| BUG-548 | AV6 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches dead | use `&&` |
-| BUG-549 | AV7 | P1 | High | Error parsing commented out — a failure looks like an empty feed | restore and show an error |
-| BUG-550 | AV9 | P1 | High | The YouTube player is never released on tab change — playback/WebView can outlive the screen | release in `onPause` (needs FEED, since the view lives in the adapter) |
-| BUG-551 | AV10 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroyView` |
-| BUG-552 | M-1 | P1 | High | A **~390-line near-duplicate** of `AdminAudioFragment` | shared base fragment (PM-level, two agents) |
-| BUG-553 | AV2 | P2 | Medium | `Util.getVideo` hard-codes a **second host** independent of the API base URL | move to NETWORK config (PLATFORM) |
-| BUG-554 | AV8 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
-| BUG-555 | M-8 | P2 | Medium | `getMyDetails` copy #8 | shared helper (PM-level) |
-| BUG-556 | M-10 | P2 | Medium | Page `"home"` shows follow/fav buttons on curated admin content | new page value (needs FEED) |
-| BUG-557 | AV1 | P3 | Low | No `getInstance()` companion, unlike its twin | align the two |
-| BUG-558 | AV3 | P3 | Low | Inherited `Util.player` teardown that this tab never needs | leave it; note it when refactoring |
-| BUG-559 | AV11 | P3 | Low | No pull-to-refresh and no screen title | add if wanted |
+| BUG-570 | AV4 | P1 | High | 5 `authToken` observers, one per method | one-shot read |
+| BUG-571 | AV5 | P1 | High | A new `OnScrollListener` per page load | add it once |
+| BUG-572 | AV6 | P1 | High | The always-true `\|\|` token guard; all 5 logout branches dead | use `&&` |
+| BUG-573 | AV7 | P1 | High | Error parsing commented out — a failure looks like an empty feed | restore and show an error |
+| BUG-574 | AV9 | P1 | High | The YouTube player is never released on tab change — playback/WebView can outlive the screen | release in `onPause` (needs FEED, since the view lives in the adapter) |
+| BUG-575 | AV10 | P1 | High | Retrofit calls are never cancelled | cancel in `onDestroyView` |
+| BUG-576 | M-1 | P1 | High | A **~390-line near-duplicate** of `AdminAudioFragment` | shared base fragment (PM-level, two agents) |
+| BUG-577 | AV2 | P2 | Medium | `Util.getVideo` hard-codes a **second host** independent of the API base URL | move to NETWORK config (PLATFORM) |
+| BUG-578 | AV8 | P2 | Medium | `dialog.hide()` instead of `dismiss()` | use `dismiss()` |
+| BUG-579 | M-8 | P2 | Medium | `getMyDetails` copy #8 | shared helper (PM-level) |
+| BUG-580 | M-10 | P2 | Medium | Page `"home"` shows follow/fav buttons on curated admin content | new page value (needs FEED) |
+| BUG-581 | AV1 | P3 | Low | No `getInstance()` companion, unlike its twin | align the two |
+| BUG-582 | AV3 | P3 | Low | Inherited `Util.player` teardown that this tab never needs | leave it; note it when refactoring |
+| BUG-583 | AV11 | P3 | Low | No pull-to-refresh and no screen title | add if wanted |
 
 #### `FILES_BROWSER` — module · `agents/MEDIA/FILES_BROWSER.md` · 12 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-560 | FB2 | P1 | High | The list/grid toggle does `detach().attach()`, **re-fetching the entire folder** just to swap the layout manager | swap `layoutManager` in place and call `notifyDataSetChanged` |
-| BUG-561 | FB7 | P1 | High | The always-true `\|\|` token guard; the logout branch is dead | use `&&` |
-| BUG-562 | FB10 | P1 | High | A non-200 has **no `else` branch** — no error, no empty state, stale content stays | add an error state |
-| BUG-563 | FB11 | P1 | High | The Retrofit call is never cancelled; the callback touches views after detach | cancel in `onDestroyView` |
-| BUG-564 | FB3 | P2 | Medium | Deprecated `requireFragmentManager()` | `parentFragmentManager` |
-| BUG-565 | FB5 | P2 | Medium | `Util.listview` is a global that is never persisted | move to DataStore (STORAGE) |
-| BUG-566 | FB6 | P2 | Medium | The root folder is requested with an **empty string**, producing `api/v1/files/` | use an explicit root id or a dedicated endpoint |
-| BUG-567 | FB8 | P2 | Medium | The envelope key is **`files`**, a third convention alongside `result`/`results` | document; align with NETWORK if the backend changes |
-| BUG-568 | FB9 | P2 | Medium | A new `FileAdapter` is created on every load | reuse + notify |
-| BUG-569 | FB12 | P2 | Medium | No pull-to-refresh and no breadcrumb — the user cannot tell they are at the root | add a title/breadcrumb |
-| BUG-570 | FB1 | P3 | Low | Commented-out `header_main` code left in `onCreateView` | delete |
-| BUG-571 | FB4 | P3 | Low | The toggle icon shows the current mode rather than the target mode | confirm intent with the customer |
+| BUG-584 | FB2 | P1 | High | The list/grid toggle does `detach().attach()`, **re-fetching the entire folder** just to swap the layout manager | swap `layoutManager` in place and call `notifyDataSetChanged` |
+| BUG-585 | FB7 | P1 | High | The always-true `\|\|` token guard; the logout branch is dead | use `&&` |
+| BUG-586 | FB10 | P1 | High | A non-200 has **no `else` branch** — no error, no empty state, stale content stays | add an error state |
+| BUG-587 | FB11 | P1 | High | The Retrofit call is never cancelled; the callback touches views after detach | cancel in `onDestroyView` |
+| BUG-588 | FB3 | P2 | Medium | Deprecated `requireFragmentManager()` | `parentFragmentManager` |
+| BUG-589 | FB5 | P2 | Medium | `Util.listview` is a global that is never persisted | move to DataStore (STORAGE) |
+| BUG-590 | FB6 | P2 | Medium | The root folder is requested with an **empty string**, producing `api/v1/files/` | use an explicit root id or a dedicated endpoint |
+| BUG-591 | FB8 | P2 | Medium | The envelope key is **`files`**, a third convention alongside `result`/`results` | document; align with NETWORK if the backend changes |
+| BUG-592 | FB9 | P2 | Medium | A new `FileAdapter` is created on every load | reuse + notify |
+| BUG-593 | FB12 | P2 | Medium | No pull-to-refresh and no breadcrumb — the user cannot tell they are at the root | add a title/breadcrumb |
+| BUG-594 | FB1 | P3 | Low | Commented-out `header_main` code left in `onCreateView` | delete |
+| BUG-595 | FB4 | P3 | Low | The toggle icon shows the current mode rather than the target mode | confirm intent with the customer |
 
 #### `FILE_LIST` — module · `agents/MEDIA/FILE_LIST.md` · 13 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-572 | FL-3 | P1 | High | **Every non-folder opens in the PDF viewer** — images, audio, video and documents all route to `PdfActivity2` | branch on the real file type/extension |
-| BUG-573 | FL-5 | P1 | High | `getType().equals("folder")` NPEs on a null type | `"folder".equals(getType())` |
-| BUG-574 | FL-8 | P1 | High | The always-true `\|\|` token guard | use `&&` |
-| BUG-575 | FL-9 | P1 | High | A non-200 has **no `else` branch** — no error, no empty state | add an error state |
-| BUG-576 | FL-11 | P1 | High | The Retrofit call is never cancelled | cancel in `onDestroy` |
-| BUG-577 | FL-1 | P2 | Medium | Folder navigation recurses into new activities with **no breadcrumb or title** | show the current folder name |
-| BUG-578 | FL-2 | P2 | Medium | Rows show only an icon and a name, ignoring `size`, `createdAt`, `createdBy`, `permission` | enrich the row |
-| BUG-579 | FL-4 | P2 | Medium | `FLAG_ACTIVITY_NEW_TASK` on both intents distorts the back stack | pass an Activity context and drop the flag |
-| BUG-580 | FL-7 | P2 | Medium | `getStringExtra("folderId").toString()` yields `"null"` when missing | validate the extra |
-| BUG-581 | FL-10 | P2 | Medium | The adapter receives **`applicationContext`** here but a fragment context in FILES_BROWSER | pass a consistent context |
-| BUG-582 | FL-12 | P2 | Medium | `permission` from the model is **never checked** before opening a file | enforce it, or confirm the server does |
-| BUG-583 | FL-6 | P3 | Low | `Log.e("type", ...)` debug logging in the click handler | remove |
-| BUG-584 | FL-13 | P3 | Low | No search or sort in a file library | ask the customer |
+| BUG-596 | FL-3 | P1 | High | **Every non-folder opens in the PDF viewer** — images, audio, video and documents all route to `PdfActivity2` | branch on the real file type/extension |
+| BUG-597 | FL-5 | P1 | High | `getType().equals("folder")` NPEs on a null type | `"folder".equals(getType())` |
+| BUG-598 | FL-8 | P1 | High | The always-true `\|\|` token guard | use `&&` |
+| BUG-599 | FL-9 | P1 | High | A non-200 has **no `else` branch** — no error, no empty state | add an error state |
+| BUG-600 | FL-11 | P1 | High | The Retrofit call is never cancelled | cancel in `onDestroy` |
+| BUG-601 | FL-1 | P2 | Medium | Folder navigation recurses into new activities with **no breadcrumb or title** | show the current folder name |
+| BUG-602 | FL-2 | P2 | Medium | Rows show only an icon and a name, ignoring `size`, `createdAt`, `createdBy`, `permission` | enrich the row |
+| BUG-603 | FL-4 | P2 | Medium | `FLAG_ACTIVITY_NEW_TASK` on both intents distorts the back stack | pass an Activity context and drop the flag |
+| BUG-604 | FL-7 | P2 | Medium | `getStringExtra("folderId").toString()` yields `"null"` when missing | validate the extra |
+| BUG-605 | FL-10 | P2 | Medium | The adapter receives **`applicationContext`** here but a fragment context in FILES_BROWSER | pass a consistent context |
+| BUG-606 | FL-12 | P2 | Medium | `permission` from the model is **never checked** before opening a file | enforce it, or confirm the server does |
+| BUG-607 | FL-6 | P3 | Low | `Log.e("type", ...)` debug logging in the click handler | remove |
+| BUG-608 | FL-13 | P3 | Low | No search or sort in a file library | ask the customer |
 
 #### `PDF_VIEWER` — module · `agents/MEDIA/PDF_VIEWER.md` · 17 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-585 | PV4 | P0 | Critical | `Log.e("inputstream", inputStream.toString())` runs on a **null** stream after a non-200 — **NPE** | null-check before logging |
-| BUG-586 | PV5 | P0 | Critical | `onPostExecute` dereferences the stream with no null check — second NPE path | handle null with an error view |
-| BUG-587 | PV6 | P1 | High | The entire PDF is streamed into memory with no size limit | download to cache and use `fromFile` |
-| BUG-588 | PV14 | P1 | High | The `AsyncTask` is never cancelled and holds the Activity + dialog — leaks on rotation | cancel in `onDestroy`, or move off `AsyncTask` |
-| BUG-589 | PV15 | P1 | High | Rotation re-downloads the whole PDF and resets the page | save state / cache the file |
-| BUG-590 | PV3 | P2 | Medium | `enableAnnotationRendering` is called **twice**, `true` then `false` | pick one |
-| BUG-591 | PV7 | P2 | Medium | `DownloadFile` is **dead code** (~45 lines) | delete, or finish the feature |
-| BUG-592 | PV8 | P2 | Medium | The dead path writes to a hard-coded **`"testthreepdf"`** folder | remove with PV7 |
-| BUG-593 | PV9 | P2 | Medium | `Environment.getExternalStorageDirectory()` is deprecated / scoped-storage blocked | app-specific storage |
-| BUG-594 | PV12 | P2 | Medium | `setTitle` writes to a title bar that is not displayed | add a page indicator to `pdf_header` |
-| BUG-595 | PV16 | P2 | Medium | No auth header on the download, unlike every Retrofit call — the file URL must be public | confirm with PLATFORM/NETWORK |
-| BUG-596 | PV17 | P2 | Medium | Extends `Activity`, not `AppCompatActivity`, so it ignores the app theme and night mode | migrate, keeping `FLAG_SECURE` |
-| BUG-597 | PV2 | P3 | Low | `pdf_header` has an **empty** click listener | remove or implement |
-| BUG-598 | PV10 | P3 | Low | No runtime permission check in the dead downloader | remove with PV7 |
-| BUG-599 | PV11 | P3 | Low | `printStackTrace()` instead of `Log` | use `Log.e` |
-| BUG-600 | PV13 | P3 | Low | Unused `SAMPLE_FILE` field and a leftover sample URL comment | delete |
-| BUG-601 | PV1 | P3 | Cosmetic | Class named `PdfActivity2` with no `PdfActivity` | rename (manifest change) |
+| BUG-609 | PV4 | P0 | Critical | `Log.e("inputstream", inputStream.toString())` runs on a **null** stream after a non-200 — **NPE** | null-check before logging |
+| BUG-610 | PV5 | P0 | Critical | `onPostExecute` dereferences the stream with no null check — second NPE path | handle null with an error view |
+| BUG-611 | PV6 | P1 | High | The entire PDF is streamed into memory with no size limit | download to cache and use `fromFile` |
+| BUG-612 | PV14 | P1 | High | The `AsyncTask` is never cancelled and holds the Activity + dialog — leaks on rotation | cancel in `onDestroy`, or move off `AsyncTask` |
+| BUG-613 | PV15 | P1 | High | Rotation re-downloads the whole PDF and resets the page | save state / cache the file |
+| BUG-614 | PV3 | P2 | Medium | `enableAnnotationRendering` is called **twice**, `true` then `false` | pick one |
+| BUG-615 | PV7 | P2 | Medium | `DownloadFile` is **dead code** (~45 lines) | delete, or finish the feature |
+| BUG-616 | PV8 | P2 | Medium | The dead path writes to a hard-coded **`"testthreepdf"`** folder | remove with PV7 |
+| BUG-617 | PV9 | P2 | Medium | `Environment.getExternalStorageDirectory()` is deprecated / scoped-storage blocked | app-specific storage |
+| BUG-618 | PV12 | P2 | Medium | `setTitle` writes to a title bar that is not displayed | add a page indicator to `pdf_header` |
+| BUG-619 | PV16 | P2 | Medium | No auth header on the download, unlike every Retrofit call — the file URL must be public | confirm with PLATFORM/NETWORK |
+| BUG-620 | PV17 | P2 | Medium | Extends `Activity`, not `AppCompatActivity`, so it ignores the app theme and night mode | migrate, keeping `FLAG_SECURE` |
+| BUG-621 | PV2 | P3 | Low | `pdf_header` has an **empty** click listener | remove or implement |
+| BUG-622 | PV10 | P3 | Low | No runtime permission check in the dead downloader | remove with PV7 |
+| BUG-623 | PV11 | P3 | Low | `printStackTrace()` instead of `Log` | use `Log.e` |
+| BUG-624 | PV13 | P3 | Low | Unused `SAMPLE_FILE` field and a leftover sample URL comment | delete |
+| BUG-625 | PV1 | P3 | Cosmetic | Class named `PdfActivity2` with no `PdfActivity` | rename (manifest change) |
 
 #### `WEBVIEW` — module · `agents/MEDIA/WEBVIEW.md` · 13 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-602 | WV4 | P1 | High | **JavaScript and DOM storage enabled** on a page that only renders static legal text — the code comment itself flags the XSS risk | disable both unless the pages genuinely need them |
-| BUG-603 | WV8 | P1 | High | **No error handling** — offline or a 404 shows the WebView's raw error page | add `onReceivedError` + a guard |
-| BUG-604 | WV1 | P2 | Medium | Binary routing: anything that is not `"terms"` (including a missing extra) silently shows **privacy** | `when` with an explicit `else` and validation |
-| BUG-605 | WV2 | P2 | Medium | Two hard-coded URLs on a **third** host family | move to config (PLATFORM) |
-| BUG-606 | WV3 | P2 | Medium | No `shouldOverrideUrlLoading` filtering — any outbound link opens in-app | restrict to the known host |
-| BUG-607 | WV5 | P2 | Medium | `loadUrl` runs **before** the settings are applied | configure settings first |
-| BUG-608 | WV7 | P2 | Medium | No loading indicator — a blank screen while fetching | add a progress bar |
-| BUG-609 | WV9 | P2 | Medium | No title, so Terms and Privacy look identical | set a per-mode title |
-| BUG-610 | WV10 | P2 | Medium | Back exits the screen instead of going back in the WebView's history | override `onBackPressed` with `webView.canGoBack()` |
-| BUG-611 | WV11 | P2 | Medium | The WebView is never destroyed in `onDestroy` | `webView.destroy()` |
-| BUG-612 | WV6 | P3 | Low | Zoom is commented out, hurting accessibility on dense legal text | re-enable |
-| BUG-613 | WV12 | P3 | Low | WebView cookies/DOM storage are never cleared | clear on exit if required |
-| BUG-614 | WV13 | P3 | Low | Rotation reloads the page and loses scroll position | save state |
+| BUG-626 | WV4 | P1 | High | **JavaScript and DOM storage enabled** on a page that only renders static legal text — the code comment itself flags the XSS risk | disable both unless the pages genuinely need them |
+| BUG-627 | WV8 | P1 | High | **No error handling** — offline or a 404 shows the WebView's raw error page | add `onReceivedError` + a guard |
+| BUG-628 | WV1 | P2 | Medium | Binary routing: anything that is not `"terms"` (including a missing extra) silently shows **privacy** | `when` with an explicit `else` and validation |
+| BUG-629 | WV2 | P2 | Medium | Two hard-coded URLs on a **third** host family | move to config (PLATFORM) |
+| BUG-630 | WV3 | P2 | Medium | No `shouldOverrideUrlLoading` filtering — any outbound link opens in-app | restrict to the known host |
+| BUG-631 | WV5 | P2 | Medium | `loadUrl` runs **before** the settings are applied | configure settings first |
+| BUG-632 | WV7 | P2 | Medium | No loading indicator — a blank screen while fetching | add a progress bar |
+| BUG-633 | WV9 | P2 | Medium | No title, so Terms and Privacy look identical | set a per-mode title |
+| BUG-634 | WV10 | P2 | Medium | Back exits the screen instead of going back in the WebView's history | override `onBackPressed` with `webView.canGoBack()` |
+| BUG-635 | WV11 | P2 | Medium | The WebView is never destroyed in `onDestroy` | `webView.destroy()` |
+| BUG-636 | WV6 | P3 | Low | Zoom is commented out, hurting accessibility on dense legal text | re-enable |
+| BUG-637 | WV12 | P3 | Low | WebView cookies/DOM storage are never cleared | clear on exit if required |
+| BUG-638 | WV13 | P3 | Low | Rotation reloads the page and loses scroll position | save state |
 
 ### SEARCH — 43 entries
 
@@ -1153,64 +1190,290 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Bug | Agent id | Issue | Affects module(s) | Risk |
 |---|---|---|---|---|
-| BUG-615 | S-1 | A **fourth response-envelope shape** (`results` as an object with `users` + `posts`) | SEARCH_ENTRY | parse confusion |
-| BUG-616 | S-2 | Both fragments take **constructor arguments** instead of a `Bundle` — Android cannot recreate them after process death | SEARCH_POSTS, SEARCH_PROFILES | **crash on restore** |
-| BUG-617 | S-3 | A search fires on **every keystroke** with no debounce, and registers a new `authToken` observer each time | SEARCH_ENTRY | request storm |
-| BUG-618 | S-4 | On every keystroke all fragments are **removed and the pager adapter rebuilt** | SEARCH_ENTRY | flicker, lost scroll |
-| BUG-619 | S-5 | `SearchAdapter.getItem` returns `null as Fragment` for an out-of-range position | SEARCH_ENTRY | crash if a tab is added |
-| BUG-620 | S-6 | The Posts tab passes page **`"searchProfile"`** — a misleading name for post results | SEARCH_POSTS | confusing, but matches FEED's contract |
-| BUG-621 | S-7 | `UsersAdapter` inflates **PROFILE's `child_follow.xml`** and hides its `follow_btn` by commenting out the binding | SEARCH_PROFILES | cross-team layout coupling |
-| BUG-622 | S-8 | No empty-query guard: clearing the box searches for `""` | SEARCH_ENTRY | pointless request |
-| BUG-623 | S-9 | The progress dialog is **commented out**, so searches are silent | SEARCH_ENTRY | no feedback |
+| BUG-639 | S-1 | A **fourth response-envelope shape** (`results` as an object with `users` + `posts`) | SEARCH_ENTRY | parse confusion |
+| BUG-640 | S-2 | Both fragments take **constructor arguments** instead of a `Bundle` — Android cannot recreate them after process death | SEARCH_POSTS, SEARCH_PROFILES | **crash on restore** |
+| BUG-641 | S-3 | A search fires on **every keystroke** with no debounce, and registers a new `authToken` observer each time | SEARCH_ENTRY | request storm |
+| BUG-642 | S-4 | On every keystroke all fragments are **removed and the pager adapter rebuilt** | SEARCH_ENTRY | flicker, lost scroll |
+| BUG-643 | S-5 | `SearchAdapter.getItem` returns `null as Fragment` for an out-of-range position | SEARCH_ENTRY | crash if a tab is added |
+| BUG-644 | S-6 | The Posts tab passes page **`"searchProfile"`** — a misleading name for post results | SEARCH_POSTS | confusing, but matches FEED's contract |
+| BUG-645 | S-7 | `UsersAdapter` inflates **PROFILE's `child_follow.xml`** and hides its `follow_btn` by commenting out the binding | SEARCH_PROFILES | cross-team layout coupling |
+| BUG-646 | S-8 | No empty-query guard: clearing the box searches for `""` | SEARCH_ENTRY | pointless request |
+| BUG-647 | S-9 | The progress dialog is **commented out**, so searches are silent | SEARCH_ENTRY | no feedback |
 
 #### `SEARCH_ENTRY` — module · `agents/SEARCH/SEARCH_ENTRY.md` · 15 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-624 | SE5 | P1 | High | A request fires on **every keystroke** — no debounce, no minimum length | debounce ~300 ms, or search on IME action |
-| BUG-625 | SE6 | P1 | High | **All fragments are removed** before each request, destroying both tabs per character | update the adapter's data instead of rebuilding |
-| BUG-626 | SE8 | P1 | High | Previous calls are never cancelled — out-of-order responses can show stale results | cancel the in-flight call before starting a new one |
-| BUG-627 | SE9 | P1 | High | A non-200 has **no `else` branch** — stale results, no message | add an error state |
-| BUG-628 | SE11 | P1 | High | `null as Fragment` in `SearchAdapter.getItem` | throw a clear exception, or handle all positions |
-| BUG-629 | SE13 | P1 | High | A new `authToken` observer per keystroke, never removed | read the token once |
-| BUG-630 | SE1 | P2 | Medium | The progress dialog's `show()` is commented out, so searching is silent | restore it, or add inline progress |
-| BUG-631 | SE2 | P2 | Medium | Uses `ViewPager` v1 + deprecated `FragmentPagerAdapter` | migrate to `ViewPager2` |
-| BUG-632 | SE7 | P2 | Medium | An empty query is still sent | guard on blank input |
-| BUG-633 | SE12 | P2 | Medium | `FragmentPagerAdapter(fm!!)` without a behaviour flag | pass `BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT` |
-| BUG-634 | SE14 | P2 | Medium | `currentTab` is not saved across configuration change | `onSaveInstanceState` |
-| BUG-635 | SE3 | P3 | Low | `onTabSelected` and `onTabReselected` are identical; `onTabUnselected` is empty | tidy |
-| BUG-636 | SE4 | P3 | Low | `setEditTextFocus` is only ever called with `true`; its `false` path is dead | simplify |
-| BUG-637 | SE10 | P3 | Low | Two `Log.e("current tab", ...)` debug calls | remove |
-| BUG-638 | SE15 | P3 | Low | No search history, no recent queries, no clear button | ask the customer |
+| BUG-648 | SE5 | P1 | High | A request fires on **every keystroke** — no debounce, no minimum length | debounce ~300 ms, or search on IME action |
+| BUG-649 | SE6 | P1 | High | **All fragments are removed** before each request, destroying both tabs per character | update the adapter's data instead of rebuilding |
+| BUG-650 | SE8 | P1 | High | Previous calls are never cancelled — out-of-order responses can show stale results | cancel the in-flight call before starting a new one |
+| BUG-651 | SE9 | P1 | High | A non-200 has **no `else` branch** — stale results, no message | add an error state |
+| BUG-652 | SE11 | P1 | High | `null as Fragment` in `SearchAdapter.getItem` | throw a clear exception, or handle all positions |
+| BUG-653 | SE13 | P1 | High | A new `authToken` observer per keystroke, never removed | read the token once |
+| BUG-654 | SE1 | P2 | Medium | The progress dialog's `show()` is commented out, so searching is silent | restore it, or add inline progress |
+| BUG-655 | SE2 | P2 | Medium | Uses `ViewPager` v1 + deprecated `FragmentPagerAdapter` | migrate to `ViewPager2` |
+| BUG-656 | SE7 | P2 | Medium | An empty query is still sent | guard on blank input |
+| BUG-657 | SE12 | P2 | Medium | `FragmentPagerAdapter(fm!!)` without a behaviour flag | pass `BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT` |
+| BUG-658 | SE14 | P2 | Medium | `currentTab` is not saved across configuration change | `onSaveInstanceState` |
+| BUG-659 | SE3 | P3 | Low | `onTabSelected` and `onTabReselected` are identical; `onTabUnselected` is empty | tidy |
+| BUG-660 | SE4 | P3 | Low | `setEditTextFocus` is only ever called with `true`; its `false` path is dead | simplify |
+| BUG-661 | SE10 | P3 | Low | Two `Log.e("current tab", ...)` debug calls | remove |
+| BUG-662 | SE15 | P3 | Low | No search history, no recent queries, no clear button | ask the customer |
 
 #### `SEARCH_POSTS` — module · `agents/SEARCH/SEARCH_POSTS.md` · 8 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-639 | SP3 | P1 | High | **Constructor arguments** instead of a `Bundle` — the fragment cannot be recreated by the system | `newInstance()` + `Bundle`; make `Posts` parcelable or pass ids |
-| BUG-640 | SP2 | P2 | Medium | All three `HomeAdapter` state maps are **empty**, so no like/follow/fav state renders | pass real maps, or confirm read-only is intended |
-| BUG-641 | SP4 | P2 | Medium | A `Context` is held in a field | use `requireContext()` |
-| BUG-642 | SP6 | P2 | Medium | No pagination — only the first page of search results is ever shown | needs `getSearch` paging (NETWORK) |
-| BUG-643 | SP8 | P2 | Medium | The empty state cannot distinguish "no results" from "search failed" | parent must pass an error flag (SEARCH_ENTRY) |
-| BUG-644 | SP1 | P3 | Low | `UserPreferences` is created and never used | delete |
-| BUG-645 | SP5 | P3 | Low | The page value `"searchProfile"` is misleading on the Posts tab | rename with FEED (shared contract) |
-| BUG-646 | SP7 | P3 | Low | No pull-to-refresh and no loading state | the parent owns loading; acceptable as-is |
+| BUG-663 | SP3 | P1 | High | **Constructor arguments** instead of a `Bundle` — the fragment cannot be recreated by the system | `newInstance()` + `Bundle`; make `Posts` parcelable or pass ids |
+| BUG-664 | SP2 | P2 | Medium | All three `HomeAdapter` state maps are **empty**, so no like/follow/fav state renders | pass real maps, or confirm read-only is intended |
+| BUG-665 | SP4 | P2 | Medium | A `Context` is held in a field | use `requireContext()` |
+| BUG-666 | SP6 | P2 | Medium | No pagination — only the first page of search results is ever shown | needs `getSearch` paging (NETWORK) |
+| BUG-667 | SP8 | P2 | Medium | The empty state cannot distinguish "no results" from "search failed" | parent must pass an error flag (SEARCH_ENTRY) |
+| BUG-668 | SP1 | P3 | Low | `UserPreferences` is created and never used | delete |
+| BUG-669 | SP5 | P3 | Low | The page value `"searchProfile"` is misleading on the Posts tab | rename with FEED (shared contract) |
+| BUG-670 | SP7 | P3 | Low | No pull-to-refresh and no loading state | the parent owns loading; acceptable as-is |
 
 #### `SEARCH_PROFILES` — module · `agents/SEARCH/SEARCH_PROFILES.md` · 11 entries
 
 | Bug | Agent id | Pri | Severity | Issue | Suggested fix |
 |---|---|---|---|---|---|
-| BUG-647 | SPR2 | P1 | High | `UsersAdapter` reuses PROFILE's `child_follow.xml` but leaves **`follow_btn` unbound** (commented out) | hide it explicitly, or use a dedicated layout |
-| BUG-648 | SPR7 | P1 | High | **Constructor arguments** instead of a `Bundle` — cannot be recreated by the system | `newInstance()` + `Bundle` |
-| BUG-649 | SPR3 | P2 | Medium | The layout manager uses `context` while the adapter uses `contexts` — two sources, one nullable | pick one |
-| BUG-650 | SPR5 | P2 | Medium | `UsersAdapter` and `FollowAdapter` are near-duplicates differing only by the follow button | merge with a flag (cross-team, PM) |
-| BUG-651 | SPR8 | P2 | Medium | A `Context` is held in a field | `requireContext()` |
-| BUG-652 | SPR9 | P2 | Medium | No follow action from search results, though the row layout has a button | confirm with the customer |
-| BUG-653 | SPR10 | P2 | Medium | No pagination — only the first page of profile results | needs `getSearch` paging (NETWORK) |
-| BUG-654 | SPR11 | P2 | Medium | The empty state cannot distinguish "no results" from "search failed" | parent must pass a flag |
-| BUG-655 | SPR1 | P3 | Low | The list id (`search_profile_list`) differs from the Posts tab's (`list`) | align naming |
-| BUG-656 | SPR4 | P3 | Low | The `LifecycleOwner` parameter is never used | remove |
-| BUG-657 | SPR6 | P3 | Low | Deprecated `Picasso.with(context)` | upgrade |
+| BUG-671 | SPR2 | P1 | High | `UsersAdapter` reuses PROFILE's `child_follow.xml` but leaves **`follow_btn` unbound** (commented out) | hide it explicitly, or use a dedicated layout |
+| BUG-672 | SPR7 | P1 | High | **Constructor arguments** instead of a `Bundle` — cannot be recreated by the system | `newInstance()` + `Bundle` |
+| BUG-673 | SPR3 | P2 | Medium | The layout manager uses `context` while the adapter uses `contexts` — two sources, one nullable | pick one |
+| BUG-674 | SPR5 | P2 | Medium | `UsersAdapter` and `FollowAdapter` are near-duplicates differing only by the follow button | merge with a flag (cross-team, PM) |
+| BUG-675 | SPR8 | P2 | Medium | A `Context` is held in a field | `requireContext()` |
+| BUG-676 | SPR9 | P2 | Medium | No follow action from search results, though the row layout has a button | confirm with the customer |
+| BUG-677 | SPR10 | P2 | Medium | No pagination — only the first page of profile results | needs `getSearch` paging (NETWORK) |
+| BUG-678 | SPR11 | P2 | Medium | The empty state cannot distinguish "no results" from "search failed" | parent must pass a flag |
+| BUG-679 | SPR1 | P3 | Low | The list id (`search_profile_list`) differs from the Posts tab's (`list`) | align naming |
+| BUG-680 | SPR4 | P3 | Low | The `LifecycleOwner` parameter is never used | remove |
+| BUG-681 | SPR6 | P3 | Low | Deprecated `Picasso.with(context)` | upgrade |
+
+### BIBLE — 76 entries
+
+#### `BIBLE_LEAD` — team lead (rollups) · `agents/BIBLE/BIBLE_LEAD.md` · 20 entries
+
+| Bug | Agent id | Issue | Affects module(s) | Risk |
+|---|---|---|---|---|
+| BUG-682 | B-1 | The Bible tab is the **only** `TabAdapter` branch with **no `Util.hasPermission` gate** (positions 0, 1, 3, 4, 5 are all gated) | BIBLE_ENTRY / APPSHELL | **High (security)** |
+| BUG-683 | B-2 | `bible.json` is cached to `filesDir` and **never invalidated** — a corrected verse on the server never reaches an existing install; it is also fetched from a **third base URL** | AUTH/PLATFORM (consumed here) | **High** |
+| BUG-684 | B-3 | `BiblePostActivity.postData` uses the always-true guard `if (!TextUtils.isEmpty(it) \|\| !it.equals("null") \|\| !it.isNullOrEmpty())` (cluster **CL-1**) — the session-lost `else` is **dead code**, so a missing token posts `Bearer null` | BIBLE_POST | **High** |
+| BUG-685 | B-4 | The bookmark's first segment is the **localized Tamil display string**; translating the app or renaming `R.string.oldBible` **orphans every stored bookmark** (`indexOf` → -1 → `Spinner.setSelection(-1)`) | BIBLE_READER | **High** |
+| BUG-686 | B-5 | The composer receives the **launch `type`**, not the spinner's current edition, so switching testament inside the reader produces a post titled with the wrong testament | BIBLE_READER, BIBLE_POST | Medium |
+| BUG-687 | B-6 | `BibleActivity.selectedText` is a **`companion object` (static) `ArrayList`** mutated from an inner adapter; it outlives the activity and is reassigned (never cleared) in six places | BIBLE_READER | Medium |
+| BUG-688 | B-7 | `Util.bible` is a **static `JSONObject` seeded only by the splash**. After process death the OS restores `MainActivity` directly, `Util.bible` is `null`, and the first edition selection calls `Util.bible.get("Old")` → **NPE, Bible tab crashes on open** | BIBLE_READER | **Critical (crash)** |
+| BUG-689 | B-8 | `setHeading` resolves a bookmark with `keyList[keyList.indexOf(bookmarkedContent)]`; when the bookmarked book is not in the selected testament `indexOf` returns **-1** → `IndexOutOfBoundsException`. Reproduces by bookmarking an Old-Testament chapter then opening the New Testament | BIBLE_READER | **Critical (crash)** |
+| BUG-690 | B-9 | `BiblePostActivity` creates a post with **no `POST`/`Create` permission check**, while `HomeFragment` gates `AddPostActivity` with exactly that check → a trivial bypass of the posting gate | BIBLE_POST | **High (security)** |
+| BUG-691 | B-10 | `child_bible.xml`'s root id is `@+id/child_post_layout`, duplicating FEED's post-row id | BIBLE_READER | Low |
+| BUG-692 | B-11 | `data class BibleSelector(content, isSelected)` in `DataModels.kt` is **never referenced** — dead model | PLATFORM (recorded here) | Low |
+| BUG-693 | B-12 | The Post button is disabled first and **only re-enabled inside `onResponse`** — `onFailure`, the offline path and the `catch` leave it **permanently disabled** with no message | BIBLE_POST | **High (UX dead end)** |
+| BUG-694 | B-13 | `postData` registers a **new continuous `authToken` LiveData observer inside the click handler**; any later write to `token` re-fires it and **posts the passage again** | BIBLE_POST | **High (duplicate posts)** |
+| BUG-695 | B-14 | `fakeSpinner.text.toString().toInt()` in the next/previous handlers — an empty or non-numeric chapter field throws `NumberFormatException` | BIBLE_READER | Medium |
+| BUG-696 | B-15 | `intent.extras!!.getString(...)` force-unwraps in **both** activities (`BibleActivity` ×1, `BiblePostActivity` ×3) — launching either without extras is an immediate NPE | BIBLE_READER, BIBLE_POST | Medium |
+| BUG-697 | B-16 | `BibleFragment` launches the reader with `FLAG_ACTIVITY_NEW_TASK` from a fragment, and `BiblePostActivity.onBackPressed` does the same **plus** `super.onBackPressed()` — the back stack grows unpredictably | BIBLE_ENTRY, BIBLE_POST | Medium |
+| BUG-698 | B-17 | Logo / home taps call `startActivity(MainActivity)` **without `finish()` or `CLEAR_TOP`**, stacking duplicate `MainActivity` instances | BIBLE_READER, BIBLE_POST | Medium |
+| BUG-699 | B-18 | Every edition change re-serializes a whole testament (`Util.bible.get("Old").toString()`) and re-parses it with Gson, then rebuilds `bibleMap` / `chapterMap` — a multi-MB round trip on the main thread | BIBLE_READER | Medium (jank) |
+| BUG-700 | B-19 | Almost no user feedback: copy shows no confirmation, a non-200 post only logs, offline does nothing at all | all three | Medium (UX) |
+| BUG-701 | B-20 | Hard-coded user-visible strings and a typo'd toast (`"Please select atleast one"`, `"Bible Post"`, `"post"`, `"Post"`); the only two `strings.xml` entries (`oldBible`, `newBible`) hold **Tamil text in the default `values/` folder** | all three | Cosmetic |
+
+#### `BIBLE_ENTRY` — module · `agents/BIBLE/BIBLE_ENTRY.md` · 10 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-702 | BE1 | P1 | High | **No permission gate** (= `B-1`). `TabAdapter.getItem` gates positions 0, 1, 3, 4 and 5 with `Util.hasPermission(...)` and falls back to `NoPermissionFragment()`; **position 2 returns `BibleFragment()` unconditionally**. There is no `PermissionType.BIBLE` enum value either, so no server policy can switch the tab off | Decide the policy with PM: add a gate in `TabAdapter` branch 2 (an APPSHELL change) or explicitly document the tab as public |
+| BUG-703 | BE3 | P1 | High | **Launches the reader without checking `Util.bible`** (feeds `B-7`). After process death the OS restores `MainActivity` → tab 2 → tapping a card opens `BibleActivity`, whose first spinner callback does `Util.bible.get("Old")` on a `null` static → NPE | Guard here (`if (Util.bible == null)` → toast + route to splash / re-download) **and** fix the root cause in `BIBLE_READER` / AUTH |
+| BUG-704 | BE2 | P2 | Medium | **Dead members everywhere**: `viewPager` is a `lateinit` that is never assigned (any read throws `UninitializedPropertyAccessException`); `shimmerFrameLayout` and `bibleLayout` are bound but never touched; `userPreferences` is constructed but never read; `Util` is imported but unused; the 148-line shimmer block is `gone` and never started | Delete `viewPager`, `shimmerFrameLayout`, `bibleLayout`, `userPreferences`, the unused imports and the `@id/bible_shimmer_layout` subtree (≈148 of 218 layout lines) |
+| BUG-705 | BE4 | P2 | Medium | `contexts = container!!.context` force-unwraps the `ViewGroup?`. `onCreateView` can legitimately be called with a `null` container → NPE before the layout is inflated | Use `requireContext()` and drop the `contexts` field |
+| BUG-706 | BE5 | P2 | Medium | **`FLAG_ACTIVITY_NEW_TASK` from a fragment** on both cards (= `B-16`). Unnecessary with an Activity context; makes the back stack version-dependent | Remove `setFlags(...)`; plain `startActivity(intent)` |
+| BUG-707 | BE6 | P3 | Low | Both card labels use `android:textSize="20dp"` (**dp, not sp**) and the screen ignores `Util.fontSize` / the `textSize` DataStore key that `SettingsActivity` controls | Change to `sp`; apply `Util.fontSize` the way `HomeAdapter` does |
+| BUG-708 | BE7 | P3 | Low | No `contentDescription` on either cover `ImageView`; the clickable cards are plain `ConstraintLayout`s with no `focusable` / `clickable` / ripple — TalkBack announces nothing and there is no touch feedback | Add `contentDescription`, `android:focusable="true"`, `?attr/selectableItemBackground` |
+| BUG-709 | BE8 | P3 | Cosmetic | `fragment_bible.xml` declares `tools:context="com.veha.fragments.FilesFragment"` — leftover from the copy of `fragment_files.xml` (same 9-row shimmer block) | Set it to `com.veha.fragments.BibleFragment` |
+| BUG-710 | BE9 | P3 | Cosmetic | Empty `onCreate` override whose body is only `super.onCreate(savedInstanceState)` | Delete the override |
+| BUG-711 | BE10 | P3 | Cosmetic | The two cards are near-identical 30-line XML blocks plus two near-identical 6-line listeners; the only difference is one string | Extract an `<include>` + a single `openBible(type: String)` helper |
+
+#### `BIBLE_POST` — module · `agents/BIBLE/BIBLE_POST.md` · 19 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-712 | BP2 | P1 | High | **Always-true token guard** (cluster `CL-1`, = `B-3`): `if (!TextUtils.isEmpty(it) \|\| !it.equals("null") \|\| !it.isNullOrEmpty())`. The `\|\|` chain is `true` for every input, so the `else` (toast + clear session + go to Login) is **dead code** and a missing token produces a `Bearer null` request | `if (!it.isNullOrEmpty() && it != "null")`; keep the `else`, and add `finish()` + `CLEAR_TASK` to the Login intent |
+| BUG-713 | BP3 | P1 | High | **Post button is a dead end on every non-200 path** (= `B-12`): `isEnabled = false` on tap, re-enabled **only inside `onResponse`**. `onFailure`, the offline branch and the `catch` all leave it **permanently disabled with no message** | Re-enable on all 4 paths (helper / `finally`) and show a toast |
+| BUG-714 | BP15 | P1 | High | **No posting permission check** (= `B-9`). The screen creates a post with no `Util.hasPermission(PermissionType.POST.value, Permission.CREATE.value)` gate, while `HomeFragment` gates `AddPostActivity` with exactly that — a trivial bypass of the posting policy via the Bible tab (itself ungated, `BE1`) | Gate both the reader's post button and this `onCreate`; denial → `NoPermissionActivity` |
+| BUG-715 | BP16 | P1 | High | **Continuous LiveData observer registered inside the click handler** (cluster `CL-8`, = `B-13`): `userPreferences.authToken.asLiveData().observe(this)` sits inside `postData`, called from the button listener. Any later write to `token` re-fires the lambda and **posts the passage again**; tapping Post twice registers two observers | Read the token once (`authToken.first()` in a coroutine) or hoist a single observer into `onCreate` |
+| BUG-716 | BP1 | P2 | Medium | **Three `intent.extras!!` force-unwraps** (= `B-15`) for `edition`, `tags`, `content`. Launching without extras NPEs instantly; `.toString()` on the first also converts a missing value into the string `"null"`, which then flows into the post title | `intent?.extras?.getString(...)` with defaults and an early `finish()` when the passage is missing |
+| BUG-717 | BP4 | P2 | Medium | **Variable shadowing hides a view**: `val title = "Bible post - …"` shadows `lateinit var title: TextView`, so `@id/bible_title` is never populated. The layout masks the bug by marking that `TextView` `visibility="gone"` — the user sees **no title**, while the title sent to the server is the computed string | Rename the local to `postTitle`; either populate and show the `TextView` or delete it |
+| BUG-718 | BP5 | P2 | Medium | **`onBackPressed` starts `BibleActivity` with `FLAG_ACTIVITY_NEW_TASK` *and* calls `super.onBackPressed()`** (= `B-16`) — a new reader instance is pushed (possibly into a new task) while this one pops, so Back does not return to the reader the user came from and the stack grows | Just `super.onBackPressed()` — the reader is already below on the stack |
+| BUG-719 | BP6 | P2 | Medium | Logo tap starts `MainActivity` **without `finish()` or `CLEAR_TOP`** (= `B-17`) | `finish()`, or `CLEAR_TOP \| SINGLE_TOP` |
+| BUG-720 | BP7 | P2 | Medium | **Silent offline no-op** (= `G6`, `B-19`): `if (Commons().isNetworkAvailable(this))` with no `else` — tapping Post offline disables the button and does literally nothing | `else { postBtn.isEnabled = true; toast(...) }` |
+| BUG-721 | BP8 | P2 | Medium | **Non-200 responses are only logged** — no toast, no inline error; the user sees the button re-enable and nothing else | Surface `errorMessage` in a toast / snackbar |
+| BUG-722 | BP14 | P2 | Medium | `loginresp.get("status").toString()` / `get("errorMessage").toString()` without null checks — an empty body, an HTML 502 page or any non-JSON error throws inside `onResponse` | `runCatching` + `has(...)` checks; fall back to `response.code()` |
+| BUG-723 | BP17 | P2 | Medium | `data.addProperty("userId", Util.userId)` reads an unguarded static — `null` after process death, producing `"userId": null` in the payload | Read `userId` from DataStore, or validate before posting |
+| BUG-724 | BP9 | P3 | Low | Each swatch colour is written **three** times (`values/colors.xml`, `Color.parseColor`, `colorCode`), and `values-night/colors.xml` repeats the same 5 hexes; FEED re-hard-codes `#25B567` as its fallback | Single source: `ContextCompat.getColor(R.color.colorN)` + a shared constant list |
+| BUG-725 | BP10 | P3 | Low | `@id/bible_content` / `@id/bible_tags` are fixed at 15dp (**dp not sp**) and ignore `Util.fontSize`; the title is 20dp | Use `sp`; honour the app font-size setting |
+| BUG-726 | BP12 | P3 | Low | The 5 swatches have **no selected state** — nothing marks the active colour except the preview background; no `contentDescription`, no ripple | Add a check / stroke on the active swatch; add content descriptions |
+| BUG-727 | BP13 | P3 | Low | After a 200 the code removes `tags`, `content`, `title` and `userId` from the `JsonObject` that has **already been serialized and sent** — a no-op inherited from `AddPostActivity` | Delete the 4 `data.remove(...)` calls |
+| BUG-728 | BP18 | P3 | Low | No `onSaveInstanceState`: rotation (no `configChanges` in the manifest) discards the chosen `colorCode` and resets the preview to green with no warning | Persist `colorCode` in the instance state |
+| BUG-729 | BP11 | P3 | Cosmetic | Copy-paste and string debt: all `Log.e` tags say **`"AddPostActivity.postData"`**; `"Bible post - "` is hard-coded English concatenated with Tamil strings; `"Bible Post"` and `"Post"` are hard-coded in XML; the placeholder `"nbscvzdmvcdgjvcgh"` ships on `@id/bible_title`; the toast says `"Somthing"` (= `B-20`) | Fix the log tags, move all strings to `strings.xml`, delete the placeholder |
+| BUG-730 | BP19 | P3 | Cosmetic | Dead UI and imports: `@drawable/bible_left` / `bible_right` and `@id/bible_title` are `visibility="gone"` and never shown; `import android.os.Build` is unused | Delete |
+
+#### `BIBLE_READER` — module · `agents/BIBLE/BIBLE_READER.md` · 27 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-731 | BR1 | P0 | Critical | **`Util.bible` dereferenced unguarded** (= `B-7`). `setBibleEdition`'s `onItemSelected` runs `Util.bible.get("Old"\|"New")`, and `setSelection()` fires it synchronously during `onCreate`. After process death the OS restores `MainActivity`, `Util.bible` is `null` (only ever assigned by `SplashScreenActivity.getBible()`), and opening the Bible tab **crashes immediately** | Null-check `Util.bible` at the top of `onCreate`; on `null` re-read `filesDir/bible.json` or route to splash with a toast. Make `Util.bible` lazily loadable (PLATFORM + AUTH) |
+| BUG-732 | BR20 | P0 | Critical | **`keyList[keyList.indexOf(bookmarkedContent)]`** in `setHeading` (= `B-8`). When the bookmarked book is not in the selected testament `indexOf` returns **−1** → `IndexOutOfBoundsException`. Repro: bookmark an Old-Testament chapter, then open the New Testament from the tab | `val i = keyList.indexOf(bookmarkedContent); if (i >= 0) … else keyList[0]`; better, store the testament id in the bookmark and apply it only to the matching edition |
+| BUG-733 | BR2 | P1 | High | **`fakeSpinner.text.toString().toInt()`** in `next` (×2), `previous` (×2) and `loadChapterList` (×1) — **5 unguarded parses** (= `B-14`). The field is an `AutoCompleteTextView`; any empty or non-numeric value throws `NumberFormatException` | `toIntOrNull() ?: 1`, or track the chapter index in an `Int` field and use the text for display only |
+| BUG-734 | BR11 | P1 | High | **No permission gate before posting** (= `B-9`). `@id/post_txt` launches `BiblePostActivity` with no `Util.hasPermission(PermissionType.POST.value, Permission.CREATE.value)` check, while `HomeFragment` gates `AddPostActivity` with exactly that | Add the gate here **and** in `BiblePostActivity` (defence in depth); denial → `NoPermissionActivity` |
+| BUG-735 | BR19 | P1 | High | **The bookmark's edition segment is the localized display string** (= `B-4`): `bibleDropdown.selectedItem.toString()` is `R.string.oldBible` / `newBible`. Translating the app or editing those strings orphans every stored bookmark — `bibleList.indexOf(bookmarkedEdition)` returns −1 and `Spinner.setSelection(-1)` silently clears the selection | Store a stable id (`"old"` / `"new"`) and map to a label for display; needs a migration for existing values — PM-coordinated with PLATFORM/STORAGE |
+| BUG-736 | BR21 | P1 | High | `loadChapterList` applies `bookmarkedChapter` to **whatever book is loading**, then calls `setVersesList(chapter - 1)`. A bookmark at chapter 50 applied to a 4-chapter book → `chapterList[49]` → `IndexOutOfBoundsException` | Clamp to `chapterList.size`; apply the bookmark only when the book matches too |
+| BUG-737 | BR3 | P2 | Medium | `intent.extras!!.getString("type")` (= `B-15`) — launching `BibleActivity` with no extras (deep link, `am start`, restored task) NPEs before anything renders | `intent?.extras?.getString("type") ?: "old"` |
+| BUG-738 | BR4 | P2 | Medium | **`companion object var selectedText: ArrayList<String>`** (= `B-6`) — static, process-wide state mutated from the inner adapter and reassigned (never `clear()`ed) in 6 places. A second activity instance shares it; it survives `finish()` and keeps verse strings alive | Make it an instance field (or `ViewModel` / RN state) and `clear()` instead of reassigning |
+| BUG-739 | BR5 | P2 | Medium | Copy and share do **not** check that anything is selected (only post does), and copy does **not** clear `selectedText` afterwards while share and post do — inconsistent, and an empty copy silently overwrites the user's clipboard | Guard all three with the same `selectedText.isEmpty()` check; align the clearing behaviour |
+| BUG-740 | BR7 | P2 | Medium | Logo / home taps `startActivity(MainActivity)` **without `finish()` or `CLEAR_TOP`** (= `B-17`), stacking duplicate `MainActivity` instances | `finish()` after `startActivity`, or `FLAG_ACTIVITY_CLEAR_TOP \| FLAG_ACTIVITY_SINGLE_TOP` |
+| BUG-741 | BR8 | P2 | Medium | **Whole-testament re-serialize + re-parse on the main thread** (= `B-18`): each edition change runs `Gson().fromJson(Util.bible.get("Old").toString(), JsonArray::class.java)` (`org.json` → `String` → Gson tree), then `setHeading` rebuilds `bibleMap` and `loadChapterList` rebuilds `chapterMap`. Multi-MB, visible jank, during `onCreate` | Parse `bible.json` once with Gson at download time into a typed model, or index lazily per book |
+| BUG-742 | BR10 | P2 | Medium | The composer receives the **launch `type`**, not `bibleDropdown`'s current value (= `B-5`). Open the Old Testament, switch to the New inside the reader, post → the post is titled "Bible post - பழைய ஏற்பாடு" | Pass `if (bibleDropdown.selectedItemPosition == 0) "old" else "new"`, or keep `type` in sync in `onItemSelected` |
+| BUG-743 | BR12 | P2 | Medium | Almost no feedback (= `B-19`): copy is silent, bookmarking is silent, every failure path is silent-until-crash, and `@id/bible_shimmer_layout` — a ready-made loading state — is never shown | Toast / snackbar on copy + bookmark; use the shimmer while the JSON loads |
+| BUG-744 | BR15 | P2 | Medium | `bibleMap` and `chapterMap` are `val HashMap`s that are **never cleared**. `bibleMap` accumulates the books of *both* testaments (name collisions silently overwrite); `chapterMap` keeps `"1".."N"` from the **previous** book, so `setVersesList` can index a stale chapter when the new `chapterList` is shorter | `clear()` both at the start of `setHeading` / `loadChapterList`, or key them by `"<edition>/<book>"` |
+| BUG-745 | BR16 | P2 | Medium | The `onLoad` flag guards only the **chapter**. `bookmarkedEdition` / `bookmarkedContent` are never reset, so every later edition change re-takes the bookmark branch in `setHeading` — switching testament jumps to the bookmarked book instead of book 1 (and triggers `BR20`) | Reset `bookmarkedContent` / `bookmarkedEdition` to `"DUMMY"` after first application, mirroring `onLoad` |
+| BUG-746 | BR22 | P2 | Medium | `showGridDropdown(items)` takes an `items` parameter, but `getView` reads **`chapterList[position]`** while `getCount` / `getItem` use `items` — the parameter is a lie. They are the same list today; the day they differ the grid renders wrong numbers or throws | Use `items[position]` consistently, or drop the parameter |
+| BUG-747 | BR23 | P2 | Medium | `MyAdapter.onBindViewHolder` attaches a **new long-click + click listener on every bind**, and leaving multi-select calls `notifyDataSetChanged()`; no `DiffUtil`, no stable ids | Set listeners in `onCreateViewHolder` using `bindingAdapterPosition`; use `notifyItemChanged` |
+| BUG-748 | BR6 | P3 | Low | Four different "cleared" representations for the bookmark: `Util.bookmarkedBible = "Dummy"`, the removed DataStore key, the flow re-emitting the **string `"null"`** (`preferences[...].toString()`), and the `"DUMMY"` field sentinel | Use `null` / empty consistently; make the `UserPreferences` flow emit `String?` (PLATFORM) |
+| BUG-749 | BR9 | P3 | Low | `child_bible.xml`'s root id is **`@+id/child_post_layout`**, duplicating FEED's `child_post.xml` row id (= `B-10`) | Rename to `@+id/child_bible_layout` (nothing references it) |
+| BUG-750 | BR13 | P3 | Low | Dead code: `bibleLinear` + `shimmerFrameLayout` bound but unused; `@id/bible_search` declared `gone` and never bound; the commented-out `chapterDropdown` field, its `findViewById` and both commented `next` / `previous` bodies; the 142-line shimmer block | Delete all of it (~160 XML lines + ~15 Kotlin lines) |
+| BUG-751 | BR14 | P3 | Low | Verse text is fixed at `20dp` in `child_bible.xml` — **dp not sp** — and `Util.fontSize` / the `textSize` DataStore key (the app-wide font-size setting) is ignored, unlike `HomeAdapter` | Use `sp`; apply `Util.fontSize` in `onBindViewHolder` |
+| BUG-752 | BR17 | P3 | Low | `fakeSpinner` has **both** `setOnClickListener` and `setOnFocusChangeListener` calling `showGridDropdown`, so the first tap can build and show **two** `PopupWindow`s | Keep only the click listener, or guard with `popupWindow?.isShowing` |
+| BUG-753 | BR18 | P3 | Low | Force-unwraps on map lookups: `bibleMap[keyList[pos]]!!` (×3) and `chapterMap[chapterList[…]]!!` (×2) — each relies on the maps staying in sync with the lists (see `BR15`) | `?: return` with a logged error, or model the data so the lookup cannot fail |
+| BUG-754 | BR24 | P3 | Low | `bibleArray[position] as JsonObject` — unchecked cast on untyped Gson data (cf. the `as Fragment` cluster); a malformed `bible.json` yields `ClassCastException` instead of a handled error | `as? JsonObject ?: return` |
+| BUG-755 | BR25 | P3 | Low | `onCreate` is ~155 lines doing binding, listener wiring, intent parsing, bookmark parsing and the first render; the file is 448 lines with **no ViewModel, no repository, and the adapter nested inside the activity** | Extract a `BibleRepository` + `ViewModel`; move `MyAdapter` to `adapter/` |
+| BUG-756 | BR26 | P3 | Low | The `PopupWindow` is a local variable, never dismissed in `onPause` / `onDestroy` — backgrounding or finishing with the grid open leaks a window (`WindowLeaked`) | Hold it in a field and `dismiss()` in `onPause` |
+| BUG-757 | BR27 | P3 | Cosmetic | Hard-coded user-visible strings — `"post"`, `"Please select atleast one"` (typo), `"choose one"`, `"Salvation Lamb"`, `"Let me recommend you this application"`, `https://salvationlamb.com/redirect` (= `B-20`) — and no `contentDescription` on any of the 7 `ImageView` controls | Move to `strings.xml`; add content descriptions |
+
+### NOTIFICATIONS — 66 entries
+
+#### `NOTIFICATIONS_LEAD` — team lead (rollups) · `agents/NOTIFICATIONS/NOTIFICATIONS_LEAD.md` · 12 entries
+
+| Bug | Agent id | Issue | Affects module(s) | Risk |
+|---|---|---|---|---|
+| BUG-758 | N-1 | The routing table is **triplicated** (`NotificationListAdapter`, `NotificationHelper`, `SplashScreenActivity`) and already inconsistent | all + AUTH | **High** — a new type silently works in one place only |
+| BUG-759 | N-2 | `NotificationHelper` applies **no permission gate** to `type=user`, while the in-app adapter does | PUSH_SERVICE | **High (security)** — the tray bypasses a gate the UI enforces |
+| BUG-760 | N-3 | A denied gate in the tray leaves `pendingIntent == null`, so the notification posts but **does nothing on tap** | PUSH_SERVICE | **High (UX)** |
+| BUG-761 | N-4 | `NotificationService.updateToken` builds a payload and **never sends it**; `savefcmToken` is commented out. A rotated FCM token is **never registered** | PUSH_SERVICE | **High** — users silently stop receiving push |
+| BUG-762 | N-5 | `NotificationViewActivity` calls `MainActivity().getMyDetails()` — a manually constructed Activity with no Context (same bug class as the one fixed in T-025) | NOTIFICATION_CENTER | **High** — always throws; the null-user guard does nothing |
+| BUG-763 | N-6 | `Util.user.role` is read **one line after** the null check that was meant to protect it → NPE on a cold deep-link | NOTIFICATION_CENTER | **High (crash)** |
+| BUG-764 | N-7 | `NotificationTabAdapter.getItem` ends `else -> b as Fragment` with `b = null` (same P0 as `TabAdapter`/`SearchAdapter`) | NOTIFICATION_CENTER | **High (crash)** |
+| BUG-765 | N-8 | All 3 fragments are ~170-line near-identical copies differing only in the `type` string and a layout id | NOTIFICATION_LISTS | Medium — fix one, forget two |
+| BUG-766 | N-9 | `notificationManagerCompat.notify(1, …)` uses a **constant id**, so every push overwrites the previous one | PUSH_SERVICE | Medium |
+| BUG-767 | N-10 | Broken `\|\|` token guard (CL-1) in all 3 fragments | NOTIFICATION_LISTS | **High** |
+| BUG-768 | N-11 | Response envelope key is `notification` (singular) — a 4th shape in the app | all | Medium (`CL-5`) |
+| BUG-769 | N-12 | No notification channel is ever **created** by this team; `Util.CHANNEL_ID` is used by the builder but `createNotificationChannel` lives in `LoginActivity` (AUTH) | PUSH_SERVICE | **High on API 26+** — pushes are dropped if that path was skipped |
+
+#### `NOTIFICATION_CENTER` — module · `agents/NOTIFICATIONS/NOTIFICATION_CENTER.md` · 14 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-770 | NC1 | P0 | Critical | **`MainActivity().getMyDetails()`** (line 45) — team id `N-5`. A manually constructed `Activity` has no `Context`, no `userPreferences`, no window. `getMyDetails()` immediately touches `userPreferences.userId.asLiveData().observe(this)` on an un-attached instance → `NullPointerException` **every time**. So the `Util.user == null` repair path does **nothing except crash** — and it crashes inside the very branch that was supposed to prevent `NC2` | Delete the call. Either bounce to `SplashScreenActivity`/`LoginActivity` when `Util.user == null`, or fetch the user from *this* activity with its own `UserPreferences(this)` + Retrofit call. Same bug class as the manually-constructed-Activity cluster in `AGENTS.md` |
+| BUG-771 | NC2 | P0 | Critical | **`Util.user.role` is read one line after the null check meant to protect it** (lines 44–47) — team id `N-6`. The `if (Util.user == null) { … }` block does **not** `return`, so execution falls straight through into `Util.user.role`. After process death (the OS restores the task into `MainActivity`, the user taps the bell) `Util.user` is `null` and the screen **NPEs before the pager is built** | `val role = Util.user?.role ?: run { startActivity(Intent(this, SplashScreenActivity::class.java)); finish(); return }`, then gate the Warrior tab on `role`. Same change set as `NC1` |
+| BUG-772 | NC3 | P1 | High | **`onBackPressed` calls `super` *and* `startActivity(MainActivity)`** — the activity finishes **and** a second `MainActivity` is pushed on top of the one already below it. The user must press Back twice to leave, and `MainActivity.onCreate` re-runs its whole bootstrap (badge count, user fetch, nag dialog) | Keep only `super.onBackPressed()`; `MainActivity` is already on the stack. If explicit up-navigation is wanted, drop the `super` call and use `FLAG_ACTIVITY_CLEAR_TOP \| FLAG_ACTIVITY_SINGLE_TOP` |
+| BUG-773 | NC5 | P1 | High | **`else -> b as Fragment` with `b: Any? = null`** in `NotificationTabAdapter.getItem` — team id `N-7`. A guaranteed NPE for any position ≥ 3 or < 0; unreachable only by accident, because `getCount()` happens to equal `tabCount`. Third copy of the same P0 (`TabAdapter.kt:78`, `SearchAdapter.kt:43`) | `else -> throw IllegalArgumentException("unknown tab $position")`, or return `UserNotificationFragment()` as a safe default. Fix all three copies together (PM-coordinated, cross-team) |
+| BUG-774 | NC4 | P2 | Medium | Logo tap does `startActivity(MainActivity)` **without `finish()` or `CLEAR_TOP`**, stacking duplicate `MainActivity` instances (same pattern as `BR7` in BIBLE and several other screens) | `finish()` after `startActivity`, or `FLAG_ACTIVITY_CLEAR_TOP \| FLAG_ACTIVITY_SINGLE_TOP` |
+| BUG-775 | NC10 | P2 | Medium | **Fully deprecated pager stack**: `androidx.viewpager.widget.ViewPager` + `FragmentPagerAdapter(fm)` (no-`behavior` constructor) + `TabLayout.TabLayoutOnPageChangeListener`. Consequence: every off-screen tab is `RESUMED`, so opening the centre fires **2 or 3 simultaneous** `GET api/v1/notifications` calls, each with its own always-true token observer (`N-10`) | Migrate to `ViewPager2` + `FragmentStateAdapter` + `TabLayoutMediator`; in RN use a lazy top-tab navigator |
+| BUG-776 | NC14 | P2 | Medium | The adapter captures `tabLayout.tabCount` **once**. Nothing re-creates it if `Util.user.role` changes while the app is alive (role promotion, admin demotion) — the Warrior tab only appears/disappears after a full restart | Re-evaluate the role and re-create the adapter in `onResume` when `tabCount` changed |
+| BUG-777 | NC15 | P2 | Medium | The activity **never refreshes**: `onResume` is not overridden and the fragments only load in `onCreateView`. Rows marked read in a sibling tab, and notifications arriving while the screen is open, stay invisible; the `MainActivity` badge also goes stale | Add a `reload()` to the fragments and call it from `onResume` (joint change with `NOTIFICATION_LISTS.md`) |
+| BUG-778 | NC6 | P3 | Low | `NotificationTabAdapter` **imports `AdminAudioFragment` and never uses it** (copy-paste residue from `TabAdapter`), and carries an unused `context` field plus an `init {}` block that only re-assigns its constructor parameters | Delete the import, the field and the `init` block; use `class NotificationTabAdapter(fm: FragmentManager, private val totalTabs: Int)` |
+| BUG-779 | NC7 | P3 | Low | The screen ignores `Util.isNight` and `Util.fontSize`: the root is hard-coded `@color/white` and the tab labels use the default size. In night mode the header is right but the row text (`@color/black` on `@color/white` in `child_notification_list.xml`) does not follow the theme | Use a night-aware colour / `?attr/colorSurface`; apply `Util.fontSize` to the tab labels |
+| BUG-780 | NC8 | P3 | Low | Tab labels `"User"` / `"Admin"` / `"Warrior"` are **hard-coded English literals in Kotlin**, not `strings.xml` — untranslatable, while the rest of the app does localise the "Warrior" concept | Move to `strings.xml` (`R.string.tab_user`, …) |
+| BUG-781 | NC9 | P3 | Low | `@id/header_main` and `@id/notification_tab_layout` both carry `layout_weight="1"` with `layout_height="wrap_content"` in a vertical `LinearLayout` (the pager has `weight="10"`). Weighting `wrap_content` heights makes the header stretch on short content and compete with the pager — fragile layout maths | Header + tabs: `wrap_content` with **no** weight; pager: `0dp` + `weight="1"` |
+| BUG-782 | NC12 | P3 | Cosmetic | Accessibility: `@id/prod_logo` has **no** `contentDescription` and `@id/close` has `contentDescription="@null"` — both header controls are unlabelled for TalkBack | Add real content descriptions (`@string/app_name`, `@string/close`) |
+| BUG-783 | NC13 | P3 | Cosmetic | `user.tag = "User"` / `admin.tag` / `warrior.tag` are assigned and **never read** anywhere in the app — dead state | Delete the three `tag` assignments |
+
+#### `NOTIFICATION_LISTS` — module · `agents/NOTIFICATIONS/NOTIFICATION_LISTS.md` · 21 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-784 | NL1 | P1 | High | **Three ~170-line near-identical fragments** (`N-8`); the only real differences are a layout id, the `type` string and the page size | one `NotificationListFragment` with `newInstance(type)` + a `Bundle` |
+| BUG-785 | NL2 | P1 | High | All three fragments use the always-true `\|\|` token guard (`CL-1`, `N-10`) — the session-lost `else` is dead and a missing token sends `Bearer null` | use `&&`, as `readNotification` already does |
+| BUG-786 | NL3 | P1 | High | `addOnScrollListener` is called **inside `onResponse`**, so page *n* attaches the *n*-th listener; all of them fire at the bottom | attach once in `onCreateView` |
+| BUG-787 | NL4 | P1 | High | `addItem` calls `notifyItemRangeInserted(notifications.size, post.size)` using the **post-insert** size, so the start index is wrong by `post.size` | capture `oldSize` before `addAll` |
+| BUG-788 | NL5 | P1 | High | `WarriorNotificationFragment` requests `size = 50` but still divides `count / 10`, so the page ceiling is **5x too high** and it refetches empty pages | divide by the page size actually used |
+| BUG-789 | NL7 | P1 | High | HTTP 401 starts `LoginActivity` without `finish()` and **without clearing the session**, so back returns to a dead screen and the next launch repeats the 401 | mirror the `bailToLogin` pattern added to `SplashScreenActivity` in T-024 |
+| BUG-790 | NL8 | P1 | High | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) | toast + retry affordance |
+| BUG-791 | NL21 | P1 | High | `AdminNotificationFragment` and `WarriorNotificationFragment` increment `page` **twice** per fetch (in `if (!updated)` and again in the scroll listener) — every other page is skipped | increment in one place |
+| BUG-792 | NL6 | P2 | Medium | `readNotification` mutates its shared `data` body with `data.remove("isVisited")` on success | build the body per call |
+| BUG-793 | NL9 | P2 | Medium | `contexts = container!!.context` force-unwraps the container | use `requireContext()` |
+| BUG-794 | NL10 | P2 | Medium | The routing switch has **no `else`** — an unknown or newly added `type` makes the row inert | log and fall back to a detail screen |
+| BUG-795 | NL11 | P2 | Medium | `file` and `event` rows are routed with **no permission gate**, unlike the other four types | gate them, or document why not |
+| BUG-796 | NL12 | P2 | Medium | `WebViewActivity` receives `pageUrl` here but `url` from `SplashScreenActivity` — one destination, two extra names | pick one and fix both call sites |
+| BUG-797 | NL13 | P2 | Medium | The `RecyclerView` is `wrap_content` inside a `FrameLayout`, defeating recycling on a paged list | `match_parent` |
+| BUG-798 | NL14 | P3 | Low | `"No Data found"` is hard-coded English at `textSize="30dp"` (should be `sp`) | string resource + `sp` |
+| BUG-799 | NL15 | P3 | Low | Row view ids are copied from PROFILE's follower row (`profile_pic_fol`) | rename jointly with ANNOUNCEMENTS |
+| BUG-800 | NL16 | P3 | Low | `child_notification_list.xml` nests a 45dp `CardView` inside an identical `CardView` | flatten |
+| BUG-801 | NL17 | P3 | Low | The row carries `app:layout_constraint*` attributes inside a `LinearLayout`, where they are inert | delete |
+| BUG-802 | NL19 | P3 | Low | Log tags read `HomeFragment.getMyDetails` in all three notification fragments | use `<Class>.<method>` |
+| BUG-803 | NL18 | P3 | Cosmetic | `"Somthing Went Wrong \nLogin again to continue"` — hard-coded and misspelled (shared with 5 other files) | app-wide string fix |
+| BUG-804 | NL20 | P3 | Cosmetic | Unused imports: `PostUser` + `NotificationType` (User); `Posts` + `UserRslt` + `PostUser` + `NotificationType` (Admin) | remove |
+
+#### `PUSH_SERVICE` — module · `agents/NOTIFICATIONS/PUSH_SERVICE.md` · 19 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-805 | NP1 | P0 | Critical | **`updateToken` never sends anything** (`N-4`). It builds the payload, then returns; `savefcmToken` is commented out. FCM rotates tokens on reinstall, data-clear, restore and periodically — after any rotation the server holds a dead token and the user **silently stops receiving push** until the next login | call `RetrofitAPI.putToken` and persist via `savefcmToken`; the endpoint already exists |
+| BUG-806 | NP13 | P0 | Critical | **Post-T-025 interaction:** `hasPermission` now fails closed, and in a push-started process `permissionMap` is always empty — so `post`, `announcement` and `warrior` notifications are now **always inert on tap**, while the ungated `user` branch still works. The tray's behaviour is the inverse of what the gates intend | route every tray tap through `SplashScreenActivity`, which loads the map before routing |
+| BUG-807 | NP2 | P1 | High | **`type=user` has no permission gate in the tray** (`N-2`), while the in-app adapter gates it with `USER`/`Read`. The tray is therefore a **bypass of a gate the UI enforces** | add the gate, matching `NotificationListAdapter` |
+| BUG-808 | NP3 | P1 | High | A denied gate or an unknown `type` leaves `pendingIntent == null`; the notification still posts and **does nothing on tap** (`N-3`) | fall back to a splash / `MainActivity` intent so a tap always does something |
+| BUG-809 | NP5 | P1 | High | This module **never creates the notification channel** (`N-12`). `Util.CHANNEL_ID` is used by the builder, but `createNotificationChannel` lives in `LoginActivity.onCreate` (AUTH). On API 26+ a push arriving before any login is **dropped by the OS** | create the channel in an `Application` subclass or in the service |
+| BUG-810 | NP6 | P1 | High | `onMessageReceived` only acts `if (message.getNotification() != null)` — **data-only pushes are silently dropped**, and data-only is the usual way to deliver a background deep link | handle data-only messages |
+| BUG-811 | NP14 | P1 | High | The routing here is **copy 2 of 3** (`N-1`); `NotificationListAdapter` has 6 branches, `SplashScreenActivity` has its own variant. They have already diverged on gates (`NP2`) and coverage (`NP7`) | extract one `NotificationRouter` used by all three |
+| BUG-812 | NP4 | P2 | Medium | `notify(1, notification)` uses a **constant id** (`N-9`) — each push overwrites the previous, so only one notification is ever visible | use a unique id derived from the server id |
+| BUG-813 | NP7 | P2 | Medium | `file` and `event` types are **not handled in the tray** at all, though the in-app list routes both | add both branches, or document the asymmetry |
+| BUG-814 | NP8 | P2 | Medium | All `PendingIntent.getActivity(context, 0, …)` use **request code 0**, so intents replace each other even with distinct extras | pass a unique request code |
+| BUG-815 | NP9 | P2 | Medium | When `POST_NOTIFICATIONS` is not granted the notification is **silently discarded** with no log and no fallback | log it; surface an in-app prompt |
+| BUG-816 | NP10 | P2 | Medium | `data.get("id").toString()` with **no null check** — a push missing `id` throws inside the service | null-guard before `toString()` |
+| BUG-817 | NP11 | P2 | Medium | `String.valueOf(userPreferences.getFcmToken())` stringifies a **`Flow` object**, not the token, so `oldToken` would be garbage even if the call were made | collect the Flow (`first()`) in a coroutine |
+| BUG-818 | NP12 | P2 | Medium | `FLAG_ACTIVITY_NEW_TASK \| FLAG_ACTIVITY_CLEAR_TASK` **wipes the back stack**, discarding unsaved work such as a half-composed post | drop `CLEAR_TASK`, or use `TaskStackBuilder` |
+| BUG-819 | NP15 | P2 | Medium | `onMessageReceived` logs the **title, body and entire data map** at `Log.e` on every push — notification content in logcat on release builds | remove, or guard with `BuildConfig.DEBUG` |
+| BUG-820 | NP16 | P3 | Low | `onDeletedMessages` is not overridden, so an FCM overflow is never reconciled with the server | override and refetch the list |
+| BUG-821 | NP17 | P3 | Low | Dead code: a bare `message.getData();` statement, a commented-out `CHANNEL_ID`/`NAME`/`DESC` block duplicating `Util`, and a commented-out `setLargeIcon` + `BitmapFactory` decode | delete |
+| BUG-822 | NP18 | P3 | Low | `displayNotification(Context, String, String, Map)` takes a **raw `Map`** | parameterise as `Map<String, String>` |
+| BUG-823 | NP19 | P3 | Low | Log tags are ad-hoc (`"notification"`, `"error while updating token"`) rather than `<Class>.<method>` | follow the convention |
+
+### ANNOUNCEMENTS — 28 entries
+
+#### `ANNOUNCEMENTS_LEAD` — team lead (rollups) · `agents/ANNOUNCEMENTS/ANNOUNCEMENTS_LEAD.md` · 11 entries
+
+| Bug | Agent id | Issue | Affects module(s) | Risk |
+|---|---|---|---|---|
+| BUG-824 | A-1 | **The adapter borrows NOTIFICATIONS' layout *and* `ViewHolder` type** (§6); a row-id change there breaks this team at runtime, not compile time | ANNOUNCEMENT_LIST | **High** |
+| BUG-825 | A-2 | The always-true `\|\|` token guard (`CL-1`) — the session-lost `else` is dead code and a missing token is sent as `Bearer null` | ANNOUNCEMENT_LIST | **High** |
+| BUG-826 | A-3 | Paging is copied from the notification lists and carries the same three defects: the scroll listener is attached **inside `onResponse`**, `notifyItemRangeInserted` is called with the **post-insert** size, and the accumulating `postlist` is re-appended on every page | ANNOUNCEMENT_LIST | **High** |
+| BUG-827 | A-4 | Rows are parsed into **`Posts`**, while the purpose-built `Announcement` data class in `DataModels.kt` is **never used anywhere** | ANNOUNCEMENT_LIST / PLATFORM | Medium |
+| BUG-828 | A-5 | The `ANNOUNCEMENT`/`Read` gate is evaluated **twice** (entry + per row); a mid-session revocation leaves the list visible but every row blocked | ANNOUNCEMENT_LIST | Low |
+| BUG-829 | A-6 | `GET api/v1/announcements/{postId}` is declared in `RetrofitAPI.kt` but **never called** — the detail view uses FEED's post endpoint instead | PLATFORM / NETWORK | Medium |
+| BUG-830 | A-7 | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`); `onFailure`'s log tag even reads `HomeFragment.getMyDetails` | ANNOUNCEMENT_LIST | **High** |
+| BUG-831 | A-8 | HTTP 401 starts `LoginActivity` with **no `finish()` and no session clear**, so back returns to a dead screen and the next launch repeats the 401 | ANNOUNCEMENT_LIST | **High** |
+| BUG-832 | A-9 | `AnnouncementAdapter` takes a `LifecycleOwner` parameter it never uses, and creates a `UserPreferences` in `onCreateViewHolder` that it also never uses | ANNOUNCEMENT_LIST | Low |
+| BUG-833 | A-10 | The activity carries **8 unused imports** (`NotificationListAdapter`, `NotificationList`, `LifecycleOwner`, …) — residue of the copy-paste from the notification list | ANNOUNCEMENT_LIST | Cosmetic |
+| BUG-834 | A-11 | The fetch method is spelled **`getAnnouncenents()`** in the source | ANNOUNCEMENT_LIST | Cosmetic |
+
+#### `ANNOUNCEMENT_LIST` — module · `agents/ANNOUNCEMENTS/ANNOUNCEMENT_LIST.md` · 17 entries
+
+| Bug | Agent id | Pri | Severity | Issue | Suggested fix |
+|---|---|---|---|---|---|
+| BUG-835 | AL1 | P1 | High | **The adapter has no row of its own**: `AnnouncementAdapter : RecyclerView.Adapter<NotificationListAdapter.ViewHolder>` inflates NOTIFICATIONS' `child_notification_list.xml` and returns **their** `ViewHolder`. A row-id change in that team breaks this screen **at runtime, not compile time** (`A-1`) | give this team its own `child_announcement.xml` + `ViewHolder` |
+| BUG-836 | AL2 | P1 | High | The always-true `\|\|` token guard (`CL-1`) — the whole session-lost `else` (toast + token delete + `LoginActivity`) is **unreachable**, and a missing token is sent as `Bearer null` | use `&&` |
+| BUG-837 | AL3 | P1 | High | `addOnScrollListener` is attached **inside `onResponse`**, so page *n* adds the *n*-th listener and all of them fire at the bottom | attach once in `onCreate` |
+| BUG-838 | AL4 | P1 | High | `addItem` calls `notifyItemRangeInserted(announcements.size, post.size)` with the **post-insert** size, so the start index is wrong by `post.size` | capture `oldSize` before `addAll` |
+| BUG-839 | AL6 | P1 | High | Non-401 errors, `onFailure` and the offline path show the user **nothing** (`CL-7`) | toast + retry affordance |
+| BUG-840 | AL7 | P1 | High | HTTP 401 starts `LoginActivity` with **no `finish()` and no session clear** | adopt the `bailToLogin` pattern from `SplashScreenActivity` (T-024) |
+| BUG-841 | AL9 | P1 | High | `getAnnouncenents()` recurses with its **default empty `postlist`** on scroll, but the adapter already holds the previous pages — combined with `AL4` the list can duplicate or misrender rows | pass the accumulated list explicitly, or let the adapter own it |
+| BUG-842 | AL5 | P2 | Medium | The empty-state check has **no `page == 1` guard** (the notification lists do), so an empty later page hides an already-populated list | add the page check |
+| BUG-843 | AL8 | P2 | Medium | Logo tap starts `MainActivity` with **no `finish()` or `CLEAR_TOP`**, stacking duplicates | `CLEAR_TOP` + `finish()` |
+| BUG-844 | AL11 | P2 | Medium | Rows are parsed into **`Posts`**; the purpose-built `Announcement` data class is never used anywhere in the app | use it, or delete it from `DataModels.kt` |
+| BUG-845 | AL16 | P2 | Medium | `count` is declared `var count: Int` **outside** the callback and assigned inside it — it is read by the scroll listener, so a second page can read a stale value | capture per response |
+| BUG-846 | AL10 | P3 | Low | `AnnouncementAdapter` takes a `LifecycleOwner` it never uses, and builds a `UserPreferences` in `onCreateViewHolder` that it also never uses | drop both |
+| BUG-847 | AL12 | P3 | Low | `onFailure` and the `catch` both log with the tag `HomeFragment.getMyDetails` | use `<Class>.<method>` |
+| BUG-848 | AL15 | P3 | Low | `AnnouncementAdapter` declares a **private `ViewHolder` class that is never used** — it obscures the fact that another team's `ViewHolder` is the real one | delete it (or make it the real one, fixing `AL1`) |
+| BUG-849 | AL13 | P3 | Cosmetic | The method is spelled **`getAnnouncenents`** | rename |
+| BUG-850 | AL14 | P3 | Cosmetic | Hard-coded, misspelled `"Somthing Went Wrong \nLogin again to continue"` (shared with 5 other files) | app-wide string fix |
+| BUG-851 | AL17 | P3 | Cosmetic | 8 unused imports (`NotificationListAdapter`, `NotificationList`, `LifecycleOwner`, …) — residue of the copy-paste from the notification list | remove |
 
 <!-- AUTO-GENERATED:END -->
 

@@ -27,6 +27,7 @@ PLATFORM/COMMONS. PROFILE does not own either.
 | `VIEW_PROFILE.md` | Another user's profile | `activity/ViewProfileActivity.kt` (112), `res/layout/activity_view_profile.xml` | READY |
 | `EDIT_PROFILE.md` | Edit details | `activity/EditProfileActivity.kt` (**738 — largest in the app**), `res/layout/activity_edit_profile.xml` (31 ids) | READY |
 | `FOLLOWERS.md` | Followers / following | `activity/FollowerActivity.kt` (254), `adapter/FollowAdapter.kt`, `res/layout/activity_follower.xml`, `child_follow.xml` | READY |
+| `APPROVE_REQUEST.md` | **Admin moderation** — approve/reject a profile-change or warrior request | `activity/ApproveRequestActivity.kt` (383), `res/layout/activity_approve_request.xml` (34 ids) | READY (T-026) |
 
 > **`UsersAdapter` is NOT a PROFILE file.** Despite living next to `FollowAdapter`, its only call
 > site is `SearchProfileFragment` — it belongs to **SEARCH**. Verified.

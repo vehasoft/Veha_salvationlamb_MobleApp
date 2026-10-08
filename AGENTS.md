@@ -83,8 +83,11 @@ AGENTS.md .................... PROJECT MANAGER (this file)
    +-- agents/PROFILE/PROFILE_LEAD.md ...... profile & social graph
    +-- agents/MEDIA/MEDIA_LEAD.md .......... files, pdf, audio, video, web
    +-- agents/SEARCH/SEARCH_LEAD.md ........ search
-   +-- agents/APPSHELL/APPSHELL_LEAD.md .... navigation, settings, theming
+   +-- agents/APPSHELL/APPSHELL_LEAD.md .... navigation, settings, theming, no-permission
    +-- agents/PLATFORM/PLATFORM_LEAD.md .... network, storage, models, utils, build
+   +-- agents/BIBLE/BIBLE_LEAD.md .......... offline Bible reader + post composer
+   +-- agents/NOTIFICATIONS/NOTIFICATIONS_LEAD.md .. FCM push, notification centre
+   +-- agents/ANNOUNCEMENTS/ANNOUNCEMENTS_LEAD.md .. admin broadcast list
 ```
 
 Folder convention (flat, one folder per team):
@@ -142,7 +145,7 @@ Legend for **v1.2 audit** (added T-019 — how well the doc matches the new base
 | `EDIT_PROFILE.md` | `EditProfileActivity` | READY | DRIFT — cropper swapped edmodo → **canhub** |
 | `VIEW_PROFILE.md` | `ViewProfileActivity` | READY | DRIFT — `userId!!` P0 still present |
 | `FOLLOWERS.md` | `FollowerActivity` + `FollowAdapter` | READY | **OK** — init-order P0 **fixed** (views bound before loading) |
-| — | `ApproveRequestActivity` (383 LOC) — warrior-request approval | **NEW** | **no agent** |
+| `APPROVE_REQUEST.md` | `ApproveRequestActivity` (383) — admin moderation | **READY (T-026)** | **NEW** — no permission gate inside the screen (`AR1`) |
 
 ### MEDIA — `agents/MEDIA/MEDIA_LEAD.md` · Status: **6/6 READY · audit pending**
 
@@ -171,7 +174,7 @@ Legend for **v1.2 audit** (added T-019 — how well the doc matches the new base
 | `SETTINGS.md` | `SettingsActivity` (font, theme, account deletion) | READY | DRIFT |
 | `ABOUT.md` | `AboutActivity` + `ExpandableView.java` (used by FEED) | READY | DRIFT |
 | `THEMING.md` | `values/`, `values-night/`, `menu/`, drawables, styles, colors | READY | DRIFT — 20 new layouts, palette changed |
-| — | `NoPermissionActivity` (26) + `NoPermissionFragment` (28) | **NEW** | **no agent** |
+| `NO_PERMISSION.md` | `NoPermissionActivity` (27) + `NoPermissionFragment` (29) | **READY (T-026)** | **NEW** — terminal screen of all 34 gates; 26 call sites |
 
 ### PLATFORM — `agents/PLATFORM/PLATFORM_LEAD.md` · Status: **5/5 READY · audit pending**
 
@@ -182,7 +185,29 @@ Legend for **v1.2 audit** (added T-019 — how well the doc matches the new base
 | `STORAGE.md` | `util/UserPreferences.kt` (DataStore `SalvationLamb`) | READY | DRIFT — 5 → **7 keys** (`fcmToken`, `bibleBookmark`) |
 | `COMMONS.md` | `util/Commons.kt`, `util/Util.java` (validators, date, globals) | READY | **DRIFT** — `Util.java` gained `permissionMap`, `hasPermission()`, `bible`, `bookmarkedBible`, FCM channel constants |
 | `BUILD_CONFIG.md` | `build.gradle` (root + app), `settings.gradle`, `AndroidManifest.xml`, permissions, proguard | READY | **REWRITE** — AGP 7.2→**8.13.2**, Kotlin 1.7.10→**1.8.21**, JVM 1.8→**11**, SDK 33→**35**, `jcenter()`→**jitpack** (`G1` closed), synthetics plugin **removed** (`G2` closed), `google-services` added |
-| — | `service/NotificationService.java` + `NotificationHelper.java` (FCM) | **NEW** | **no agent** |
+| — | ~~`service/NotificationService.java` + `NotificationHelper.java`~~ | **moved** | now owned by **NOTIFICATIONS / `PUSH_SERVICE.md`** (T-026) |
+
+### BIBLE — `agents/BIBLE/BIBLE_LEAD.md` · Status: **3/3 READY** · **new team (T-026)**
+
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `BIBLE_ENTRY.md` | `BibleFragment` — the Bible tab | READY | **NEW** — the only **ungated** tab in `TabAdapter` (`B-1`) |
+| `BIBLE_READER.md` | `BibleActivity` (448) + nested `MyAdapter` + `child_bible.xml` | READY | **NEW** — `Util.bible` NPE after process death (`B-7`), bookmark `indexOf` crash (`B-8`) |
+| `BIBLE_POST.md` | `BiblePostActivity` (173) — compose a post from a passage | READY | **NEW** — posts with **no `POST`/`Create` gate** (`B-9`) |
+
+### NOTIFICATIONS — `agents/NOTIFICATIONS/NOTIFICATIONS_LEAD.md` · Status: **3/3 READY** · **new team (T-026)**
+
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `NOTIFICATION_CENTER.md` | `NotificationViewActivity` + `NotificationTabAdapter` | READY | **NEW** — `MainActivity().getMyDetails()` always throws (`N-5`); `else -> b as Fragment` (`N-7`) |
+| `NOTIFICATION_LISTS.md` | 3 near-identical tab fragments + `NotificationListAdapter` | READY | **NEW** — paging broken 3 ways; row layout **shared with ANNOUNCEMENTS** |
+| `PUSH_SERVICE.md` | `NotificationService.java` + `NotificationHelper.java` (FCM) | READY | **NEW** — `updateToken` **never sends** (`N-4`); tray bypasses the `user` gate (`N-2`) |
+
+### ANNOUNCEMENTS — `agents/ANNOUNCEMENTS/ANNOUNCEMENTS_LEAD.md` · Status: **1/1 READY** · **new team (T-026)**
+
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `ANNOUNCEMENT_LIST.md` | `AnnouncementActivity` + `AnnouncementAdapter` | READY | **NEW** — borrows NOTIFICATIONS' row layout **and** `ViewHolder` type (`A-1`) |
 
 > **Rule:** adapters do **not** get their own agent — they belong to the screen that owns them.
 
@@ -191,21 +216,22 @@ Legend for **v1.2 audit** (added T-019 — how well the doc matches the new base
 > `ForgotPasswordActivity` -> `FORGOT_PASSWORD.md` + `OTP_VERIFY.md` (extra `page`);
 > `ChangePasswordActivity` -> `CHANGE_PASSWORD.md` + `RESET_PASSWORD.md` (extra `email`).
 
-### Unowned code on the new baseline (proposed — T-019)
+### Unowned code on the new baseline — **CLOSED by T-026**
 
-18 source files added by the 123 commits have **no agent**. PM proposes three new teams plus three
-module agents inside existing teams:
+All 18 previously unowned source files now have an agent. Three new teams and three module
+agents were created on 2026-10-08:
 
-| Proposed team / module | Files | LOC |
+| Team / module created | Files | LOC |
 |---|---|---|
-| **BIBLE** (new team) | `BibleActivity.kt` (448), `BiblePostActivity.kt` (173), `BibleFragment.kt` (62); `Util.bible` JSON cache; `bibleBookmark` DataStore key | ~683 |
-| **NOTIFICATIONS** (new team) | `NotificationViewActivity.kt` (79), `AdminNotificationFragment.kt` (175), `UserNotificationFragment.kt` (170), `WarriorNotificationFragment.kt` (174), `NotificationListAdapter.kt` (199), `NotificationTabAdapter.kt` (43), `service/NotificationService.java` (47), `service/NotificationHelper.java` (82) | ~969 |
-| **ANNOUNCEMENTS** (new team) | `AnnouncementActivity.kt` (157), `AnnouncementAdapter.kt` (89) | ~246 |
-| `PERMISSIONS.md` -> **PLATFORM** | `Util.permissionMap`, `Util.hasPermission()`, `GET /api/v1/permission/users/{userId}`, 34 call sites | cross-cutting |
-| `NO_PERMISSION.md` -> **APPSHELL** | `NoPermissionActivity.kt` (26), `NoPermissionFragment.kt` (28) | ~54 |
+| **BIBLE** (new team, 3 modules) | `BibleActivity.kt` (448), `BiblePostActivity.kt` (173), `BibleFragment.kt` (62) | ~683 |
+| **NOTIFICATIONS** (new team, 3 modules) | `NotificationViewActivity.kt` (79), `AdminNotificationFragment.kt` (175), `UserNotificationFragment.kt` (170), `WarriorNotificationFragment.kt` (174), `NotificationListAdapter.kt` (199), `NotificationTabAdapter.kt` (43), `service/NotificationService.java` (47), `service/NotificationHelper.java` (82) | ~969 |
+| **ANNOUNCEMENTS** (new team, 1 module) | `AnnouncementActivity.kt` (158), `AnnouncementAdapter.kt` (90) | ~248 |
+| `NO_PERMISSION.md` -> **APPSHELL** | `NoPermissionActivity.kt` (27), `NoPermissionFragment.kt` (29) | ~56 |
 | `APPROVE_REQUEST.md` -> **PROFILE** | `ApproveRequestActivity.kt` (383) | ~383 |
 
-**Not yet created** — awaiting customer go-ahead (`agents/TASKS.md` T-019).
+**Still outstanding:** `PERMISSIONS.md` -> **PLATFORM** (the `Util.permissionMap` /
+`hasPermission()` / `GET /api/v1/permission/users/{userId}` model and its 34 call sites). It is
+cross-cutting rather than a screen; `COMMONS.md` currently covers it. See `agents/TASKS.md` T-022.
 
 ---
 
@@ -218,7 +244,11 @@ module agents inside existing teams:
 | profile, avatar, cover photo, bio, edit profile, follow, follower, following, warrior | **PROFILE** |
 | file, folder, PDF, audio, video, YouTube, player, download, terms, privacy, webview | **MEDIA** |
 | search, filter, query, tabs on search | **SEARCH** |
-| bottom navigation, drawer, dark/night mode, font size, settings, about, theme, colors | **APPSHELL** |
+| bible, testament, chapter, verse, bookmark, scripture, old/new testament | **BIBLE** |
+| notification, push, FCM, token, tray, badge, unread, notification centre | **NOTIFICATIONS** |
+| announcement, broadcast, admin post | **ANNOUNCEMENTS** |
+| bottom navigation, drawer, dark/night mode, font size, settings, about, theme, colors, "no permission" screen | **APPSHELL** |
+| approve/reject a request, moderation, review state | **PROFILE** (`APPROVE_REQUEST.md`) |
 | API endpoint, base URL, header, DataStore key, data class, gradle, dependency, permission, manifest, crash in util | **PLATFORM** |
 | "the whole app", release, versioning, cross-cutting refactor | **PM handles directly, splits into per-team tasks** |
 
@@ -279,7 +309,7 @@ PM may create agents on demand.
 ## 7. Global known issues / tech debt (PM-level register)
 
 > **Consolidated register:** every defect recorded anywhere in the hierarchy is collected in
-> **`agents/BUG_NOTES.md`** — 653 entries from all 42 agent docs plus the G-table below, with
+> **`agents/BUG_NOTES.md`** — 851 entries from all 54 agent docs plus the G-table below, with
 > 10 cross-cutting clusters and a P0 list. Regenerate it with
 > `python3 agents/tools/sync_bug_notes.py` after editing any agent's known-issues table.
 > The per-agent tables remain the **source of truth**; `BUG_NOTES.md` is the searchable view.
@@ -300,7 +330,7 @@ PM may create agents on demand.
 | G9 | No unit tests — **first real tests landed 2026-10-08 (T-025)**: `UtilPermissionTest.kt` (10 tests) pins the `G13` fail-closed behaviour. Still ~0% coverage overall; a QA team is needed | PM (future QA team) | regressions |
 | G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); tag `baseline-on-master-backup` preserves the old `master`-based docs | PM | ~~safety~~ |
 | G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
-| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; per-doc staleness is tracked in the "v1.2 audit" column in §3 — 3 `OK`, ~30 `DRIFT`, 6 `REWRITE`, 18 files with **no agent** (T-019) | PM | doc accuracy |
+| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; staleness per doc is tracked in the "v1.2 audit" column in §3. **T-026 closed the coverage gap** — all 18 previously unowned files now have agents (54 docs, 10 teams); ~30 `DRIFT` refreshes remain (T-023) | PM | doc accuracy |
 | G13 | ~~**`Util.hasPermission()` fails open**~~ — **FIXED 2026-10-08 (T-025)**: now fail-CLOSED via a `permissionsLoaded` flag; the splash loads the map **before** routing and bails to Login if the fetch fails. 10 unit tests in `UtilPermissionTest.kt` | PLATFORM / COMMONS | ~~security (high)~~ |
 | G14 | **`app/google-services.json` is committed** — contains the Firebase API key and project config | PLATFORM / BUILD_CONFIG | secret exposure (low-ish; FCM keys are client-side but should be reviewed) |
 
@@ -315,7 +345,7 @@ PM may create agents on demand.
 | **Verified** | `isVerified == "true"` -> email OTP confirmed; unverified users are sent to the verify screen |
 | **Admin audio / video** | Curated media feeds published by admins (`api/v1/post/admin/audio|video`) |
 | **Favorites** | Posts bookmarked by the user (`api/v1/favorites`) |
-| **Permission map** | `Util.permissionMap` — `{type -> "Read,Edit,Delete,Create"}`, fetched at splash from `GET /api/v1/permission/users/{userId}`. Checked via `Util.hasPermission(type, permission)`; a denial routes to `NoPermissionActivity`. **Fails open when empty** (`G13`) |
+| **Permission map** | `Util.permissionMap` — `{type -> "Read,Edit,Delete,Create"}`, fetched at splash from `GET /api/v1/permission/users/{userId}`. Checked via `Util.hasPermission(type, permission)`; a denial routes to `NoPermissionActivity`. **Fails CLOSED since T-025** (`G13`) |
 | **Announcement** | Admin-published broadcast item (`api/v1/announcements`), shown in `AnnouncementActivity` |
 | **Bible** | Offline Bible text cached in `Util.bible` from `GET salvationlamb-images/bible.json`, with a per-user bookmark in the `bibleBookmark` DataStore key |
 | **Review state** | `isReviewState` — account under moderation; hides parts of the overflow menu (9 call sites, see `CL-4`) |

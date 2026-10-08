@@ -27,6 +27,7 @@ tabs are rendered by FEED, MEDIA and PROFILE; APPSHELL only hosts them.
 | `SETTINGS.md` | Settings | `activity/SettingsActivity.kt` (197), `res/layout/activity_settings.xml` (7 ids) | READY |
 | `ABOUT.md` | About / my details | `activity/AboutActivity.kt` (152), `activity/ExpandableView.java`, `res/layout/activity_about.xml` (11 ids) | READY |
 | `THEMING.md` | All shared resources | `res/values/`, `res/values-night/`, `res/menu/`, `res/drawable*`, `values-land`, `values-w600dp`, `values-w1240dp` | READY |
+| `NO_PERMISSION.md` | Permission-denied screen — **terminal destination of all 34 gates** | `activity/NoPermissionActivity.kt` (27), `fragments/NoPermissionFragment.kt` (29), `res/layout/activity_no_permission.xml`, `fragment_no_permission.xml` | READY (T-026) |
 
 > **`preview_image.xml` belongs to `MAIN_NAV.md`**, not to FEED's `IMAGE_DETAIL`. It is inflated
 > into a `Dialog` by `MainActivity` for the first-run cover image. Verified and already corrected in
