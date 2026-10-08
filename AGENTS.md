@@ -257,7 +257,9 @@ PM may create agents on demand.
 | G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans | PLATFORM / DATA_MODELS | parse crashes |
 | G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP | PLATFORM / BUILD_CONFIG | security |
 | G9 | No unit tests; only the generated instrumented test exists | PM (future QA team) | regressions |
-| G10 | Repo is not under git — no change history or rollback | PM | safety |
+| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: now a git repo on branch `salvation_lamb_agent_baseline`, forked from remote `master` (`78e9b5c`), remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (not yet pushed) | PM | ~~safety~~ |
+| G11 | **Signing keys are already in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on every branch. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
+| G12 | **Agent docs describe a 2.5-year-old branch.** All 42 docs document `master` (v1.1, `versionCode 6`, 2023-09-16); `salvation_lamb_permissions_final_1` is **123 commits ahead** (v1.2.0, `versionCode 22`, 2026-02-26) with Bible / Announcements / Notifications / FCM, no synthetics, AGP 8.13.2, Kotlin 1.8.21, `compileSdk 35` (T-019) | PM | doc accuracy |
 
 ---
 

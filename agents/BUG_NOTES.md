@@ -220,7 +220,7 @@ Fix these first. Each is a **real, reachable** failure, not a style issue.
 
 | Wave | Scope | Why in this position |
 |---|---|---|
-| **0** | **`git init`** (`G10`) | **No rollback exists today.** Do this before touching any code. |
+| **0** | ~~**`git init`** (`G10`)~~ — **DONE 2026-10-08 (T-018)** | Rollback now exists: branch `salvation_lamb_agent_baseline` off remote `master` `78e9b5c`. |
 | **1** | P0 #1 and #2 — Splash | The app can be **unusable at launch**. Highest user impact, smallest diff. |
 | **2** | **CL-1** token-guard sweep | Mechanical, closes ~30 rows, removes `Bearer null`, and makes every logout branch real. |
 | **3** | P0 #3–#10 | The remaining confirmed crashers. |
@@ -231,8 +231,14 @@ Fix these first. Each is a **real, reachable** failure, not a style issue.
 | **8** | `G1`, `G2`, `G3` build hygiene | `jcenter()`, synthetics, legacy support lib — needed before any Kotlin/AGP upgrade. |
 | **9** | **QA team + `G9`** | No tests exist. Every wave above is a regression risk until this lands. |
 
-> **Standing recommendation:** `G10` (no git) and `G9` (no tests) mean **every** fix above is
-> currently unverifiable and irreversible. PM advises closing both before wave 3.
+> **Standing recommendation:** ~~`G10` (no git)~~ is **closed as of 2026-10-08** — the repo is now
+> versioned on `salvation_lamb_agent_baseline`. `G9` (no tests) still stands, so every fix above
+> remains **unverifiable** (though now reversible). PM advises closing `G9` before wave 3.
+>
+> **Also read `G12` first:** this fix order was derived from remote `master` (v1.1). If the project
+> re-baselines onto `salvation_lamb_permissions_final_1` (v1.2.0, 123 commits ahead), several waves
+> change — synthetics are already gone there (`G2`), `jcenter()` is already replaced (`G1`), and
+> `SplashhScreenActivity` has been replaced by `SplashScreenActivity`.
 
 ---
 
@@ -242,7 +248,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 <!-- AUTO-GENERATED:BEGIN -- do not edit by hand; run agents/tools/sync_bug_notes.py -->
 
-**653 tracked entries** extracted from 42 agent docs, plus 10 PM-level global issues.
+**653 tracked entries** extracted from 42 agent docs, plus 12 PM-level global issues.
 
 | Severity | Count | Priority |
 |---|---|---|
@@ -279,7 +285,9 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans | PLATFORM / DATA_MODELS | parse crashes |
 | G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP | PLATFORM / BUILD_CONFIG | security |
 | G9 | No unit tests; only the generated instrumented test exists | PM (future QA team) | regressions |
-| G10 | Repo is not under git — no change history or rollback | PM | safety |
+| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: now a git repo on branch `salvation_lamb_agent_baseline`, forked from remote `master` (`78e9b5c`), remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (not yet pushed) | PM | ~~safety~~ |
+| G11 | **Signing keys are already in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on every branch. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
+| G12 | **Agent docs describe a 2.5-year-old branch.** All 42 docs document `master` (v1.1, `versionCode 6`, 2023-09-16); `salvation_lamb_permissions_final_1` is **123 commits ahead** (v1.2.0, `versionCode 22`, 2026-02-26) with Bible / Announcements / Notifications / FCM, no synthetics, AGP 8.13.2, Kotlin 1.8.21, `compileSdk 35` (T-019) | PM | doc accuracy |
 
 ---
 
