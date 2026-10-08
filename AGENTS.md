@@ -16,30 +16,45 @@
 | Gradle root project | `Fb Project` |
 | Gradle modules | **single module `:app`** (no multi-module split) |
 | `applicationId` / `namespace` | `com.veha.activity` |
-| Version | `versionCode 6`, `versionName 1.1` |
-| SDK | `compileSdk 33`, `minSdk 23`, `targetSdk 33` |
-| AGP / Kotlin | `7.2.0` / `1.7.10`, JVM target `1.8` |
+| Version | `versionCode 22`, `versionName 1.2.0` |
+| SDK | `compileSdk 35`, `minSdk 24`, `targetSdk 35` |
+| AGP / Kotlin | `8.13.2` / `1.8.21`, JVM target `11`, Gradle wrapper `8.13` |
 | Source root | `app/src/main/java/com/veha/` |
-| Packages | `activity/` (21), `fragments/` (7), `adapter/` (7), `util/` (6) — ~8.1k LOC |
-| Layouts | `app/src/main/res/layout/` (35 XML files) |
-| Launcher | `SplashhScreenActivity` (only `exported="true"` entry point with intent-filter) |
-| Tests | only the stock `ExampleInstrumentedTest.kt` — **effectively zero coverage** |
-| VCS | **no git repository initialised in this folder** |
+| Packages | `activity/` (27), `fragments/` (12), `adapter/` (10), `util/` (6), `service/` (2) — ~12.7k LOC |
+| Layouts | `app/src/main/res/layout/` (55 XML files) |
+| Launcher | `SplashScreenActivity` (425 LOC; only `exported="true"` entry point with intent-filter) |
+| Tests | only stock `ExampleInstrumentedTest.kt` + `ExampleUnitTest.kt` — **effectively zero coverage** |
+| VCS | git ✅ — branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (**not yet pushed**) |
+
+> **Baseline (T-019, 2026-10-08):** the docs now target **`salvation_lamb_permissions_final_1`**
+> (v1.2.0, 2026-02-26), the newest branch on the remote. The previous baseline was `master`
+> (v1.1, `versionCode 6`, 2023-09-16), which is **123 commits behind**. A git tag
+> `baseline-on-master-backup` preserves the old doc state. **42 of the 42 agent docs were written
+> against `master` and are being re-audited** — see the staleness column in §3.
 
 ### Tech stack actually in use
 
-- **UI:** XML layouts + `kotlinx.android.synthetic` (Kotlin synthetics) in most screens;
-  `viewBinding true` is enabled in `app/build.gradle` but used sparsely. Material Components,
-  ConstraintLayout, Navigation (fragment/ui ktx).
-- **Network:** Retrofit 2.9 + Gson converter + OkHttp. Every endpoint returns a raw
-  `com.google.gson.JsonObject` which is manually mapped to data classes with `Gson().fromJson(...)`.
-- **Persistence:** `androidx.datastore:datastore-preferences:1.0.0-alpha01` (old alpha API:
-  `createDataStore`, `preferencesKey`) wrapped by `com.veha.util.UserPreferences`.
-- **Global state:** `com.veha.util.Util` static fields (`userId`, `user`, `isWarrior`, `isFirst`,
-  `isNight`, `fontSize`, `listview`, `player`).
+- **UI:** XML layouts + **`findViewById`** (45 files). **Kotlin synthetics are gone** — the
+  `kotlin-android-extensions` plugin was removed on this branch (closes `G2`). `viewBinding true`
+  is enabled but **still unused** (0 files). Material Components, ConstraintLayout, Navigation,
+  Shimmer.
+- **Network:** Retrofit 2.9 + Gson converter + OkHttp, **44 endpoints** (was 32). Every endpoint
+  still returns a raw `com.google.gson.JsonObject` mapped by hand with `Gson().fromJson(...)`.
+- **Push:** **Firebase Cloud Messaging** (`firebase-bom:32.8.0`, `firebase-messaging:23.4.1`,
+  `google-services:4.4.1`) via `service/NotificationService.java` + `NotificationHelper.java`.
+  `app/google-services.json` is committed.
+- **Persistence:** `androidx.datastore:datastore-preferences:1.0.0-alpha01` (still the old alpha
+  API) wrapped by `com.veha.util.UserPreferences` — now **7 keys** (added `fcmToken`,
+  `bibleBookmark`).
+- **Global state:** `com.veha.util.Util` statics (`userId`, `user`, `isWarrior`, `isFirst`,
+  `isNight`, `fontSize`, `listview`, `player`) **plus new**: `permissionMap`, `bible`,
+  `bookmarkedBible`, `CHANNEL_ID/NAME/DESC`.
+- **Permissions model (new):** `Util.permissionMap` + `Util.hasPermission(type, permission)`,
+  seeded from `GET /api/v1/permission/users/{userId}` at splash; **34 call sites**. Gates route to
+  `NoPermissionActivity`. ⚠️ `hasPermission` **returns `true` when the map is empty** (fail-open).
 - **Async:** Retrofit `enqueue` callbacks + `lifecycleScope.launch` for DataStore writes.
-- **Media/3rd-party:** Picasso, android-pdf-viewer, android-image-cropper, SpotsDialog,
-  androidyoutubeplayer, android-gif-drawable, richeditor-android, cronet-embedded.
+- **Media/3rd-party:** Picasso, android-pdf-viewer, **canhub cropper** (replaced edmodo),
+  SpotsDialog, androidyoutubeplayer, android-gif-drawable, richeditor-android, cronet-embedded.
 - **No DI framework, no ViewModel/Repository layer, no Compose, no Flow-based UI state.**
 
 ### Base URL warning (known inconsistency)
@@ -92,75 +107,82 @@ agents/<TEAM>/<MODULE>.md         <- module (screen) agent
 
 Legend for **Status**: `READY` = agent doc written & verified · `PLANNED` = not written yet.
 
-### AUTH — `agents/AUTH/AUTH_LEAD.md` · Status: **COMPLETE (7/7 READY)**
+Legend for **v1.2 audit** (added T-019 — how well the doc matches the new baseline):
+`OK` = still accurate · `DRIFT` = screen changed, doc needs a refresh ·
+`REWRITE` = subject file renamed/replaced · `NEW` = screen exists in code with **no agent yet**.
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `LOGIN.md` | `LoginActivity` + `activity_login.xml` | READY |
-| `REGISTER.md` | `RegisterActivity` + `activity_register.xml` | READY |
-| `FORGOT_PASSWORD.md` | `ForgotPasswordActivity` (mode `forgot`) | READY |
-| `OTP_VERIFY.md` | `ForgotPasswordActivity` (mode `verify`) | READY |
-| `CHANGE_PASSWORD.md` | `ChangePasswordActivity` (signed-in, no `email` extra) | READY |
-| `RESET_PASSWORD.md` | `ChangePasswordActivity` (after OTP, `email` + `otp` extras) | READY |
-| `SPLASH.md` | `SplashhScreenActivity` (session bootstrap) | READY |
+### AUTH — `agents/AUTH/AUTH_LEAD.md` · Status: **7/7 READY · audit pending**
 
-### FEED — `agents/FEED/FEED_LEAD.md` · Status: **COMPLETE (6/6 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `LOGIN.md` | `LoginActivity` + `activity_login.xml` | READY | **DRIFT** — now registers an FCM token (`FirebaseMessaging`), posts to `PUT api/v1/users/token/update` |
+| `REGISTER.md` | `RegisterActivity` + `activity_register.xml` | READY | DRIFT |
+| `FORGOT_PASSWORD.md` | `ForgotPasswordActivity` (mode `forgot`) | READY | DRIFT |
+| `OTP_VERIFY.md` | `ForgotPasswordActivity` (mode `verify`) | READY | DRIFT |
+| `CHANGE_PASSWORD.md` | `ChangePasswordActivity` (signed-in, no `email` extra) | READY | DRIFT |
+| `RESET_PASSWORD.md` | `ChangePasswordActivity` (after OTP, `email` + `otp` extras) | READY | DRIFT |
+| `SPLASH.md` | ~~`SplashhScreenActivity`~~ → **`SplashScreenActivity`** | READY | **REWRITE** — renamed, 133 → **425 LOC**; also loads the permission map, the Bible JSON, and handles FCM deep links |
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `HOME_FEED.md` | `HomeFragment` + `HomeAdapter` + `child_post.xml` | READY |
-| `ADD_POST.md` | `AddPostActivity` | READY |
-| `VIEW_POST.md` | `ViewPostActivity` — **dead code, crashes on launch** | READY |
-| `VIEW_LIKES.md` | `ViewLikesActivity` + `ViewLikesAdapter` | READY |
-| `FAVORITES.md` | `FavoritesActivity` (hosts `HomeFragment("fav")`) | READY |
-| `IMAGE_DETAIL.md` | `ImageDetailActivity` + `activity_image_detail.xml` | READY |
+### FEED — `agents/FEED/FEED_LEAD.md` · Status: **6/6 READY · audit pending**
 
-### PROFILE — `agents/PROFILE/PROFILE_LEAD.md` · Status: **COMPLETE (4/4 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `HOME_FEED.md` | `HomeFragment` + `HomeAdapter` + `child_post.xml` | READY | DRIFT — permission gates added |
+| `ADD_POST.md` | `AddPostActivity` | READY | DRIFT |
+| `VIEW_POST.md` | `ViewPostActivity` | READY | **REWRITE** — P0 **fixed** (`findViewById` moved into `onCreate`), and **no longer dead code**: 15 call sites incl. FCM deep links |
+| `VIEW_LIKES.md` | `ViewLikesActivity` + `ViewLikesAdapter` | READY | DRIFT |
+| `FAVORITES.md` | `FavoritesActivity` (hosts `HomeFragment("fav")`) | READY | DRIFT |
+| `IMAGE_DETAIL.md` | `ImageDetailActivity` + `activity_image_detail.xml` | READY | DRIFT |
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `MY_PROFILE.md` | `ProfileFragment` (serves both profile screens via `who`) | READY |
-| `EDIT_PROFILE.md` | `EditProfileActivity` (738 LOC — largest file) | READY |
-| `VIEW_PROFILE.md` | `ViewProfileActivity` (hosts `ProfileFragment("other")`) | READY |
-| `FOLLOWERS.md` | `FollowerActivity` + `FollowAdapter` | READY |
+### PROFILE — `agents/PROFILE/PROFILE_LEAD.md` · Status: **4/4 READY · audit pending**
 
-### MEDIA — `agents/MEDIA/MEDIA_LEAD.md` · Status: **COMPLETE (6/6 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `MY_PROFILE.md` | `ProfileFragment` (serves both profile screens via `who`) | READY | DRIFT |
+| `EDIT_PROFILE.md` | `EditProfileActivity` | READY | DRIFT — cropper swapped edmodo → **canhub** |
+| `VIEW_PROFILE.md` | `ViewProfileActivity` | READY | DRIFT — `userId!!` P0 still present |
+| `FOLLOWERS.md` | `FollowerActivity` + `FollowAdapter` | READY | **OK** — init-order P0 **fixed** (views bound before loading) |
+| — | `ApproveRequestActivity` (383 LOC) — warrior-request approval | **NEW** | **no agent** |
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `FILES_BROWSER.md` | `FilesFragment` (Files tab) | READY |
-| `FILE_LIST.md` | `FileListActivity` + `FileAdapter` + `child_folders.xml` | READY |
-| `PDF_VIEWER.md` | `PdfActivity2` (Java, `Activity`) | READY |
-| `ADMIN_AUDIO.md` | `AdminAudioFragment` | READY |
-| `ADMIN_VIDEO.md` | `AdminVideoFragment` | READY |
-| `WEBVIEW.md` | `WebViewActivity` (terms / privacy pages) | READY |
+### MEDIA — `agents/MEDIA/MEDIA_LEAD.md` · Status: **6/6 READY · audit pending**
 
-### SEARCH — `agents/SEARCH/SEARCH_LEAD.md` · Status: **COMPLETE (3/3 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `FILES_BROWSER.md` | `FilesFragment` (Files tab) | READY | DRIFT |
+| `FILE_LIST.md` | `FileListActivity` + `FileAdapter` | READY | **REWRITE** — `FileAdapter.java` deleted, replaced by `FileAdapter.kt` |
+| `PDF_VIEWER.md` | `PdfActivity2` (Java, `Activity`) | READY | **REWRITE** — rewritten to 145 LOC; both NPE P0s **gone** (no raw `InputStream`), now uses the library loader + a reflection workaround |
+| `ADMIN_AUDIO.md` | `AdminAudioFragment` | READY | DRIFT |
+| `ADMIN_VIDEO.md` | `AdminVideoFragment` | READY | DRIFT |
+| `WEBVIEW.md` | `WebViewActivity` (terms / privacy pages) | READY | DRIFT |
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `SEARCH_ENTRY.md` | `SearchActivity` + `SearchAdapter` | READY |
-| `SEARCH_POSTS.md` | `SearchPostFragment` | READY |
-| `SEARCH_PROFILES.md` | `SearchProfileFragment` + `UsersAdapter` | READY |
+### SEARCH — `agents/SEARCH/SEARCH_LEAD.md` · Status: **3/3 READY · audit pending**
 
-### APPSHELL — `agents/APPSHELL/APPSHELL_LEAD.md` · Status: **COMPLETE (4/4 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `SEARCH_ENTRY.md` | `SearchActivity` + `SearchAdapter` | READY | DRIFT — `else -> null as Fragment` P0 **still present** (`SearchAdapter.kt:43`) |
+| `SEARCH_POSTS.md` | `SearchPostFragment` | READY | **OK** — ctor-arg P0 **fixed**; now `companion object` + `Bundle` |
+| `SEARCH_PROFILES.md` | `SearchProfileFragment` + `UsersAdapter` | READY | **OK** — same fix |
 
-| Module agent | Screen / unit | Status |
-|---|---|---|
-| `MAIN_NAV.md` | `MainActivity` + `TabAdapter` (bottom nav, night mode, 427 LOC) | READY |
-| `SETTINGS.md` | `SettingsActivity` (font, theme, account deletion) | READY |
-| `ABOUT.md` | `AboutActivity` + `ExpandableView.java` (used by FEED) | READY |
-| `THEMING.md` | `values/`, `values-night/`, `menu/`, drawables, styles, colors | READY |
+### APPSHELL — `agents/APPSHELL/APPSHELL_LEAD.md` · Status: **4/4 READY · audit pending**
 
-### PLATFORM — `agents/PLATFORM/PLATFORM_LEAD.md` · Status: **COMPLETE (5/5 READY)**
+| Module agent | Screen / unit | Status | v1.2 audit |
+|---|---|---|---|
+| `MAIN_NAV.md` | `MainActivity` + `TabAdapter` | READY | **REWRITE** — 427 → **782 LOC**; `exitProcess(-1)` P0 **still present** (line 778), `else -> b as Fragment` **still present** (`TabAdapter.kt:78`) |
+| `SETTINGS.md` | `SettingsActivity` (font, theme, account deletion) | READY | DRIFT |
+| `ABOUT.md` | `AboutActivity` + `ExpandableView.java` (used by FEED) | READY | DRIFT |
+| `THEMING.md` | `values/`, `values-night/`, `menu/`, drawables, styles, colors | READY | DRIFT — 20 new layouts, palette changed |
+| — | `NoPermissionActivity` (26) + `NoPermissionFragment` (28) | **NEW** | **no agent** |
 
-| Module agent | Owned files | Status |
-|---|---|---|
-| `NETWORK.md` | `util/RetrofitAPI.kt`, `util/APIUtil.kt`, `Util.getRetrofit()` | READY |
-| `DATA_MODELS.md` | `util/DataModels.kt` | READY |
-| `STORAGE.md` | `util/UserPreferences.kt` (DataStore `SalvationLamb`) | READY |
-| `COMMONS.md` | `util/Commons.kt`, `util/Util.java` (validators, date, globals) | READY |
-| `BUILD_CONFIG.md` | `build.gradle` (root + app), `settings.gradle`, `AndroidManifest.xml`, permissions, proguard | READY |
+### PLATFORM — `agents/PLATFORM/PLATFORM_LEAD.md` · Status: **5/5 READY · audit pending**
+
+| Module agent | Owned files | Status | v1.2 audit |
+|---|---|---|---|
+| `NETWORK.md` | `util/RetrofitAPI.kt`, `util/APIUtil.kt`, `Util.getRetrofit()` | READY | **DRIFT** — 32 → **44 endpoints**; new `getRetrofit(String url)` overload; `APIUtil.kt` is the **only file untouched by all 123 commits** (still dead) |
+| `DATA_MODELS.md` | `util/DataModels.kt` | READY | DRIFT — notification / announcement / bible / permission models added |
+| `STORAGE.md` | `util/UserPreferences.kt` (DataStore `SalvationLamb`) | READY | DRIFT — 5 → **7 keys** (`fcmToken`, `bibleBookmark`) |
+| `COMMONS.md` | `util/Commons.kt`, `util/Util.java` (validators, date, globals) | READY | **DRIFT** — `Util.java` gained `permissionMap`, `hasPermission()`, `bible`, `bookmarkedBible`, FCM channel constants |
+| `BUILD_CONFIG.md` | `build.gradle` (root + app), `settings.gradle`, `AndroidManifest.xml`, permissions, proguard | READY | **REWRITE** — AGP 7.2→**8.13.2**, Kotlin 1.7.10→**1.8.21**, JVM 1.8→**11**, SDK 33→**35**, `jcenter()`→**jitpack** (`G1` closed), synthetics plugin **removed** (`G2` closed), `google-services` added |
+| — | `service/NotificationService.java` + `NotificationHelper.java` (FCM) | **NEW** | **no agent** |
 
 > **Rule:** adapters do **not** get their own agent — they belong to the screen that owns them.
 
@@ -168,6 +190,22 @@ Legend for **Status**: `READY` = agent doc written & verified · `PLANNED` = not
 > **two agents**, one per mode, each carrying a shared-file warning naming the other. Current pairs:
 > `ForgotPasswordActivity` -> `FORGOT_PASSWORD.md` + `OTP_VERIFY.md` (extra `page`);
 > `ChangePasswordActivity` -> `CHANGE_PASSWORD.md` + `RESET_PASSWORD.md` (extra `email`).
+
+### Unowned code on the new baseline (proposed — T-019)
+
+18 source files added by the 123 commits have **no agent**. PM proposes three new teams plus three
+module agents inside existing teams:
+
+| Proposed team / module | Files | LOC |
+|---|---|---|
+| **BIBLE** (new team) | `BibleActivity.kt` (448), `BiblePostActivity.kt` (173), `BibleFragment.kt` (62); `Util.bible` JSON cache; `bibleBookmark` DataStore key | ~683 |
+| **NOTIFICATIONS** (new team) | `NotificationViewActivity.kt` (79), `AdminNotificationFragment.kt` (175), `UserNotificationFragment.kt` (170), `WarriorNotificationFragment.kt` (174), `NotificationListAdapter.kt` (199), `NotificationTabAdapter.kt` (43), `service/NotificationService.java` (47), `service/NotificationHelper.java` (82) | ~969 |
+| **ANNOUNCEMENTS** (new team) | `AnnouncementActivity.kt` (157), `AnnouncementAdapter.kt` (89) | ~246 |
+| `PERMISSIONS.md` -> **PLATFORM** | `Util.permissionMap`, `Util.hasPermission()`, `GET /api/v1/permission/users/{userId}`, 34 call sites | cross-cutting |
+| `NO_PERMISSION.md` -> **APPSHELL** | `NoPermissionActivity.kt` (26), `NoPermissionFragment.kt` (28) | ~54 |
+| `APPROVE_REQUEST.md` -> **PROFILE** | `ApproveRequestActivity.kt` (383) | ~383 |
+
+**Not yet created** — awaiting customer go-ahead (`agents/TASKS.md` T-019).
 
 ---
 
@@ -246,20 +284,25 @@ PM may create agents on demand.
 > `python3 agents/tools/sync_bug_notes.py` after editing any agent's known-issues table.
 > The per-agent tables remain the **source of truth**; `BUG_NOTES.md` is the searchable view.
 
+> **Re-verified against the v1.2.0 baseline on 2026-10-08 (T-019).** `G1`, `G2` and `G10` are now
+> closed by the newer branch; `G3`–`G9` were each re-checked in the code and **still reproduce**.
+
 | # | Issue | Owner | Risk |
 |---|---|---|---|
-| G1 | `jcenter()` still in `settings.gradle` (shut down, read-only) | PLATFORM / BUILD_CONFIG | build fragility |
-| G2 | `kotlin-android-extensions` (synthetics) is deprecated and removed in Kotlin 1.8+ | PLATFORM / BUILD_CONFIG | blocks Kotlin upgrade |
-| G3 | Legacy `com.android.support:appcompat-v7:28.0.0` mixed with AndroidX | PLATFORM / BUILD_CONFIG | duplicate-class risk |
-| G4 | Two Retrofit builders with different base URLs (`Util` vs `APIUtil`) | PLATFORM / NETWORK | wrong-host bugs |
-| G5 | `Thread.sleep(2000)` on the main thread in `LoginActivity` and `SplashhScreenActivity` | AUTH | ANR |
-| G6 | Network calls silently no-op when offline (no user feedback) in most screens | all teams | UX |
-| G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans | PLATFORM / DATA_MODELS | parse crashes |
-| G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP | PLATFORM / BUILD_CONFIG | security |
-| G9 | No unit tests; only the generated instrumented test exists | PM (future QA team) | regressions |
-| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: now a git repo on branch `salvation_lamb_agent_baseline`, forked from remote `master` (`78e9b5c`), remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (not yet pushed) | PM | ~~safety~~ |
-| G11 | **Signing keys are already in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on every branch. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
-| G12 | **Agent docs describe a 2.5-year-old branch.** All 42 docs document `master` (v1.1, `versionCode 6`, 2023-09-16); `salvation_lamb_permissions_final_1` is **123 commits ahead** (v1.2.0, `versionCode 22`, 2026-02-26) with Bible / Announcements / Notifications / FCM, no synthetics, AGP 8.13.2, Kotlin 1.8.21, `compileSdk 35` (T-019) | PM | doc accuracy |
+| G1 | ~~`jcenter()` still in `settings.gradle`~~ — **CLOSED on v1.2.0**: replaced with `maven { url 'https://jitpack.io' }` | PLATFORM / BUILD_CONFIG | ~~build fragility~~ |
+| G2 | ~~`kotlin-android-extensions` (synthetics) deprecated~~ — **CLOSED on v1.2.0**: plugin removed, **0 files** use synthetics (now `findViewById` in 45 files) | PLATFORM / BUILD_CONFIG | ~~blocks Kotlin upgrade~~ |
+| G3 | Legacy `com.android.support:appcompat-v7:28.0.0` mixed with AndroidX — **still present** (2 declarations) | PLATFORM / BUILD_CONFIG | duplicate-class risk |
+| G4 | Two Retrofit builders with different base URLs (`Util` vs `APIUtil`) — **still present**; `APIUtil.kt` is the only file the 123 commits never touched | PLATFORM / NETWORK | wrong-host bugs |
+| G5 | `Thread.sleep(2000)` on the main thread — **still present** in `LoginActivity` and the renamed `SplashScreenActivity` (line 159) | AUTH | ANR |
+| G6 | Network calls silently no-op when offline (no user feedback) in most screens — **still present** | all teams | UX |
+| G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans — **still present** across all 44 endpoints | PLATFORM / DATA_MODELS | parse crashes |
+| G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP — **still present** | PLATFORM / BUILD_CONFIG | security |
+| G9 | No unit tests; only the generated `ExampleUnitTest` + `ExampleInstrumentedTest` | PM (future QA team) | regressions |
+| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); tag `baseline-on-master-backup` preserves the old `master`-based docs | PM | ~~safety~~ |
+| G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
+| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; per-doc staleness is tracked in the "v1.2 audit" column in §3 — 3 `OK`, ~30 `DRIFT`, 6 `REWRITE`, 18 files with **no agent** (T-019) | PM | doc accuracy |
+| G13 | **`Util.hasPermission()` fails open** — returns `true` when `permissionMap` is null/empty, so a failed `GET /api/v1/permission/users/{userId}` at splash silently grants **every** permission across 34 call sites | PLATFORM / COMMONS | **security (high)** |
+| G14 | **`app/google-services.json` is committed** — contains the Firebase API key and project config | PLATFORM / BUILD_CONFIG | secret exposure (low-ish; FCM keys are client-side but should be reviewed) |
 
 ---
 
@@ -272,3 +315,7 @@ PM may create agents on demand.
 | **Verified** | `isVerified == "true"` -> email OTP confirmed; unverified users are sent to the verify screen |
 | **Admin audio / video** | Curated media feeds published by admins (`api/v1/post/admin/audio|video`) |
 | **Favorites** | Posts bookmarked by the user (`api/v1/favorites`) |
+| **Permission map** | `Util.permissionMap` — `{type -> "Read,Edit,Delete,Create"}`, fetched at splash from `GET /api/v1/permission/users/{userId}`. Checked via `Util.hasPermission(type, permission)`; a denial routes to `NoPermissionActivity`. **Fails open when empty** (`G13`) |
+| **Announcement** | Admin-published broadcast item (`api/v1/announcements`), shown in `AnnouncementActivity` |
+| **Bible** | Offline Bible text cached in `Util.bible` from `GET salvationlamb-images/bible.json`, with a per-user bookmark in the `bibleBookmark` DataStore key |
+| **Review state** | `isReviewState` — account under moderation; hides parts of the overflow menu (9 call sites, see `CL-4`) |

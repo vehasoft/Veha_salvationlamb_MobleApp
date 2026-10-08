@@ -10,6 +10,13 @@
 
 ---
 
+> ⚠️ **Baseline moved on 2026-10-08 (T-019).** Every entry in §7 below was extracted from agent docs
+> written against remote `master` (v1.1). The project now builds from
+> **`salvation_lamb_permissions_final_1` (v1.2.0)**, 123 commits ahead. PM spot-checked the 10 P0s
+> on the new code — see §5, where each is marked **STILL PRESENT** or **FIXED UPSTREAM**. Treat
+> line numbers and file names in §7 as **`master`-era** until each agent is re-audited; the
+> per-agent staleness grid lives in `AGENTS.md` §3 ("v1.2 audit" column).
+
 ## 1. How this file works
 
 | Part | Who writes it | Rule |
@@ -111,7 +118,7 @@ These are **not** single-screen defects. Each one is the *same* defect replicate
 files, and each needs a **PM-coordinated** fix rather than a module-local one. Fixing the cluster
 closes many register rows at once.
 
-### CL-1 · The always-true token guard — **~30 call sites**
+### CL-1 · The always-true token guard — **29 call sites (verified on v1.2.0)**
 
 ```kotlin
 if (!TextUtils.isEmpty(it) || !it.equals("null") || !it.isNullOrEmpty())   // always true
@@ -121,6 +128,14 @@ Three `||`-ed negations can never all be false. Consequences:
 
 - the session-lost `else` branch is **dead code** in almost every screen;
 - a missing token is sent as the literal header **`Bearer null`**.
+
+> **v1.2.0 re-count (T-019):** exactly **29 broken `||` guards remain**, against **29 correct `&&`
+> guards** — the codebase is split half-and-half, so the correct form is already established
+> convention. Worst offenders: `HomeFragment.kt` (6), `ProfileFragment.kt` (5),
+> `AdminVideoFragment.kt` (5), `AdminAudioFragment.kt` (5), then 1 each in `Commons.kt`,
+> `WarriorNotificationFragment.kt`, `UserNotificationFragment.kt`, `AdminNotificationFragment.kt`,
+> `ChangePasswordActivity.kt`, `BiblePostActivity.kt`, `AnnouncementActivity.kt`, `AddPostActivity.kt`.
+> Note the **new** Bible/Notification/Announcement screens copied the broken form.
 
 **Correct reference implementations:** `FEED/VIEW_LIKES` and `SEARCH/SEARCH_ENTRY` use `&&`.
 Rolled up as `AUTH A19`, `FEED F-4`, `PROFILE F-6`, `MEDIA M-7`; itemised in nearly every module.
@@ -201,18 +216,27 @@ wildcard-imports **both** synthetic packages → the wrong view can be bound sil
 
 Fix these first. Each is a **real, reachable** failure, not a style issue.
 
-| # | Agent-local id | What happens | Where |
+> **All 10 re-verified in the v1.2.0 code on 2026-10-08 (T-019).** 4 were fixed upstream by the
+> 123 commits, **6 still reproduce**, and one got *worse* (`#4` is no longer dead code).
+
+| # | Agent-local id | What happens | Where | v1.2.0 status |
+|---|---|---|---|---|
+| 1 | `AUTH/SPLASH` (`A26`) | **`onFailure` does nothing.** Launch offline or with the server down and the user is **stuck on the splash logo forever** — the only launcher entry point. | `SplashScreenActivity.kt:354` | 🔴 **STILL PRESENT** — body is still just `Log.e("Splashscreen", "fail")` |
+| 2 | `AUTH/SPLASH` (`A27`) | Splash never clears a proven-invalid session, so the failing round-trip **repeats on every cold start**. | `SplashScreenActivity.kt` | 🔴 **STILL PRESENT** |
+| 3 | `MEDIA/PDF_VIEWER` | **NPE on any non-200 download** (two separate paths). | `PdfActivity2.java` | ✅ **FIXED UPSTREAM** — rewritten to 145 LOC, no raw `InputStream`; uses the library loader + `onError` callback |
+| 4 | `FEED/VIEW_POST` | 14 `findViewById` calls **in the constructor, before `setContentView`** → guaranteed NPE. | `ViewPostActivity.kt` | ✅ **FIXED UPSTREAM** — all binding moved into `onCreate` (line 77+) after `setContentView`. ⚠️ And it is **no longer dead code**: **15 call sites**, including FCM deep links from the splash |
+| 5 | `SEARCH` (`S-2`) | Both result fragments take **constructor arguments** → crash on process-death restore. | `SearchPostFragment.kt`, `SearchProfileFragment.kt` | ✅ **FIXED UPSTREAM** — now `companion object` + `Bundle` arguments |
+| 6 | `PROFILE/VIEW_PROFILE` (`F-15`) | `userId!!` force-unwrap → crash if the extra is missing. | `ViewProfileActivity.kt:20` | 🔴 **STILL PRESENT** |
+| 7 | `PROFILE/FOLLOWERS` (`F-14`) | Loading starts **before** views are bound → `UninitializedPropertyAccessException`. | `FollowerActivity.kt` | ✅ **FIXED UPSTREAM** — `setContentView` (44) → `findViewById` (51-61) → load (137) |
+| 8 | `APPSHELL/MAIN_NAV MN4` (`AS-5`), `SEARCH S-5` | `TabAdapter.getItem` ends `else -> b as Fragment` (`b` is null); `SearchAdapter.getItem` returns `null as Fragment`. **Adding one tab crashes the app.** | `TabAdapter.kt:78`, `SearchAdapter.kt:43` | 🔴 **STILL PRESENT — both** |
+| 9 | `APPSHELL/MAIN_NAV MN2` (`AS-3`) + CL-4 | `Util.user.isReviewState.toBoolean()` unguarded → **NPE after process death** when opening the menu. | 7 activities | 🔴 **STILL PRESENT** — now **9 call sites** (`MainActivity` ×3, `FavoritesActivity`, `FollowerActivity`, `EditProfileActivity`, `ViewLikesActivity`) |
+| 10 | `APPSHELL/MAIN_NAV MN12` (`AS-6`) | `onBackPressed` calls **`exitProcess(-1)`** — kills the process, skipping all lifecycle and persistence. | `MainActivity.kt:778` | 🔴 **STILL PRESENT** |
+
+### New P0 candidate found during the v1.2.0 audit
+
+| # | Id | What happens | Where |
 |---|---|---|---|
-| 1 | `AUTH/SPLASH` (`A26`) | **`SplashhScreenActivity.onFailure` does nothing.** Launch offline or with the server down and the user is **stuck on the splash logo forever** — and it is the only launcher entry point. | `SplashhScreenActivity.kt` |
-| 2 | `AUTH/SPLASH` (`A27`) | Splash never clears a proven-invalid session, so the failing round-trip **repeats on every cold start** — a permanently broken install. | `SplashhScreenActivity.kt` |
-| 3 | `MEDIA/PDF_VIEWER` | **NPE on any non-200 download** (two separate paths). Any missing or renamed PDF crashes the viewer. | `PdfActivity2.java` |
-| 4 | `FEED/VIEW_POST` | `ViewPostActivity` initialises **14 views in its constructor, before `setContentView`** → guaranteed NPE. Harmless today **only because nothing launches it** — dead code that crashes the moment it is wired up. | `ViewPostActivity.kt` |
-| 5 | `SEARCH` (`S-2`) | Both result fragments take **constructor arguments** instead of a `Bundle` → **crash on process-death restore**. | `SearchPostFragment.kt`, `SearchProfileFragment.kt` |
-| 6 | `PROFILE/VIEW_PROFILE` (`F-15`) | `userId!!` force-unwrap → crash if the extra is ever missing. | `ViewProfileActivity.kt` |
-| 7 | `PROFILE/FOLLOWERS` (`F-14`) | Loading starts **before** the views are bound → `UninitializedPropertyAccessException`. | `FollowerActivity.kt` |
-| 8 | `APPSHELL/MAIN_NAV MN4` (`AS-5`), `SEARCH S-5` | `TabAdapter.getItem` ends `else -> b as Fragment` where `b` is `null`; `SearchAdapter.getItem` returns `null as Fragment`. **Adding one tab crashes the app.** | `TabAdapter.kt`, `SearchAdapter.kt` |
-| 9 | `APPSHELL/MAIN_NAV MN2` (`AS-3`) + CL-4 | `Util.user.isReviewState.toBoolean()` unguarded in 6+ menu copies → **NPE after process death** when opening the menu. | 6 activities |
-| 10 | `APPSHELL/MAIN_NAV MN12` (`AS-6`) | `onBackPressed` calls **`exitProcess(-1)`** — kills the process, skipping all lifecycle and persistence. | `MainActivity.kt` |
+| 11 | `G13` | **`Util.hasPermission()` fails open.** `if (permissionMap == null \|\| permissionMap.isEmpty()) return true;` — if the splash permission fetch fails (offline, 500, auth error), the map stays empty and **every one of the 34 permission gates grants access**, including admin-only screens. | `Util.java:207-209` |
 
 ---
 
@@ -220,25 +244,25 @@ Fix these first. Each is a **real, reachable** failure, not a style issue.
 
 | Wave | Scope | Why in this position |
 |---|---|---|
-| **0** | ~~**`git init`** (`G10`)~~ — **DONE 2026-10-08 (T-018)** | Rollback now exists: branch `salvation_lamb_agent_baseline` off remote `master` `78e9b5c`. |
-| **1** | P0 #1 and #2 — Splash | The app can be **unusable at launch**. Highest user impact, smallest diff. |
-| **2** | **CL-1** token-guard sweep | Mechanical, closes ~30 rows, removes `Bearer null`, and makes every logout branch real. |
-| **3** | P0 #3–#10 | The remaining confirmed crashers. |
-| **4** | **CL-7** error/offline feedback policy | Turns "the app is broken" into "the network failed". Cheap, large UX win. |
-| **5** | **CL-4** extract the overflow menu once | Closes `AS-1`, `AS-3`, `F-7`, `F-10` and fixes logout in one place. |
-| **6** | **CL-3** + **CL-6** typed models | Correct roles and counts; unblocks a lot of downstream logic. |
-| **7** | **CL-2** shared `SessionBootstrap` | Removes 9-way drift. |
-| **8** | `G1`, `G2`, `G3` build hygiene | `jcenter()`, synthetics, legacy support lib — needed before any Kotlin/AGP upgrade. |
-| **9** | **QA team + `G9`** | No tests exist. Every wave above is a regression risk until this lands. |
+| **0** | ~~**`git init`** (`G10`)~~ — **DONE 2026-10-08 (T-018/T-019)** | Rollback now exists: branch `salvation_lamb_agent_baseline` off **`salvation_lamb_permissions_final_1`** (`d8b778a`, v1.2.0). |
+| **1** | **P0 #1 and #2 — Splash** (`SplashScreenActivity.kt:354`) | 🔴 confirmed still present on v1.2.0. The app can be **unusable at launch**. Highest user impact, smallest diff. |
+| **2** | **`G13` fail-open permissions** (`Util.java:207`) | 🆕 **promoted to wave 2.** A failed splash fetch silently grants all 34 permission gates — a security hole that did not exist on `master`. |
+| **3** | **CL-1** token-guard sweep — **29 sites** | Mechanical, removes `Bearer null`, makes every logout branch real. The correct `&&` form already exists in 29 other places: copy it. |
+| **4** | **Remaining P0s: #6, #8, #9, #10** | 🔴 the 4 crashers that survived the upgrade (`userId!!`, two `as Fragment` casts, 9× `isReviewState`, `exitProcess`). #3, #4, #5, #7 are ✅ already fixed upstream. |
+| **5** | **CL-7** error/offline feedback policy | Turns "the app is broken" into "the network failed". Cheap, large UX win. |
+| **6** | **CL-4** extract the overflow menu once | Closes `AS-1`, `AS-3`, `F-7`, `F-10` and fixes logout in one place. Now **9** `isReviewState` call sites, not 6. |
+| **7** | **CL-3** + **CL-6** typed models | Correct roles and counts; unblocks a lot of downstream logic. |
+| **8** | **CL-2** shared `SessionBootstrap` | Removes 9-way drift. |
+| **9** | ~~`G1`, `G2`~~ **closed upstream** · `G3` only | Only the legacy `com.android.support` mix remains; `jcenter()` and synthetics were fixed by the v1.2 branch. |
+| **10** | **QA team + `G9`** | No tests exist. Every wave above is a regression risk until this lands. |
 
-> **Standing recommendation:** ~~`G10` (no git)~~ is **closed as of 2026-10-08** — the repo is now
-> versioned on `salvation_lamb_agent_baseline`. `G9` (no tests) still stands, so every fix above
-> remains **unverifiable** (though now reversible). PM advises closing `G9` before wave 3.
+> **Standing recommendation:** ~~`G10` (no git)~~ **closed 2026-10-08**. `G9` (no tests) still
+> stands, so every fix above remains **unverifiable** (though now reversible). PM advises closing
+> `G9` before wave 4.
 >
-> **Also read `G12` first:** this fix order was derived from remote `master` (v1.1). If the project
-> re-baselines onto `salvation_lamb_permissions_final_1` (v1.2.0, 123 commits ahead), several waves
-> change — synthetics are already gone there (`G2`), `jcenter()` is already replaced (`G1`), and
-> `SplashhScreenActivity` has been replaced by `SplashScreenActivity`.
+> **Why the order changed (T-019):** re-baselining onto v1.2.0 closed `G1`, `G2` and 4 of the 10
+> P0s for free, but surfaced `G13` (fail-open permissions) and `G11` (keys in history). The
+> remaining work is roughly **40% smaller** than the `master`-era plan.
 
 ---
 
@@ -248,7 +272,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 <!-- AUTO-GENERATED:BEGIN -- do not edit by hand; run agents/tools/sync_bug_notes.py -->
 
-**653 tracked entries** extracted from 42 agent docs, plus 12 PM-level global issues.
+**653 tracked entries** extracted from 42 agent docs, plus 14 PM-level global issues.
 
 | Severity | Count | Priority |
 |---|---|---|
@@ -276,18 +300,20 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | # | Issue | Owner | Risk |
 |---|---|---|---|
-| G1 | `jcenter()` still in `settings.gradle` (shut down, read-only) | PLATFORM / BUILD_CONFIG | build fragility |
-| G2 | `kotlin-android-extensions` (synthetics) is deprecated and removed in Kotlin 1.8+ | PLATFORM / BUILD_CONFIG | blocks Kotlin upgrade |
-| G3 | Legacy `com.android.support:appcompat-v7:28.0.0` mixed with AndroidX | PLATFORM / BUILD_CONFIG | duplicate-class risk |
-| G4 | Two Retrofit builders with different base URLs (`Util` vs `APIUtil`) | PLATFORM / NETWORK | wrong-host bugs |
-| G5 | `Thread.sleep(2000)` on the main thread in `LoginActivity` and `SplashhScreenActivity` | AUTH | ANR |
-| G6 | Network calls silently no-op when offline (no user feedback) in most screens | all teams | UX |
-| G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans | PLATFORM / DATA_MODELS | parse crashes |
-| G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP | PLATFORM / BUILD_CONFIG | security |
-| G9 | No unit tests; only the generated instrumented test exists | PM (future QA team) | regressions |
-| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: now a git repo on branch `salvation_lamb_agent_baseline`, forked from remote `master` (`78e9b5c`), remote `origin` = `github.com/vehasoft/Veha_salvationlamb_MobleApp` (not yet pushed) | PM | ~~safety~~ |
-| G11 | **Signing keys are already in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on every branch. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
-| G12 | **Agent docs describe a 2.5-year-old branch.** All 42 docs document `master` (v1.1, `versionCode 6`, 2023-09-16); `salvation_lamb_permissions_final_1` is **123 commits ahead** (v1.2.0, `versionCode 22`, 2026-02-26) with Bible / Announcements / Notifications / FCM, no synthetics, AGP 8.13.2, Kotlin 1.8.21, `compileSdk 35` (T-019) | PM | doc accuracy |
+| G1 | ~~`jcenter()` still in `settings.gradle`~~ — **CLOSED on v1.2.0**: replaced with `maven { url 'https://jitpack.io' }` | PLATFORM / BUILD_CONFIG | ~~build fragility~~ |
+| G2 | ~~`kotlin-android-extensions` (synthetics) deprecated~~ — **CLOSED on v1.2.0**: plugin removed, **0 files** use synthetics (now `findViewById` in 45 files) | PLATFORM / BUILD_CONFIG | ~~blocks Kotlin upgrade~~ |
+| G3 | Legacy `com.android.support:appcompat-v7:28.0.0` mixed with AndroidX — **still present** (2 declarations) | PLATFORM / BUILD_CONFIG | duplicate-class risk |
+| G4 | Two Retrofit builders with different base URLs (`Util` vs `APIUtil`) — **still present**; `APIUtil.kt` is the only file the 123 commits never touched | PLATFORM / NETWORK | wrong-host bugs |
+| G5 | `Thread.sleep(2000)` on the main thread — **still present** in `LoginActivity` and the renamed `SplashScreenActivity` (line 159) | AUTH | ANR |
+| G6 | Network calls silently no-op when offline (no user feedback) in most screens — **still present** | all teams | UX |
+| G7 | All API responses are untyped `JsonObject`; model fields are `String` even for booleans — **still present** across all 44 endpoints | PLATFORM / DATA_MODELS | parse crashes |
+| G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP — **still present** | PLATFORM / BUILD_CONFIG | security |
+| G9 | No unit tests; only the generated `ExampleUnitTest` + `ExampleInstrumentedTest` | PM (future QA team) | regressions |
+| G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); tag `baseline-on-master-backup` preserves the old `master`-based docs | PM | ~~safety~~ |
+| G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
+| G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; per-doc staleness is tracked in the "v1.2 audit" column in §3 — 3 `OK`, ~30 `DRIFT`, 6 `REWRITE`, 18 files with **no agent** (T-019) | PM | doc accuracy |
+| G13 | **`Util.hasPermission()` fails open** — returns `true` when `permissionMap` is null/empty, so a failed `GET /api/v1/permission/users/{userId}` at splash silently grants **every** permission across 34 call sites | PLATFORM / COMMONS | **security (high)** |
+| G14 | **`app/google-services.json` is committed** — contains the Firebase API key and project config | PLATFORM / BUILD_CONFIG | secret exposure (low-ish; FCM keys are client-side but should be reviewed) |
 
 ---
 
@@ -1178,6 +1204,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Change | Detail |
 |---|---|
+| Re-baselined (T-019, 2026-10-08) | Baseline moved from remote `master` (v1.1) to **`salvation_lamb_permissions_final_1`** (v1.2.0, 123 commits ahead). PM re-verified the **10 P0s** in the new code: **4 fixed upstream** (PDF NPEs, `ViewPostActivity` ctor binding, Search fragment ctor args, `FollowerActivity` init order), **6 still reproduce**. Re-counted **CL-1** (29 broken `||` vs 29 correct `&&`) and **CL-4** (6 → 9 `isReviewState` sites). Added **`G13`** (fail-open `Util.hasPermission`) as a new P0 candidate and **`G14`** (committed `google-services.json`). `G1`/`G2` closed upstream. Fix order rewritten to 10 waves. §7 still holds `master`-era line numbers until each agent is re-audited. |
 | Created (T-017) | Consolidated register opened. Hand-written half: id scheme + prefix-collision table, priority mapping, status tracking, closing procedure, **10 cross-cutting clusters (CL-1 … CL-10)**, **10 P0 crashers**, and a 10-wave fix order. Generated half produced by the new `agents/tools/sync_bug_notes.py` from all 42 agent docs + `AGENTS.md` §7. |
 
 
