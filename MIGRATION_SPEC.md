@@ -176,7 +176,8 @@ Harmless today because the base URL has no path, but do not copy the inconsisten
 | GET | `api/v1/follows/{userId}` | `results` — **following** |
 | GET | `api/v1/search?query=` | `results` → `{users, posts}` |
 | GET | `api/v1/review/{userId}` | `results` → `{user, updateRequest}` |
-| POST | `api/v1/review/{status}/{userId}` | `result` — `status` = `approve`\|`reject`, **no body** |
+| POST | `api/v1/review/approve/{userId}` | `result` — **no body** |
+| POST | `api/v1/review/reject/{userId}` | `result` — **no body** |
 
 > ⚠️ `follows/user/{id}` and `follows/{id}` differ by one path segment and mean opposite things.
 
@@ -369,8 +370,9 @@ Worth answering before phase 0.
 
 1. **`isWarrior` semantics** — which of the two contradictory parsings (§2.3) does the backend
    intend? What values does it actually send?
-2. **Server-side authorisation** — is `POST api/v1/review/{status}/{userId}` authorised on the
-   server, or does it trust the client? The Android client has **no gate** on that screen (`AR1`).
+2. **Server-side authorisation** — are `POST api/v1/review/approve/{userId}` and
+   `.../reject/{userId}` authorised on the server, or do they trust the client? The Android
+   client has **no gate** on that screen (`AR1`).
 3. **Bible cache invalidation** — should a corrected verse reach existing installs? Today it
    never does.
 4. **Announcement write operations** — the permission model defines `ANNOUNCEMENT`/`Create`,

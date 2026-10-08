@@ -124,7 +124,7 @@ shadows both parameters with local `var`s of the same name — legal but confusi
 | Item | Value |
 |---|---|
 | Retrofit method | `postUpdateRequest(head, userId, status)` |
-| HTTP | **`POST api/v1/review/{status}/{userId}`** where `status` ∈ `"approve"` \| `"reject"` |
+| HTTP | **`POST api/v1/review/approve/{userId}`** or **`POST api/v1/review/reject/{userId}`** — the Retrofit declaration is templated as `api/v1/review/{status}/{userId}`, and `status` is passed as the string literal `"approve"` (line 130) or `"reject"` (line 133). Those are the only two values ever used |
 | Headers | `Authorization: Bearer <token>` |
 | Request body | **none** — the decision is carried entirely in the path |
 | Success (200) | `startActivity(MainActivity)` — **no success toast**, so the admin gets no confirmation that the decision registered (`AR7`) |
