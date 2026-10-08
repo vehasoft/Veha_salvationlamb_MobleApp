@@ -13,7 +13,8 @@ This module controls **whether the app compiles, installs and launches at all**.
 bump, a removed permission or a deleted manifest entry breaks the entire product, not one screen.
 
 It also governs **secrets**: `app/Key/key.jks` and `app/Key/private_key.pepk` are committed in the
-tree. **Never open, print, move or modify them.**
+tree **and in remote git history**. **Never open, print, move or modify them.** The exposure is an
+**accepted risk** as of T-020 (2026-10-08) — see §4.
 
 Every change needs PM sign-off.
 
@@ -142,8 +143,14 @@ applied (B-8).
 | `app/Key/private_key.pepk` | Play App Signing export key, **committed** |
 
 No `signingConfigs` block exists in `app/build.gradle`, so these are used manually (or by an
-external process). **Never open, print, move, rename or modify them.** Removing them from the tree
-is a PM decision, not an agent action (B-9).
+external process). **Never open, print, move, rename or modify them.**
+
+> **T-020 (2026-10-08) — customer decision: the key exposure is an ACCEPTED RISK.** Both files
+> have been in remote git history since `3d34164` (2023-08-29) and sit on every branch. There will
+> be **no history rewrite and no key rotation**. Consequence for the React Native migration: the
+> new app must ship under the same `applicationId` (`com.veha.activity`) to reach existing users
+> as an update, so it must be signed with **this same keystore**. Treat it as the permanent
+> signing identity, keep it out of any new public surface, and do not purge it (`B-9`).
 
 ---
 
@@ -188,7 +195,7 @@ Everything. Specifically:
 | B-11 | **`kotlin-android-extensions` is deprecated** and removed in Kotlin 1.8+; the whole UI layer depends on synthetics (G2) | **High** | blocks any Kotlin upgrade; a ViewBinding migration is a cross-team project |
 | B-12 | **`com.android.support:appcompat-v7:28.0.0` alongside AndroidX**, papered over by Jetifier (G3) | **High** | remove the two `com.android.support` lines and verify |
 | B-6 | `usesCleartextTraffic="true"` globally, plus a `network_security_config` naming a **stale** host (G8) | **High** (security) | set `false` and whitelist only the real host |
-| B-9 | Signing keystore and Play export key **committed** to the tree | **High** (security) | rotate keys and move them out of the repo |
+| B-9 | ~~Signing keystore and Play export key **committed** to the tree~~ — **CLOSED as WON'T FIX 2026-10-08 (T-020)**: customer accepted the risk; no history rewrite, no rotation. ⚠️ Treat `app/Key/key.jks` as the **permanent** signing identity — the React Native app must reuse the same `applicationId` (`com.veha.activity`) and therefore this same key to ship as an update | Accepted | do **not** rotate or purge without a PM decision reversing T-020 |
 | B-7 | `EditProfileActivity`, `RegisterActivity` and `MainActivity` are `exported="true"` with **no intent-filter** | Medium (security) | set `exported="false"` |
 | B-8 | `minifyEnabled false` and an empty `proguard-rules.pro` | Medium | enable R8 for release with keep rules for Gson models + Retrofit |
 | B-13 | No `debug` build type, no flavours, no `buildConfigField` — the base URL is hard-coded in `Util.java` | Medium | add `buildConfigField` for the URL (with NETWORK) |

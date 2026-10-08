@@ -85,7 +85,6 @@ move a row to *Fixed* when it closes.
 |---|---|---|---|---|---|
 | `AUTH/SPLASH S23` | — | `getBible()` rethrows `RuntimeException` from a Retrofit callback on a malformed payload | AUTH | — | found 2026-10-08 (T-024) |
 | `PLATFORM/COMMONS C-22` | — | `Util.permissionMap` is still a public mutable static, so `permissionsLoaded` can be bypassed | PLATFORM | — | found 2026-10-08 (T-025) |
-| `G11` | — | Signing keys in remote git history — needs history rewrite + key rotation | PLATFORM | T-020 | 2026-10-08 |
 
 ### Fixed
 
@@ -112,6 +111,7 @@ move a row to *Fixed* when it closes.
 | `AUTH/REGISTER R14` | `Util.user` populated for a signed-out user | current flow depends on it; changing it is an AUTH redesign |
 | `AUTH A12` | Sign-up creates no session, so a verified user is bounced to Login | **intended today** — document before changing |
 | `MEDIA M-10` | Admin feeds pass page `"home"`, showing follow/fav on curated content | **needs a product decision from the customer** |
+| `G11` | **Signing keys in remote git history** (`app/Key/key.jks`, `private_key.pepk`, since `3d34164`) | **Customer decision 2026-10-08 (T-020)** — accepted, no rewrite, no rotation. ⚠️ The React Native app must reuse the same `applicationId` **and therefore this same exposed key** to ship as an update to existing users |
 
 ---
 
@@ -289,8 +289,8 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | Severity | Count | Priority |
 |---|---|---|
 | Critical | 13 | P0 |
-| High | 207 | P1 |
-| Medium | 285 | P2 |
+| High | 206 | P1 |
+| Medium | 286 | P2 |
 | Low | 170 | P3 |
 | Cosmetic | 29 | P3 |
 | Rollup (team-lead aggregate) | 147 | -- |
@@ -300,7 +300,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 
 | Team | Critical | High | Medium | Low | Cosmetic | Rollups | Total |
 |---|---|---|---|---|---|---|---|
-| PLATFORM | 1 | 23 | 34 | 25 | 1 | 17 | **101** |
+| PLATFORM | 1 | 22 | 35 | 25 | 1 | 17 | **101** |
 | AUTH | 3 | 32 | 64 | 31 | 8 | 30 | **168** |
 | APPSHELL | 0 | 19 | 27 | 16 | 1 | 10 | **73** |
 | FEED | 1 | 28 | 34 | 24 | 4 | 13 | **104** |
@@ -325,7 +325,7 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 | G8 | `usesCleartextTraffic="true"` + `networkSecurityConfig` allow plain HTTP — **still present** | PLATFORM / BUILD_CONFIG | security |
 | G9 | No unit tests — **first real tests landed 2026-10-08 (T-025)**: `UtilPermissionTest.kt` (10 tests) pins the `G13` fail-closed behaviour. Still ~0% coverage overall; a QA team is needed | PM (future QA team) | regressions |
 | G10 | ~~Repo is not under git~~ — **FIXED 2026-10-08 (T-018)**: branch `salvation_lamb_agent_baseline`, forked from `salvation_lamb_permissions_final_1` (`d8b778a`); tag `baseline-on-master-backup` preserves the old `master`-based docs | PM | ~~safety~~ |
-| G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. Needs history rewrite + key rotation (T-020) | PLATFORM / BUILD_CONFIG | **security (high)** |
+| G11 | **Signing keys are in remote git history** — `app/Key/key.jks` + `private_key.pepk` committed in `3d34164` (2023-08-29), present on **every** branch incl. v1.2.0. **ACCEPTED by the customer 2026-10-08 (T-020 closed as WON'T FIX)** — no history rewrite, no rotation. ⚠️ The React Native app must ship under the same `applicationId` (`com.veha.activity`) and therefore **must be signed with this same exposed key** to reach existing users as an update | PLATFORM / BUILD_CONFIG | accepted risk |
 | G12 | **42 agent docs were written against `master` (v1.1).** Baseline moved to v1.2.0 on 2026-10-08; staleness per doc is tracked in the "v1.2 audit" column in §3. **T-026 closed the coverage gap** — all 18 previously unowned files now have agents (54 docs, 10 teams); ~30 `DRIFT` refreshes remain (T-023) | PM | doc accuracy |
 | G13 | ~~**`Util.hasPermission()` fails open**~~ — **FIXED 2026-10-08 (T-025)**: now fail-CLOSED via a `permissionsLoaded` flag; the splash loads the map **before** routing and bails to Login if the fetch fails. 10 unit tests in `UtilPermissionTest.kt` | PLATFORM / COMMONS | ~~security (high)~~ |
 | G14 | **`app/google-services.json` is committed** — contains the Firebase API key and project config | PLATFORM / BUILD_CONFIG | secret exposure (low-ish; FCM keys are client-side but should be reviewed) |
@@ -364,14 +364,14 @@ Everything below is produced by `agents/tools/sync_bug_notes.py`. **Do not edit 
 |---|---|---|---|---|---|
 | BUG-018 | B-1 | P1 | High | **`jcenter()` is still a repository** (shut down, read-only); three artifacts (`spots-dialog`, `android-image-cropper`, `richeditor-android`) still resolve from it | migrate to maintained forks on mavenCentral, or vendor them |
 | BUG-019 | B-6 | P1 | High | `usesCleartextTraffic="true"` globally, plus a `network_security_config` naming a **stale** host (G8) | set `false` and whitelist only the real host |
-| BUG-020 | B-9 | P1 | High | Signing keystore and Play export key **committed** to the tree | rotate keys and move them out of the repo |
-| BUG-021 | B-11 | P1 | High | **`kotlin-android-extensions` is deprecated** and removed in Kotlin 1.8+; the whole UI layer depends on synthetics (G2) | blocks any Kotlin upgrade; a ViewBinding migration is a cross-team project |
-| BUG-022 | B-12 | P1 | High | **`com.android.support:appcompat-v7:28.0.0` alongside AndroidX**, papered over by Jetifier (G3) | remove the two `com.android.support` lines and verify |
-| BUG-023 | B-2 | P2 | Medium | `READ/WRITE_EXTERNAL_STORAGE` without `android:maxSdkVersion`, though Android 13 media permissions are present | add `maxSdkVersion="32"` |
-| BUG-024 | B-3 | P2 | Medium | `CAMERA` declares `android:required` / `android:requiredFeature`, which are **not valid** on `<uses-permission>`; no `<uses-feature>` is declared | remove the attributes; add a proper `<uses-feature>` |
-| BUG-025 | B-4 | P2 | Medium | `allowBackup="true"` with no backup rules — the DataStore **auth token** is included in cloud backups | set `false` or exclude the datastore file |
-| BUG-026 | B-7 | P2 | Medium | `EditProfileActivity`, `RegisterActivity` and `MainActivity` are `exported="true"` with **no intent-filter** | set `exported="false"` |
-| BUG-027 | B-8 | P2 | Medium | `minifyEnabled false` and an empty `proguard-rules.pro` | enable R8 for release with keep rules for Gson models + Retrofit |
+| BUG-020 | B-11 | P1 | High | **`kotlin-android-extensions` is deprecated** and removed in Kotlin 1.8+; the whole UI layer depends on synthetics (G2) | blocks any Kotlin upgrade; a ViewBinding migration is a cross-team project |
+| BUG-021 | B-12 | P1 | High | **`com.android.support:appcompat-v7:28.0.0` alongside AndroidX**, papered over by Jetifier (G3) | remove the two `com.android.support` lines and verify |
+| BUG-022 | B-2 | P2 | Medium | `READ/WRITE_EXTERNAL_STORAGE` without `android:maxSdkVersion`, though Android 13 media permissions are present | add `maxSdkVersion="32"` |
+| BUG-023 | B-3 | P2 | Medium | `CAMERA` declares `android:required` / `android:requiredFeature`, which are **not valid** on `<uses-permission>`; no `<uses-feature>` is declared | remove the attributes; add a proper `<uses-feature>` |
+| BUG-024 | B-4 | P2 | Medium | `allowBackup="true"` with no backup rules — the DataStore **auth token** is included in cloud backups | set `false` or exclude the datastore file |
+| BUG-025 | B-7 | P2 | Medium | `EditProfileActivity`, `RegisterActivity` and `MainActivity` are `exported="true"` with **no intent-filter** | set `exported="false"` |
+| BUG-026 | B-8 | P2 | Medium | `minifyEnabled false` and an empty `proguard-rules.pro` | enable R8 for release with keep rules for Gson models + Retrofit |
+| BUG-027 | B-9 | P2 | Medium | ~~Signing keystore and Play export key **committed** to the tree~~ — **CLOSED as WON'T FIX 2026-10-08 (T-020)**: customer accepted the risk; no history rewrite, no rotation. ⚠️ Treat `app/Key/key.jks` as the **permanent** signing identity — the React Native app must reuse the same `applicationId` (`com.veha.activity`) and therefore this same key to ship as an update | do **not** rotate or purge without a PM decision reversing T-020 |
 | BUG-028 | B-13 | P2 | Medium | No `debug` build type, no flavours, no `buildConfigField` — the base URL is hard-coded in `Util.java` | add `buildConfigField` for the URL (with NETWORK) |
 | BUG-029 | B-14 | P2 | Medium | `okhttp` declared **without a version**; `lifecycle-runtime-ktx:2.3.0-alpha03` is an alpha; `android-pdf-viewer` is a beta | pin and stabilise |
 | BUG-030 | B-16 | P2 | Medium | `cronet-embedded:76.3809.111` (2019) adds ~20 MB and appears unused | verify usage and remove |
