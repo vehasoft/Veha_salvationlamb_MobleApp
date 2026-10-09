@@ -13,6 +13,12 @@
 plain confirmation dialog — no password, no re-authentication, no typed confirmation. Treat every
 change near `deleteAccount()` as high-risk (team issue AS-9).
 
+> **No permission gate here is BY DESIGN** — customer-confirmed 2026-10-08: *"Everyone has the
+> right to delete their own account."* `SettingsActivity` contains **zero** `Util.hasPermission`
+> calls, and that is intentional: the endpoint acts on `Util.userId`, i.e. the caller's **own**
+> account, so there is nothing to authorise. Do not add a gate. (The weak confirmation UX in
+> `AS-9` is a separate matter and still stands.)
+
 ---
 
 ## 1. Identity

@@ -105,6 +105,29 @@ Permission:     All | Read | Edit | Delete | Create      ("All" wins)
 Denial       →  the "no permission" screen
 ```
 
+#### What is deliberately **not** gated (customer-confirmed 2026-10-08)
+
+Do not "fix" these in the RN app — they are product rules, not oversights:
+
+| Area | Rule |
+|---|---|
+| **Bible tab** | Open to everyone. The only ungated tab of the six. There is deliberately no `PermissionType.BIBLE` |
+| **Bible post composer** | Anyone can post a Bible passage. Note the asymmetry: a user denied `POST`/`Create` **can** publish via the Bible composer but **cannot** use the normal composer |
+| **Delete own account** | Everyone may delete their own account. `DELETE api/v1/users/{userId}` acts on the caller's own id, so there is nothing to authorise |
+| **Follow / favourite** | Ungated today. The customer is open to adding a gate — **decide before building**, since it is cheaper now than later |
+
+#### Where the real authority lives
+
+**The backend authorises every privileged operation** (customer-confirmed). Client-side gates are
+therefore **UX, not security** — they exist so the user sees a clear "no permission" screen
+instead of a button that silently fails.
+
+One consequence worth designing around: the Kotlin app puts its gates on the **navigation call
+sites** (the button that opens a screen), not inside the screen. That is how the Bible composer
+ended up reachable without the `POST`/`Create` check — a second route to the same action simply
+forgot it. **In RN, put the check in the screen's own entry effect**, so a new navigation path
+cannot bypass it.
+
 ### 2.5 🟠 The auth-token guard is inverted in 29 places
 
 ```kotlin
@@ -347,7 +370,8 @@ Dependency-driven: each phase needs the one before it.
 ## 7. Bugs to fix **during** the port, not copy
 
 The register has 851 entries. These are the ones where copying the current behaviour is actively
-harmful — each is cheap to get right while writing new code.
+harmful — each is cheap to get right while writing new code. **Rows marked `By design` in the
+register are *not* in this list**: those are customer-confirmed product rules (see §2.4).
 
 | # | Issue | Where to read more |
 |---|---|---|
@@ -355,12 +379,11 @@ harmful — each is cheap to get right while writing new code.
 | 2 | Tray notification bypasses the `USER`/`Read` gate the in-app list enforces | `PUSH_SERVICE.md` `NP2` |
 | 3 | The moderation screen (approve/reject) has **no client-side permission check** — the backend does authorise it, so this is UI integrity, not escalation. Add the gate anyway so the user gets a message instead of two buttons that silently fail | `PROFILE/APPROVE_REQUEST.md` `AR1` |
 | 4 | Approve/reject is irreversible with **no confirmation and no success feedback** | `APPROVE_REQUEST.md` `AR6`, `AR7` |
-| 5 | The Bible tab is **ungated**, and the Bible post composer bypasses `POST`/`Create` | `BIBLE/BIBLE_LEAD.md` `B-1`, `B-9` |
-| 6 | Paging is broken 4 different ways (listener per page, wrong insert index, double increment, page-size mismatch) | `NOTIFICATIONS/NOTIFICATION_LISTS.md` `NL3`–`NL5`, `NL21` |
-| 7 | The permission-denied screen never says **which** permission was denied | `APPSHELL/NO_PERMISSION.md` `NOP4` |
-| 8 | Silent failure everywhere: a failed request and an empty result look identical | `BUG_NOTES.md` cluster `CL-7` |
-| 9 | `onBackPressed` calls `exitProcess(-1)`, killing the process and skipping persistence | `APPSHELL/MAIN_NAV.md` `MN12` |
-| 10 | `Util` global state does not survive process death → NPEs after the OS restores the app | `BUG_NOTES.md` `CL-4`, `PLATFORM/COMMONS.md` `C-1` |
+| 5 | Paging is broken 4 different ways (listener per page, wrong insert index, double increment, page-size mismatch) | `NOTIFICATIONS/NOTIFICATION_LISTS.md` `NL3`–`NL5`, `NL21` |
+| 6 | The permission-denied screen never says **which** permission was denied | `APPSHELL/NO_PERMISSION.md` `NOP4` |
+| 7 | Silent failure everywhere: a failed request and an empty result look identical | `BUG_NOTES.md` cluster `CL-7` |
+| 8 | `onBackPressed` calls `exitProcess(-1)`, killing the process and skipping persistence | `APPSHELL/MAIN_NAV.md` `MN12` |
+| 9 | `Util` global state does not survive process death → NPEs after the OS restores the app | `BUG_NOTES.md` `CL-4`, `PLATFORM/COMMONS.md` `C-1` |
 
 ---
 
@@ -387,6 +410,10 @@ Worth answering before phase 0.
 6. **Typed API** — would the backend team consider returning real booleans and one consistent
    envelope? That removes traps §2.1 and §2.2 permanently, and is far cheaper than defending
    against them on two clients.
+7. **Follow / favourite gating** — these are ungated today and the customer is open to adding a
+   gate. **Decide before phase 4** (feed): adding it later means touching every call site again.
+   Candidate: `USER`/`Create` for follow, `POST`/`Create` for favourite — but the permission
+   model has no dedicated type for either.
 
 ---
 
@@ -394,6 +421,7 @@ Worth answering before phase 0.
 
 | Change | Detail |
 |---|---|
+| Updated (2026-10-08 20:45) | **Client-side permission audit completed, customer answers folded in.** §2.4 gained a "what is deliberately **not** gated" table — the Bible tab, the Bible post composer and delete-own-account are **by design**, not oversights; follow/favourite stay ungated but the customer is open to a gate (decide before building). Added "where the real authority lives": the backend authorises everything, so client gates are UX, and RN should put the check **in the screen's entry effect**, not on the navigation call site — that is how the Bible composer ended up bypassing `POST`/`Create`. Removed the Bible rows from §7 (they are product rules). Marked those 4 register rows `By design` and taught `sync_bug_notes.py` to count them separately. Open question 7 added: should follow/favourite be gated? |
 | Updated (2026-10-08 20:30) | Customer answers folded in. (a) The review endpoints are **two concrete paths**, `POST api/v1/review/approve/{userId}` and `.../reject/{userId}` — the Retrofit `{status}` template only ever takes those two literals (`ApproveRequestActivity.kt:130,133`). (b) **§8 Q2 answered: the backend authorises approve/reject server-side**, so `AR1` is a UI-integrity gap, not privilege escalation — downgraded High → Medium in `APPROVE_REQUEST.md` and re-worded in §7. Added a follow-up question about whether the same server-side authorisation covers the other privileged endpoints (post delete, user delete, post create). |
 | Created (T-027, 2026-10-08) | Written from the v1.2.0 source and the 54 agent docs. Covers the 7 fixed constraints (`applicationId`, signing key, Firebase project, base URLs), the 5 porting traps, all 44 endpoints with their envelopes, the 4 core models, the fixed session-bootstrap contract, the 6-type FCM routing table, the 37-screen inventory, a 10-phase build order and 10 bugs to fix rather than copy. |
 

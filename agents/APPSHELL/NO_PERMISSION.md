@@ -119,7 +119,7 @@ Both strings are missing from `strings.xml` and are **not translatable** (`NOP6`
 |---|---|---|
 | `adapter/TabAdapter.kt` 0 | Home | `POST`/`Read` |
 | `adapter/TabAdapter.kt` 1 | Files | `FILE`/`Read` |
-| `adapter/TabAdapter.kt` 2 | **Bible** | **no gate — the only ungated tab** (`NOP5`) |
+| `adapter/TabAdapter.kt` 2 | **Bible** | **no gate — by design** (`NOP5`, customer-confirmed) |
 | `adapter/TabAdapter.kt` 3 | Admin video | `POST`/`Read` **and** `VIDEO`/`Read` |
 | `adapter/TabAdapter.kt` 4 | Admin audio | `POST`/`Read` **and** `AUDIO`/`Read` |
 | `adapter/TabAdapter.kt` 5 | Profile | `PROFILE`/`Read` |
@@ -157,7 +157,7 @@ v1.2.0 for which that is true.**
 |---|---|---|---|
 | NOP4 | **The user is never told which permission was denied.** The Activity receives **no extras** and reads no state, so all 19 call sites produce one identical message. With `hasPermission` now failing closed (T-025), a failed permission fetch sends the user here from anywhere with no way to tell a real denial from a loading failure | **High (UX)** | pass `type` + `permission` as extras and render them; distinguish "not permitted" from "could not load permissions" |
 | NOP2 | `NoPermissionFragment` declares `lateinit var goBack: Button` and **never binds it**, so the fragment's only control is inert. A user on a denied tab has **no action at all** | **High (UX)** | bind it and pop to a permitted tab, or remove the button from the layout |
-| NOP5 | `TabAdapter` position 2 (**Bible**) is the only tab with **no permission gate** — every other tab and both search tabs are gated. Also recorded as `BIBLE B-1` | **High (security)** | gate it, or add a `BIBLE` permission type |
+| NOP5 | ~~`TabAdapter` position 2 (**Bible**) is the only tab with no permission gate~~ — **BY DESIGN, confirmed by the customer 2026-10-08: "Bible is open to everyone."** Also recorded as `BIBLE B-1` | By design | **do not add a gate** |
 | NOP3 | The logo tap starts `MainActivity` with **no `finish()` and no `CLEAR_TOP`**, stacking a duplicate `MainActivity` and leaving the denial screen underneath it | Medium | `FLAG_ACTIVITY_CLEAR_TOP` + `finish()` |
 | NOP8 | Both the Activity and the Fragment exist to render the **same message**, with duplicated layout and duplicated hard-coded text | Medium | one shared layout `<include>`d by both |
 | NOP6 | The two user-visible strings are **hard-coded in the layouts**, absent from `strings.xml`, and therefore untranslatable. `textSize="20dp"` should be `20sp` | Low | move to `strings.xml`; use `sp` |

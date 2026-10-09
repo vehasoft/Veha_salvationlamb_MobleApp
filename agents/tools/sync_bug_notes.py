@@ -85,7 +85,8 @@ SEVERITY_RANK = {
     "Medium": 2,
     "Low": 3,
     "Cosmetic": 4,
-    "Rollup": 5,
+    "By design": 5,
+    "Rollup": 6,
 }
 SEVERITY_TO_PRIORITY = {
     "Critical": "P0",
@@ -93,15 +94,24 @@ SEVERITY_TO_PRIORITY = {
     "Medium": "P2",
     "Low": "P3",
     "Cosmetic": "P3",
+    "By design": "--",
     "Rollup": "--",
 }
-SEVERITY_WORDS = ["Critical", "High", "Medium", "Low", "Cosmetic"]
+SEVERITY_WORDS = ["Critical", "High", "Medium", "Low", "Cosmetic", "By design"]
 
 
 def normalise_severity(cell: str) -> str:
-    """Map a free-text severity cell ('**High (ANR)**') onto one keyword."""
+    """Map a free-text severity cell ('**High (ANR)**') onto one keyword.
+
+    'By design' marks a row the customer has confirmed as intended behaviour. It is kept
+    in the register (so nobody re-raises it) but is not counted as a defect.
+    """
     plain = cell.replace("*", "").strip()
+    if re.search(r"\bby\s+design\b", plain, re.IGNORECASE):
+        return "By design"
     for word in SEVERITY_WORDS:
+        if word == "By design":
+            continue
         if re.search(rf"\b{word}\b", plain, re.IGNORECASE):
             return word
     return "Medium"  # module tables always carry a severity; default defensively
@@ -244,7 +254,7 @@ def render(records: list[dict], globals_: list[dict]) -> str:
     counts: dict[str, int] = {}
     for rec in records:
         counts[rec["severity"]] = counts.get(rec["severity"], 0) + 1
-    real = [r for r in records if r["severity"] != "Rollup"]
+    real = [r for r in records if r["severity"] not in ("Rollup", "By design")]
     n_docs = len({r["source"] for r in records})
 
     out: list[str] = [BEGIN, ""]
@@ -257,15 +267,18 @@ def render(records: list[dict], globals_: list[dict]) -> str:
     out.append("|---|---|---|")
     for sev in SEVERITY_WORDS + ["Rollup"]:
         if counts.get(sev):
-            label = sev if sev != "Rollup" else "Rollup (team-lead aggregate)"
+            label = {
+                "Rollup": "Rollup (team-lead aggregate)",
+                "By design": "By design (customer-confirmed, not a defect)",
+            }.get(sev, sev)
             out.append(f"| {label} | {counts[sev]} | {SEVERITY_TO_PRIORITY[sev]} |")
     out.append(f"| **Distinct module-level defects** | **{len(real)}** | |")
     out.append("")
 
     out.append("### Per-team breakdown")
     out.append("")
-    out.append("| Team | Critical | High | Medium | Low | Cosmetic | Rollups | Total |")
-    out.append("|---|---|---|---|---|---|---|---|")
+    out.append("| Team | Critical | High | Medium | Low | Cosmetic | By design | Rollups | Total |")
+    out.append("|---|---|---|---|---|---|---|---|---|")
     for team in TEAM_ORDER:
         rows = [r for r in records if r["team"] == team]
         if not rows:
